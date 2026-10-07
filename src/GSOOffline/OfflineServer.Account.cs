@@ -146,6 +146,7 @@ namespace GSOOffline
             }
 
             character = ch;
+            if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             ResetWorldState();
             Plugin.Log.LogInfo($"'{ch.name}' entering world: scene {ch.scene} at {ch.Position}.");
 
@@ -210,6 +211,8 @@ namespace GSOOffline
             Line("Position", SceneWorld.Vec(ch.Position));
             Line("HomeWayshrine", ch.homeWayshrine);
             if (ch.quests.Count > 0) Line("Quests", QuestsLine());
+            if (ch.abilitySlots.Count > 0)
+                Line("Abilityslots", string.Join(",", ch.abilitySlots.ConvertAll(a => a.slot + "_" + a.ability).ToArray()));
             Line("Wayshrines", string.Join(",", UnlockedWayshrines(ch).ConvertAll(i => i.ToString()).ToArray()));
             foreach (string skill in SkillKeys)
                 Line("s_" + skill, ch.GetXp(skill));

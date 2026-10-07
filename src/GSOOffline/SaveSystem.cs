@@ -40,6 +40,13 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class AbilitySlotSave
+    {
+        public int slot;
+        public int ability;
+    }
+
+    [Serializable]
     public class QuestVar
     {
         public int quest;
@@ -90,6 +97,20 @@ namespace GSOOffline
 
         public List<QuestState> quests = new List<QuestState>();
         public List<QuestVar> questVars = new List<QuestVar>();
+        public List<AbilitySlotSave> abilitySlots = new List<AbilitySlotSave>();
+
+        public int GetAbilitySlot(int slot)
+        {
+            foreach (var a in abilitySlots)
+                if (a.slot == slot) return a.ability;
+            return 0;
+        }
+
+        public void SetAbilitySlot(int slot, int ability)
+        {
+            abilitySlots.RemoveAll(a => a.slot == slot);
+            if (ability != 0) abilitySlots.Add(new AbilitySlotSave { slot = slot, ability = ability });
+        }
 
         public int GetQuestPhase(int quest)
         {

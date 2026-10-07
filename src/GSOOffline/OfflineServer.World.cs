@@ -38,6 +38,7 @@ namespace GSOOffline
             pendingSpawn = null;
             lastNpcList = lastHarvestableList = null;
             job = null;
+            ResetCombat();
         }
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;

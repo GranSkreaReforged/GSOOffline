@@ -41,6 +41,7 @@
 
   "triggers": [
     { "on": "item", "quest": 2, "phase": 1, "item": 10381, "amount": 1, "setPhase": 2 },
-    { "on": "kill", "quest": 1, "phase": 4, "npc": 9, "setPhase": 5 }
+    { "on": "kill", "quest": 1, "phase": 4, "npc": 9, "setPhase": 5 },
+    { "on": "heal", "quest": 1, "phase": 11, "setPhase": 12 }
   ]
 }

@@ -195,6 +195,13 @@ namespace GSOOffline
             }
         }
 
+        public void OnHealed()
+        {
+            foreach (var t in Content.Triggers)
+                if (t.on == "heal" && character.GetQuestPhase(t.quest) == t.phase)
+                    SetQuestPhase(t.quest, t.setPhase);
+        }
+
         public void OnNpcKilled(int npcType)
         {
             foreach (var t in Content.Triggers)

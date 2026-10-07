@@ -22,6 +22,14 @@ namespace GSOOffline
         public int health;
         public bool canFight;
         public int respawnTime;
+        public bool aggressive;
+        public float aggroDistance;
+        public float attackDistance;
+        public float attackSpeed;      // seconds between swings
+        public int damage;             // explicit damage (rare); 0 = derive from level
+        public int defence;
+        public int damageBlock;
+        public int damageType;
     }
 
     /// <summary>Server-side view of the XML data files the client ships in Resources/XMLs.</summary>
@@ -105,9 +113,17 @@ namespace GSOOffline
                     name = Attr(n, "name"),
                     level = level,
                     // Only a couple of entries carry explicit health; the rest was a server-side formula.
-                    health = IntAttr(n, "health", 20 + level * 10),
+                    health = IntAttr(n, "health", CombatRules.NpcHealth(level)),
                     canFight = IntAttr(n, "canfight") == 1,
                     respawnTime = IntAttr(n, "respawntime", 60),
+                    aggressive = IntAttr(n, "aggressive") == 1,
+                    aggroDistance = IntAttr(n, "aggrodistance", 10),
+                    attackDistance = Mathf.Max(2.5f, IntAttr(n, "attackdistance", 3)),
+                    attackSpeed = IntAttr(n, "attackspeed", 3000) / 1000f,
+                    damage = IntAttr(n, "damage"),
+                    defence = IntAttr(n, "defence"),
+                    damageBlock = IntAttr(n, "damageblock"),
+                    damageType = IntAttr(n, "damagetype"),
                 };
                 Npcs[info.id] = info;
             }

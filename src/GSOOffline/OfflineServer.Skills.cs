@@ -27,7 +27,7 @@ namespace GSOOffline
         private void RegisterSkillHandlers()
         {
             On(8, 4, c => StartAction((int)c[2], (int)c[3]));
-            On(6, 25, c => CancelJob());
+            On(6, 25, c => { CancelJob(); autoAttacking = false; });
         }
 
         private static int SkillIdByName(string name)

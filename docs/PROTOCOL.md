@@ -81,6 +81,19 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. |
 | 13/1 harvestable status | uid, depleted (bool) |
 
+| 3/7 select target (C→S) → 3/19 | name, npc uid (0 clears) |
+| 3/0 use ability (C→S) → 3/1 | name, slot (0 = basic weapon attack) |
+| 3/20 attack animation | name, attack id (0 = basic attack for the equipped weapon) |
+| 12/0 NPC health | uid, current, max, damage type (the client shows the difference as a hit splash) |
+| 11/0 NPC attacking | uid, attacking, target player name (the client animates swings at the NPC's attackSpeed) |
+| 198/25 + 13/2 NPC move | uid, current pos, waypoint1, waypoint2 / uid, moving. The client walks in a straight line. |
+| 13/0 NPC dead, 9/1 set NPC position | uid, dead / uid, pos |
+| 8/2 player damage | name, signed delta (negative = damage), damage type |
+| 1/2 player dead | name, dead |
+| 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
+
+Town guards are `aggressive` with 1500 damage in NPCInfo. The old server only aimed them at criminals.
+
 Recipe ids are the client's `Script_Crafting.craftingIdCounter`, which counts each `Crafting` stat in item file order. An item without a `Level` attribute has level 0, not 1. The basic tools are hard-coded in `Scr_ItemHandler` (e.g. `isPickaxe` = item 59), not flagged in the XML.
 
 Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin assembly. Use it only for the game's own packet classes.

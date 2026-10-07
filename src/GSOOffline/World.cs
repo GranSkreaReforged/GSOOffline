@@ -14,6 +14,10 @@ namespace GSOOffline
         public int health;
         public int maxHealth;
         public bool dead;
+
+        // combat AI state (server side only)
+        public bool aggro, returning, attackingSent;
+        public float nextSwing, nextWaypoint, respawnAt;
     }
 
     public class HarvestableEntity

@@ -103,6 +103,7 @@ Working:
 - Shops
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Crafting at workbenches
+- Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
@@ -111,7 +112,7 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- Combat and NPC AI
+- Weapon abilities beyond the basic attack (bandage heals work), NPC loot tables, NPC wandering
 - Banks
 - Doors and zone transitions
 - Showing only the right copy of a quest NPC (each appears in several places)

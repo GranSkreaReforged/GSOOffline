@@ -30,6 +30,14 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
   - All 341 recipes are rebuilt with the same ids as the client.
   - Crafting checks materials and skill level, takes the recipe time, and supports batch crafting.
 - Harvesting and crafting give XP from a level-scaled base. The original formula was lost; it lives in `SkillData.BaseXp`.
+- Combat:
+  - Targeting and auto-attack with weapon-based range and speed. Damage scales with the weapon's damage stats and combat skill, and the skill matching the weapon gets XP.
+  - NPCs aggro, chase, swing at their own attack speed, leash home and respawn.
+  - Kills drop silver and advance quest kill objectives.
+  - When you die you respawn at your home wayshrine, with brief protection from aggro.
+  - Bandage-heal abilities work, and ability bar slots are saved.
+  - Combat numbers live in `CombatRules`, since the originals were lost.
+  - Town guards no longer attack on sight (offline, there are no criminals).
 - `content.json` overrides placed next to the DLL replace the built-in quest content without rebuilding.
 - Chat commands `/give`, `/silver` and `/quest`.
 - An opt-in developer automation bridge (`Debug.DevCommandFile`) for testing through the real client.
