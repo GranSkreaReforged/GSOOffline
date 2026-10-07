@@ -114,6 +114,6 @@ Unimplemented client events are logged to `BepInEx/LogOutput.log` as `Unhandled 
 
 ## License
 
-The code in this repository is licensed under the **GNU General Public License v2.0**; see [LICENSE](LICENSE).
+The code in this repository is licensed under the **GNU General Public License, version 3 or (at your option) any later version** (GPL-3.0-or-later); see [LICENSE](LICENSE).
 
 The license covers only this project's own source code and tooling. It does not cover Gran Skrea Online or any of its files, assets or data, which remain the property of their respective owners and are not included here. BepInEx (LGPL-2.1) and HarmonyX (MIT) are separate projects under their own licenses.
