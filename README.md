@@ -28,6 +28,8 @@ To uninstall, delete `winhttp.dll`, `doorstop_config.ini`, `BepInEx/` and `steam
 
 ## Building it yourself
 
+New to the project? Start with [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Every script, test command, chat command and setting is listed in [docs/COMMANDS.md](docs/COMMANDS.md).
+
 Requirements:
 - Windows, the [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer (for the `.slnx` solution)
 - An installed copy of Gran Skrea Online. The build compiles against the game's own DLLs.
