@@ -68,6 +68,7 @@ try {
     Copy-Item (Join-Path $out 'GSOOffline.dll') $pluginDir
     Copy-Item (Join-Path $root 'README.md') (Join-Path $pluginDir 'README.md')
     Copy-Item $changelog (Join-Path $pluginDir 'CHANGELOG.md')
+    Copy-Item (Join-Path $root 'LICENSE') (Join-Path $pluginDir 'LICENSE')
     Set-Content -Path (Join-Path $plugin 'steam_appid.txt') -Value '595110' -NoNewline
 
     $full = Join-Path $staging 'full'

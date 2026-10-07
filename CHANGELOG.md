@@ -15,3 +15,4 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Chat and offline commands (`/help`, `/pos`, `/tele`, `/scene`, `/wayshrine`, `/wayshrines`, `/time`, `/save`).
 - Steamworks calls made safe so the game still works when it is launched without Steam.
 - Build, release and data-extraction tooling.
+- GPL-2.0 license (included in release zips) and a README note that this is a non-commercial project for a game no longer sold on Steam.

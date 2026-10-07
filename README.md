@@ -2,6 +2,17 @@
 
 A BepInEx plugin that lets you play **Gran Skrea Online** after the official servers shut down. It runs a small replacement game server inside the game process. No game files are modified or redistributed, so you need your own copy of the game.
 
+## About this project
+
+Gran Skrea Online is **no longer sold on the Steam store**, and its official servers have been shut down. Without a server, copies of the game that people already own can't be played.
+
+This is a **non-commercial passion project**. It exists to keep a game I loved playable for people who already own it.
+
+- It is not affiliated with or endorsed by the original developers or publisher.
+- It is free, and there is no intention to make money from it in any form: no sales, no donations tied to it, no paid features.
+- It does not include, sell or redistribute any game content. You must already own the game.
+- "Gran Skrea Online" and all game assets belong to their respective owners.
+
 ## Playing (release zip)
 
 1. Download `GSOOffline-<version>-with-BepInEx.zip` from the releases page.
@@ -100,3 +111,9 @@ Not yet implemented:
 - Doors and zone transitions
 
 Unimplemented client events are logged to `BepInEx/LogOutput.log` as `Unhandled client event X/Y`.
+
+## License
+
+The code in this repository is licensed under the **GNU General Public License v2.0**; see [LICENSE](LICENSE).
+
+The license covers only this project's own source code and tooling. It does not cover Gran Skrea Online or any of its files, assets or data, which remain the property of their respective owners and are not included here. BepInEx (LGPL-2.1) and HarmonyX (MIT) are separate projects under their own licenses.
