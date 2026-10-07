@@ -86,7 +86,7 @@ This drives the real client by script: dialogue, combat, crafting, screenshots a
 |---|---|
 | `gso-build` | build.ps1, net35 constraints, deploy |
 | `gso-devbridge` | in-game testing loop |
-| `gso-release` | worktrees, merging, release.ps1 |
+| `gso-release` | branches, merging, release.ps1 |
 | `gso-decompile` | reading the client code for protocol details |
 | `gso-datamining` | extracted data, markers, door table generation |
 | `gso-content` | quest glue in content.json |

@@ -68,8 +68,8 @@ Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content
 
 ## 6. Branches and releases
 
-- `main` holds releases; `dev` (a separate git worktree in this setup) is where work happens.
-- Merge with `git merge --ff-only dev` on main.
+- `main` holds releases; `dev` is where work happens.
+- Merge with `git switch main; git merge --ff-only dev; git switch dev`.
 - Release with `.\release.ps1 -Version x.y.z` (try `-DryRun` first). The zips never contain game files.
 
 ## Rules
