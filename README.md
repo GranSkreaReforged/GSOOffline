@@ -61,6 +61,7 @@ There is no CI build, because compiling needs the proprietary game assemblies.
 ```powershell
 .\tools\decompile.ps1              # dnSpyEx console -> decomp\
 .\tools\datamining\extract.ps1     # UnityPy -> extracted\ (XML data, scene markers, scene list)
+python -I tools\datamining\gen_doors.py extracted\markers.json src\GSOOffline\Data\doors.json   # rebuild door table
 ```
 
 Both write only to git-ignored folders. Never commit decompiled or extracted game content.
@@ -103,6 +104,8 @@ Working:
 - Shops
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Crafting at workbenches
+- Doors, dungeon entrances and interiors
+- Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
@@ -113,8 +116,7 @@ Partially working:
 
 Not yet implemented:
 - Weapon abilities beyond the basic attack (bandage heals work), NPC loot tables, NPC wandering
-- Banks
-- Doors and zone transitions
+- Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
