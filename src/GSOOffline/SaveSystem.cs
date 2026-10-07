@@ -21,6 +21,40 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class ItemStat
+    {
+        public string key;
+        public int value;
+    }
+
+    [Serializable]
+    public class ItemSave
+    {
+        public int id;
+        public int typeId;
+        public int amount = 1;
+        public int tab;
+        public int grade;
+        public bool equipped;
+        public List<ItemStat> stats = new List<ItemStat>();
+    }
+
+    [Serializable]
+    public class QuestVar
+    {
+        public int quest;
+        public int var;
+        public int value;
+    }
+
+    [Serializable]
+    public class QuestState
+    {
+        public int id;
+        public int phase;   // 0 not started, -1 completed
+    }
+
+    [Serializable]
     public class CharacterSave
     {
         public string name;
@@ -43,11 +77,33 @@ namespace GSOOffline
         public int silver = 100;
         public int bankSilver;
         public int gold;
-        public int health = 100;
+        public int health = 100;          // base max health, before equipment
+        public int currentHealth = 100;
         public int mana = 100;
         public int homeWayshrine = 1;
         public List<int> wayshrines = new List<int> { 1 };
         public List<SkillXp> skills = new List<SkillXp>();
+
+        // Order matches the client's Inventory.items list; swap/insert requests are index based.
+        public List<ItemSave> items = new List<ItemSave>();
+        public int nextItemId = 1;
+
+        public List<QuestState> quests = new List<QuestState>();
+        public List<QuestVar> questVars = new List<QuestVar>();
+
+        public int GetQuestPhase(int quest)
+        {
+            foreach (var q in quests)
+                if (q.id == quest) return q.phase;
+            return 0;
+        }
+
+        public void SetQuestPhase(int quest, int phase)
+        {
+            foreach (var q in quests)
+                if (q.id == quest) { q.phase = phase; return; }
+            quests.Add(new QuestState { id = quest, phase = phase });
+        }
 
         public Vector3 Position
         {
@@ -84,13 +140,13 @@ namespace GSOOffline
             return sb.Length == 0 ? "_" : sb.ToString();
         }
 
-        private static T Load<T>(string dir, string name) where T : class
+        private static T Load<T>(string dir, string name) where T : class, new()
         {
             string path = Path.Combine(dir, FileKey(name) + ".json");
             if (!File.Exists(path)) return null;
             try
             {
-                return JsonUtility.FromJson<T>(File.ReadAllText(path));
+                return Json.Deserialize<T>(File.ReadAllText(path));
             }
             catch (Exception e)
             {
@@ -104,7 +160,7 @@ namespace GSOOffline
             Directory.CreateDirectory(dir);
             string path = Path.Combine(dir, FileKey(name) + ".json");
             string tmp = path + ".tmp";
-            File.WriteAllText(tmp, JsonUtility.ToJson(obj, true));
+            File.WriteAllText(tmp, Json.Serialize(obj));
             if (File.Exists(path)) File.Delete(path);
             File.Move(tmp, path);
         }

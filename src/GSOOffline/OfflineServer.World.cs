@@ -92,6 +92,8 @@ namespace GSOOffline
             if (Plugin.TimeOfDay.Value >= 0f)
                 Send(16, 1, (int)Plugin.TimeOfDay.Value, 20);
             SendWayshrines();
+            SendPendingEquips();
+            SendHealth();
 
             sceneReady = true;
             visibilityTimer = 0.5f;

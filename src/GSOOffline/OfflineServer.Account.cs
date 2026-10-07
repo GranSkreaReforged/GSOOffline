@@ -87,7 +87,7 @@ namespace GSOOffline
                         hairColorR = (byte)ch.hairR,
                         hairColorG = (byte)ch.hairG,
                         hairColorB = (byte)ch.hairB,
-                        equippedItems = new List<int>(),
+                        equippedItems = EquippedTypeIds(ch),
                     });
                 }
             }
@@ -136,6 +136,7 @@ namespace GSOOffline
 
         private void OnCharacterLogin(object[] c)
         {
+            GameData.EnsureLoaded();
             string name = c[1] as string;
             var ch = name == null ? null : SaveSystem.LoadCharacter(name);
             if (ch == null || account == null || !account.characters.Contains(ch.name))
@@ -149,6 +150,7 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"'{ch.name}' entering world: scene {ch.scene} at {ch.Position}.");
 
             Send(2, 42, ch.name, BuildPlayerData(ch));
+            SendInventory();
             if (!ch.creationDone)
                 Send(7, 3, ch.name);
             Send(25, 28, 1);
@@ -159,6 +161,7 @@ namespace GSOOffline
         {
             if (character == null) return;
             character.creationDone = true;
+            GrantStarterKit();
             Send(1, 4, character.name, true);
             SaveCurrentCharacter();
         }
@@ -200,11 +203,13 @@ namespace GSOOffline
             Line("Bodysize", ch.bodySize);
             Line("Eyebrow", ch.eyebrow);
             Line("Health", ch.health);
-            Line("Currenthealth", ch.health);
+            Line("Currenthealth", ch.currentHealth);
             Line("Mana", ch.mana);
+            Line("CarryingCap", 150);
             Line("Currentmana", ch.mana);
             Line("Position", SceneWorld.Vec(ch.Position));
             Line("HomeWayshrine", ch.homeWayshrine);
+            if (ch.quests.Count > 0) Line("Quests", QuestsLine());
             Line("Wayshrines", string.Join(",", UnlockedWayshrines(ch).ConvertAll(i => i.ToString()).ToArray()));
             foreach (string skill in SkillKeys)
                 Line("s_" + skill, ch.GetXp(skill));

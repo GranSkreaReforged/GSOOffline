@@ -1,0 +1,46 @@
+{
+  "_readme": "Server-side quest glue that died with the official server. Node/NPC/item ids refer to the game's own XML data. Entries: which NPC (by name) opens with which dialogue node; quest/phase are derived automatically from the dialogue graph unless given (quest 0 = derive, always=true = unconditional). Actions implement dialogue otheraction ids. Triggers advance quests on game events.",
+
+  "entries": [
+    { "node": 20,  "npc": "Alden" },
+    { "node": 33,  "npc": "Alden" },
+
+    { "node": 50,  "npc": "Merrick" },
+    { "node": 65,  "npc": "Merrick" },
+    { "node": 57,  "npc": "Merrick", "requires": [ { "type": 183, "amount": 1 }, { "type": 193, "amount": 1 } ] },
+
+    { "node": 70,  "npc": "Nort" },
+    { "node": 72,  "npc": "Nort" },
+    { "node": 75,  "npc": "Nort" },
+    { "node": 80,  "npc": "Nort", "requires": [ { "type": 10084, "amount": 3 } ] },
+    { "node": 85,  "npc": "Nort" },
+    { "node": 87,  "npc": "Nort" },
+    { "node": 90,  "npc": "Nort", "requires": [ { "type": 10288, "amount": 1 } ] },
+    { "node": 121, "npc": "Nort" },
+
+    { "node": 100, "npc": "Tailus" },
+    { "node": 106, "npc": "Tailus", "requires": [ { "type": 10367, "amount": 1 } ] },
+    { "node": 120, "npc": "Tailus" },
+    { "node": 107, "npc": "Tailus" },
+
+    { "node": 150, "npc": "Gery" },
+    { "node": 165, "npc": "Gery", "requires": [ { "type": 10381, "amount": 1 } ] },
+    { "node": 180, "npc": "Gery" },
+    { "node": 160, "npc": "Willas" },
+    { "node": 185, "npc": "Willas" }
+  ],
+
+  "actions": [
+    { "id": 5,  "note": "Merrick hands over a pickaxe", "give": [ { "type": 59, "amount": 1 } ], "onlyIfMissing": true },
+    { "id": 7,  "note": "Nort hands over a fishing rod", "give": [ { "type": 90, "amount": 1 } ], "onlyIfMissing": true },
+    { "id": 10, "note": "Tailus hands over wool", "give": [ { "type": 10017, "amount": 6 } ] },
+    { "id": 3,  "note": "Merrick inspects the forged gear (no effect)" },
+    { "id": 4,  "note": "Merrick lets you keep the gear (no effect)" },
+    { "id": 6,  "note": "Combat tutorial text (no effect)" }
+  ],
+
+  "triggers": [
+    { "on": "item", "quest": 2, "phase": 1, "item": 10381, "amount": 1, "setPhase": 2 },
+    { "on": "kill", "quest": 1, "phase": 4, "npc": 9, "setPhase": 5 }
+  ]
+}

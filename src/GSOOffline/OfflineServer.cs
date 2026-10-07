@@ -53,6 +53,8 @@ namespace GSOOffline
             RegisterAccountHandlers();
             RegisterWorldHandlers();
             RegisterChatHandlers();
+            RegisterInventoryHandlers();
+            RegisterDialogueHandlers();
         }
 
         public void Receive(byte ev, object[] c)

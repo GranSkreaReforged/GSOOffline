@@ -40,7 +40,9 @@ namespace GSOOffline
             {
                 LoadWayshrines();
                 LoadNpcs();
-                Plugin.Log.LogInfo($"Game data: {Wayshrines.Count} wayshrines, {Npcs.Count} NPC types.");
+                ItemData.Load();
+                DialogueData.Load();
+                Plugin.Log.LogInfo($"Game data: {Wayshrines.Count} wayshrines, {Npcs.Count} NPC types, {ItemData.Templates.Count} items.");
             }
             catch (Exception e)
             {
@@ -48,7 +50,7 @@ namespace GSOOffline
             }
         }
 
-        private static XmlDocument LoadXml(string resource)
+        internal static XmlDocument LoadXml(string resource)
         {
             var ta = Resources.Load(resource) as TextAsset;
             if (ta == null) throw new Exception("Missing resource " + resource);
@@ -57,9 +59,9 @@ namespace GSOOffline
             return doc;
         }
 
-        private static string Attr(XmlNode n, string name) => n.Attributes?[name]?.Value;
+        internal static string Attr(XmlNode n, string name) => n.Attributes?[name]?.Value;
 
-        private static int IntAttr(XmlNode n, string name, int def = 0)
+        internal static int IntAttr(XmlNode n, string name, int def = 0)
         {
             string v = Attr(n, name);
             return v != null && int.TryParse(v.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int r) ? r : def;

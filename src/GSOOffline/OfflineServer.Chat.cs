@@ -40,7 +40,7 @@ namespace GSOOffline
                 switch (a[0].ToLowerInvariant())
                 {
                     case "help":
-                        Notice("Offline commands: /pos, /tele x y z, /scene id [x y z], /wayshrine id, /wayshrines, /time 0-2400, /save");
+                        Notice("Offline commands: /pos, /tele x y z, /scene id [x y z], /wayshrine id, /wayshrines, /time 0-2400, /save, /give id [n], /silver n, /quest id [phase]");
                         break;
                     case "pos":
                         if (player != null)
@@ -64,6 +64,18 @@ namespace GSOOffline
                         break;
                     case "time":
                         Send(16, 1, int.Parse(a[1], CultureInfo.InvariantCulture), 20);
+                        break;
+                    case "give":
+                        GiveItem(int.Parse(a[1], CultureInfo.InvariantCulture), a.Length > 2 ? int.Parse(a[2], CultureInfo.InvariantCulture) : 1);
+                        break;
+                    case "silver":
+                        SetSilver(int.Parse(a[1], CultureInfo.InvariantCulture));
+                        break;
+                    case "quest":
+                        if (a.Length > 2)
+                            SetQuestPhase(int.Parse(a[1], CultureInfo.InvariantCulture), int.Parse(a[2], CultureInfo.InvariantCulture));
+                        else
+                            Notice($"Quest {a[1]} phase: {character.GetQuestPhase(int.Parse(a[1], CultureInfo.InvariantCulture))}");
                         break;
                     case "save":
                         SaveCurrentCharacter();
