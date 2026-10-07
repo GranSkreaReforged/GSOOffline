@@ -6,6 +6,32 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 
 ### Added
+- Inventory and items:
+  - Items are saved per character, and their stats are rolled from the item database.
+  - Equip, unequip, destroy, drop, swap/insert and item tabs work.
+  - Using food heals.
+- Starter kits from the character creator: clothes, a weapon for the chosen fighting style, profession items, and level 5 in the profession skill.
+- NPC dialogue:
+  - Conversations follow the game's own dialogue trees, including quest, item and quest-variable conditions on options.
+  - Which conversation an NPC opens with is rebuilt from the dialogue graph, plus `Data/content.json`.
+- Quests:
+  - Phases and the quest tracker update as you progress.
+  - Completing a quest grants its item, silver and XP rewards.
+  - Quests advance on item-based triggers.
+  - The first steps of "An Honest Day's Work" are playable through Merrick's hand-in.
+- Shops:
+  - All 47 shop ids are stocked with rebuilt inventories that fit their merchant.
+  - Buying and selling use the client's own pricing rules, and merchants have silver.
+- `content.json` overrides placed next to the DLL replace the built-in quest content without rebuilding.
+- Chat commands `/give`, `/silver` and `/quest`.
+- An opt-in developer automation bridge (`Debug.DevCommandFile`) for testing through the real client.
+
+### Fixed
+- Saves now keep inventories, skills and other lists. UnityEngine.JsonUtility had silently dropped them, so it was replaced with the plugin's own JSON serializer.
+- Max health and carrying capacity are now sent at login.
+- Equipment slots are restored correctly after relogging.
+
+### Added (0.1 groundwork)
 - Offline server that replaces the shut-down Photon game server, running inside the game process.
 - Login with any account name. Accounts and characters are saved as JSON in `OfflineSaves/`.
 - Character list, creation (including the appearance editor) and deletion.

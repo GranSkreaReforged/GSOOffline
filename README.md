@@ -97,18 +97,26 @@ Working:
 - Entering the world and zone loading
 - Saving
 - Wayshrine travel
+- Inventory, equipment and starter kits
+- NPC dialogue
+- Quest progress and rewards
+- Shops
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
 
+Partially working:
+- Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
+
 Not yet implemented:
-- Inventory and items
-- Dialogue and quests
-- Shops
 - Harvesting
-- Combat and NPC AI
 - Crafting
+- Combat and NPC AI
+- Banks
 - Doors and zone transitions
+- Showing only the right copy of a quest NPC (each appears in several places)
+
+Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 
 Unimplemented client events are logged to `BepInEx/LogOutput.log` as `Unhandled client event X/Y`.
 

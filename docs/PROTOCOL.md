@@ -62,6 +62,23 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 - **Appearance:** 3/22 gender, 3/23 hair, 3/24 body type, 3/25 eyebrows, 3/26 body size, 4/6 hair colour (r, g, b); 8/9 fighting style and profession.
 - **Ignored offline** (heartbeats and telemetry): 7/0, 3/47, 6/27, 7/18, 7/21, 27/0, 198/2, 198/3.
 
+## Items, dialogue and shops (S→C)
+
+| Event | Payload |
+|---|---|
+| 2/1 add item | item data `Key=Value
+...` (Id, Typeid, Amount, Tab, Grade, Slot, stat keys), player name. For stackables, Amount is the delta. |
+| 8/0 equip | name, itemId, replaced itemId (0 = none). Send after the world scene has loaded, or the slots stay empty. |
+| 3/6 unequip, 4/3 remove | name, itemId [, typeId, amount] |
+| 198/37 swap, 198/38 insert | inventory indexes (server list order must match the client's) |
+| 3/16 silver, 8/1 XP | name, value / name, skillId, amount |
+| 8/13 health | name, current, max |
+| 3/10 + 2/3 dialogue | confirm interact (name, uid), then node `nodeId>opt\|opt>var1\|var2`; `-` closes |
+| 8/9 quest phase, 3/15 complete | name, quest, phase / name, quest. Rewards must be granted by the server. |
+| 0/2 open shop, 2/37 refresh | name, shop name, `0>type-price-stock,...` / shop name, `merchantSilver>type-price-stock,...` |
+
+Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin assembly. Use it only for the game's own packet classes.
+
 ## Interactable typeIds (`Scr_Interactable.typeId`)
 
 | Type | What |
