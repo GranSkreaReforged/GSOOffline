@@ -17,7 +17,7 @@ namespace GSOOffline
 
         // combat AI state (server side only)
         public bool aggro, returning, attackingSent;
-        public float nextSwing, nextWaypoint, respawnAt;
+        public float nextSwing, nextWaypoint, respawnAt, nextWander;
     }
 
     public class HarvestableEntity

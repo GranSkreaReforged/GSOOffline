@@ -13,6 +13,7 @@ namespace GSOOffline
         public static int NpcMaxHit(NpcInfo n) => n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
         public static int PlayerMaxHit(int weaponDamage, int skillLevel) => 4 + weaponDamage + skillLevel;
         public static float HitChance = 0.85f;
+        public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
@@ -98,8 +99,74 @@ namespace GSOOffline
                 OnHealed();
                 return;
             }
-            Plugin.Log.LogInfo($"[combat] ability {ability} in slot {slot} not implemented; using a basic attack");
-            UseAbility(0);
+            if (!SkillData.Abilities.TryGetValue(ability, out var a))
+            {
+                UseAbility(0);
+                return;
+            }
+            UseSkillAbility(slot, a);
+        }
+
+        private readonly Dictionary<int, float> slotReadyAt = new Dictionary<int, float>();
+
+        /// <summary>
+        /// Abilities from XMLs/Abilities: level, mana, range and cooldown come from the data. Their damage
+        /// formulas are lost, so offensive abilities hit for CombatRules.AbilityMultiplier x a basic hit.
+        /// </summary>
+        private void UseSkillAbility(int slot, AbilityInfo a)
+        {
+            if (slotReadyAt.TryGetValue(slot, out float ready) && Time.time < ready) return;
+            int skill = SkillIdByName((a.skill ?? string.Empty).Replace(" ", string.Empty));
+            if (skill != 0 && SkillLevel(skill) < a.level)
+            {
+                Notice($"You need level {a.level} {a.skill} to use {a.name}.", "red");
+                return;
+            }
+            if (character.currentMana < a.manaCost)
+            {
+                Notice("Not enough mana.", "red");
+                return;
+            }
+
+            NpcEntity npc = null;
+            if (a.requiresTarget && !a.friendly)
+            {
+                npc = world?.GetNpc(targetUid);
+                if (npc == null || npc.dead || !CanFight(npc)) return;
+                float range = Mathf.Max(a.range, WeaponRange(EquippedWeapon()));
+                if (Vector3.Distance(NpcPosition(npc), LocalPlayer.transform.position) > range)
+                {
+                    Notice("You are too far away.", "gray");
+                    return;
+                }
+            }
+
+            character.currentMana -= a.manaCost;
+            if (a.manaCost > 0) SendMana();
+            slotReadyAt[slot] = Time.time + a.cooldown;
+            int cd = Mathf.RoundToInt(a.cooldown * 100f);
+            Send(4, 0, character.name, slot, cd, cd);
+            Send(3, 20, character.name, a.id);   // ability id doubles as the attack animation id
+            if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
+
+            var targets = new List<NpcEntity>();
+            if (npc != null) targets.Add(npc);
+            else if (a.weaponSkill && !a.friendly)
+            {
+                // Sweeping technique: everything hostile within reach.
+                Vector3 p = LocalPlayer.transform.position;
+                float reach = Mathf.Max(a.range, WeaponRange(EquippedWeapon()));
+                foreach (var n in world.npcs)
+                    if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), p) <= reach) targets.Add(n);
+            }
+            var weapon = EquippedWeapon();
+            foreach (var t in targets)
+            {
+                Aggro(t);
+                int hit = RollPlayerHit(weapon, t);
+                DealDamage(t, Mathf.RoundToInt(hit * CombatRules.AbilityMultiplier), skill != 0 ? skill : WeaponSkill(weapon));
+            }
+            if (npc != null) autoAttacking = !npc.dead;
         }
 
         private static bool CanFight(NpcEntity npc) =>
@@ -174,15 +241,21 @@ namespace GSOOffline
             Send(3, 20, character.name, 0);   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
 
-            int skill = WeaponSkill(weapon);
-            int damage = 0;
-            if (Random.value < CombatRules.HitChance)
-            {
-                int weaponDamage = StatSum(weapon, "Damage", "SlashDamage", "BluntDamage", "PiercingDamage");
-                damage = Random.Range(1, CombatRules.PlayerMaxHit(weaponDamage, SkillLevel(skill)) + 1);
-                if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
-                    damage = Mathf.Max(1, damage - info.damageBlock / 10);
-            }
+            DealDamage(npc, RollPlayerHit(weapon, npc), WeaponSkill(weapon));
+        }
+
+        private int RollPlayerHit(ItemSave weapon, NpcEntity npc)
+        {
+            if (Random.value >= CombatRules.HitChance) return 0;
+            int weaponDamage = StatSum(weapon, "Damage", "SlashDamage", "BluntDamage", "PiercingDamage");
+            int damage = Random.Range(1, CombatRules.PlayerMaxHit(weaponDamage, SkillLevel(WeaponSkill(weapon))) + 1);
+            if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
+                damage = Mathf.Max(1, damage - info.damageBlock / 10);
+            return damage;
+        }
+
+        private void DealDamage(NpcEntity npc, int damage, int skill)
+        {
             npc.health = Mathf.Max(0, npc.health - damage);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
             if (npc.health <= 0) KillNpc(npc, skill);
@@ -224,6 +297,7 @@ namespace GSOOffline
         {
             if (npc.aggro) return;
             npc.aggro = true;
+            Send(198, 30, npc.uid, false);   // run, not walk
             npc.nextSwing = Time.time + 1f;
         }
 
@@ -233,6 +307,20 @@ namespace GSOOffline
             npc.nextWaypoint = Time.time + 0.5f;
             Send(198, 25, npc.uid, NpcPosition(npc), to, to);
             Send(13, 2, npc.uid, true);
+        }
+
+        private void Wander(NpcEntity npc, NpcInfo info)
+        {
+            npc.nextWander = Time.time + info.wanderFrequency * Random.Range(0.6f, 1.4f);
+            Vector2 offset = Random.insideUnitCircle * info.wanderDistance;
+            var origin = npc.spawnPos + new Vector3(offset.x, 30f, offset.y);
+            // Keep strolls on the ground (the client walks NPCs in straight lines, including height).
+            if (!Physics.Raycast(origin, Vector3.down, out var hit, 60f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                return;
+            if (Mathf.Abs(hit.point.y - npc.spawnPos.y) > 5f) return;
+            Send(198, 30, npc.uid, true);   // walk
+            npc.nextWaypoint = 0f;
+            MoveNpc(npc, hit.point);
         }
 
         private void Disengage(NpcEntity npc)
@@ -257,11 +345,15 @@ namespace GSOOffline
                     if (Time.time >= npc.respawnAt) RespawnNpc(npc);
                     continue;
                 }
-                if (!GameData.Npcs.TryGetValue(npc.typeId, out var info) || !info.canFight) continue;
+                if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) continue;
 
                 Vector3 pos = NpcPosition(npc);
                 float dist = Vector3.Distance(pos, playerPos);
                 if (dist > Plugin.NpcViewDistance.Value) continue;
+
+                if (!npc.aggro && !npc.returning && info.wandering && Time.time >= npc.nextWander && npc.uid != dialogueNpc?.uid)
+                    Wander(npc, info);
+                if (!info.canFight) continue;
 
                 if (npc.returning)
                 {

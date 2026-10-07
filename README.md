@@ -115,7 +115,7 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- Weapon abilities beyond the basic attack (bandage heals work), NPC loot tables, NPC wandering
+- NPC loot tables (kills drop silver), projectile/spell visuals for abilities, buffs from support abilities
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
 

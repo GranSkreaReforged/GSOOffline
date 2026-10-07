@@ -35,11 +35,26 @@ namespace GSOOffline
         public float time;          // seconds
     }
 
+    public class AbilityInfo
+    {
+        public int id;
+        public string name;
+        public string skill;
+        public int level;
+        public bool requiresTarget;
+        public bool friendly;
+        public bool weaponSkill;   // weapon technique: without requirestarget it sweeps everything in range
+        public float range;
+        public float cooldown;      // seconds
+        public int manaCost;
+    }
+
     /// <summary>Harvestable nodes (XMLs/HarvestableInfo) and crafting recipes (items "Crafting" stats).</summary>
     internal static class SkillData
     {
         public static readonly Dictionary<int, HarvestableInfo> Harvestables = new Dictionary<int, HarvestableInfo>();
         public static readonly Dictionary<int, CraftRecipe> Recipes = new Dictionary<int, CraftRecipe>();
+        public static readonly Dictionary<int, AbilityInfo> Abilities = new Dictionary<int, AbilityInfo>();
 
         // Neither the harvesting nor the crafting XP formula survived; this level-scaled base keeps early
         // levels at a handful of actions each (level 5 needs 414 XP) and is the single place to rebalance.
@@ -85,6 +100,25 @@ namespace GSOOffline
                     });
                 }
                 Harvestables[h.typeId] = h;
+            }
+
+            foreach (XmlNode x in GameData.LoadXml("XMLs/Abilities").DocumentElement.ChildNodes)
+            {
+                if (x.NodeType != XmlNodeType.Element) continue;
+                var a = new AbilityInfo
+                {
+                    id = GameData.IntAttr(x, "id"),
+                    name = GameData.Attr(x, "name"),
+                    skill = GameData.Attr(x, "skill"),
+                    level = GameData.IntAttr(x, "level", 1),
+                    requiresTarget = GameData.IntAttr(x, "requirestarget") == 1,
+                    friendly = GameData.IntAttr(x, "friendly") == 1,
+                    weaponSkill = GameData.IntAttr(x, "weaponskill") == 1,
+                    range = GameData.IntAttr(x, "range", 4),
+                    cooldown = GameData.IntAttr(x, "cooldown", 4000) / 1000f,
+                    manaCost = GameData.IntAttr(x, "manacost"),
+                };
+                Abilities[a.id] = a;
             }
 
             // Recipes: walk items in file order exactly like Scr_ItemHandler.LoadItems so ids line up.

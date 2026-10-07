@@ -30,6 +30,9 @@ namespace GSOOffline
         public int defence;
         public int damageBlock;
         public int damageType;
+        public bool wandering;
+        public float wanderFrequency;  // seconds between strolls
+        public float wanderDistance;
     }
 
     /// <summary>Server-side view of the XML data files the client ships in Resources/XMLs.</summary>
@@ -124,6 +127,9 @@ namespace GSOOffline
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),
+                    wandering = IntAttr(n, "wandering") == 1,
+                    wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
+                    wanderDistance = IntAttr(n, "wanderingdistance", 10),
                 };
                 Npcs[info.id] = info;
             }

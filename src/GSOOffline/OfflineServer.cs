@@ -98,6 +98,7 @@ namespace GSOOffline
             TickSkills();
             TickRespawns();
             TickCombat();
+            TickRegen();
             TickAutoLogin();
         }
 

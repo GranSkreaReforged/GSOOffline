@@ -86,7 +86,8 @@ namespace GSOOffline
         public int gold;
         public int health = 100;          // base max health, before equipment
         public int currentHealth = 100;
-        public int mana = 100;
+        public int mana = 100;            // base max mana
+        public int currentMana = 100;
         public int homeWayshrine = 1;
         public List<int> wayshrines = new List<int> { 1 };
         public List<SkillXp> skills = new List<SkillXp>();

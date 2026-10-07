@@ -208,7 +208,7 @@ namespace GSOOffline
             Line("Currenthealth", ch.currentHealth);
             Line("Mana", ch.mana);
             Line("CarryingCap", 150);
-            Line("Currentmana", ch.mana);
+            Line("Currentmana", ch.currentMana);
             Line("Position", SceneWorld.Vec(ch.Position));
             Line("HomeWayshrine", ch.homeWayshrine);
             if (ch.quests.Count > 0) Line("Quests", QuestsLine());
