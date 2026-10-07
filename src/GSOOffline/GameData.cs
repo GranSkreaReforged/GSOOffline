@@ -42,6 +42,7 @@ namespace GSOOffline
                 LoadNpcs();
                 ItemData.Load();
                 DialogueData.Load();
+                SkillData.Load();
                 Plugin.Log.LogInfo($"Game data: {Wayshrines.Count} wayshrines, {Npcs.Count} NPC types, {ItemData.Templates.Count} items.");
             }
             catch (Exception e)

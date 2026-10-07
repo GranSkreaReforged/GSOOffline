@@ -13,6 +13,7 @@ namespace GSOOffline
 
         private void Notice(string text, string color = "yellow")
         {
+            Plugin.Log.LogInfo("[notice] " + text);
             Send(2, 0, string.Empty, "color=" + color + "|" + text.Replace('|', '/'), 0);
         }
 

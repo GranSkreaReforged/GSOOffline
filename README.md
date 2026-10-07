@@ -101,6 +101,8 @@ Working:
 - NPC dialogue
 - Quest progress and rewards
 - Shops
+- Harvesting (mining, woodcutting, fishing, gathering)
+- Crafting at workbenches
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
@@ -109,8 +111,6 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- Harvesting
-- Crafting
 - Combat and NPC AI
 - Banks
 - Doors and zone transitions

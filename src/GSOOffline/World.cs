@@ -22,6 +22,8 @@ namespace GSOOffline
         public int typeId;
         public Vector3 pos;
         public int health = 10;
+        public bool dead;
+        public float respawnAt;
     }
 
     /// <summary>
@@ -55,7 +57,11 @@ namespace GSOOffline
             foreach (var d in Resources.FindObjectsOfTypeAll<Scr_HarvestableDummy>())
             {
                 if (!InScene(d, unitySceneName)) continue;
-                w.harvestables.Add(new HarvestableEntity { uid = 5000000 + sceneId * 10000 + i++, typeId = d.typeId, pos = d.transform.position });
+                w.harvestables.Add(new HarvestableEntity
+                {
+                    uid = 5000000 + sceneId * 10000 + i++, typeId = d.typeId, pos = d.transform.position,
+                    health = w.RollHarvestableHealth(d.typeId),
+                });
             }
             Plugin.Log.LogInfo($"Scene {sceneId} ({unitySceneName}): {w.npcs.Count} NPCs, {w.harvestables.Count} harvestables.");
             return w;
@@ -66,6 +72,15 @@ namespace GSOOffline
         {
             var s = c.gameObject.scene;
             return s.IsValid() && s.isLoaded && s.name == sceneName;
+        }
+
+        public int RollHarvestableHealth(int typeId) =>
+            SkillData.Harvestables.TryGetValue(typeId, out var info) ? Random.Range(info.healthMin, info.healthMax + 1) : 5;
+
+        public HarvestableEntity GetHarvestable(int uid)
+        {
+            foreach (var h in harvestables) if (h.uid == uid) return h;
+            return null;
         }
 
         public NpcEntity GetNpc(int uid)

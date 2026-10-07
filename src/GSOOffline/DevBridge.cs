@@ -20,6 +20,8 @@ namespace GSOOffline
     ///   harvestables [n]                           nearest n harvestables
     ///   shot &lt;name&gt;                                 screenshot to OfflineSaves/dev/&lt;name&gt;.png
     ///   goto x y z                                 move the local player (client side only)
+    ///   near &lt;uid&gt;                                 step next to a visible NPC or harvestable
+    ///   checkrecipes                               compare server recipe ids with the client's
     /// </summary>
     internal class DevBridge : MonoBehaviour
     {
@@ -80,6 +82,8 @@ namespace GSOOffline
                     break;
                 case "npcs": DumpNpcs(a.Length > 1 ? int.Parse(a[1]) : 10); break;
                 case "harvestables": DumpHarvestables(a.Length > 1 ? int.Parse(a[1]) : 10); break;
+                case "checkrecipes": CheckRecipes(); break;
+                case "near": GoNear(int.Parse(a[1])); break;
                 case "shot": Screenshot(a.Length > 1 ? a[1] : "shot"); break;
                 case "goto":
                     Player.transform.position = new Vector3(F(a[1]), F(a[2]), F(a[3]));
@@ -153,6 +157,37 @@ namespace GSOOffline
                          .OrderBy(x => Vector3.Distance(x.transform.position, p.transform.position)).Take(n))
                 sb.Append($"\n  uid={h.uniqueId} type={h.typeId} '{h.harvestableName}' d={Vector3.Distance(h.transform.position, p.transform.position):F1} hp={h.currentHealth}");
             Plugin.Log.LogInfo(sb.ToString());
+        }
+
+        private static void GoNear(int uid)
+        {
+            Transform t = null;
+            var h = Scr_HarvestableHandler.instance.harvestablesList.FirstOrDefault(x => x != null && x.uniqueId == uid);
+            if (h != null) t = h.transform;
+            var n = Scr_NpcHandler.instance.npcList.FirstOrDefault(x => x != null && x.npcUniqueId == uid);
+            if (n != null) t = n.transform;
+            if (t == null)
+            {
+                Plugin.Log.LogWarning("[dev] nothing visible with uid " + uid);
+                return;
+            }
+            var dir = (Player.transform.position - t.position);
+            dir.y = 0f;
+            Player.transform.position = t.position + (dir.sqrMagnitude > 0.01f ? dir.normalized : Vector3.forward) * 1.5f + Vector3.up * 0.5f;
+        }
+
+        // Server recipe ids must match the client's Script_Crafting numbering or crafts produce the wrong item.
+        private static void CheckRecipes()
+        {
+            int ok = 0, bad = 0;
+            foreach (var c in Script_Crafting.instance.craftingRecipes)
+            {
+                if (SkillData.Recipes.TryGetValue(c.recipeId, out var r) && r.product == c.product1 && r.skill == c.skill && r.level == c.level)
+                    ok++;
+                else if (bad++ < 5)
+                    Plugin.Log.LogWarning($"[dev] recipe {c.recipeId} mismatch: client product {c.product1}, server {(r != null ? r.product.ToString() : "missing")}");
+            }
+            Plugin.Log.LogInfo($"[dev] recipes: {ok} match, {bad} mismatch, client {Script_Crafting.instance.craftingRecipes.Count}, server {SkillData.Recipes.Count}");
         }
 
         private static void Screenshot(string name)

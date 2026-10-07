@@ -22,6 +22,14 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Shops:
   - All 47 shop ids are stocked with rebuilt inventories that fit their merchant.
   - Buying and selling use the client's own pricing rules, and merchants have silver.
+- Harvesting:
+  - Mining, woodcutting, fishing and gathering use the game's own drop tables, and drop chances rise with skill level.
+  - Each node has a tool and level requirement and a limited amount before it depletes, then respawns.
+  - Gathering repeats until the node is used up or you walk away.
+- Crafting:
+  - All 341 recipes are rebuilt with the same ids as the client.
+  - Crafting checks materials and skill level, takes the recipe time, and supports batch crafting.
+- Harvesting and crafting give XP from a level-scaled base. The original formula was lost; it lives in `SkillData.BaseXp`.
 - `content.json` overrides placed next to the DLL replace the built-in quest content without rebuilding.
 - Chat commands `/give`, `/silver` and `/quest`.
 - An opt-in developer automation bridge (`Debug.DevCommandFile`) for testing through the real client.

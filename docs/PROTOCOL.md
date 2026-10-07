@@ -77,6 +77,12 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/9 quest phase, 3/15 complete | name, quest, phase / name, quest. Rewards must be granted by the server. |
 | 0/2 open shop, 2/37 refresh | name, shop name, `0>type-price-stock,...` / shop name, `merchantSilver>type-price-stock,...` |
 
+| 8/4 start action (C→S) | name, type (1 harvest, 2 craft), target (harvestable uid / recipe id) |
+| 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. |
+| 13/1 harvestable status | uid, depleted (bool) |
+
+Recipe ids are the client's `Script_Crafting.craftingIdCounter`, which counts each `Crafting` stat in item file order. An item without a `Level` attribute has level 0, not 1. The basic tools are hard-coded in `Scr_ItemHandler` (e.g. `isPickaxe` = item 59), not flagged in the XML.
+
 Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin assembly. Use it only for the game's own packet classes.
 
 ## Interactable typeIds (`Scr_Interactable.typeId`)

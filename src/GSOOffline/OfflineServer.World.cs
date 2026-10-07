@@ -37,6 +37,7 @@ namespace GSOOffline
             sceneReady = false;
             pendingSpawn = null;
             lastNpcList = lastHarvestableList = null;
+            job = null;
         }
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
@@ -138,6 +139,10 @@ namespace GSOOffline
             {
                 lastHarvestableList = harvestables;
                 Send(2, 4, character.name, harvestables);
+                // Newly visible nodes spawn alive client-side; mark the depleted ones.
+                float r2 = Plugin.HarvestableViewDistance.Value * Plugin.HarvestableViewDistance.Value;
+                foreach (var h in world.harvestables)
+                    if (h.dead && (h.pos - p).sqrMagnitude <= r2) Send(13, 1, h.uid, true);
             }
         }
 

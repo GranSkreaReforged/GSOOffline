@@ -55,6 +55,7 @@ namespace GSOOffline
             RegisterChatHandlers();
             RegisterInventoryHandlers();
             RegisterDialogueHandlers();
+            RegisterSkillHandlers();
         }
 
         public void Receive(byte ev, object[] c)
@@ -92,6 +93,8 @@ namespace GSOOffline
                 Deliver(outbox.Dequeue());
 
             TickWorld();
+            TickSkills();
+            TickRespawns();
             TickAutoLogin();
         }
 
