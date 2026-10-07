@@ -57,6 +57,7 @@ namespace GSOOffline
             RegisterDialogueHandlers();
             RegisterSkillHandlers();
             RegisterCombatHandlers();
+            RegisterTravelHandlers();
         }
 
         public void Receive(byte ev, object[] c)

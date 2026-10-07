@@ -38,6 +38,12 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
   - Bandage-heal abilities work, and ability bar slots are saved.
   - Combat numbers live in `CombatRules`, since the originals were lost.
   - Town guards no longer attack on sight (offline, there are no criminals).
+- Doors and zone transitions:
+  - Dungeon, cave and monastery entrances and exits are paired from the developers' own object names (`tools/datamining/gen_doors.py` builds `Data/doors.json`).
+  - Building doors lead into their town's interior scene, and exits return you to the door you used.
+  - The snowy portal works.
+  - Generic doors report as locked.
+- Bank: deposit and withdraw items (unique items keep their rolled stats) and silver, from bank chests or a banker's dialogue.
 - `content.json` overrides placed next to the DLL replace the built-in quest content without rebuilding.
 - Chat commands `/give`, `/silver` and `/quest`.
 - An opt-in developer automation bridge (`Debug.DevCommandFile`) for testing through the real client.

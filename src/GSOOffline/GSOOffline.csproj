@@ -34,6 +34,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Data\content.json" LogicalName="GSOOffline.content.json" />
+    <EmbeddedResource Include="Data\doors.json" LogicalName="GSOOffline.doors.json" />
   </ItemGroup>
 
   <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">

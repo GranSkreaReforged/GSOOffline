@@ -36,7 +36,8 @@
     { "id": 10, "note": "Tailus hands over wool", "give": [ { "type": 10017, "amount": 6 } ] },
     { "id": 3,  "note": "Merrick inspects the forged gear (no effect)" },
     { "id": 4,  "note": "Merrick lets you keep the gear (no effect)" },
-    { "id": 6,  "note": "Combat tutorial text (no effect)" }
+    { "id": 6,  "note": "Combat tutorial text (no effect)" },
+    { "id": 22, "note": "Bankers open your bank", "window": 14 }
   ],
 
   "triggers": [

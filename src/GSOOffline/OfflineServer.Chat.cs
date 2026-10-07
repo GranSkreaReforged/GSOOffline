@@ -78,6 +78,9 @@ namespace GSOOffline
                         else
                             Notice($"Quest {a[1]} phase: {character.GetQuestPhase(int.Parse(a[1], CultureInfo.InvariantCulture))}");
                         break;
+                    case "useportal":   // sent by the client when confirming the snowy portal
+                        UsePortal();
+                        break;
                     case "save":
                         SaveCurrentCharacter();
                         Notice("Character saved.");

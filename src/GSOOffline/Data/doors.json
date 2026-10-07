@@ -1,0 +1,380 @@
+{
+ "doors": [
+  {
+   "type": 9,
+   "scene": 1,
+   "pos": [
+    655.04,
+    15.41,
+    1444.98
+   ],
+   "toScene": 2,
+   "toPos": [
+    0.71,
+    44.06,
+    2.49
+   ],
+   "note": "Prefab_Object_Interactable_10ExitFromYorkhillMiningCave"
+  },
+  {
+   "type": 10,
+   "scene": 2,
+   "pos": [
+    0.14,
+    43.56,
+    4.41
+   ],
+   "toScene": 1,
+   "toPos": [
+    655.16,
+    15.91,
+    1446.98
+   ],
+   "note": "Prefab_Object_Interactable_9EntranceToYorkhillMiningCave"
+  },
+  {
+   "type": 12,
+   "scene": 1,
+   "pos": [
+    555.92,
+    21.72,
+    1205.49
+   ],
+   "toScene": 5,
+   "toPos": [
+    442.5,
+    108.39,
+    1592.96
+   ],
+   "note": "Prefab_Object_Interactable_11ExitFromEvilMonkDungeon"
+  },
+  {
+   "type": 11,
+   "scene": 5,
+   "pos": [
+    442.54,
+    107.89,
+    1590.96
+   ],
+   "toScene": 1,
+   "toPos": [
+    557.77,
+    22.22,
+    1206.24
+   ],
+   "note": "Prefab_Object_Interactable_12EntranceToEvilMonkDungeon"
+  },
+  {
+   "type": 15,
+   "scene": 1,
+   "pos": [
+    509.06,
+    3.16,
+    1169.36
+   ],
+   "toScene": 5,
+   "toPos": [
+    478.71,
+    119.1,
+    1778.86
+   ],
+   "note": "Prefab_Object_Interactable_16ExitFromRokeDungeonToForest"
+  },
+  {
+   "type": 16,
+   "scene": 5,
+   "pos": [
+    478.71,
+    118.6,
+    1778.86
+   ],
+   "toScene": 1,
+   "toPos": [
+    509.65,
+    3.66,
+    1171.27
+   ],
+   "note": "Prefab_Object_Interactable_15EntranceRokeDungeonFromForest"
+  },
+  {
+   "type": 14,
+   "scene": 1,
+   "pos": [
+    725.99,
+    33.94,
+    1560.2
+   ],
+   "toScene": 5,
+   "toPos": [
+    761.59,
+    130.56,
+    1860.13
+   ],
+   "note": "Prefab_Object_Interactable_13ExitFromRokeDungeonToMonastery"
+  },
+  {
+   "type": 13,
+   "scene": 5,
+   "pos": [
+    763.59,
+    130.06,
+    1860.22
+   ],
+   "toScene": 1,
+   "toPos": [
+    725.31,
+    34.44,
+    1558.32
+   ],
+   "note": "Prefab_Object_Interactable_14ExitFromRokeDungeonToMonastery"
+  },
+  {
+   "type": 13,
+   "scene": 11,
+   "pos": [
+    643.75,
+    118.07,
+    1820.07
+   ],
+   "toScene": 1,
+   "toPos": [
+    725.31,
+    34.44,
+    1558.32
+   ],
+   "note": "Prefab_Object_Interactable_14ExitFromRokeDungeonToMonastery"
+  },
+  {
+   "type": 22,
+   "scene": 1,
+   "pos": [
+    482.84,
+    3.76,
+    1628.6
+   ],
+   "toScene": 16,
+   "toPos": [
+    259.47,
+    21.76,
+    417.07
+   ],
+   "note": "Prefab_Object_Interactable_23ExitFromSilkCrabCave"
+  },
+  {
+   "type": 23,
+   "scene": 16,
+   "pos": [
+    258.66,
+    21.26,
+    418.9
+   ],
+   "toScene": 1,
+   "toPos": [
+    482.84,
+    4.26,
+    1628.6
+   ],
+   "note": "Prefab_Object_Interactable_22EntranceToSilkCrabCave"
+  },
+  {
+   "type": 24,
+   "scene": 1,
+   "pos": [
+    667.52,
+    33.71,
+    1534.95
+   ],
+   "toScene": 1,
+   "toPos": [
+    686.13,
+    34.21,
+    1551.2
+   ],
+   "note": "Prefab_Object_Interactable_25_ExitFromYorkhillMonastery (1)"
+  },
+  {
+   "type": 25,
+   "scene": 1,
+   "pos": [
+    686.4,
+    33.71,
+    1549.22
+   ],
+   "toScene": 1,
+   "toPos": [
+    669.37,
+    34.21,
+    1535.7
+   ],
+   "note": "Prefab_Object_Interactable_24_EntranceToYorkhillMonastery"
+  },
+  {
+   "type": 33,
+   "scene": 8,
+   "pos": [
+    885.04,
+    10.7,
+    1447.1
+   ],
+   "toScene": 25,
+   "toPos": [
+    74.36,
+    71.43,
+    30.26
+   ],
+   "note": "Prefab_Object_Interactable_34ExitFromUlansDungeon"
+  },
+  {
+   "type": 34,
+   "scene": 25,
+   "pos": [
+    74.36,
+    70.93,
+    30.26
+   ],
+   "toScene": 8,
+   "toPos": [
+    883.41,
+    11.2,
+    1445.94
+   ],
+   "note": "Prefab_Object_Interactable_33EntranceToUlansDungeon"
+  },
+  {
+   "type": 35,
+   "scene": 25,
+   "pos": [
+    80.71,
+    16.36,
+    -182.07
+   ],
+   "toScene": 26,
+   "toPos": [
+    -1.8,
+    53.28,
+    21.44
+   ],
+   "note": "Prefab_Object_Interactable_38ExitFromUlan2ndFloor"
+  },
+  {
+   "type": 38,
+   "scene": 26,
+   "pos": [
+    -1.8,
+    52.78,
+    21.44
+   ],
+   "toScene": 25,
+   "toPos": [
+    82.49,
+    16.86,
+    -182.98
+   ],
+   "note": "Prefab_Object_Interactable_35EntranceToUlan2ndFloor"
+  },
+  {
+   "type": 42,
+   "scene": 16,
+   "pos": [
+    80.39,
+    5.62,
+    72.69
+   ],
+   "toScene": 27,
+   "toPos": [
+    211.11,
+    157.5,
+    80.38
+   ],
+   "note": "Coral dungeon"
+  }
+ ],
+ "interiors": [
+  {
+   "scene": 1,
+   "interior": 23
+  },
+  {
+   "scene": 8,
+   "interior": 20
+  },
+  {
+   "scene": 21,
+   "interior": 22
+  }
+ ],
+ "interiorSpawns": [
+  {
+   "scene": 20,
+   "pos": [
+    199.21,
+    100.38,
+    -0.34
+   ]
+  },
+  {
+   "scene": 20,
+   "pos": [
+    100.14,
+    100.44,
+    -0.33
+   ]
+  },
+  {
+   "scene": 21,
+   "pos": [
+    225.43,
+    10.75,
+    112.57
+   ]
+  },
+  {
+   "scene": 21,
+   "pos": [
+    198.63,
+    14.78,
+    81.78
+   ]
+  },
+  {
+   "scene": 22,
+   "pos": [
+    110.63,
+    6.8,
+    98.01
+   ]
+  },
+  {
+   "scene": 23,
+   "pos": [
+    110.76,
+    6.8,
+    96.01
+   ]
+  },
+  {
+   "scene": 23,
+   "pos": [
+    99.06,
+    102.41,
+    -0.53
+   ]
+  },
+  {
+   "scene": 24,
+   "pos": [
+    110.83,
+    6.8,
+    113.03
+   ]
+  }
+ ],
+ "portal": {
+  "scene": 34,
+  "pos": [
+   -296.61,
+   12.31,
+   -420.98
+  ]
+ }
+}

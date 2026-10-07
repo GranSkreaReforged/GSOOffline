@@ -36,6 +36,7 @@ namespace GSOOffline
         public int silver;
         public int scene;
         public string pos;
+        public int window;         // open a client window (14 = bank)
     }
 
     [Serializable]

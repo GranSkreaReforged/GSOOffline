@@ -132,6 +132,7 @@ namespace GSOOffline
                 if (!a.onlyIfMissing || CountItem(g.type) == 0) GiveItem(g.type, g.Amount);
             foreach (var t in a.take) TakeItems(t.type, t.Amount);
             if (a.silver != 0) SetSilver(character.silver + a.silver);
+            if (a.window > 0) Send(3, 33, character.name, a.window);
             if (a.scene > 0 && !string.IsNullOrEmpty(a.pos)) Teleport(a.scene, GameData.ParseVec(a.pos));
         }
 

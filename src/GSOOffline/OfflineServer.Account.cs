@@ -152,6 +152,7 @@ namespace GSOOffline
 
             Send(2, 42, ch.name, BuildPlayerData(ch));
             SendInventory();
+            SendBank();
             if (!ch.creationDone)
                 Send(7, 3, ch.name);
             Send(25, 28, 1);

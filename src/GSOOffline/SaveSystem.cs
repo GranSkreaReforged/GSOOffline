@@ -98,6 +98,8 @@ namespace GSOOffline
         public List<QuestState> quests = new List<QuestState>();
         public List<QuestVar> questVars = new List<QuestVar>();
         public List<AbilitySlotSave> abilitySlots = new List<AbilitySlotSave>();
+        public List<ItemSave> bank = new List<ItemSave>();
+        public List<ReturnPoint> returnPoints = new List<ReturnPoint>();   // where interior exits lead back to
 
         public int GetAbilitySlot(int slot)
         {

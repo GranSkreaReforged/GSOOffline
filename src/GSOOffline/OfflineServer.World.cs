@@ -193,6 +193,7 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandleTravelInteract(typeId)) return;
             if (typeId == InteractWayshrine)
             {
                 var w = NearestWayshrine(30f);
