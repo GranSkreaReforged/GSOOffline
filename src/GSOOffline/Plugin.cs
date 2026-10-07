@@ -26,7 +26,6 @@ namespace GSOOffline
         internal static ConfigEntry<float> TimeOfDay;
         internal static ConfigEntry<string> AutoLogin;
         internal static ConfigEntry<string> AutoCharacter;
-        internal static ConfigEntry<string> DevCommandFile;
 
         private void Awake()
         {
@@ -43,7 +42,6 @@ namespace GSOOffline
             TimeOfDay = Config.Bind("World", "StartTimeOfDay", 1000f, "Time of day sent on scene load (0-2400). Negative = leave client default.");
             LogUnhandledEvents = Config.Bind("Debug", "LogUnhandledEvents", true, "Log client->server events the offline server does not implement yet.");
             AutoLogin = Config.Bind("Convenience", "AutoLogin", "", "If set, log in automatically with this account name (skips the login screen).");
-            DevCommandFile = Config.Bind("Debug", "DevCommandFile", "", "Developer automation: path (relative to the game folder) of a command file to poll. Empty = off. See DevBridge.cs.");
             AutoCharacter = Config.Bind("Convenience", "AutoCharacter", "", "If set together with AutoLogin, enter the world with this character (created if missing).");
 
             SaveDir = Path.Combine(Paths.GameRootPath, "OfflineSaves");
@@ -55,8 +53,6 @@ namespace GSOOffline
             DontDestroyOnLoad(host);
             host.hideFlags = HideFlags.HideAndDontSave;
             host.AddComponent<OfflineServer>();
-            if (DevCommandFile.Value.Trim().Length > 0)
-                host.AddComponent<DevBridge>();
 
             Log.LogInfo($"{Name} {Version} loaded. Saves: {SaveDir}");
         }

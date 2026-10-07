@@ -5,6 +5,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
+- The DevBridge, `devbridge.ps1`, `decompile.ps1` and the datamining tools moved to the separate GSODevTools repo. The DevBridge is now its own plugin, and the `Debug.DevCommandFile` setting is gone. `checkrecipes` remains as a GSOOffline bridge command (`DevCommands.cs`).
+
 ### Added
 - Inventory and items:
   - Items are saved per character, and their stats are rolled from the item database.

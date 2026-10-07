@@ -29,48 +29,14 @@ Output in `dist\`:
 
 It never pushes.
 
-## tools/dev/devbridge.ps1
+## Developer tools
 
-Drives the real client for testing. See [DEVBRIDGE.md](DEVBRIDGE.md).
+`devbridge.ps1`, `decompile.ps1`, the datamining scripts and the DevBridge command reference are in the GSODevTools repo (`..\GSODevTools\docs\COMMANDS.md`).
 
-| Parameter | Default | Meaning |
-|---|---|---|
-| `-Enable` | | Set AutoLogin, AutoCharacter and DevCommandFile in the plugin config |
-| `-Account <name>` / `-Character <name>` | Tester / Testguy | Used with `-Enable` |
-| `-Disable` | | Kill the game and clear those three settings |
-| `-ResetSaves` | | Kill the game and delete `OfflineSaves\accounts`, `characters` and `dev` |
-| `-Launch` | | Kill the game, delete the old log, start the game, and wait (up to 120 s) for the world to load |
-| `-Commands <lines>` | | Bridge commands to send, one at a time |
-| `-Wait <seconds>` | 2 | Pause after each command |
-| `-Filter <regex>` | | Only print matching log lines |
-
-## tools/decompile.ps1
-
-| Parameter | Meaning |
-|---|---|
-| `-DnSpyConsole <path>` | dnSpyEx console. Defaults to `<game>\GSO_Data\Managed\dnSpy.Console.exe` or one on PATH. |
-
-Writes `decomp\` (git-ignored; never commit it).
-
-## tools/datamining
+This plugin adds one bridge command through `src/GSOOffline/DevCommands.cs`:
 
 | Command | Meaning |
 |---|---|
-| `.\tools\datamining\extract.ps1 [-GameDir]` | Creates the venv (UnityPy) and writes `extracted\textassets\*.txt`, `extracted\markers.json` and `extracted\scenes.txt` |
-| `tools\datamining\.venv\Scripts\python.exe -I tools\datamining\gen_doors.py extracted\markers.json src\GSOOffline\Data\doors.json` | Regenerate the door table |
-| `dump_text.py`, `dump_markers.py`, `scenes.py`, `count_dummies.py` | Building blocks used by extract.ps1, runnable on their own (see each file's docstring/argv) |
-
-## DevBridge commands (written to `OfflineSaves\dev\cmd.txt`)
-
-| Command | Meaning |
-|---|---|
-| `client <Scr_RPCSender method> [args]` | Call a client send method as the UI would. `$me` = player name; `_` in strings becomes a space. |
-| `creationdone` | Press Done in the character creator |
-| `inv` | Dump inventory, equipment, silver and HP |
-| `npcs [n]` / `harvestables [n]` | List the nearest NPCs or nodes, with uids |
-| `near <uid>` | Step next to an NPC or node |
-| `goto x y z` | Move the player (client side) |
-| `shot <name>` | Screenshot to `OfflineSaves\dev\<name>.png` |
 | `checkrecipes` | Verify server recipe ids against the client's |
 
 ## In-game chat commands
@@ -102,4 +68,3 @@ The client sends `/useportal` itself when you confirm the snowy portal.
 | World.StartTimeOfDay | 1000 | Time sent on scene load (negative = client default) |
 | Convenience.AutoLogin / AutoCharacter | empty | Skip the menus |
 | Debug.LogUnhandledEvents | true | Log unimplemented client events |
-| Debug.DevCommandFile | empty | Enables the DevBridge |

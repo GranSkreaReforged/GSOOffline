@@ -7,9 +7,7 @@ The "server" is not a separate program. It is a BepInEx plugin that runs inside 
 - Windows, with Gran Skrea Online installed (Steam)
 - [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer
 - PowerShell 7 (`pwsh`) for releases; 5.1 is fine for building
-- Optional:
-  - Python 3.10+ for the data tools
-  - [dnSpyEx](https://github.com/dnSpyEx/dnSpy) for decompiling
+- The sibling **GSODevTools** repo (`..\GSODevTools`) for decompiling, data mining and in-game testing
 
 ## 2. Get the code
 
@@ -46,25 +44,27 @@ Useful files:
 | `<game>\OfflineSaves\` | Accounts and characters as JSON |
 | `<game>\BepInEx\config\gso.offline.server.cfg` | Settings; see [COMMANDS.md](COMMANDS.md) |
 
-To skip the menus while developing, set `AutoLogin` / `AutoCharacter` in the config, or use the DevBridge.
+To skip the menus while developing, set `AutoLogin` / `AutoCharacter` in the config, or use the GSODevTools DevBridge.
 
 ## 5. Develop and test
 
-1. Read how the client behaves: `.\tools\decompile.ps1`, then [PROTOCOL.md](PROTOCOL.md).
+1. Read how the client behaves: `..\GSODevTools\tools\decompile.ps1`, then [PROTOCOL.md](PROTOCOL.md).
 2. Change code in `src\GSOOffline\` (the file map is in the README).
 3. `.\build.ps1`
 4. Test through the real client:
 
    ```powershell
-   .\tools\dev\devbridge.ps1 -Enable
-   .\tools\dev\devbridge.ps1 -Launch -Commands 'npcs 5' -Filter 'uid='
-   .\tools\dev\devbridge.ps1 -Disable -ResetSaves
+   cd ..\GSODevTools
+   .\build.ps1                                   # once: deploys the DevBridge plugin
+   .\tools\devbridge.ps1 -Enable
+   .\tools\devbridge.ps1 -Launch -Commands 'npcs 5' -Filter 'uid='
+   .\tools\devbridge.ps1 -Disable -ResetSaves
    ```
 
-   See [DEVBRIDGE.md](DEVBRIDGE.md) for the test commands.
+   GSODevTools' `docs/DEVBRIDGE.md` lists the test commands.
 5. Update `CHANGELOG.md` under `## [Unreleased]`.
 
-Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content.json`. Game data tools are in `tools\datamining\`. Everything is listed in [COMMANDS.md](COMMANDS.md).
+Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content.json`. Game data tools are in `..\GSODevTools\tools\datamining\`. Everything is listed in [COMMANDS.md](COMMANDS.md).
 
 ## 6. Branches and releases
 
@@ -74,7 +74,7 @@ Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content
 
 ## Rules
 
-- Never commit game files, `decomp\` or `extracted\` (they are git-ignored).
+- Never commit game files or anything decompiled or extracted (those live, git-ignored, in GSODevTools).
 - Target framework is .NET 3.5 (Unity 2017.4 Mono), so check that the APIs you use exist there.
 - Use the plugin's `Json` class, not `UnityEngine.JsonUtility`, for the plugin's own data.
 - License: GPL-3.0-or-later.

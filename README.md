@@ -58,37 +58,18 @@ git push --follow-tags
 
 There is no CI build, because compiling needs the proprietary game assemblies.
 
-### Reverse-engineering tools
+### Developer tools (separate repo)
 
-```powershell
-.\tools\decompile.ps1              # dnSpyEx console -> decomp\
-.\tools\datamining\extract.ps1     # UnityPy -> extracted\ (XML data, scene markers, scene list)
-python -I tools\datamining\gen_doors.py extracted\markers.json src\GSOOffline\Data\doors.json   # rebuild door table
-```
-
-Both write only to git-ignored folders. Never commit decompiled or extracted game content.
-
-### Testing in the game (DevBridge)
-
-```powershell
-.\tools\dev\devbridge.ps1 -Enable                      # auto-login a test character + command file
-.\tools\dev\devbridge.ps1 -Launch -Commands 'npcs 5' -Filter 'uid='
-.\tools\dev\devbridge.ps1 -Disable -ResetSaves         # back to normal play
-```
-
-This drives the real client by script: dialogue, combat, crafting, screenshots and more. See [docs/DEVBRIDGE.md](docs/DEVBRIDGE.md).
+Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps one bridge hook: `src/GSOOffline/DevCommands.cs` (`checkrecipes`), which GSODevTools discovers at runtime with no compile-time reference.
 
 ### Working with Claude Code
 
-`.claude/skills/` contains project skills describing each tool and workflow. Claude Code loads them automatically when it is started in this repo:
+`CLAUDE.md` and `.claude/skills/` describe this repo's workflows (testing, decompiling and data-mining skills are in GSODevTools):
 
 | Skill | Covers |
 |---|---|
 | `gso-build` | build.ps1, net35 constraints, deploy |
-| `gso-devbridge` | in-game testing loop |
 | `gso-release` | branches, merging, release.ps1 |
-| `gso-decompile` | reading the client code for protocol details |
-| `gso-datamining` | extracted data, markers, door table generation |
 | `gso-content` | quest glue in content.json |
 | `gso-server-feature` | end-to-end recipe for adding a server system |
 

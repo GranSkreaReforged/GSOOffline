@@ -8,12 +8,11 @@ dist/
 # Machine-specific game path (written by build.ps1)
 GameDir.user.props
 
-# Proprietary game content produced by tools/ - never commit
+# Proprietary game content (now produced in GSODevTools) - never commit
 extracted/
 decomp/
 
 # Python
-tools/datamining/.venv/
 __pycache__/
 
 # IDEs
