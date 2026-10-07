@@ -1,0 +1,22 @@
+<Project>
+
+  <!-- Single source of truth for the release version. build/release.ps1 rewrites this line. -->
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <!--
+    Location of the Gran Skrea Online install whose DLLs we compile against (they are proprietary
+    and never committed). Precedence: /p:GameDir=... > GSO_GAME_DIR env var > GameDir.user.props
+    (written by build.ps1, git-ignored) > default Steam path.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)GameDir.user.props" Condition="Exists('$(MSBuildThisFileDirectory)GameDir.user.props')" />
+  <PropertyGroup>
+    <GameDir Condition="'$(GSO_GAME_DIR)' != ''">$(GSO_GAME_DIR)</GameDir>
+    <GameDir Condition="'$(GameDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Gran Skrea Online</GameDir>
+    <GameDir>$([MSBuild]::EnsureTrailingSlash('$(GameDir)'))</GameDir>
+    <ManagedDir>$(GameDir)GSO_Data\Managed\</ManagedDir>
+    <BepInExCore>$(GameDir)BepInEx\core\</BepInExCore>
+  </PropertyGroup>
+
+</Project>

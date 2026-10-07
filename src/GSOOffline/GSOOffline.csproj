@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Unity 2017.4 legacy Mono runtime: .NET 3.5 profile. -->
+    <TargetFramework>net35</TargetFramework>
+    <AssemblyName>GSOOffline</AssemblyName>
+    <RootNamespace>GSOOffline</RootNamespace>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Deterministic>true</Deterministic>
+    <DebugType>portable</DebugType>
+    <PluginDir>$(GameDir)BepInEx\plugins\GSOOffline\</PluginDir>
+    <!-- Copy the built plugin into the game after building. Release packaging turns this off. -->
+    <DeployToGame Condition="'$(DeployToGame)' == ''">true</DeployToGame>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net35" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx" HintPath="$(BepInExCore)BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(BepInExCore)0Harmony.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(ManagedDir)Assembly-CSharp.dll" Private="false" />
+    <Reference Include="Assembly-CSharp-firstpass" HintPath="$(ManagedDir)Assembly-CSharp-firstpass.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(ManagedDir)UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(ManagedDir)UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(ManagedDir)UnityEngine.JSONSerializeModule.dll" Private="false" />
+    <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ManagedDir)UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="System.Xml" HintPath="$(ManagedDir)System.Xml.dll" Private="false" />
+  </ItemGroup>
+
+  <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">
+    <Error Condition="!Exists('$(ManagedDir)Assembly-CSharp.dll')"
+           Text="Gran Skrea Online not found at '$(GameDir)'. Run build.ps1 (auto-detects Steam libraries), pass -p:GameDir=..., or set GSO_GAME_DIR." />
+    <Error Condition="!Exists('$(BepInExCore)BepInEx.dll')"
+           Text="BepInEx is not installed in '$(GameDir)'. Run: build.ps1 -InstallBepInEx" />
+  </Target>
+
+  <!-- Exposes the MSBuild version to the [BepInPlugin] attribute, which needs a compile-time constant. -->
+  <Target Name="GeneratePluginInfo" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <PluginInfoFile>$(IntermediateOutputPath)PluginInfo.g.cs</PluginInfoFile>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(PluginInfoFile)" Overwrite="true" WriteOnlyWhenDifferent="true"
+                      Lines="namespace GSOOffline { internal static class PluginInfo { public const string Version = &quot;$(Version)&quot;%3B } }" />
+    <ItemGroup>
+      <Compile Include="$(PluginInfoFile)" />
+      <FileWrites Include="$(PluginInfoFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true'">
+    <MakeDir Directories="$(PluginDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginDir)" />
+    <Message Importance="high" Text="Deployed $(TargetFileName) $(Version) -> $(PluginDir)" />
+  </Target>
+
+</Project>

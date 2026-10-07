@@ -1,0 +1,113 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Xml;
+using UnityEngine;
+
+namespace GSOOffline
+{
+    public class WayshrineInfo
+    {
+        public int id;
+        public string name;
+        public int scene;
+        public Vector3 pos;
+    }
+
+    public class NpcInfo
+    {
+        public int id;
+        public string name;
+        public int level;
+        public int health;
+        public bool canFight;
+        public int respawnTime;
+    }
+
+    /// <summary>Server-side view of the XML data files the client ships in Resources/XMLs.</summary>
+    internal static class GameData
+    {
+        public static readonly Dictionary<int, WayshrineInfo> Wayshrines = new Dictionary<int, WayshrineInfo>();
+        public static readonly Dictionary<int, NpcInfo> Npcs = new Dictionary<int, NpcInfo>();
+
+        private static bool loaded;
+
+        public static void EnsureLoaded()
+        {
+            if (loaded) return;
+            loaded = true;
+            try
+            {
+                LoadWayshrines();
+                LoadNpcs();
+                Plugin.Log.LogInfo($"Game data: {Wayshrines.Count} wayshrines, {Npcs.Count} NPC types.");
+            }
+            catch (Exception e)
+            {
+                Plugin.Log.LogError("Loading game data failed: " + e);
+            }
+        }
+
+        private static XmlDocument LoadXml(string resource)
+        {
+            var ta = Resources.Load(resource) as TextAsset;
+            if (ta == null) throw new Exception("Missing resource " + resource);
+            var doc = new XmlDocument();
+            doc.LoadXml(ta.text);
+            return doc;
+        }
+
+        private static string Attr(XmlNode n, string name) => n.Attributes?[name]?.Value;
+
+        private static int IntAttr(XmlNode n, string name, int def = 0)
+        {
+            string v = Attr(n, name);
+            return v != null && int.TryParse(v.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int r) ? r : def;
+        }
+
+        public static Vector3 ParseVec(string s)
+        {
+            string[] p = s.Split(',');
+            return new Vector3(
+                float.Parse(p[0], CultureInfo.InvariantCulture),
+                float.Parse(p[1], CultureInfo.InvariantCulture),
+                float.Parse(p[2], CultureInfo.InvariantCulture));
+        }
+
+        private static void LoadWayshrines()
+        {
+            foreach (XmlNode n in LoadXml("XMLs/Wayshrines").DocumentElement.ChildNodes)
+            {
+                if (n.NodeType != XmlNodeType.Element) continue;
+                var w = new WayshrineInfo
+                {
+                    id = IntAttr(n, "id"),
+                    name = Attr(n, "name"),
+                    scene = IntAttr(n, "scene"),
+                    pos = ParseVec(Attr(n, "pos")),
+                };
+                Wayshrines[w.id] = w;
+            }
+        }
+
+        private static void LoadNpcs()
+        {
+            foreach (XmlNode n in LoadXml("XMLs/NPCInfo").DocumentElement.ChildNodes)
+            {
+                if (n.NodeType != XmlNodeType.Element) continue;
+                int level = IntAttr(n, "level", 1);
+                var info = new NpcInfo
+                {
+                    id = IntAttr(n, "id"),
+                    name = Attr(n, "name"),
+                    level = level,
+                    // Only a couple of entries carry explicit health; the rest was a server-side formula.
+                    health = IntAttr(n, "health", 20 + level * 10),
+                    canFight = IntAttr(n, "canfight") == 1,
+                    respawnTime = IntAttr(n, "respawntime", 60),
+                };
+                Npcs[info.id] = info;
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+# Build output
+bin/
+obj/
+artifacts/
+dist/
+.cache/
+
+# Machine-specific game path (written by build.ps1)
+GameDir.user.props
+
+# Proprietary game content produced by tools/ - never commit
+extracted/
+decomp/
+
+# Python
+tools/datamining/.venv/
+__pycache__/
+
+# IDEs
+.vs/
+.idea/
+*.user
+*.suo

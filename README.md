@@ -1,0 +1,102 @@
+# GSO Offline Server
+
+A BepInEx plugin that lets you play **Gran Skrea Online** after the official servers shut down. It runs a small replacement game server inside the game process. No game files are modified or redistributed, so you need your own copy of the game.
+
+## Playing (release zip)
+
+1. Download `GSOOffline-<version>-with-BepInEx.zip` from the releases page.
+   - If you already have BepInEx 5 x64 installed, use `GSOOffline-<version>.zip` instead.
+2. Extract it into the game folder, next to `GSO.exe`. (In Steam: right-click Gran Skrea Online → Manage → Browse local files.)
+3. Start the game, then log in with any username. The password is ignored.
+
+Characters are saved in `OfflineSaves/` inside the game folder. Settings are in `BepInEx/config/gso.offline.server.cfg`; `AutoLogin` and `AutoCharacter` skip the menus.
+
+In-game chat commands: `/help`, `/pos`, `/tele x y z`, `/scene id [x y z]`, `/wayshrine id`, `/wayshrines`, `/time 0-2400`, `/save`.
+
+To uninstall, delete `winhttp.dll`, `doorstop_config.ini`, `BepInEx/` and `steam_appid.txt` from the game folder.
+
+## Building it yourself
+
+Requirements:
+- Windows, the [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer (for the `.slnx` solution)
+- An installed copy of Gran Skrea Online. The build compiles against the game's own DLLs.
+- PowerShell 7 for releases. Building also works in Windows PowerShell 5.1.
+
+```powershell
+.\build.ps1 -InstallBepInEx   # first time: installs pinned BepInEx + steam_appid.txt, builds, deploys
+.\build.ps1                   # Debug build, copied into <game>\BepInEx\plugins\GSOOffline
+.\build.ps1 -Configuration Release -NoDeploy
+```
+
+The game folder is found automatically by searching every Steam library. You can override it in any of these ways:
+- `-GameDir <path>` (remembered in the git-ignored `GameDir.user.props`)
+- the `GSO_GAME_DIR` environment variable
+- `dotnet build -p:GameDir=<path>`
+
+### Releasing
+
+```powershell
+.\release.ps1 -Version 0.2.0 -DryRun   # build and package into dist\ only
+.\release.ps1 -Version 0.2.0           # also bump the version, date the CHANGELOG, commit, and tag v0.2.0
+git push --follow-tags
+```
+
+`dist\` receives the plugin-only zip, the zip with BepInEx included, and `SHA256SUMS.txt`. BepInEx is pinned to a specific version and SHA-256 in `build\GSOBuild.psm1`. The version number lives only in `Directory.Build.props`, and the plugin's `[BepInPlugin]` version is generated from it.
+
+There is no CI build, because compiling needs the proprietary game assemblies.
+
+### Reverse-engineering tools
+
+```powershell
+.\tools\decompile.ps1              # dnSpyEx console -> decomp\
+.\tools\datamining\extract.ps1     # UnityPy -> extracted\ (XML data, scene markers, scene list)
+```
+
+Both write only to git-ignored folders. Never commit decompiled or extracted game content.
+
+## How it works
+
+See [docs/PROTOCOL.md](docs/PROTOCOL.md) for the message map. In short:
+- The client is a thin client. The old Photon server ran everything.
+- Everything the client sends goes through `Scr_RPCSender.RaiseEvent`. A Harmony prefix hands it to `OfflineServer.Receive`.
+- Replies are queued and fed into `Scr_RPCReceiver.OnEventCall`, exactly as Photon would have delivered them.
+- The Photon connect loop, the server-status checks and the heartbeat timeout are patched out.
+- World content comes from data the client already ships:
+  - `Resources/XMLs/*`: NPC stats, dialogue, quests, abilities, harvestables, wayshrines and more.
+  - `Scr_NPCDummy` and `Scr_HarvestableDummy` placement markers left in every scene by the developers' export tool.
+
+```
+src/GSOOffline/
+  Plugin.cs                    BepInEx entry, config
+  Patches.cs                   RaiseEvent hook, fake Photon connection
+  SteamPatches.cs              Steamworks calls made safe without Steam
+  OfflineServer.cs             event queue, dispatch, delivery
+  OfflineServer.Account.cs     login, characters, enter world
+  OfflineServer.World.cs       scenes, teleports, wayshrines, NPC/harvestable streaming
+  OfflineServer.Chat.cs        chat and commands
+  GameData.cs                  XML data loaders
+  World.cs                     per-scene entities built from scene markers
+  SaveSystem.cs                JSON saves
+```
+
+## Status
+
+Working:
+- Login and characters
+- Entering the world and zone loading
+- Saving
+- Wayshrine travel
+- NPCs and harvestables placed in the world
+- Client-side interactables such as workbenches
+- Chat
+
+Not yet implemented:
+- Inventory and items
+- Dialogue and quests
+- Shops
+- Harvesting
+- Combat and NPC AI
+- Crafting
+- Doors and zone transitions
+
+Unimplemented client events are logged to `BepInEx/LogOutput.log` as `Unhandled client event X/Y`.
