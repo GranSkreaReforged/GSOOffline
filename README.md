@@ -66,6 +66,30 @@ python -I tools\datamining\gen_doors.py extracted\markers.json src\GSOOffline\Da
 
 Both write only to git-ignored folders. Never commit decompiled or extracted game content.
 
+### Testing in the game (DevBridge)
+
+```powershell
+.\tools\dev\devbridge.ps1 -Enable                      # auto-login a test character + command file
+.\tools\dev\devbridge.ps1 -Launch -Commands 'npcs 5' -Filter 'uid='
+.\tools\dev\devbridge.ps1 -Disable -ResetSaves         # back to normal play
+```
+
+This drives the real client by script: dialogue, combat, crafting, screenshots and more. See [docs/DEVBRIDGE.md](docs/DEVBRIDGE.md).
+
+### Working with Claude Code
+
+`.claude/skills/` contains project skills describing each tool and workflow. Claude Code loads them automatically when it is started in this repo:
+
+| Skill | Covers |
+|---|---|
+| `gso-build` | build.ps1, net35 constraints, deploy |
+| `gso-devbridge` | in-game testing loop |
+| `gso-release` | worktrees, merging, release.ps1 |
+| `gso-decompile` | reading the client code for protocol details |
+| `gso-datamining` | extracted data, markers, door table generation |
+| `gso-content` | quest glue in content.json |
+| `gso-server-feature` | end-to-end recipe for adding a server system |
+
 ## How it works
 
 See [docs/PROTOCOL.md](docs/PROTOCOL.md) for the message map. In short:

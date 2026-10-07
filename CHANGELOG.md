@@ -38,6 +38,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
   - Bandage-heal abilities work, and ability bar slots are saved.
   - Combat numbers live in `CombatRules`, since the originals were lost.
   - Town guards no longer attack on sight (offline, there are no criminals).
+- `tools/dev/devbridge.ps1` and `docs/DEVBRIDGE.md`: enable/disable the DevBridge, launch, send commands, read results.
+- Claude Code project skills in `.claude/skills/` for build, testing, release, decompiling, data mining, quest content, and adding server features.
 - Abilities on the action bar work:
   - Level, mana, range and cooldown come from the game's ability data.
   - Targeted abilities hit the target, and sweeping weapon techniques hit everything in reach. Damage is a multiple of a basic hit, because the original ability damage values were lost.
