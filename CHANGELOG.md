@@ -6,7 +6,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 
 ### Changed
-- The DevBridge, `devbridge.ps1`, `decompile.ps1` and the datamining tools moved to the separate GSODevTools repo. The DevBridge is now its own plugin, and the `Debug.DevCommandFile` setting is gone. `checkrecipes` remains as a GSOOffline bridge command (`DevCommands.cs`), now joined by `npcbounds` and `animclips`.
+- The DevBridge, `devbridge.ps1`, `decompile.ps1` and the datamining tools moved to the separate GSODevTools repo. The DevBridge is now its own plugin, and the `Debug.DevCommandFile` setting is gone. `checkrecipes` remains as a GSOOffline bridge command (`DevCommands.cs`), now joined by `npcbounds`, `animclips`, `door`, `clearspot` and `probe`.
 - Builds no longer touch the game. `build.ps1` puts the plugin in `artifacts\build\<Configuration>\`, laid out like the game folder, with an `INSTALL.txt` saying where it goes; `-Deploy` (replacing the old default and `-NoDeploy`) copies it into the game. BepInEx's DLLs for compiling come from the pinned BepInEx zip, so building doesn't need BepInEx installed in the game.
 - `docs/INSTALL.md`: installation guides from a release and from a build (with updating, uninstalling and troubleshooting), also shipped in the release zips.
 
@@ -61,6 +61,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - An opt-in developer automation bridge (`Debug.DevCommandFile`) for testing through the real client.
 
 ### Fixed
+- Doors no longer drop you behind rocks or walls. Arrival points were guessed offline and some landed in a pocket you couldn't walk out of (leaving the Grimwall mine, leaving Roke's dungeon by the ruins). The server now picks the arrival in-game: solid, flat-enough ground with room to stand, in sight of the door, preferring open space. Scenes whose floors appear a moment after loading (Roke's dungeon) keep the loading screen up until the floor exists, instead of letting you fall through. All 18 doors were checked in-game.
 - NPCs are animated again. The server sent animation 0 (an empty clip) for every NPC, so people stood frozen and sunk to the waist, and animals stretched hundreds of metres across the map. NPCs now get their idle, run, attack and death animations from the game data.
 - Saves now keep inventories, skills and other lists. UnityEngine.JsonUtility had silently dropped them, so it was replaced with the plugin's own JSON serializer.
 - Max health and carrying capacity are now sent at login.

@@ -36,6 +36,8 @@ namespace GSOOffline
             world = null;
             sceneReady = false;
             pendingSpawn = null;
+            arrivalDeadline = -1f;
+            pendingSpawnNeedsClearing = false;
             lastNpcList = lastHarvestableList = null;
             job = null;
             ResetCombat();
@@ -85,6 +87,17 @@ namespace GSOOffline
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
 
+            // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
+            if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)
+            {
+                arrivalDeadline = Time.time + ArrivalWait;
+                return;
+            }
+            FinishSceneLoad();
+        }
+
+        private void FinishSceneLoad()
+        {
             Send(198, 10);   // clears Script_sceneManager.loadingInProgress
             if (pendingSpawn.HasValue)
             {
@@ -112,6 +125,7 @@ namespace GSOOffline
         private void TickWorld()
         {
             if (character == null) return;
+            TickArrival();
 
             autosaveTimer -= Time.deltaTime;
             if (autosaveTimer <= 0f)

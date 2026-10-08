@@ -21,6 +21,41 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] recipes: {ok} match, {bad} mismatch, client {Script_Crafting.instance.craftingRecipes.Count}, server {SkillData.Recipes.Count}");
         }
 
+        // door <n>: goes through doors.json entry n exactly as clicking it would (arrival included). "door" alone lists them.
+        private static void Door(string[] args)
+        {
+            var doors = OfflineServer.Instance.DoorList;
+            if (args.Length < 2)
+            {
+                for (int i = 0; i < doors.Count; i++)
+                    Plugin.Log.LogInfo($"[dev] door {i}: type {doors[i].type} scene {doors[i].scene} -> {doors[i].toScene} ({doors[i].note})");
+                return;
+            }
+            OfflineServer.Instance.UseDoor(doors[int.Parse(args[1])]);
+        }
+
+        // probe x y z: every collider on a vertical line through the point (60 m up and down) and within 4 m of it.
+        private static void Probe(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var p = new UnityEngine.Vector3(float.Parse(args[1], inv), float.Parse(args[2], inv), float.Parse(args[3], inv));
+            var hits = UnityEngine.Physics.RaycastAll(p + UnityEngine.Vector3.up * 60f, UnityEngine.Vector3.down, 120f, ~0, UnityEngine.QueryTriggerInteraction.Collide);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (var h in hits)
+                Plugin.Log.LogInfo($"[dev] hit y={h.point.y:F2} normal={h.normal} '{h.collider.name}' trigger={h.collider.isTrigger} active={h.collider.gameObject.activeInHierarchy} scene={h.collider.gameObject.scene.name}");
+            foreach (var c in UnityEngine.Physics.OverlapSphere(p, 4f, ~0, UnityEngine.QueryTriggerInteraction.Collide))
+                Plugin.Log.LogInfo($"[dev] near '{c.name}' at {c.transform.position} trigger={c.isTrigger} bounds={c.bounds.min}..{c.bounds.max}");
+            Plugin.Log.LogInfo($"[dev] probe done ({hits.Length} hits)");
+        }
+
+        // clearspot x y z: runs the door arrival search at a point, logging why each candidate is rejected.
+        private static void ClearSpot(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var p = new UnityEngine.Vector3(float.Parse(args[1], inv), float.Parse(args[2], inv), float.Parse(args[3], inv));
+            Plugin.Log.LogInfo($"[dev] clear spot -> {OfflineServer.Instance.ClearSpotNear(p, true)}");
+        }
+
         // animclips: the client's shared animation table (the ids NPC animation messages refer to).
         private static void AnimClips(string[] args)
         {

@@ -105,7 +105,7 @@ namespace GSOOffline
             }
             if (door != null)
             {
-                Teleport(door.toScene, V(door.toPos));
+                UseDoor(door);
                 return true;
             }
 
@@ -116,7 +116,7 @@ namespace GSOOffline
                     var spawn = interior != null ? Doors.interiorSpawns.Find(s => s.scene == interior.interior) : null;
                     if (spawn == null) return false;
                     PushReturnPoint(p);
-                    Teleport(spawn.scene, V(spawn.pos));
+                    TeleportNear(spawn.scene, V(spawn.pos));
                     return true;
 
                 case DoorInteriorExit:
@@ -126,7 +126,7 @@ namespace GSOOffline
                         var dungeon = Doors.interiorSpawns.Find(s => s.scene == 24);
                         if (dungeon == null) return false;
                         PushReturnPoint(p);
-                        Teleport(dungeon.scene, V(dungeon.pos));
+                        TeleportNear(dungeon.scene, V(dungeon.pos));
                         return true;
                     }
                     ReturnToPreviousPoint();
@@ -147,6 +147,10 @@ namespace GSOOffline
             }
             return false;
         }
+
+        internal List<DoorDef> DoorList => Doors.doors;
+
+        internal void UseDoor(DoorDef door) => TeleportNear(door.toScene, V(door.toPos));
 
         private void PushReturnPoint(Vector3 p)
         {
