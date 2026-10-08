@@ -17,7 +17,8 @@ namespace GSOOffline
 
         // combat AI state (server side only)
         public bool aggro, returning, attackingSent;
-        public float nextSwing, nextWaypoint, respawnAt, nextWander;
+        public float nextSwing, nextWaypoint, respawnAt, nextWander, attackAnimUntil;
+        public int anim = -1;   // animation id last sent to the client
     }
 
     public class HarvestableEntity
@@ -101,10 +102,11 @@ namespace GSOOffline
             {
                 if ((n.pos - center).sqrMagnitude > r2) continue;
                 if (sb.Length > 0) sb.Append('>');
+                int anim = n.anim >= 0 ? n.anim : NpcAnims.IdleOf(n.typeId);
                 // uid_type_x,y,z_hp_maxhp_dead_customName_anim  (see Scr_NpcHandler.updateVisibleNpcs)
                 sb.Append(n.uid).Append('_').Append(n.typeId).Append('_').Append(Vec(n.pos)).Append('_')
                   .Append(n.health).Append('_').Append(n.maxHealth).Append('_').Append(n.dead ? 1 : 0)
-                  .Append("__0");
+                  .Append("__").Append(anim);
             }
             return sb.ToString();
         }

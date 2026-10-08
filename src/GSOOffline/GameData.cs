@@ -33,6 +33,19 @@ namespace GSOOffline
         public bool wandering;
         public float wanderFrequency;  // seconds between strolls
         public float wanderDistance;
+        // Ids into the client's shared animation table (EasyAnimationHandler); defaults are the client's own.
+        public int animIdle = NpcAnims.Idle, animRun = NpcAnims.Run, animAttack = NpcAnims.Attack, animDeath = NpcAnims.Death;
+    }
+
+    /// <summary>
+    /// NPC animation ids. The client plays only what the server sends (2/2 spawn list, 198/26), and id 0 is an
+    /// empty clip that leaves models in their bind pose: humans sunk to the waist, animals stretched to hundreds of metres.
+    /// </summary>
+    internal static class NpcAnims
+    {
+        public const int Idle = 28, Run = 29, Attack = 39, Death = 30;
+
+        public static int IdleOf(int typeId) => GameData.Npcs.TryGetValue(typeId, out var i) ? i.animIdle : Idle;
     }
 
     /// <summary>Server-side view of the XML data files the client ships in Resources/XMLs.</summary>
@@ -130,6 +143,10 @@ namespace GSOOffline
                     wandering = IntAttr(n, "wandering") == 1,
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
+                    animIdle = IntAttr(n, "anim_idle", NpcAnims.Idle),
+                    animRun = IntAttr(n, "anim_run", NpcAnims.Run),
+                    animAttack = IntAttr(n, "anim_attack", NpcAnims.Attack),
+                    animDeath = IntAttr(n, "anim_death", NpcAnims.Death),
                 };
                 Npcs[info.id] = info;
             }

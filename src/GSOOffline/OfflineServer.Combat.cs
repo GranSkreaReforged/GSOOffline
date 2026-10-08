@@ -271,6 +271,7 @@ namespace GSOOffline
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);
+            SetAnim(npc, info?.animDeath ?? NpcAnims.Death);
 
             int level = info?.level ?? 1;
             AddXp(skill, CombatRules.KillXp(level));
@@ -284,6 +285,29 @@ namespace GSOOffline
         }
 
         // ---- NPC AI --------------------------------------------------------------------------
+
+        private void SetAnim(NpcEntity npc, int anim, bool restart = false)
+        {
+            if (npc.anim == anim && !restart) return;
+            npc.anim = anim;
+            Send(198, 26, npc.uid, anim);
+        }
+
+        private static float AnimLength(int anim)
+        {
+            var clips = EasyAnimationHandler.instance != null ? EasyAnimationHandler.instance.animations : null;
+            return clips != null && anim >= 0 && anim < clips.Length && clips[anim] != null ? clips[anim].length : 1f;
+        }
+
+        // Idle or run, following the client's own moving flag (it walks NPCs along our waypoints); attack while a swing plays.
+        private void UpdateAnim(NpcEntity npc, NpcInfo info)
+        {
+            if (Time.time < npc.attackAnimUntil) return;
+            var c = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(npc.uid) : null;
+            if (c == null) return;
+            int idle = info?.animIdle ?? NpcAnims.Idle, run = info?.animRun ?? NpcAnims.Run;
+            SetAnim(npc, c.moving ? run : idle);
+        }
 
         // The client walks NPCs along the waypoints we give it; its transform is the truth for position.
         private Vector3 NpcPosition(NpcEntity npc)
@@ -345,11 +369,12 @@ namespace GSOOffline
                     if (Time.time >= npc.respawnAt) RespawnNpc(npc);
                     continue;
                 }
-                if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) continue;
-
+                GameData.Npcs.TryGetValue(npc.typeId, out var info);
                 Vector3 pos = NpcPosition(npc);
                 float dist = Vector3.Distance(pos, playerPos);
                 if (dist > Plugin.NpcViewDistance.Value) continue;
+                UpdateAnim(npc, info);
+                if (info == null) continue;
 
                 if (!npc.aggro && !npc.returning && info.wandering && Time.time >= npc.nextWander && npc.uid != dialogueNpc?.uid)
                     Wander(npc, info);
@@ -398,6 +423,8 @@ namespace GSOOffline
                 }
                 if (Time.time < npc.nextSwing) continue;
                 npc.nextSwing = Time.time + info.attackSpeed;
+                SetAnim(npc, info.animAttack, true);
+                npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
                 NpcHitsPlayer(info);
             }
         }
@@ -424,9 +451,11 @@ namespace GSOOffline
             npc.aggro = npc.returning = npc.attackingSent = false;
             npc.health = npc.maxHealth;
             npc.pos = npc.spawnPos;
+            npc.attackAnimUntil = 0f;
             Send(13, 0, npc.uid, false);
             Send(9, 1, npc.uid, npc.spawnPos);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
+            SetAnim(npc, NpcAnims.IdleOf(npc.typeId));
         }
 
         // ---- player death --------------------------------------------------------------------

@@ -33,11 +33,13 @@ It never pushes.
 
 `devbridge.ps1`, `decompile.ps1`, the datamining scripts and the DevBridge command reference are in the GSODevTools repo (`..\GSODevTools\docs\COMMANDS.md`).
 
-This plugin adds one bridge command through `src/GSOOffline/DevCommands.cs`:
+This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 
 | Command | Meaning |
 |---|---|
 | `checkrecipes` | Verify server recipe ids against the client's |
+| `npcbounds [n]` | The nearest *n* NPCs: rendered size, feet height above the ground, animation playing |
+| `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 
 ## In-game chat commands
 
