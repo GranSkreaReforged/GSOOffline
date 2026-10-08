@@ -47,7 +47,9 @@ namespace GSOOffline
             SaveDir = Path.Combine(Paths.GameRootPath, "OfflineSaves");
             Directory.CreateDirectory(SaveDir);
 
-            new Harmony(Guid).PatchAll(typeof(Plugin).Assembly);
+            var harmony = new Harmony(Guid);
+            harmony.PatchAll(typeof(Plugin).Assembly);
+            OpenUrlPatch.Apply(harmony);
 
             var host = new GameObject("GSOOfflineServer");
             DontDestroyOnLoad(host);

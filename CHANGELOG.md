@@ -4,6 +4,11 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Steam no longer shows the game as running after you quit, with "Stop" stuck on "Stopping", when you opened an in-game link (Leaderboards, Discord, wiki...) while your browser was closed. The game started the browser as its own child process, with the Steam overlay injected, so Steam waited for the browser to close. Links now open through the Windows shell, outside the game's processes.
+
+### Added
+- `openurl <url>` bridge command: calls `Application.OpenURL` as a menu link would.
 
 ## [1.0.0] - 2026-10-08
 ### Changed

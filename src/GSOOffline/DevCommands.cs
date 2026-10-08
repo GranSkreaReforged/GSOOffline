@@ -63,6 +63,13 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] player attacking={pl.attacking} attackId={pl.attackId} anim.combat={pl.anim.combat} anim.attackId={pl.anim.attackId} dead={pl.dead}");
         }
 
+        // openurl <url>: Application.OpenURL as a menu link would call it (checks OpenUrlPatch).
+        private static void OpenUrl(string[] args)
+        {
+            UnityEngine.Application.OpenURL(args[1]);
+            Plugin.Log.LogInfo($"[dev] openurl {args[1]} returned");
+        }
+
         // animclips: the client's shared animation table (the ids NPC animation messages refer to).
         private static void AnimClips(string[] args)
         {
