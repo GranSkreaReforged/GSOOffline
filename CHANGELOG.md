@@ -8,6 +8,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Changed
 - The DevBridge, `devbridge.ps1`, `decompile.ps1` and the datamining tools moved to the separate GSODevTools repo. The DevBridge is now its own plugin, and the `Debug.DevCommandFile` setting is gone. `checkrecipes` remains as a GSOOffline bridge command (`DevCommands.cs`).
 - Builds no longer touch the game. `build.ps1` puts the plugin in `artifacts\build\<Configuration>\`, laid out like the game folder, with an `INSTALL.txt` saying where it goes; `-Deploy` (replacing the old default and `-NoDeploy`) copies it into the game. BepInEx's DLLs for compiling come from the pinned BepInEx zip, so building doesn't need BepInEx installed in the game.
+- `docs/INSTALL.md`: installation guides from a release and from a build (with updating, uninstalling and troubleshooting), also shipped in the release zips.
 
 ### Added
 - Inventory and items:

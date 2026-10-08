@@ -15,6 +15,8 @@ This is a **non-commercial passion project**. It exists to keep a game I loved p
 
 ## Playing (release zip)
 
+Step-by-step guides for installing from a release zip or from your own build, updating, uninstalling and troubleshooting are in [docs/INSTALL.md](docs/INSTALL.md). The short version:
+
 1. Download `GSOOffline-<version>-with-BepInEx.zip` from the releases page.
    - If you already have BepInEx 5 x64 installed, use `GSOOffline-<version>.zip` instead.
 2. Extract it into the game folder, next to `GSO.exe`. (In Steam: right-click Gran Skrea Online → Manage → Browse local files.)
