@@ -83,7 +83,8 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 
 | 3/7 select target (C→S) → 3/19 | name, npc uid (0 clears) |
 | 3/0 use ability (C→S) → 3/1 | name, slot (0 = basic weapon attack) |
-| 3/20 attack animation | name, attack id (0 = basic attack for the equipped weapon) |
+| 3/20 attack animation | name, attack id (0 = basic attack for the equipped weapon). Puts the player into attack mode until 7/2. |
+| 7/2 stop attacking | name. Ends the player's attack animation and combat stance; send it when the target dies, the attack is cancelled (6/25) or the target is cleared. |
 | 12/0 NPC health | uid, current, max, damage type (the client shows the difference as a hit splash) |
 | 11/0 NPC attacking | uid, attacking, target player name (combat state only; it plays no animation) |
 | 198/26 NPC animation | uid, animation id. The client plays only what the server sends: idle, run, attack (each swing) and death. Ids index the client's shared clip table (`EasyAnimationHandler.animations`) and come from `anim_idle`/`anim_run`/`anim_attack`/`anim_death` in NPCInfo (client defaults 28/29/39/30). Id 0 is an empty clip that leaves models in their bind pose. |

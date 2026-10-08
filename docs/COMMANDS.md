@@ -42,6 +42,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
+| `playerstate` | The client's attack state for your character (attacking, combat stance, animation) |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |
 
 ## In-game chat commands

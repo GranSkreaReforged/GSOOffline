@@ -33,6 +33,7 @@ namespace GSOOffline
     {
         private int targetUid;
         private bool autoAttacking;
+        private bool swingShown;   // a 3/20 attack animation was sent since the last 7/2
         private float nextPlayerSwing;
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
@@ -55,13 +56,24 @@ namespace GSOOffline
         private void ResetCombat()
         {
             targetUid = 0;
-            autoAttacking = false;
+            StopAttacking();
+        }
+
+        /// <summary>
+        /// Ends the player's attack on both sides. Each swing (3/20) puts the client's player into its attack
+        /// animation, and only 7/2 takes it out again; without it the player stays stuck mid-swing after a kill.
+        /// </summary>
+        private void StopAttacking()
+        {
+            bool wasAttacking = autoAttacking || swingShown;
+            autoAttacking = swingShown = false;
+            if (wasAttacking && character != null) Send(7, 2, character.name);
         }
 
         private void SelectTarget(int uid)
         {
             targetUid = uid;
-            if (uid == 0) autoAttacking = false;
+            if (uid == 0) StopAttacking();
             Send(3, 19, character.name, uid);
         }
 
@@ -146,7 +158,8 @@ namespace GSOOffline
             slotReadyAt[slot] = Time.time + a.cooldown;
             int cd = Mathf.RoundToInt(a.cooldown * 100f);
             Send(4, 0, character.name, slot, cd, cd);
-            Send(3, 20, character.name, a.id);   // ability id doubles as the attack animation id
+            Send(3, 20, character.name, a.id);
+            swingShown = true;   // ability id doubles as the attack animation id
             if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
 
             var targets = new List<NpcEntity>();
@@ -231,14 +244,15 @@ namespace GSOOffline
             var npc = world.GetNpc(targetUid);
             if (npc == null || npc.dead)
             {
-                autoAttacking = false;
+                StopAttacking();
                 return;
             }
             var weapon = EquippedWeapon();
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
             nextPlayerSwing = Time.time + WeaponSpeed(weapon);
-            Send(3, 20, character.name, 0);   // attack id 0: basic attack animation for the equipped weapon
+            Send(3, 20, character.name, 0);
+            swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
 
             DealDamage(npc, RollPlayerHit(weapon, npc), WeaponSkill(weapon));
@@ -265,7 +279,7 @@ namespace GSOOffline
         {
             npc.dead = true;
             npc.aggro = false;
-            autoAttacking = false;
+            if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
             npc.respawnAt = Time.time + (info?.respawnTime ?? 60);
             Send(11, 0, npc.uid, false, string.Empty);
@@ -462,7 +476,7 @@ namespace GSOOffline
 
         private void PlayerDies()
         {
-            autoAttacking = false;
+            StopAttacking();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
             foreach (var npc in world.npcs)

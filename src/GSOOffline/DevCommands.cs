@@ -56,6 +56,13 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] clear spot -> {OfflineServer.Instance.ClearSpotNear(p, true)}");
         }
 
+        // playerstate: the client's attack state for the local player (stuck-in-combat checks).
+        private static void PlayerState(string[] args)
+        {
+            var pl = Scr_PlayerHandler.instance.player;
+            Plugin.Log.LogInfo($"[dev] player attacking={pl.attacking} attackId={pl.attackId} anim.combat={pl.anim.combat} anim.attackId={pl.anim.attackId} dead={pl.dead}");
+        }
+
         // animclips: the client's shared animation table (the ids NPC animation messages refer to).
         private static void AnimClips(string[] args)
         {
