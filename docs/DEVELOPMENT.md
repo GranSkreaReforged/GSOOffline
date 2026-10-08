@@ -19,15 +19,16 @@ cd GSOOffline
 ## 3. First build
 
 ```powershell
-.\build.ps1 -InstallBepInEx
+.\build.ps1 -InstallBepInEx -Deploy
 ```
 
 This command:
-1. Finds the game in your Steam libraries (or pass `-GameDir 'X:\...\Gran Skrea Online'`).
-2. Installs the pinned, hash-checked BepInEx 5.4.23.5 and `steam_appid.txt`.
-3. Builds `GSOOffline.dll` and copies it to `<game>\BepInEx\plugins\GSOOffline\`.
+1. Finds the game in your Steam libraries (or pass `-GameDir 'X:\...\Gran Skrea Online'`). The build only reads it.
+2. Builds `GSOOffline.dll` into `artifacts\build\Debug\BepInEx\plugins\GSOOffline\`, next to an `INSTALL.txt`.
+3. `-InstallBepInEx`: puts the pinned, hash-checked BepInEx 5.4.23.5 and `steam_appid.txt` into the game.
+4. `-Deploy`: copies the built files into the game (`<game>\BepInEx\plugins\GSOOffline\`).
 
-After that, `.\build.ps1` is all you need. **Close the game before building**, because the running game locks the DLL.
+Both switches are conveniences. Without them the game is left alone, and you can review `artifacts\build\Debug\` and copy it in yourself (see `INSTALL.txt`). After the first time, `.\build.ps1 -Deploy` is the usual loop. **Close the game before deploying**, because the running game locks the DLL.
 
 ## 4. Run the server (= play the game)
 
@@ -50,12 +51,12 @@ To skip the menus while developing, set `AutoLogin` / `AutoCharacter` in the con
 
 1. Read how the client behaves: `..\GSODevTools\tools\decompile.ps1`, then [PROTOCOL.md](PROTOCOL.md).
 2. Change code in `src\GSOOffline\` (the file map is in the README).
-3. `.\build.ps1`
+3. `.\build.ps1 -Deploy`
 4. Test through the real client:
 
    ```powershell
    cd ..\GSODevTools
-   .\build.ps1                                   # once: deploys the DevBridge plugin
+   .\build.ps1 -Deploy                           # once: deploys the DevBridge plugin
    .\tools\devbridge.ps1 -Enable
    .\tools\devbridge.ps1 -Launch -Commands 'npcs 5' -Filter 'uid='
    .\tools\devbridge.ps1 -Disable -ResetSaves

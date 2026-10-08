@@ -37,6 +37,7 @@ if (-not $DryRun) {
 
 $GameDir = Resolve-GameDir $GameDir
 Save-GameDir $GameDir
+Get-BepInExCore | Out-Null   # BepInEx's DLLs for compiling, from the pinned zip
 
 $changelog = Join-Path $root 'CHANGELOG.md'
 $previousVersion = Get-ProjectVersion
@@ -54,7 +55,7 @@ try {
     $project = Join-Path $root 'src\GSOOffline\GSOOffline.csproj'
     $out = Join-Path $root 'artifacts\release'
     if (Test-Path $out) { Remove-Item $out -Recurse -Force }
-    Invoke-Checked dotnet @('build', $project, '-c', 'Release', '-nologo', '-p:DeployToGame=false', "-p:Version=$Version", '-o', $out)
+    Invoke-Checked dotnet @('build', $project, '-c', 'Release', '-nologo', "-p:Version=$Version", '-o', $out)
 
     $dist = Join-Path $root 'dist'
     $staging = Join-Path $root 'artifacts\staging'

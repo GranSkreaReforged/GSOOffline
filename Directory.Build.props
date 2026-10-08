@@ -6,9 +6,12 @@
   </PropertyGroup>
 
   <!--
-    Location of the Gran Skrea Online install whose DLLs we compile against (they are proprietary
-    and never committed). Precedence: /p:GameDir=... > GSO_GAME_DIR env var > GameDir.user.props
-    (written by build.ps1, git-ignored) > default Steam path.
+    Location of YOUR Gran Skrea Online install. The build only reads its Unity/game DLLs to compile
+    against (they are proprietary: never committed, never copied into the output) and never writes to
+    it; build.ps1 -Deploy is a separate, optional step. Precedence: /p:GameDir=... > GSO_GAME_DIR env
+    var > GameDir.user.props (written by build.ps1, git-ignored) > default Steam path.
+    BepInEx's DLLs come from the pinned BepInEx zip that build.ps1 unpacks into .cache\bepinex-ref,
+    so compiling doesn't need BepInEx installed in the game.
   -->
   <Import Project="$(MSBuildThisFileDirectory)GameDir.user.props" Condition="Exists('$(MSBuildThisFileDirectory)GameDir.user.props')" />
   <PropertyGroup>
@@ -16,7 +19,7 @@
     <GameDir Condition="'$(GameDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\Gran Skrea Online</GameDir>
     <GameDir>$([MSBuild]::EnsureTrailingSlash('$(GameDir)'))</GameDir>
     <ManagedDir>$(GameDir)GSO_Data\Managed\</ManagedDir>
-    <BepInExCore>$(GameDir)BepInEx\core\</BepInExCore>
+    <BepInExCore Condition="'$(BepInExCore)' == ''">$(MSBuildThisFileDirectory).cache\bepinex-ref\BepInEx\core\</BepInExCore>
   </PropertyGroup>
 
 </Project>

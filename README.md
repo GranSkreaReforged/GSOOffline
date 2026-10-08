@@ -32,14 +32,29 @@ New to the project? Start with [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md). Every
 
 Requirements:
 - Windows, the [.NET SDK](https://dotnet.microsoft.com/download) 9.0.200 or newer (for the `.slnx` solution)
-- An installed copy of Gran Skrea Online. The build compiles against the game's own DLLs.
+- Your own installed copy of Gran Skrea Online. The build reads the game's DLLs to compile against; it never copies them into the output and never writes to the game.
 - PowerShell 7 for releases. Building also works in Windows PowerShell 5.1.
 
 ```powershell
-.\build.ps1 -InstallBepInEx   # first time: installs pinned BepInEx + steam_appid.txt, builds, deploys
-.\build.ps1                   # Debug build, copied into <game>\BepInEx\plugins\GSOOffline
-.\build.ps1 -Configuration Release -NoDeploy
+.\build.ps1                          # Debug build into artifacts\build\Debug; the game is untouched
+.\build.ps1 -Deploy                  # ...and copy it into the game (close the game first)
+.\build.ps1 -InstallBepInEx -Deploy  # first time, as a convenience: also put BepInEx + steam_appid.txt in the game
+.\build.ps1 -Configuration Release
 ```
+
+Every build lands in `artifacts\build\<Configuration>\`, laid out exactly like the game folder, with an `INSTALL.txt`:
+
+```
+artifacts\build\Debug\
+  INSTALL.txt
+  BepInEx\plugins\GSOOffline\GSOOffline.dll
+```
+
+Review it there, then install it either way:
+- **By hand:** install [BepInEx 5.4.23.5 (x64)](https://github.com/BepInEx/BepInEx/releases) into the game folder (the one with `GSO.exe`), then copy this `BepInEx` folder into it, merging. Optionally add `steam_appid.txt` containing `595110` to start `GSO.exe` without Steam.
+- **With the script:** `-Deploy` does the copy; `-InstallBepInEx` does the BepInEx and `steam_appid.txt` part.
+
+BepInEx's DLLs for compiling come from the same pinned, hash-checked BepInEx zip, unpacked into `.cache\`, so you don't need BepInEx in the game to build.
 
 The game folder is found automatically by searching every Steam library. You can override it in any of these ways:
 - `-GameDir <path>` (remembered in the git-ignored `GameDir.user.props`)

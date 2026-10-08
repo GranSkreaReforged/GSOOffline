@@ -120,6 +120,61 @@ function Install-SteamAppId([string]$GameDir) {
     if (-not (Test-Path $file)) { Set-Content -Path $file -Value $script:SteamAppId -NoNewline }
 }
 
+# BepInEx's own DLLs (BepInEx.dll, 0Harmony.dll) for compiling, from the pinned zip, so building
+# never needs BepInEx installed in (or anything else changed in) the game. Returns the core folder.
+function Get-BepInExCore {
+    $dir = Join-Path $script:RepoRoot '.cache\bepinex-ref'
+    $core = Join-Path $dir 'BepInEx\core'
+    $stamp = Join-Path $dir 'version.txt'
+    if (-not (Test-Path $stamp) -or (Get-Content $stamp -Raw).Trim() -ne $script:BepInExVersion) {
+        if (Test-Path $dir) { Remove-Item $dir -Recurse -Force }
+        Expand-Archive -Path (Get-BepInExZip) -DestinationPath $dir -Force
+        Set-Content -Path $stamp -Value $script:BepInExVersion -NoNewline
+    }
+    $core
+}
+
+# Where a build is laid out exactly as it goes into the game folder, for review or a manual install.
+# Kept in sync with <StageDir> in the .csproj.
+function Get-StageDir([string]$Configuration) { Join-Path $script:RepoRoot "artifacts\build\$Configuration" }
+
+# INSTALL.txt next to the staged files: where someone who owns the game puts them.
+function Write-InstallNote([string]$StageDir, [string]$PluginName, [string]$Extra = '') {
+    $text = @"
+$PluginName build output, laid out like the Gran Skrea Online game folder.
+
+To install by hand:
+  1. You need your own copy of Gran Skrea Online (Steam) with BepInEx $($script:BepInExVersion) (x64) in its
+     folder: extract BepInEx_win_x64_$($script:BepInExVersion).zip from
+     https://github.com/BepInEx/BepInEx/releases into the folder that contains GSO.exe.
+  2. Copy the BepInEx folder from here into that same game folder, merging with the existing one.
+     The plugin ends up in <game>\BepInEx\plugins\$PluginName\.
+  3. Start the game once; settings appear in <game>\BepInEx\config\.
+$Extra
+
+To uninstall, delete <game>\BepInEx\plugins\$PluginName\.
+Nothing in this folder comes from the game. build.ps1 -Deploy does step 2 for you.
+"@
+    Set-Content -Path (Join-Path $StageDir 'INSTALL.txt') -Value $text
+}
+
+# Copies a staged build into the game (the convenience behind build.ps1 -Deploy). Only files that
+# exist in the stage are written; nothing in the game is deleted.
+function Deploy-Stage([string]$StageDir, [string]$GameDir) {
+    if (-not (Test-Path (Join-Path $GameDir 'BepInEx\core\BepInEx.dll'))) {
+        throw "BepInEx is not installed in '$GameDir'. Install it by hand (see INSTALL.txt) or run build.ps1 -InstallBepInEx."
+    }
+    foreach ($file in Get-ChildItem $StageDir -Recurse -File) {
+        $relative = $file.FullName.Substring($StageDir.TrimEnd('\').Length + 1)
+        if ($relative -eq 'INSTALL.txt') { continue }
+        $target = Join-Path $GameDir $relative
+        New-Item -ItemType Directory -Force -Path (Split-Path $target) | Out-Null
+        try { Copy-Item $file.FullName $target -Force }
+        catch { throw "Couldn't write $target. Is the game running? Close it (it locks plugin DLLs) and retry. $_" }
+        Write-Host "  Deployed $relative"
+    }
+}
+
 function Get-ProjectVersion {
     $props = Join-Path $script:RepoRoot 'Directory.Build.props'
     $m = [regex]::Match((Get-Content $props -Raw), '<Version>([^<]+)</Version>')

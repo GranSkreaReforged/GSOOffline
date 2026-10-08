@@ -10,9 +10,13 @@
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <Deterministic>true</Deterministic>
     <DebugType>portable</DebugType>
-    <PluginDir>$(GameDir)BepInEx\plugins\GSOOffline\</PluginDir>
-    <!-- Copy the built plugin into the game after building. Release packaging turns this off. -->
-    <DeployToGame Condition="'$(DeployToGame)' == ''">true</DeployToGame>
+    <!--
+      Every build is laid out as it goes into the game folder, for review or a manual install (see
+      INSTALL.txt there). Building never writes to the game; build.ps1 -Deploy copies this in.
+      Kept in sync with Get-StageDir in build\GSOBuild.psm1.
+    -->
+    <StageDir>$(MSBuildThisFileDirectory)..\..\artifacts\build\$(Configuration)\</StageDir>
+    <StagePluginDir>$(StageDir)BepInEx\plugins\$(AssemblyName)\</StagePluginDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -40,7 +44,7 @@
     <Error Condition="!Exists('$(ManagedDir)Assembly-CSharp.dll')"
            Text="Gran Skrea Online not found at '$(GameDir)'. Run build.ps1 (auto-detects Steam libraries), pass -p:GameDir=..., or set GSO_GAME_DIR." />
     <Error Condition="!Exists('$(BepInExCore)BepInEx.dll')"
-           Text="BepInEx is not installed in '$(GameDir)'. Run: build.ps1 -InstallBepInEx" />
+           Text="BepInEx reference DLLs not found at '$(BepInExCore)'. Run build.ps1 once; it unpacks the pinned BepInEx into .cache\bepinex-ref (nothing is installed in the game)." />
   </Target>
 
   <!-- Exposes the MSBuild version to the [BepInPlugin] attribute, which needs a compile-time constant. -->
@@ -56,10 +60,10 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(DeployToGame)' == 'true'">
-    <MakeDir Directories="$(PluginDir)" />
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginDir)" />
-    <Message Importance="high" Text="Deployed $(TargetFileName) $(Version) -> $(PluginDir)" />
+  <Target Name="StagePlugin" AfterTargets="Build">
+    <MakeDir Directories="$(StagePluginDir)" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StagePluginDir)" />
+    <Message Importance="high" Text="Built $(TargetFileName) $(Version) -> $([System.IO.Path]::GetFullPath('$(StagePluginDir)'))" />
   </Target>
 
 </Project>

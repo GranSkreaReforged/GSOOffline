@@ -4,15 +4,15 @@ Every command available for developing and running the GSO Offline Server. Run t
 
 ## build.ps1
 
-Builds the plugin, and by default copies it into the game.
+Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the game folder (`BepInEx\plugins\GSOOffline\GSOOffline.dll`) with an `INSTALL.txt`. It only reads the game; copying into it is opt-in.
 
 | Parameter | Default | Meaning |
 |---|---|---|
 | `-Configuration Debug\|Release` | Debug | Build configuration |
-| `-GameDir <path>` | auto | Game folder (remembered in `GameDir.user.props`) |
-| `-NoDeploy` | off | Don't copy the DLL into `<game>\BepInEx\plugins\GSOOffline` |
-| `-InstallBepInEx` | off | Install the pinned BepInEx 5.4.23.5 (hash-checked) and `steam_appid.txt` |
-| `-Clean` | off | `dotnet clean` first |
+| `-GameDir <path>` | auto | Game folder to compile against (remembered in `GameDir.user.props`) |
+| `-Deploy` | off | Copy the built files into the game (`<game>\BepInEx\plugins\GSOOffline\`). Close the game first. |
+| `-InstallBepInEx` | off | Put the pinned BepInEx 5.4.23.5 (hash-checked) and `steam_appid.txt` into the game |
+| `-Clean` | off | `dotnet clean` and empty `artifacts\build\<Configuration>` first |
 
 ## release.ps1 (PowerShell 7)
 
