@@ -20,3 +20,8 @@ __pycache__/
 .idea/
 *.user
 *.suo
+
+# Claude Code: local instructions and skills (machine-specific, never published)
+CLAUDE.md
+CLAUDE.local.md
+.claude/

@@ -79,17 +79,6 @@ There is no CI build, because compiling needs the proprietary game assemblies.
 
 Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps one bridge hook: `src/GSOOffline/DevCommands.cs` (`checkrecipes`), which GSODevTools discovers at runtime with no compile-time reference.
 
-### Working with Claude Code
-
-`CLAUDE.md` and `.claude/skills/` describe this repo's workflows (testing, decompiling and data-mining skills are in GSODevTools):
-
-| Skill | Covers |
-|---|---|
-| `gso-build` | build.ps1, net35 constraints, deploy |
-| `gso-release` | branches, merging, release.ps1 |
-| `gso-content` | quest glue in content.json |
-| `gso-server-feature` | end-to-end recipe for adding a server system |
-
 ## How it works
 
 See [docs/PROTOCOL.md](docs/PROTOCOL.md) for the message map. In short:
