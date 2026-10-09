@@ -90,6 +90,8 @@ namespace GSOOffline
             {
                 var npc = world?.GetNpc(targetUid);
                 if (npc == null || npc.dead || !CanFight(npc)) return;
+                CancelJob("attacking");
+                ReadyWeapon();
                 autoAttacking = true;
                 Send(3, 1, character.name, 0);
                 return;
@@ -116,6 +118,8 @@ namespace GSOOffline
                 UseAbility(0);
                 return;
             }
+            CancelJob("attacking");
+            ReadyWeapon();
             UseSkillAbility(slot, a);
         }
 

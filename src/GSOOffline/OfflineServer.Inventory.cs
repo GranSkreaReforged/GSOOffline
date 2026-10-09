@@ -53,6 +53,8 @@ namespace GSOOffline
             On(198, 15, OnSwapItems);
             On(198, 17, OnInsertItem);
             On(3, 18, c => UseItem((int)c[2]));
+            On(6, 5, c => SwitchWeapon());
+            On(6, 6, c => SetSecondaryWeapon(null));
         }
 
         // ---- queries -------------------------------------------------------------------------
@@ -117,6 +119,8 @@ namespace GSOOffline
             equipSyncPending = false;
             foreach (var it in character.items)
                 if (it.equipped) Send(8, 0, character.name, it.id, 0);
+            var back = SecondaryWeapon();
+            if (back != null) SetSecondaryWeapon(back);
         }
 
         private List<int> EquippedTypeIds(CharacterSave ch)
@@ -185,13 +189,20 @@ namespace GSOOffline
             return taken;
         }
 
-        private void RemoveFromStack(ItemSave it, int amount)
+        /// <summary>Takes an item out of its equipment or back slot before it leaves the inventory.</summary>
+        private void ReleaseItem(ItemSave it)
         {
             if (it.equipped)
             {
                 it.equipped = false;
                 Send(3, 6, character.name, it.id);
             }
+            if (it.id == character.secondaryWeaponId) SetSecondaryWeapon(null);
+        }
+
+        private void RemoveFromStack(ItemSave it, int amount)
+        {
+            ReleaseItem(it);
             it.amount -= amount;
             if (it.amount <= 0) character.items.Remove(it);
             Send(4, 3, character.name, it.id, it.typeId, amount);
@@ -211,18 +222,46 @@ namespace GSOOffline
             var t = it != null ? ItemData.Get(it.typeId) : null;
             if (t?.slot == null) return;
 
-            int replaced = 0;
+            ItemSave replaced = null;
             foreach (var other in character.items)
             {
                 if (other == it || !other.equipped) continue;
                 if (ItemData.Get(other.typeId)?.slot == t.slot)
                 {
                     other.equipped = false;
-                    replaced = other.id;
+                    replaced = other;
                 }
             }
             it.equipped = true;
-            Send(8, 0, character.name, it.id, replaced);
+            Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
+
+            // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the
+            // "Switch weapon" key). The client has no other way to fill that slot, so the old server did this.
+            if (t.slot != "Weapon") return;
+            if (replaced != null) SetSecondaryWeapon(replaced);
+            else if (it.id == character.secondaryWeaponId) SetSecondaryWeapon(null);
+        }
+
+        private ItemSave SecondaryWeapon()
+        {
+            var it = character.secondaryWeaponId != 0 ? FindItem(character.secondaryWeaponId) : null;
+            return it != null && !it.equipped ? it : null;
+        }
+
+        /// <summary>8/19: the weapon on the player's back. The inventory hides that item while it's there.</summary>
+        private void SetSecondaryWeapon(ItemSave it)
+        {
+            if (character == null) return;
+            character.secondaryWeaponId = it != null ? it.id : 0;
+            Send(8, 19, character.name, character.secondaryWeaponId, it != null ? it.typeId : 0);
+        }
+
+        /// <summary>6/5 "Switch weapon": the back weapon goes in hand, the one in hand (if any) on the back.</summary>
+        private void SwitchWeapon()
+        {
+            var back = character != null ? SecondaryWeapon() : null;
+            if (back == null) return;
+            Equip(back.id);
         }
 
         private void Unequip(int itemId)

@@ -49,6 +49,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 - **Targeting and combat:** 3/7 select NPC; 3/0 use ability (name, slot); 6/25 cancel attack; 8/7 set ability slot.
 - **Items:**
   - 3/4 equip and 3/5 unequip (name, itemId)
+  - 6/5 switch to the secondary weapon, 6/6 unequip it (no arguments)
   - 3/18 use (name, typeId)
   - 4/4 remove (itemId, typeId, amount, name)
   - 4/14 drop
@@ -70,6 +71,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 ...` (Id, Typeid, Amount, Tab, Grade, Slot, stat keys), player name. For stackables, Amount is the delta. |
 | 8/0 equip | name, itemId, replaced itemId (0 = none). Send after the world scene has loaded, or the slots stay empty. |
 | 3/6 unequip, 4/3 remove | name, itemId [, typeId, amount] |
+| 8/19 secondary weapon | name, itemId, typeId (0, 0 = none). Drawn on the back; the inventory hides that item. There's no client message to put a weapon there: the server does it when a weapon is equipped over another. Switch (C→S 6/5) swaps it into the hand; 6/6 takes it off. |
 | 198/37 swap, 198/38 insert | inventory indexes (server list order must match the client's) |
 | 3/16 silver, 8/1 XP | name, value / name, skillId, amount |
 | 8/13 health | name, current, max |
@@ -78,7 +80,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 0/2 open shop, 2/37 refresh | name, shop name, `0>type-price-stock,...` / shop name, `merchantSilver>type-price-stock,...` |
 
 | 8/4 start action (C→S) | name, type (1 harvest, 2 craft), target (harvestable uid / recipe id) |
-| 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. |
+| 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. The gathering animation (from the node's tool type) only plays outside the attack stance, so send 7/2 first; the hand shows the equipped weapon, so equip the tool. |
 | 13/1 harvestable status | uid, depleted (bool) |
 
 | 3/7 select target (C→S) → 3/19 | name, npc uid (0 clears) |

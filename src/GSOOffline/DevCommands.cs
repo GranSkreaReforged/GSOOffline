@@ -61,6 +61,8 @@ namespace GSOOffline
         {
             var pl = Scr_PlayerHandler.instance.player;
             Plugin.Log.LogInfo($"[dev] player attacking={pl.attacking} attackId={pl.attackId} anim.combat={pl.anim.combat} anim.attackId={pl.anim.attackId} dead={pl.dead}");
+            var hand = Inventory.instance.equipSlots.Find(s => s.slot == Item.ItemSlot.Weapon)?.item;
+            Plugin.Log.LogInfo($"[dev] player actionId={pl.actionId} anim.actionId={pl.anim.actionId} hand={(hand != null ? hand.itemTypeID + " " + hand.itemName : "empty")} back={pl.secondaryWeaponId}/{pl.secondaryWeaponTypeId}");
         }
 
         // openurl <url>: Application.OpenURL as a menu link would call it (checks OpenUrlPatch).

@@ -7,8 +7,13 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Fixed
 - Steam no longer shows the game as running after you quit, with "Stop" stuck on "Stopping", when you opened an in-game link (Leaderboards, Discord, wiki...) while your browser was closed. The game started the browser as its own child process, with the Steam overlay injected, so Steam waited for the browser to close. Links now open through the Windows shell, outside the game's processes.
 
+- Harvesting right after a fight no longer swings your weapon at the node. Starting a harvest or craft now ends the attack stance; the client only plays the gathering animation outside it.
+- You now harvest with the tool in your hand. Starting to mine, chop, fish or gather puts your best matching tool in hand and your weapon on your back; attacking with a tool in hand brings the weapon back. Attacking also stops the harvest.
+
 ### Added
+- Secondary weapon: equipping a weapon over another puts the old one on your back, as the original server did. Switch with the "Switch weapon" key or the button by the spell bar, or take it off from the equipment window. It is saved with the character.
 - `openurl <url>` bridge command: calls `Application.OpenURL` as a menu link would.
+- `playerstate` also shows the action animation, the weapon in hand and the one on the back.
 
 ### Changed
 - Branching: work happens on `feature/<area>/<name>` branches merged into `dev`, and each release is one merge of `dev` into `main` (`docs/DEVELOPMENT.md`).
