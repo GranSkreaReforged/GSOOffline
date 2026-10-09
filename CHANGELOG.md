@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Changing zones no longer turns the clock back to 10:00. The start time (`World.StartTimeOfDay`) is sent once when you enter the world, and the day/night cycle runs on from there, so GSO HD Textures' weather and days continue across zones.
 - Stack counts show again in the inventory and bank (e.g. "12" on a stack of logs). The windows only draw a count for items with id 0, which is how the original server sent stackable items; stacks now go to the client that way.
 - Sorting the inventory no longer scrambles it on the server. The client sorts its own list and sends only "sorted"; dragging or swapping items afterwards moved the wrong ones, and the order came back wrong after a relog. The server now adopts the client's order.
 - Steam no longer shows the game as running after you quit, with "Stop" stuck on "Stopping", when you opened an in-game link (Leaderboards, Discord, wiki...) while your browser was closed. The game started the browser as its own child process, with the Steam overlay injected, so Steam waited for the browser to close. Links now open through the Windows shell, outside the game's processes.

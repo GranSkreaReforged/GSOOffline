@@ -43,6 +43,10 @@ namespace GSOOffline
             ResetCombat();
         }
 
+        // The start time goes out once per login: resending it on every zone change would turn the clock back
+        // (the client's day/night cycle runs on its own, and GSO HD Textures' weather keeps it going across zones).
+        private bool startTimeSent;
+
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
         private void ChangeScene(int sceneId, Vector3 spawn)
@@ -106,8 +110,11 @@ namespace GSOOffline
                 PlayArrivalGfx(pendingSpawn.Value);
                 pendingSpawn = null;
             }
-            if (Plugin.TimeOfDay.Value >= 0f)
+            if (Plugin.TimeOfDay.Value >= 0f && !startTimeSent)
+            {
                 Send(16, 1, (int)Plugin.TimeOfDay.Value, 20);
+                startTimeSent = true;
+            }
             SendWayshrines();
             SendPendingEquips();
             SendHealth();

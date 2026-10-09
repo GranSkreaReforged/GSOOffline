@@ -78,6 +78,6 @@ The client sends `/useportal` itself when you confirm the snowy portal.
 | World.NpcViewDistance | 120 | NPC streaming radius (m) |
 | World.HarvestableViewDistance | 90 | Harvestable streaming radius (m) |
 | World.UnlockAllWayshrines | true | All wayshrines unlocked |
-| World.StartTimeOfDay | 1000 | Time sent on scene load (negative = client default) |
+| World.StartTimeOfDay | 1000 | Time of day when you enter the world; the day/night cycle runs on from there (negative = client default) |
 | Convenience.AutoLogin / AutoCharacter | empty | Skip the menus |
 | Debug.LogUnhandledEvents | true | Log unimplemented client events |
