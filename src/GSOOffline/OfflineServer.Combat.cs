@@ -39,6 +39,9 @@ namespace GSOOffline
         private bool swingShown;   // a 3/20 attack animation was sent since the last 7/2
         private float castEndsAt = -1f;   // when an ability's cast animation is over
         private float nextPlayerSwing;
+        private float lastPlayerSwing, measureSwingAt = -1f;
+        // Seconds the client's basic attack animation lasts, per weapon type (measured as it plays).
+        private readonly Dictionary<int, float> swingLength = new Dictionary<int, float>();
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
         private float lastHitTaken = -1000f;
@@ -192,6 +195,7 @@ namespace GSOOffline
 
         private void TickPlayerAttack(Vector3 playerPos)
         {
+            MeasureSwing();
             if (!autoAttacking || PlayerDead || Time.time < nextPlayerSwing) return;
             var npc = world.GetNpc(targetUid);
             if (npc == null || npc.dead)
@@ -202,14 +206,19 @@ namespace GSOOffline
             var weapon = EquippedWeapon();
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
-            nextPlayerSwing = Time.time + WeaponSpeed(weapon) * AttackSpeedMultiplier();
+            // One swing per play of the attack animation; damage per hit scales so damage per second stays
+            // that of a swing every WeaponSpeed seconds.
+            float interval = swingLength.TryGetValue(weapon?.typeId ?? 0, out float len) ? len : WeaponSpeed(weapon);
+            nextPlayerSwing = Time.time + interval * AttackSpeedMultiplier();
+            lastPlayerSwing = Time.time;
+            measureSwingAt = Time.time + 0.3f;
             Send(3, 20, character.name, 0);
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
             WeaponSounds(weapon, out int swingSfx, out int hitSfx);
             PlaySound(swingSfx, playerPos);
 
-            int hit = RollPlayerHit(weapon, npc), skill = WeaponSkill(weapon);
+            int hit = RollPlayerHit(weapon, npc, interval / WeaponSpeed(weapon)), skill = WeaponSkill(weapon);
             int projectile = WeaponProjectile(weapon);
             System.Action land = () =>
             {
@@ -219,6 +228,26 @@ namespace GSOOffline
             };
             if (projectile > 0) ShootAtNpc(projectile, npc, land);
             else land();
+        }
+
+        /// <summary>
+        /// Each 3/20 restarts the client's attack animation, which loops while attacking. Swinging on a timer of our
+        /// own cut it off midway, so shortly after a swing starts (once the animator is in the attack state) this
+        /// reads the clip's length and times the next swing to its end. Standing and walking attacks differ.
+        /// </summary>
+        private void MeasureSwing()
+        {
+            if (measureSwingAt < 0f || Time.time < measureSwingAt) return;
+            measureSwingAt = -1f;
+            var anim = LocalPlayer != null ? LocalPlayer.anim : null;
+            if (anim == null || anim.animator == null || anim.attackId < 0 || !autoAttacking) return;
+            var a = anim.animator;
+            int layer = a.GetLayerWeight(3) > a.GetLayerWeight(5) ? 3 : 5;   // 3 = attacking on the move, 5 = standing
+            var state = a.IsInTransition(layer) ? a.GetNextAnimatorStateInfo(layer) : a.GetCurrentAnimatorStateInfo(layer);
+            if (state.length < 0.5f || state.length > 5f) return;
+            var weapon = EquippedWeapon();
+            swingLength[weapon?.typeId ?? 0] = state.length;
+            nextPlayerSwing = lastPlayerSwing + state.length * AttackSpeedMultiplier();
         }
 
         /// <summary>

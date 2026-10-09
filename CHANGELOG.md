@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Basic attacks play their whole animation. The server swung on its own 2.4-second timer, which cut the weapon's attack animation off midway and restarted it, so attacks looked fast and choppy. Swings now follow the animation's length (1.6 seconds with a sword), and each hit does proportionally less, so damage per second is unchanged.
 - Attacks make sound. Basic attacks play a swing and an impact (daggers use the stab sound; bows and crossbows the arrow abilities' shot), and abilities the game data gives no sound now sound like your weapon, or play the heal chime for heals and buffs. The original server sent these and no data names them, so they are picked from the sounds the ability data uses for weapon blows.
 - Monsters turn to face you when they attack, and their blows land partway into the swing (each monster's attack delay from the game data) instead of before the animation. Stepping out of reach during the wind-up dodges the blow.
 - Monsters and animals stop their run animation when they stop walking, instead of running on the spot for up to 4 seconds.
@@ -25,6 +26,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - content.json: entries for one NPC copy (`npcType`), prerequisites (`after`) and quest variables (`var`); NPC rules (`npcs`) for which copy exists in which phase and for quest spawns; actions that set quest phases and variables, open conversations, post chat lines and spawn NPCs; triggers for areas, chat, item use, object clicks, dialogue nodes and finished quests. See the `gso-content` skill.
 - `npcground [n]` bridge command: how far the nearest NPCs stand above the ground under them, whether they're walking, their animation and how far they face away from you.
 - `sounds` bridge command: the sounds the client is playing.
+- `playeranim` bridge command: the player's animation layers, with clip length and progress.
 - `worldnpcs [type...]` bridge command: the server's NPCs in this scene, including hidden quest copies.
 - `setlevel <skillId> <level>` and `buffs` bridge commands: set a skill level for testing, and list the active buffs.
 
