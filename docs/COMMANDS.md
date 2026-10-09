@@ -42,6 +42,8 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
+| `fx <id>` / `sfx <id>` | Plays an effect ("_GFX IDs") 3 m in front of the player, or a sound at the player |
+| `projectiles` | The client's projectiles in flight (id, position, speed, model) |
 | `playerstate` | The client's attack state for your character (attacking, combat stance, animation), action animation, weapon in hand and on the back |
 | `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
 | `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |

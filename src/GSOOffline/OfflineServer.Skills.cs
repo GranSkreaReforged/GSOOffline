@@ -197,6 +197,7 @@ namespace GSOOffline
                 return;
             }
             job.due = Time.time + info.harvestTime;
+            PlaySound(Pick(info.sfx), h.pos, 30);   // each swing: chopping, mining, splashing...
 
             int skill = SkillIdByName(info.skill);
             int level = skill != 0 ? SkillLevel(skill) : 1;
@@ -217,6 +218,8 @@ namespace GSOOffline
             h.dead = true;
             h.respawnAt = Time.time + info.respawnTime;
             Send(13, 1, h.uid, true);
+            PlayEffect(info.endGfx, h.pos);   // e.g. the tree falling
+            Plugin.Log.LogInfo($"[skill] {info.name} {h.uid} used up (respawns in {info.respawnTime}s)");
             Send(3, 13, character.name, ActionHarvest);
             job = null;
         }

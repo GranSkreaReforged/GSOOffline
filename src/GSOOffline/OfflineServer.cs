@@ -101,6 +101,7 @@ namespace GSOOffline
             TickCombat();
             TickRegen();
             TickLoot();
+            TickImpacts();
             TickAutoLogin();
         }
 

@@ -34,6 +34,10 @@ namespace GSOOffline
         public float wanderFrequency;  // seconds between strolls
         public float wanderDistance;
         public bool dropLootAtPlayer;  // loot bag at the killer's feet (NPCs that die out of reach, e.g. in water)
+        // Ranged attacks: projectile id (XMLs/Projectiles), the share of attacks that use it (percent), and its reach.
+        public int projectile, projectileRate;
+        public float projectileDistance;
+        public int[] sfxAttack = new int[0], sfxTakeHit = new int[0], sfxDeath = new int[0];
         // Ids into the client's shared animation table (EasyAnimationHandler); defaults are the client's own.
         public int animIdle = NpcAnims.Idle, animRun = NpcAnims.Run, animAttack = NpcAnims.Attack, animDeath = NpcAnims.Death;
     }
@@ -93,6 +97,15 @@ namespace GSOOffline
             return v != null && int.TryParse(v.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int r) ? r : def;
         }
 
+        /// <summary>"334,335,336" -> [334, 335, 336] (sound lists pick one at random).</summary>
+        internal static int[] IntListAttr(XmlNode n, string name)
+        {
+            var list = new List<int>();
+            foreach (string part in (Attr(n, name) ?? string.Empty).Split(','))
+                if (int.TryParse(part.Trim(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int r) && r != 0) list.Add(r);
+            return list.ToArray();
+        }
+
         public static Vector3 ParseVec(string s)
         {
             string[] p = s.Split(',');
@@ -145,6 +158,12 @@ namespace GSOOffline
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
                     dropLootAtPlayer = IntAttr(n, "droplootatplayer") == 1,
+                    projectile = IntAttr(n, "projectile"),
+                    projectileRate = IntAttr(n, "projectilerate"),
+                    projectileDistance = IntAttr(n, "projectileattackdistance"),
+                    sfxAttack = IntListAttr(n, "sfxattack"),
+                    sfxTakeHit = IntListAttr(n, "sfxtakehit"),
+                    sfxDeath = IntListAttr(n, "sfxdeath"),
                     animIdle = IntAttr(n, "anim_idle", NpcAnims.Idle),
                     animRun = IntAttr(n, "anim_run", NpcAnims.Run),
                     animAttack = IntAttr(n, "anim_attack", NpcAnims.Attack),
