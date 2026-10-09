@@ -53,7 +53,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
   - 4/4 remove (itemId, typeId, amount, name)
   - 4/14 drop
   - 198/15 swap and 198/17 insert (index1, index2)
-  - 198/16 sort
+  - 198/16 sort (type, ascending). The client has already sorted its own list when it sends this; the server adopts that order.
   - 3/17 collect loot (name, lootId)
 - **Shops:** 8/8 buy (name, typeId, amount); 4/5 sell (name, typeId, uniqueId, amount).
 - **Bank:** 4/11 add and 4/12 remove items; 3/37 silver.
@@ -68,6 +68,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 |---|---|
 | 2/1 add item | item data `Key=Value
 ...` (Id, Typeid, Amount, Tab, Grade, Slot, stat keys), player name. For stackables, Amount is the delta. |
+| Stackable ids | Stackables (`typeId > 10000` and not `isUnique`) are `Id=0` in every message: 2/1, 2/14, 4/3, 4/13. The inventory and bank windows only draw a stack's count when its id is 0, and the client finds bank stacks by id. |
 | 8/0 equip | name, itemId, replaced itemId (0 = none). Send after the world scene has loaded, or the slots stay empty. |
 | 3/6 unequip, 4/3 remove | name, itemId [, typeId, amount] |
 | 198/37 swap, 198/38 insert | inventory indexes (server list order must match the client's) |

@@ -63,6 +63,18 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] player attacking={pl.attacking} attackId={pl.attackId} anim.combat={pl.anim.combat} anim.attackId={pl.anim.attackId} dead={pl.dead}");
         }
 
+        // invorder: server vs client inventory and bank row by row. Swaps and drags are sent as list indexes,
+        // so the two orders must match; stacks must be id 0 on the client or their counts aren't drawn.
+        private static void InvOrder(string[] args) => OfflineServer.Instance.CompareInventories();
+
+        // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
+        private static void SortInv(string[] args)
+        {
+            var inv = Inventory.instance;
+            inv.items.Sort((a, b) => string.Compare(a.item.itemName, b.item.itemName));
+            Scr_RPCSender.instance.IssueSortInventory(2, true);
+        }
+
         // openurl <url>: Application.OpenURL as a menu link would call it (checks OpenUrlPatch).
         private static void OpenUrl(string[] args)
         {

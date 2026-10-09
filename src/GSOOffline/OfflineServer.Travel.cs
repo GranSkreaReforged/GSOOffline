@@ -226,7 +226,7 @@ namespace GSOOffline
 
             it.amount -= amount;
             if (it.amount <= 0) character.bank.Remove(it);
-            Send(4, 13, character.name, it.id, typeId, amount);
+            Send(4, 13, character.name, WireId(it), typeId, amount);
 
             if (!t.Stacks)
             {
