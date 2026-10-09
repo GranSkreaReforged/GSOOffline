@@ -189,6 +189,22 @@ function Set-ProjectVersion([string]$Version) {
     [IO.File]::WriteAllText($props, $text)
 }
 
+# Label for dev builds (everything build.ps1 makes): "dev+<branch>.<commit>[.dirty]". It's stamped into the
+# DLL's informational version and printed in the BepInEx log, so a playtest build says where it came from.
+# Release builds come only from release.ps1 (-p:ReleaseBuild=true) and carry the plain version.
+function Get-DevBuildLabel {
+    try {
+        $sha = git -C $script:RepoRoot rev-parse --short HEAD
+        if ($LASTEXITCODE -ne 0 -or -not $sha) { return 'dev' }
+        $branch = git -C $script:RepoRoot branch --show-current
+        if (-not $branch) { $branch = 'detached' }
+        $label = "dev+$($branch -replace '[^0-9A-Za-z-]', '-').$sha"
+        if (git -C $script:RepoRoot status --porcelain --untracked-files=no) { $label += '.dirty' }
+        return $label
+    }
+    catch { return 'dev' }   # not a git checkout (e.g. a source zip)
+}
+
 function Invoke-Checked {
     param([string]$Exe, [string[]]$Arguments)
     & $Exe @Arguments

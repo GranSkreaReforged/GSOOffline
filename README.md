@@ -65,14 +65,12 @@ The game folder is found automatically by searching every Steam library. You can
 
 ### Releasing
 
-Work happens on `feature/<area>/<name>` branches from `dev`, merged back into `dev`; `main` only receives releases. The full flow is in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#6-branches-and-releases).
+Work happens on `feature/<area>/<name>` branches from `dev`, merged back into `dev`; risky or large changes go through a reviewed pull request. `main` only receives releases, each one a pull request from `dev`. `build.ps1` makes dev builds (versioned like `1.0.0-dev+<branch>.<commit>`); only `release.ps1` makes release builds. The full flow is in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#6-branches-and-releases).
 
 ```powershell
-git switch main; git merge --no-ff dev -m "Merge dev for v0.2.0"
-.\release.ps1 -Version 0.2.0 -DryRun   # build and package into dist\ only
-.\release.ps1 -Version 0.2.0           # also bump the version, date the CHANGELOG, commit, and tag v0.2.0
-git push --follow-tags
-git switch dev; git merge --ff-only main; git push
+.\release.ps1 -Version 0.2.0 -DryRun   # on dev: build and package into dist\ only
+.\release.ps1 -Version 0.2.0           # also bump the version, date the CHANGELOG, commit the release notes, and tag v0.2.0
+git push origin dev                    # then open the dev -> main pull request; push the tag once it's merged
 ```
 
 `dist\` receives the plugin-only zip, the zip with BepInEx included, and `SHA256SUMS.txt`. BepInEx is pinned to a specific version and SHA-256 in `build\GSOBuild.psm1`. The version number lives only in `Directory.Build.props`, and the plugin's `[BepInPlugin]` version is generated from it.

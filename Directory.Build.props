@@ -6,6 +6,19 @@
   </PropertyGroup>
 
   <!--
+    Dev builds vs release builds. Every build is a dev build, versioned "<Version>-dev+<branch>.<commit>"
+    (build.ps1 passes DevBuildLabel; a bare dotnet build says just "-dev"). Only release.ps1 makes release
+    builds (ReleaseBuild=true), which carry the plain version. The plugin logs it at startup.
+  -->
+  <PropertyGroup>
+    <DevBuildLabel Condition="'$(DevBuildLabel)' == ''">dev</DevBuildLabel>
+    <ReleaseBuild Condition="'$(ReleaseBuild)' != 'true'">false</ReleaseBuild>
+    <InformationalVersion Condition="'$(ReleaseBuild)' == 'true'">$(Version)</InformationalVersion>
+    <InformationalVersion Condition="'$(ReleaseBuild)' != 'true'">$(Version)-$(DevBuildLabel)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+  </PropertyGroup>
+
+  <!--
     Location of YOUR Gran Skrea Online install. The build only reads its Unity/game DLLs to compile
     against (they are proprietary: never committed, never copied into the output) and never writes to
     it; build.ps1 -Deploy is a separate, optional step. Precedence: /p:GameDir=... > GSO_GAME_DIR env
