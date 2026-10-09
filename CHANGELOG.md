@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-10-09
 ### Fixed
 - Changing zones no longer turns the clock back to 10:00. The start time (`World.StartTimeOfDay`) is sent once when you enter the world, and the day/night cycle runs on from there, so GSO HD Textures' weather and days continue across zones.
 - Stack counts show again in the inventory and bank (e.g. "12" on a stack of logs). The windows only draw a count for items with id 0, which is how the original server sent stackable items; stacks now go to the client that way.
