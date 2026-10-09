@@ -15,6 +15,8 @@ namespace GSOOffline
         public static float HitChance = 0.85f;
         public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
+        // Armor skills share a kill's XP if the player was hit this recently before it (community wiki: 30 s).
+        public const float ArmorXpWindow = 30f;
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
@@ -38,13 +40,8 @@ namespace GSOOffline
         private float nextPlayerSwing;
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
+        private float lastHitTaken = -1000f;
         private bool PlayerDead => respawnPlayerAt > 0f;
-
-        // Bandage-heal abilities (Healing skill) -> bandage item consumed.
-        private static readonly Dictionary<int, int> BandageAbilities = new Dictionary<int, int>
-        {
-            { 72, 10367 }, { 73, 10368 }, { 82, 10369 }, { 83, 10370 },
-        };
 
         private void RegisterCombatHandlers()
         {
@@ -99,107 +96,17 @@ namespace GSOOffline
             }
 
             int ability = character.GetAbilitySlot(slot);
-            if (BandageAbilities.TryGetValue(ability, out int bandage))
-            {
-                if (CountItem(bandage) == 0)
-                {
-                    Notice("You have no bandages of that kind.", "red");
-                    return;
-                }
-                TakeItems(bandage, 1);
-                int level = SkillLevel(24);
-                Heal(15 + 3 * level);
-                AddXp(24, SkillData.BaseXp(level));
-                Send(4, 0, character.name, slot, 300, 300);   // 3 s cooldown (hundredths)
-                OnHealed();
-                return;
-            }
             if (!SkillData.Abilities.TryGetValue(ability, out var a))
             {
                 UseAbility(0);
                 return;
             }
             CancelJob("attacking");
-            ReadyWeapon();
+            if (RuleFor(a).kind != AbilityKind.Bandage) ReadyWeapon();
             UseSkillAbility(slot, a);
         }
 
         private readonly Dictionary<int, float> slotReadyAt = new Dictionary<int, float>();
-
-        /// <summary>
-        /// Abilities from XMLs/Abilities: level, mana, range and cooldown come from the data. Their damage
-        /// formulas are lost, so offensive abilities hit for CombatRules.AbilityMultiplier x a basic hit.
-        /// </summary>
-        private void UseSkillAbility(int slot, AbilityInfo a)
-        {
-            if (slotReadyAt.TryGetValue(slot, out float ready) && Time.time < ready) return;
-            int skill = SkillIdByName((a.skill ?? string.Empty).Replace(" ", string.Empty));
-            if (skill != 0 && SkillLevel(skill) < a.level)
-            {
-                Notice($"You need level {a.level} {a.skill} to use {a.name}.", "red");
-                return;
-            }
-            if (character.currentMana < a.manaCost)
-            {
-                Notice("Not enough mana.", "red");
-                return;
-            }
-
-            NpcEntity npc = null;
-            if (a.requiresTarget && !a.friendly)
-            {
-                npc = world?.GetNpc(targetUid);
-                if (npc == null || npc.dead || !CanFight(npc)) return;
-                float range = Mathf.Max(a.range, WeaponRange(EquippedWeapon()));
-                if (Vector3.Distance(NpcPosition(npc), LocalPlayer.transform.position) > range)
-                {
-                    Notice("You are too far away.", "gray");
-                    return;
-                }
-            }
-
-            character.currentMana -= a.manaCost;
-            if (a.manaCost > 0) SendMana();
-            slotReadyAt[slot] = Time.time + a.cooldown;
-            int cd = Mathf.RoundToInt(a.cooldown * 100f);
-            Send(4, 0, character.name, slot, cd, cd);
-            Send(3, 20, character.name, a.id);
-            swingShown = true;   // ability id doubles as the attack animation id
-            if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-            PlaySound(Pick(a.startSfx), LocalPlayer.transform.position);
-            PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
-
-            var targets = new List<NpcEntity>();
-            if (npc != null) targets.Add(npc);
-            else if (a.weaponSkill && !a.friendly)
-            {
-                // Sweeping technique: everything hostile within reach.
-                Vector3 p = LocalPlayer.transform.position;
-                float reach = Mathf.Max(a.range, WeaponRange(EquippedWeapon()));
-                foreach (var n in world.npcs)
-                    if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), p) <= reach) targets.Add(n);
-            }
-            var weapon = EquippedWeapon();
-            int targetGfx = a.hitGfx > 0 ? a.hitGfx : AbilityTargetGfx.TryGetValue(a.id, out int g) ? g : 0;
-            AbilityProjectile.TryGetValue(a.id, out int projectile);
-            foreach (var t in targets)
-            {
-                Aggro(t);
-                var target = t;
-                int hit = Mathf.RoundToInt(RollPlayerHit(weapon, t) * CombatRules.AbilityMultiplier);
-                int hitSkill = skill != 0 ? skill : WeaponSkill(weapon);
-                System.Action land = () =>
-                {
-                    if (target.dead) return;
-                    PlayNpcEffect(target, targetGfx);
-                    PlaySound(Pick(a.hitSfx), NpcPosition(target));
-                    DealDamage(target, hit, hitSkill);
-                };
-                if (projectile > 0) ShootAtNpc(projectile, target, land);
-                else land();
-            }
-            if (npc != null) autoAttacking = !npc.dead;
-        }
 
         private static bool CanFight(NpcEntity npc) =>
             GameData.Npcs.TryGetValue(npc.typeId, out var info) && info.canFight;
@@ -213,29 +120,53 @@ namespace GSOOffline
             return null;
         }
 
+        // A weapon's "requires<Skill>" flag names the skill it trains (wands: Mental grim, lutes: Healing).
+        private static readonly Dictionary<string, int> RequiresSkill = new Dictionary<string, int>
+        {
+            { "requiresSwordsmanship", 15 }, { "requiresFencing", 16 }, { "requiresArchery", 17 },
+            { "requiresMacefighting", 18 }, { "requiresElementalgrim", 20 }, { "requiresMentalgrim", 21 },
+            { "requiresHealing", 24 },
+        };
+
         // Combat skill trained by the equipped weapon (Scr_SkillsHandler ids).
         private int WeaponSkill(ItemSave weapon)
         {
             if (weapon == null) return 23;   // Wrestling
+            var flags = ItemData.Get(weapon.typeId)?.flags;
+            if (flags != null)
+                foreach (var kv in RequiresSkill)
+                    if (flags.Contains(kv.Key)) return kv.Value;
             var ih = Scr_ItemHandler.instance;
             int t = weapon.typeId;
             if (ih.isBow(t) || ih.isCrossBow(t)) return 17;
             if (ih.isStaff(t)) return 20;
-            var flags = ItemData.Get(t)?.flags;
             if (flags != null)
             {
                 if (flags.Contains("isDagger")) return 16;
                 if (flags.Contains("isMace")) return 18;
+                if (flags.Contains("isInstrument")) return 24;
             }
             return 15;   // Swordsmanship
         }
 
+        /// <summary>
+        /// Attack reach, as the client's Scr_SkillsHandler.getMeleeWeaponRange: the client stops walking at this
+        /// distance, so a shorter server range would leave the player standing there never swinging.
+        /// </summary>
         private float WeaponRange(ItemSave weapon)
         {
-            if (weapon == null) return 3.5f;
+            const float slack = 1f;   // server and client NPC positions drift a little apart
+            if (weapon == null) return 3f + slack;
             var ih = Scr_ItemHandler.instance;
-            if (ih.isBow(weapon.typeId) || ih.isCrossBow(weapon.typeId) || ih.isStaff(weapon.typeId)) return 25f;
-            return 4f;
+            int t = weapon.typeId;
+            if (ih.isBow(t) || ih.isCrossBow(t)) return 50f + slack;
+            if (ih.isStaff(t)) return 25f + slack;
+            if (ih.isWand(t) || ih.isInstrument(t)) return 20f + slack;
+            if (ih.isMace(t)) return 4f + slack;
+            if (ih.isDagger(t)) return 3f + slack;
+            if (ih.isHalberd(t) || ih.isGreatsword(t)) return 4.5f + slack;
+            if (ih.isBroadsword(t)) return 4f + slack;
+            return 3f + slack;
         }
 
         private float WeaponSpeed(ItemSave weapon)
@@ -269,7 +200,7 @@ namespace GSOOffline
             var weapon = EquippedWeapon();
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
-            nextPlayerSwing = Time.time + WeaponSpeed(weapon);
+            nextPlayerSwing = Time.time + WeaponSpeed(weapon) * AttackSpeedMultiplier();
             Send(3, 20, character.name, 0);
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
@@ -280,11 +211,22 @@ namespace GSOOffline
             else DealDamage(npc, hit, skill);
         }
 
-        private int RollPlayerHit(ItemSave weapon, NpcEntity npc)
+        // Every damage stat on the weapon: Damage, the physical kinds (SlashDamage...) and the elemental ones
+        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count their damage too.
+        private static int WeaponDamage(ItemSave weapon)
+        {
+            int sum = 0;
+            if (weapon == null) return 0;
+            foreach (var s in weapon.stats)
+                if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
+            return sum;
+        }
+
+        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f)
         {
             if (Random.value >= CombatRules.HitChance) return 0;
-            int weaponDamage = StatSum(weapon, "Damage", "SlashDamage", "BluntDamage", "PiercingDamage");
-            int damage = Random.Range(1, CombatRules.PlayerMaxHit(weaponDamage, SkillLevel(WeaponSkill(weapon))) + 1);
+            int max = CombatRules.PlayerMaxHit(WeaponDamage(weapon), SkillLevel(WeaponSkill(weapon)));
+            int damage = Mathf.RoundToInt(Random.Range(1, max + 1) * power * DamageDealtMultiplier());
             if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
                 damage = Mathf.Max(1, damage - info.damageBlock / 10);
             return damage;
@@ -325,9 +267,38 @@ namespace GSOOffline
             if (info != null) NpcSound(npc, info.sfxDeath);
 
             int level = info?.level ?? 1;
-            AddXp(skill, CombatRules.KillXp(level));
+            AwardKillXp(skill, CombatRules.KillXp(level));
             DropLoot(npc, info);
             OnNpcKilled(npc.typeId);
+        }
+
+        /// <summary>
+        /// Kill XP goes to the weapon skill and, if the player was hit within <see cref="CombatRules.ArmorXpWindow"/>,
+        /// is shared with the armor skills worn (light and/or heavy), split evenly as the community wiki describes.
+        /// </summary>
+        private void AwardKillXp(int weaponSkill, int xp)
+        {
+            var skills = new List<int> { weaponSkill };
+            if (Time.time - lastHitTaken <= CombatRules.ArmorXpWindow)
+            {
+                foreach (var it in character.items)
+                {
+                    if (!it.equipped) continue;
+                    var flags = ItemData.Get(it.typeId)?.flags;
+                    if (flags == null) continue;
+                    if (flags.Contains("isLightArmor") && !skills.Contains(25)) skills.Add(25);
+                    if (flags.Contains("isHeavyArmor") && !skills.Contains(26)) skills.Add(26);
+                }
+            }
+            foreach (int s in skills) AddXp(s, xp / skills.Count);
+        }
+
+        /// <summary>Stunned or rooted NPCs stop where they are (the client keeps walking to the last waypoint).</summary>
+        private void HoldNpc(NpcEntity npc)
+        {
+            Vector3 here = NpcPosition(npc);
+            Send(198, 25, npc.uid, here, here, here);
+            Send(13, 2, npc.uid, false);
         }
 
         // ---- NPC AI --------------------------------------------------------------------------
@@ -373,7 +344,7 @@ namespace GSOOffline
 
         private void MoveNpc(NpcEntity npc, Vector3 to)
         {
-            if (Time.time < npc.nextWaypoint) return;
+            if (Time.time < npc.nextWaypoint || Time.time < npc.rootedUntil || Time.time < npc.stunnedUntil) return;
             npc.nextWaypoint = Time.time + 0.5f;
             Send(198, 25, npc.uid, NpcPosition(npc), to, to);
             Send(13, 2, npc.uid, true);
@@ -440,9 +411,10 @@ namespace GSOOffline
                 }
 
                 if (!npc.aggro && info.aggressive && !CombatRules.IsGuard(info) && !PlayerDead
-                    && Time.time >= aggroImmuneUntil && dist <= info.aggroDistance)
+                    && Time.time >= aggroImmuneUntil && dist <= info.aggroDistance && !CalmedBy(info))
                     Aggro(npc);
                 if (!npc.aggro) continue;
+                if (Time.time < npc.stunnedUntil) continue;   // stunned: no moving, no swinging
 
                 if (PlayerDead || Vector3.Distance(pos, npc.spawnPos) > CombatRules.LeashDistance)
                 {
@@ -479,13 +451,13 @@ namespace GSOOffline
                 {
                     var shooter = npc;
                     var shooterInfo = info;
-                    NpcShoots(shooter, info.projectile, () => { if (!PlayerDead && !shooter.dead) NpcHitsPlayer(shooterInfo); });
+                    NpcShoots(shooter, info.projectile, () => { if (!PlayerDead && !shooter.dead) NpcHitsPlayer(shooterInfo, shooter); });
                 }
-                else NpcHitsPlayer(info);
+                else NpcHitsPlayer(info, npc);
             }
         }
 
-        private void NpcHitsPlayer(NpcInfo info)
+        private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)
         {
             int damage = 0;
             if (Random.value < CombatRules.HitChance)
@@ -494,6 +466,8 @@ namespace GSOOffline
                 foreach (var it in character.items)
                     if (it.equipped) block += StatSum(it, "Damageblock");
                 damage = Mathf.Max(0, Random.Range(1, CombatRules.NpcMaxHit(info) + 1) - block / 2);
+                lastHitTaken = Time.time;
+                damage = ApplyDefensiveBuffs(damage, attacker);
             }
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
             Send(8, 2, character.name, -damage, info.damageType);
@@ -508,6 +482,8 @@ namespace GSOOffline
             npc.health = npc.maxHealth;
             npc.pos = npc.spawnPos;
             npc.attackAnimUntil = 0f;
+            npc.stunnedUntil = npc.rootedUntil = 0f;
+            npc.dotTicks = 0;
             Send(13, 0, npc.uid, false);
             Send(9, 1, npc.uid, npc.spawnPos);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
@@ -519,6 +495,7 @@ namespace GSOOffline
         private void PlayerDies()
         {
             StopAttacking();
+            ClearBuffs();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
             foreach (var npc in world.npcs)
@@ -546,6 +523,8 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
             TickPlayerRespawn();
+            TickBuffs();
+            TickNpcEffects();
             TickPlayerAttack(p);
             TickNpcs(p);
         }

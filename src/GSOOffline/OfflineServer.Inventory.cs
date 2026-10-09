@@ -54,6 +54,7 @@ namespace GSOOffline
             On(198, 17, OnInsertItem);
             On(198, 16, c => MirrorClientOrder());
             On(3, 18, c => UseItem((int)c[2]));
+            On(16, 3, c => UseExperienceScroll((int)c[1], (int)c[2]));
             On(6, 5, c => SwitchWeapon());
             On(6, 6, c => SetSecondaryWeapon(null));
         }
@@ -356,18 +357,6 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev] {what} {i}: server {s} client {c}{(s != c ? "  MISMATCH" : "")}");
             }
             Plugin.Log.LogInfo($"[dev] {what}: {server.Count} server, {client.Count} client, {bad} mismatched rows");
-        }
-
-        private void UseItem(int typeId)
-        {
-            if (character == null || CountItem(typeId) == 0) return;
-            var t = ItemData.Get(typeId);
-            if (t != null && t.food > 0)
-            {
-                TakeItems(typeId, 1);
-                Heal(t.food);
-            }
-            Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps...)
         }
 
         public void SetSilver(int silver)

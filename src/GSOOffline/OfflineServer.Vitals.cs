@@ -14,7 +14,7 @@ namespace GSOOffline
                 foreach (var s in it.stats)
                     if (s.key == "Health") max += s.value;
             }
-            return Mathf.Max(1, max);
+            return Mathf.Max(1, max + BonusHealth());
         }
 
         private void SendHealth()

@@ -99,6 +99,9 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/2 player damage | name, signed delta (negative = damage), damage type |
 | 1/2 player dead | name, dead |
 | 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
+| 4/9 add buff, 3/35 end buff | name, buff id (XMLs/Buffs), time left, total time (tenths of a second) / name, buff id. The icon shows by the health bar; the effect is the server's. |
+| 3/18 use item (C→S) → 3/24 | name, item type id / name, type id. The reply opens item UIs (knife, mortar, experience scroll picker, furniture placement). |
+| 16/3 experience scroll (C→S) | skill id, scroll type id (sent from the picker window, with no name) |
 
 Effects, projectiles and sounds. The client plays nothing on its own: every effect is a server message. Effect ids are the game's "_GFX IDs" list (1 level up, 16/17 spruce/oak falling, 40/41 teleport/land...); the client's own level-up banner is never triggered.
 

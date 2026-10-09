@@ -87,6 +87,12 @@ namespace GSOOffline
         // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
         private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
 
+        // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
+        private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
+
+        // buffs: the player's active buffs and what they do.
+        private static void Buffs(string[] args) => OfflineServer.Instance.LogBuffs();
+
         // projectiles: the client's projectiles in flight (id, position, target).
         private static void Projectiles(string[] args)
         {

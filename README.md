@@ -122,6 +122,9 @@ Working:
 - Doors, dungeon entrances and interiors
 - Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
+- Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
+- Light and heavy armor XP, shared from kills made shortly after being hit
+- Potions, food, experience scrolls, teleport scrolls and gear crates
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
@@ -132,7 +135,7 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- Buffs from support abilities
+- Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
