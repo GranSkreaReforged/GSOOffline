@@ -77,6 +77,16 @@ namespace GSOOffline
             Scr_RPCSender.instance.IssueSortInventory(2, true);
         }
 
+        // loot: the loot bags the server holds in this scene, and how many the client shows.
+        private static void Loot(string[] args) => OfflineServer.Instance.LogLoot();
+
+        // lootroll <npcType> [n]: rolls that NPC type's drop table n times (default 1000) and logs the totals.
+        private static void LootRoll(string[] args) =>
+            OfflineServer.LogLootRolls(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 1000);
+
+        // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
+        private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
+
         // openurl <url>: Application.OpenURL as a menu link would call it (checks OpenUrlPatch).
         private static void OpenUrl(string[] args)
         {

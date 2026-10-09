@@ -58,6 +58,7 @@ namespace GSOOffline
             RegisterSkillHandlers();
             RegisterCombatHandlers();
             RegisterTravelHandlers();
+            RegisterLootHandlers();
         }
 
         public void Receive(byte ev, object[] c)
@@ -99,6 +100,7 @@ namespace GSOOffline
             TickRespawns();
             TickCombat();
             TickRegen();
+            TickLoot();
             TickAutoLogin();
         }
 

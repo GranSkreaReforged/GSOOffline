@@ -109,6 +109,7 @@ namespace GSOOffline
             SendWayshrines();
             SendPendingEquips();
             SendHealth();
+            SendSceneLoot();
 
             sceneReady = true;
             visibilityTimer = 0.5f;

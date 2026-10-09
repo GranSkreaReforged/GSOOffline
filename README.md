@@ -122,6 +122,7 @@ Working:
 - Doors, dungeon entrances and interiors
 - Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
+- Loot bags: kills drop a bag with the monster's loot; click it to take everything
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
@@ -130,9 +131,11 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- NPC loot tables (kills drop silver), projectile/spell visuals for abilities, buffs from support abilities
+- Projectile/spell visuals for abilities, buffs from support abilities
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
+
+Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 

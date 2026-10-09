@@ -33,6 +33,7 @@ namespace GSOOffline
         public bool wandering;
         public float wanderFrequency;  // seconds between strolls
         public float wanderDistance;
+        public bool dropLootAtPlayer;  // loot bag at the killer's feet (NPCs that die out of reach, e.g. in water)
         // Ids into the client's shared animation table (EasyAnimationHandler); defaults are the client's own.
         public int animIdle = NpcAnims.Idle, animRun = NpcAnims.Run, animAttack = NpcAnims.Attack, animDeath = NpcAnims.Death;
     }
@@ -143,6 +144,7 @@ namespace GSOOffline
                     wandering = IntAttr(n, "wandering") == 1,
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
+                    dropLootAtPlayer = IntAttr(n, "droplootatplayer") == 1,
                     animIdle = IntAttr(n, "anim_idle", NpcAnims.Idle),
                     animRun = IntAttr(n, "anim_run", NpcAnims.Run),
                     animAttack = IntAttr(n, "anim_attack", NpcAnims.Attack),

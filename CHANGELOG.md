@@ -12,6 +12,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - You now harvest with the tool in your hand. Starting to mine, chop, fish or gather puts your best matching tool in hand and your weapon on your back; attacking with a tool in hand brings the weapon back. Attacking also stops the harvest.
 
 ### Added
+- Loot bags. A kill drops a bag where the monster fell, showing what's in it when you hover over it; click it to take everything. Bags stay for 5 minutes and are still there if you leave the area and come back. Drop lists for 43 monsters come from the community wiki (e.g. sheep: wool, sheep leather and bones; wolves: fur and bones; Red crab: silk gear, pistols and its rare pet). Monsters the wiki doesn't cover drop silver by level, and every monster can drop upgrade and grade stones for its level band. Silver now comes in the bag instead of straight into your inventory.
+- `loot`, `lootroll <npcType> [n]` and `killnpc <uid>` bridge commands: list loot bags, check a drop table's rates over many kills, and kill an NPC as the player would.
 - Secondary weapon: equipping a weapon over another puts the old one on your back, as the original server did. Switch with the "Switch weapon" key or the button by the spell bar, or take it off from the equipment window. It is saved with the character.
 - `openurl <url>` bridge command: calls `Application.OpenURL` as a menu link would.
 - `invorder` and `sortinv` bridge commands: compare the server's and the client's inventory and bank row by row, and sort as the inventory's "By name" button does.
