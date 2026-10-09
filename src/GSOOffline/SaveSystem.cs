@@ -95,6 +95,7 @@ namespace GSOOffline
         // Order matches the client's Inventory.items list; swap/insert requests are index based.
         public List<ItemSave> items = new List<ItemSave>();
         public int nextItemId = 1;
+        public int secondaryWeaponId;   // weapon carried on the back (item id in items, not equipped); 0 = none
 
         public List<QuestState> quests = new List<QuestState>();
         public List<QuestVar> questVars = new List<QuestVar>();
