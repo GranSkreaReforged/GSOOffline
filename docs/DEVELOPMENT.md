@@ -82,15 +82,16 @@ A feature:
 ```powershell
 git switch dev; git pull --ff-only
 git switch -c feature/inventory/stack-split
-git push -u origin feature/inventory/stack-split
-# ...commit and push as you go...
+# ...commit as you go...
 git switch dev; git pull --ff-only
 git merge --no-ff feature/inventory/stack-split
 git push
-git branch -d feature/inventory/stack-split; git push origin --delete feature/inventory/stack-split
+git branch -d feature/inventory/stack-split
 ```
 
-`--no-ff` keeps each feature as one merge on `dev`, so `git log --first-parent dev` reads as a list of features. If `dev` moved on and the feature conflicts, merge `dev` into the feature branch and resolve there; don't rebase a branch that's already pushed. A single small commit (a typo, one doc line) can go straight on `dev`.
+Feature branches stay local; only `dev` and `main` live on GitHub. Push a feature branch only when you want it backed up or shared (`git push -u origin <branch>`, and `git push origin --delete <branch>` after merging).
+
+`--no-ff` keeps each feature as one merge on `dev`, so `git log --first-parent dev` reads as a list of features. If `dev` moved on and the feature conflicts, resolve it on the feature branch: rebase it onto `dev` while it's local, or merge `dev` into it if it has been pushed. A single small commit (a typo, one doc line) can go straight on `dev`.
 
 A release:
 
