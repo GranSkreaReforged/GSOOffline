@@ -418,6 +418,7 @@ namespace GSOOffline
             Send(4, 0, character.name, slot, cd, cd);
             Send(3, 20, character.name, a.id);
             swingShown = true;   // ability id doubles as the attack animation id
+            castEndsAt = Time.time + a.attackTime;
             PlaySound(Pick(a.startSfx), LocalPlayer.transform.position);
             PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
             Plugin.Log.LogInfo($"[ability] {a.id} {a.name}: {rule.kind}");

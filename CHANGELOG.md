@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Your character no longer stays stuck in a skill's animation after casting it. Buffs, heals and area attacks without a target to keep attacking left the character mid-cast until the next attack; the cast now ends after the ability's own attack time.
 - Talking to Alden during the first quest no longer starts "Into the Depths" early, and other quest conversations no longer open on the wrong copy of an NPC. Quest NPCs now exist only in their own phases (the dinner table, the crime scene, Roke in his tunnel, wounded Alden...), the way the original server showed them.
 - Buff abilities no longer hurt every monster around you. Thick skin, Heavy shield block, Frenzy, Flame barrier and other untargeted weapon abilities were treated as sweeping attacks.
 - Staffs, wands and lutes now count their damage. Only plain and physical damage stats were added to hits, so fire, ice, psychic and poison weapons hit like bare hands.
