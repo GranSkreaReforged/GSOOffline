@@ -206,11 +206,40 @@ namespace GSOOffline
             Send(3, 20, character.name, 0);
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
+            WeaponSounds(weapon, out int swingSfx, out int hitSfx);
+            PlaySound(swingSfx, playerPos);
 
             int hit = RollPlayerHit(weapon, npc), skill = WeaponSkill(weapon);
             int projectile = WeaponProjectile(weapon);
-            if (projectile > 0) ShootAtNpc(projectile, npc, () => { if (!npc.dead) DealDamage(npc, hit, skill); });
-            else DealDamage(npc, hit, skill);
+            System.Action land = () =>
+            {
+                if (npc.dead) return;
+                if (hit > 0) PlaySound(hitSfx, NpcPosition(npc));
+                DealDamage(npc, hit, skill);
+            };
+            if (projectile > 0) ShootAtNpc(projectile, npc, land);
+            else land();
+        }
+
+        /// <summary>
+        /// The player's attack sounds were the server's to send and no data names them for basic attacks. These are
+        /// the ids the ability data gives weapon blows: "Swing" and Brutal slash (321 swing, 320 impact), Stab (93),
+        /// the arrows (34). Staffs, wands and lutes shoot projectiles, which bring their own impact sound.
+        /// </summary>
+        private static void WeaponSounds(ItemSave weapon, out int swing, out int hit)
+        {
+            swing = 321;
+            hit = 320;
+            if (weapon == null) return;
+            var ih = Scr_ItemHandler.instance;
+            int t = weapon.typeId;
+            if (ih.isBow(t) || ih.isCrossBow(t))
+            {
+                swing = 34;
+                hit = 0;
+            }
+            else if (ih.isStaff(t) || ih.isWand(t) || ih.isInstrument(t)) swing = hit = 0;
+            else if (ih.isDagger(t)) hit = 93;
         }
 
         /// <summary>
@@ -387,7 +416,13 @@ namespace GSOOffline
                 float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
                 if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
             }
-            else npc.hasDest = false;
+            else if (flat.magnitude < 0.3f)
+            {
+                // Arrived. Without this the client keeps the run animation going until its own 2-second stall check.
+                npc.hasDest = false;
+                Send(13, 2, npc.uid, false);
+                return;
+            }
             Send(198, 25, npc.uid, from, to, to);
             Send(13, 2, npc.uid, true);
         }
@@ -421,7 +456,10 @@ namespace GSOOffline
             {
                 Vector3 p = list[i].transform.position;
                 string above = GroundAt(p, p.y + 5f, 30f, out var g) ? (p.y - g.y).ToString("F2") : "no ground";
-                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} above-ground={above}");
+                var server = world?.GetNpc(list[i].npcUniqueId);
+                Vector3 forward = list[i].transform.forward, toMe = me - p;
+                forward.y = toMe.y = 0f;
+                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above}");
             }
         }
 
@@ -520,20 +558,38 @@ namespace GSOOffline
                     npc.hasDest = false;
                     Send(13, 2, npc.uid, false);
                     Send(11, 0, npc.uid, true, character.name);   // client animates swings at attackSpeed
+                    Send(198, 28, npc.uid, playerPos);   // turn to the player: the client only turns NPCs as they walk
                 }
                 if (Time.time < npc.nextSwing) continue;
                 npc.nextSwing = Time.time + info.attackSpeed;
+                Send(198, 28, npc.uid, playerPos);
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
                 NpcSound(npc, info.sfxAttack);
-                if (ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate))
-                {
-                    var shooter = npc;
-                    var shooterInfo = info;
-                    NpcShoots(shooter, info.projectile, () => { if (!PlayerDead && !shooter.dead) NpcHitsPlayer(shooterInfo, shooter); });
-                }
-                else NpcHitsPlayer(info, npc);
+                bool shoot = ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate);
+                var attacker = npc;
+                var attackerInfo = info;
+                // The blow lands attackdelay into the swing, in time with the animation.
+                Later(Mathf.Min(info.attackDelay, info.attackSpeed), () => NpcSwingLands(attacker, attackerInfo, shoot));
             }
+        }
+
+        private void NpcSwingLands(NpcEntity npc, NpcInfo info, bool shoot)
+        {
+            var player = LocalPlayer;
+            if (npc.dead || !npc.aggro || PlayerDead || player == null || Time.time < npc.stunnedUntil) return;
+            if (shoot)
+            {
+                NpcShoots(npc, info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
+                return;
+            }
+            // Stepping out of reach during the wind-up dodges the blow.
+            if (Vector3.Distance(NpcPosition(npc), player.transform.position) > info.attackDistance + info.attackMissDistance)
+            {
+                Send(8, 2, character.name, 0, info.damageType);
+                return;
+            }
+            NpcHitsPlayer(info, npc);
         }
 
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)

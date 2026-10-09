@@ -26,6 +26,8 @@ namespace GSOOffline
         public float aggroDistance;
         public float attackDistance;
         public float attackSpeed;      // seconds between swings
+        public float attackDelay;      // seconds into a swing before the blow lands
+        public float attackMissDistance;   // a melee blow misses if the player got this much beyond reach
         public int damage;             // explicit damage (rare); 0 = derive from level
         public int defence;
         public int damageBlock;
@@ -150,6 +152,8 @@ namespace GSOOffline
                     aggroDistance = IntAttr(n, "aggrodistance", 10),
                     attackDistance = Mathf.Max(2.5f, IntAttr(n, "attackdistance", 3)),
                     attackSpeed = IntAttr(n, "attackspeed", 3000) / 1000f,
+                    attackDelay = IntAttr(n, "attackdelay", 600) / 1000f,
+                    attackMissDistance = IntAttr(n, "attackmissdistance", 1),
                     damage = IntAttr(n, "damage"),
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),

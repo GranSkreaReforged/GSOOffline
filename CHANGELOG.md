@@ -5,6 +5,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Attacks make sound. Basic attacks play a swing and an impact (daggers use the stab sound; bows and crossbows the arrow abilities' shot), and abilities the game data gives no sound now sound like your weapon, or play the heal chime for heals and buffs. The original server sent these and no data names them, so they are picked from the sounds the ability data uses for weapon blows.
+- Monsters turn to face you when they attack, and their blows land partway into the swing (each monster's attack delay from the game data) instead of before the animation. Stepping out of reach during the wind-up dodges the blow.
+- Monsters and animals stop their run animation when they stop walking, instead of running on the spot for up to 4 seconds.
 - Monsters and animals no longer sink into the ground while walking (sheep and rats around Yorkhill Monastery, for example). The client walks them in a straight line to each point the server gives, so a walk over a hill cut through it; the server now sends short steps that follow the ground.
 - Your character no longer stays stuck in a skill's animation after casting it. Buffs, heals and area attacks without a target to keep attacking left the character mid-cast until the next attack; the cast now ends after the ability's own attack time.
 - Talking to Alden during the first quest no longer starts "Into the Depths" early, and other quest conversations no longer open on the wrong copy of an NPC. Quest NPCs now exist only in their own phases (the dinner table, the crime scene, Roke in his tunnel, wounded Alden...), the way the original server showed them.
@@ -20,7 +23,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Usable items: health and mana potions, mana regeneration, health boost, crafting and gathering speed potions (crafting or gathering 25% faster); experience scrolls (100, 300, 1000 and 5000 XP in the skill you pick, the amounts the wiki records; quest rewards hand these out); teleport scrolls to the wayshrines that exist offline, including the home wayshrine teleport; gear crates, which hold a random piece of equipment of their tier. Resistance, stamina and movement speed potions, beer and wine show their buff icon only.
 - Quests 5, 6, 7, 17, 18, 19, 20, 26, 27, 28, 31 and 32 can be played to the end, and the ambush in Flowerful Persuasions happens. Quest steps include going to places, clicking quest objects (the pond scroll, the cook book, the rum crate, the graves), using items (the yarrowroot, Tesco's remains, fibervine seeds), saying a name in chat (Wallace), killing quest monsters (with quest drops such as Tesco's remains and the troll's hide), and conversations that start other quests. Ambushers, bosses and summoned ghosts spawn when the story calls for them, and "Into the Depths" takes you into its battle and aftermath scenes.
 - content.json: entries for one NPC copy (`npcType`), prerequisites (`after`) and quest variables (`var`); NPC rules (`npcs`) for which copy exists in which phase and for quest spawns; actions that set quest phases and variables, open conversations, post chat lines and spawn NPCs; triggers for areas, chat, item use, object clicks, dialogue nodes and finished quests. See the `gso-content` skill.
-- `npcground [n]` bridge command: how far the nearest NPCs stand above the ground under them.
+- `npcground [n]` bridge command: how far the nearest NPCs stand above the ground under them, whether they're walking, their animation and how far they face away from you.
+- `sounds` bridge command: the sounds the client is playing.
 - `worldnpcs [type...]` bridge command: the server's NPCs in this scene, including hidden quest copies.
 - `setlevel <skillId> <level>` and `buffs` bridge commands: set a skill level for testing, and list the active buffs.
 

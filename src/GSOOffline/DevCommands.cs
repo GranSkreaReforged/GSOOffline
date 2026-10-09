@@ -134,6 +134,15 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev] anim {i}: {(clips[i] != null ? clips[i].name + " " + clips[i].length.ToString("F2") + "s" : "null")}");
         }
 
+        // sounds: the client's sounds playing right now (ids as in Audio_Sound_<id>.wav).
+        private static void Sounds(string[] args)
+        {
+            var ids = new System.Collections.Generic.List<string>();
+            foreach (var s in Scr_AudioHandler.instance.sounds)
+                if (s != null) ids.Add(s.id.ToString());
+            Plugin.Log.LogInfo($"[dev] sounds playing: {string.Join(" ", ids.ToArray())}");
+        }
+
         // npcground [n]: the nearest n client NPCs' height above the ground under them (sunken NPCs read negative).
         private static void NpcGround(string[] args) => OfflineServer.Instance.LogNpcGround(args.Length > 1 ? int.Parse(args[1]) : 15);
 

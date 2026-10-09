@@ -419,7 +419,8 @@ namespace GSOOffline
             Send(3, 20, character.name, a.id);
             swingShown = true;   // ability id doubles as the attack animation id
             castEndsAt = Time.time + a.attackTime;
-            PlaySound(Pick(a.startSfx), LocalPlayer.transform.position);
+            WeaponSounds(EquippedWeapon(), out int weaponSwingSfx, out int weaponHitSfx);
+            PlaySound(a.startSfx.Length > 0 ? Pick(a.startSfx) : DefaultCastSound(rule, weaponSwingSfx), LocalPlayer.transform.position);
             PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
             Plugin.Log.LogInfo($"[ability] {a.id} {a.name}: {rule.kind}");
 
@@ -503,7 +504,7 @@ namespace GSOOffline
                 {
                     if (target.dead) return;
                     PlayNpcEffect(target, targetGfx);
-                    PlaySound(Pick(a.hitSfx), NpcPosition(target));
+                    PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : weaponHitSfx, NpcPosition(target));
                     if (hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
                     // Damage over time replaces part of the up-front hit.
                     DealDamage(target, rule.dot > 0f ? hit / 2 : hit, xpSkill);
@@ -513,6 +514,24 @@ namespace GSOOffline
                 else land();
             }
             if (npc != null) autoAttacking = !npc.dead;
+        }
+
+        // Most abilities name no sound. Attacks sound like the weapon; heals and buffs use Charm's heal sound (308).
+        private static int DefaultCastSound(AbilityRule rule, int weaponSwing)
+        {
+            switch (rule.kind)
+            {
+                case AbilityKind.Heal:
+                case AbilityKind.HealOverTime:
+                case AbilityKind.Buff:
+                case AbilityKind.Taunt:
+                    return 308;
+                case AbilityKind.Utility:
+                case AbilityKind.Bandage:
+                    return 0;
+                default:
+                    return weaponSwing;
+            }
         }
 
         // Reconstructed: a bandage heals more the better it is and the higher the Healing level.
