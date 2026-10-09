@@ -19,6 +19,8 @@ namespace GSOOffline
         public bool aggro, returning, attackingSent;
         public float nextSwing, nextWaypoint, respawnAt, nextWander, attackAnimUntil;
         public int anim = -1;   // animation id last sent to the client
+        public bool hasDest;    // walking to dest in ground-following steps
+        public Vector3 dest;
 
         // ability effects
         public float stunnedUntil, rootedUntil;

@@ -297,6 +297,7 @@ namespace GSOOffline
         private void HoldNpc(NpcEntity npc)
         {
             Vector3 here = NpcPosition(npc);
+            npc.hasDest = false;
             Send(198, 25, npc.uid, here, here, here);
             Send(13, 2, npc.uid, false);
         }
@@ -344,24 +345,82 @@ namespace GSOOffline
 
         private void MoveNpc(NpcEntity npc, Vector3 to)
         {
+            npc.dest = to;
+            npc.hasDest = true;
+            StepNpc(npc);
+        }
+
+        /// <summary>
+        /// The client walks an NPC in a straight line to its waypoint, height included, so a far waypoint over
+        /// a hump takes it through the ground. Each waypoint is a short step towards the destination, put on
+        /// the ground, and the next one goes out before the NPC reaches it.
+        /// </summary>
+        private void StepNpc(NpcEntity npc)
+        {
             if (Time.time < npc.nextWaypoint || Time.time < npc.rootedUntil || Time.time < npc.stunnedUntil) return;
+            var c = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(npc.uid) : null;
+            if (c == null) return;
             npc.nextWaypoint = Time.time + 0.5f;
-            Send(198, 25, npc.uid, NpcPosition(npc), to, to);
+            Vector3 from = c.transform.position;
+            npc.pos = from;
+            Vector3 flat = npc.dest - from;
+            flat.y = 0f;
+            float step = Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed);   // about a second of walking
+            Vector3 to = npc.dest;
+            if (flat.magnitude > step)
+            {
+                to = from + flat.normalized * step;
+                to.y = Mathf.Lerp(from.y, npc.dest.y, step / flat.magnitude);
+                float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
+                if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
+            }
+            else npc.hasDest = false;
+            Send(198, 25, npc.uid, from, to, to);
             Send(13, 2, npc.uid, true);
+        }
+
+        /// <summary>The first solid surface straight down from height top above p, ignoring NPCs and players.</summary>
+        private static bool GroundAt(Vector3 p, float top, float depth, out Vector3 ground)
+        {
+            ground = p;
+            float best = float.MaxValue;
+            foreach (var h in Physics.RaycastAll(new Vector3(p.x, top, p.z), Vector3.down, depth, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+            {
+                if (h.distance >= best || h.collider.GetComponentInParent<Scr_Npc>() != null
+                    || h.collider.GetComponentInParent<Scr_Player>() != null || h.collider.GetComponentInParent<Scr_OtherPlayer>() != null)
+                    continue;
+                best = h.distance;
+                ground = h.point;
+            }
+            return best < float.MaxValue;
+        }
+
+        /// <summary>Dev: how far the nearest client NPCs stand above the ground (bridge command npcground).</summary>
+        internal void LogNpcGround(int count)
+        {
+            var player = LocalPlayer;
+            if (player == null || Scr_NpcHandler.instance == null) return;
+            Vector3 me = player.transform.position;
+            var list = new List<Scr_Npc>(Scr_NpcHandler.instance.npcList);
+            list.RemoveAll(x => x == null);
+            list.Sort((a, b) => (a.transform.position - me).sqrMagnitude.CompareTo((b.transform.position - me).sqrMagnitude));
+            for (int i = 0; i < list.Count && i < count; i++)
+            {
+                Vector3 p = list[i].transform.position;
+                string above = GroundAt(p, p.y + 5f, 30f, out var g) ? (p.y - g.y).ToString("F2") : "no ground";
+                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} above-ground={above}");
+            }
         }
 
         private void Wander(NpcEntity npc, NpcInfo info)
         {
             npc.nextWander = Time.time + info.wanderFrequency * Random.Range(0.6f, 1.4f);
             Vector2 offset = Random.insideUnitCircle * info.wanderDistance;
-            var origin = npc.spawnPos + new Vector3(offset.x, 30f, offset.y);
-            // Keep strolls on the ground (the client walks NPCs in straight lines, including height).
-            if (!Physics.Raycast(origin, Vector3.down, out var hit, 60f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
-                return;
-            if (Mathf.Abs(hit.point.y - npc.spawnPos.y) > 5f) return;
+            // A spot on the ground within 5 m of the spawn's height (not a roof above it or a cliff below).
+            if (!GroundAt(npc.spawnPos + new Vector3(offset.x, 0f, offset.y), npc.spawnPos.y + 5f, 10f, out var spot)) return;
             Send(198, 30, npc.uid, true);   // walk
             npc.nextWaypoint = 0f;
-            MoveNpc(npc, hit.point);
+            MoveNpc(npc, spot);
         }
 
         private void Disengage(NpcEntity npc)
@@ -398,6 +457,7 @@ namespace GSOOffline
                 UpdateAnim(npc, info);
                 if (info == null) continue;
 
+                if (npc.hasDest) StepNpc(npc);
                 if (!npc.aggro && !npc.returning && info.wandering && Time.time >= npc.nextWander && npc.uid != dialogueNpc?.uid)
                     Wander(npc, info);
                 if (!info.canFight) continue;
@@ -444,6 +504,7 @@ namespace GSOOffline
                 if (!npc.attackingSent)
                 {
                     npc.attackingSent = true;
+                    npc.hasDest = false;
                     Send(13, 2, npc.uid, false);
                     Send(11, 0, npc.uid, true, character.name);   // client animates swings at attackSpeed
                 }
@@ -486,6 +547,7 @@ namespace GSOOffline
             npc.aggro = npc.returning = npc.attackingSent = false;
             npc.health = npc.maxHealth;
             npc.pos = npc.spawnPos;
+            npc.hasDest = false;
             npc.attackAnimUntil = 0f;
             npc.stunnedUntil = npc.rootedUntil = 0f;
             npc.dotTicks = 0;
