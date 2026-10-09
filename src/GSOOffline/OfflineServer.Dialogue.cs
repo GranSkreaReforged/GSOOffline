@@ -24,7 +24,7 @@ namespace GSOOffline
         private void InteractNpc(int uid)
         {
             var npc = world?.GetNpc(uid);
-            if (character == null || npc == null || npc.dead) return;
+            if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 
@@ -45,9 +45,14 @@ namespace GSOOffline
             {
                 foreach (var e in entries)
                 {
+                    if (e.npcType != 0 && e.npcType != npcType) continue;
                     if (e.quest != 0 && character.GetQuestPhase(e.quest) != e.phase) continue;
+                    if (e.condition != null && !e.condition.Holds(character, GetQuestVar)) continue;
                     if (!HasItems(e.requiredItems)) continue;
-                    if (best == null || e.priority > best.priority || (e.priority == best.priority && e.node < best.node))
+                    // Ties: the entry that asks for items first ("you have the hide!" over "slain it yet?"), then the lower node.
+                    if (best == null || e.priority > best.priority
+                        || (e.priority == best.priority && (e.requiredItems.Count > best.requiredItems.Count
+                            || (e.requiredItems.Count == best.requiredItems.Count && e.node < best.node))))
                         best = e;
                 }
             }
@@ -84,6 +89,8 @@ namespace GSOOffline
             if (n.addItem != null) GiveItem(n.addItem[0], n.addItem.Length > 1 ? n.addItem[1] : 1);
             if (n.otherAction > 0) RunAction(n.otherAction, n.id);
             if (n.openShop > 0) OpenShop(n.openShop);
+            foreach (var t in Content.Triggers.ToArray())
+                if (t.node == n.id && TriggerReady(t, "node")) FireTrigger(t);
 
             var visible = new List<string>();
             foreach (var o in n.options)
@@ -115,10 +122,15 @@ namespace GSOOffline
                 CloseDialogue();
         }
 
+        private ActionDef pendingDialogueTeleport;
+
         private void CloseDialogue()
         {
             dialogueNode = null;
             if (character != null) Send(2, 3, character.name, "-");
+            var move = pendingDialogueTeleport;
+            pendingDialogueTeleport = null;
+            if (move != null && character != null) TeleportNear(move.scene, GameData.ParseVec(move.pos));
         }
 
         private void RunAction(int id, int nodeId)
@@ -128,12 +140,29 @@ namespace GSOOffline
                 Plugin.Log.LogWarning($"Dialogue action {id} (node {nodeId}) is not implemented yet; add it to content.json.");
                 return;
             }
+            if (a.silver < 0 && character.silver < -a.silver)
+            {
+                Notice("You don't have enough silver.", "red");
+                return;
+            }
             foreach (var g in a.give)
                 if (!a.onlyIfMissing || CountItem(g.type) == 0) GiveItem(g.type, g.Amount);
             foreach (var t in a.take) TakeItems(t.type, t.Amount);
             if (a.silver != 0) SetSilver(character.silver + a.silver);
             if (a.window > 0) Send(3, 33, character.name, a.window);
-            if (a.scene > 0 && !string.IsNullOrEmpty(a.pos)) Teleport(a.scene, GameData.ParseVec(a.pos));
+            if (!string.IsNullOrEmpty(a.notice)) Notice(a.notice);
+            var v = Content.ParseInts(a.setVar);
+            if (v != null && v.Length >= 3) SetQuestVar(v[0], v[1], v[2]);
+            var q = Content.ParseInts(a.setQuest);
+            if (q != null && q.Length >= 2) SetQuestPhase(q[0], q[1]);
+            if (a.scene > 0 && !string.IsNullOrEmpty(a.pos))
+            {
+                // Mid-conversation, the move waits for the conversation to end (a scene change would cut it off).
+                if (dialogueNode != null) pendingDialogueTeleport = a;
+                else TeleportNear(a.scene, GameData.ParseVec(a.pos));
+            }
+            if (a.spawnNear != null && a.spawnNear.Count > 0) SpawnNearPlayer(a.spawnNear);
+            if (a.dialogue > 0) StartDialogue(a.dialogue, a.dialogueNpc);
         }
 
         // ---- quests --------------------------------------------------------------------------
@@ -154,6 +183,7 @@ namespace GSOOffline
             Send(8, 9, character.name, quest, phase);
             if (phase == -1) CompleteQuest(quest);
             else CheckItemTriggers();
+            OnQuestPhaseReached(quest);
         }
 
         private static readonly Regex XpReward = new Regex(@"gained (\d+) XP in (.+?)\.", RegexOptions.IgnoreCase);
@@ -186,9 +216,9 @@ namespace GSOOffline
             checkingTriggers = true;
             try
             {
-                foreach (var t in Content.Triggers)
-                    if (t.on == "item" && character.GetQuestPhase(t.quest) == t.phase && CountItem(t.item) >= Math.Max(1, t.amount))
-                        SetQuestPhase(t.quest, t.setPhase);
+                foreach (var t in Content.Triggers.ToArray())
+                    if (TriggerReady(t, "item") && CountItem(t.item) >= Math.Max(1, t.amount))
+                        FireTrigger(t);
             }
             finally
             {
@@ -198,16 +228,16 @@ namespace GSOOffline
 
         public void OnHealed()
         {
-            foreach (var t in Content.Triggers)
-                if (t.on == "heal" && character.GetQuestPhase(t.quest) == t.phase)
-                    SetQuestPhase(t.quest, t.setPhase);
+            foreach (var t in Content.Triggers.ToArray())
+                if (TriggerReady(t, "heal"))
+                    FireTrigger(t);
         }
 
         public void OnNpcKilled(int npcType)
         {
-            foreach (var t in Content.Triggers)
-                if (t.on == "kill" && t.npc == npcType && character.GetQuestPhase(t.quest) == t.phase)
-                    SetQuestPhase(t.quest, t.setPhase);
+            foreach (var t in Content.Triggers.ToArray())
+                if (TriggerReady(t, "kill") && t.npc == npcType && InTriggerArea(t) && UnityEngine.Random.Range(0, 100) < t.chance)
+                    FireTrigger(t);
         }
 
         private string QuestsLine()

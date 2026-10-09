@@ -50,6 +50,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
 | `setlevel <skillId> <level>` | Raises a skill to that level (Scr_SkillsHandler ids, e.g. 15 Swordsmanship, 24 Healing) |
 | `buffs` | Lists the player's active buffs with their effects, health and mana |
+| `worldnpcs [type...]` | The server's NPCs in this scene (all, or those types), with position and whether quest rules show them |
 | `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
 | `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |

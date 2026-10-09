@@ -145,6 +145,7 @@ namespace GSOOffline
             }
 
             if (!sceneReady || world == null) return;
+            TickQuestTriggers();
             visibilityTimer -= Time.deltaTime;
             if (visibilityTimer > 0f) return;
             visibilityTimer = 1f;
@@ -153,7 +154,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
 
-            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value);
+            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
             if (npcs != lastNpcList)
             {
                 lastNpcList = npcs;
@@ -221,6 +222,7 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleTravelInteract(typeId)) return;
+            OnObjectClicked(typeId);
             if (typeId == InteractWayshrine)
             {
                 var w = NearestWayshrine(30f);

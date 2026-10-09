@@ -28,6 +28,7 @@ namespace GSOOffline
                 return;
             }
             Send(2, 0, string.Empty, character.name + ": " + msg.Replace('|', '/'), 0);
+            OnSay(msg);
         }
 
         private static float F(string s) => float.Parse(s, CultureInfo.InvariantCulture);
