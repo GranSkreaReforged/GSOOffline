@@ -77,6 +77,8 @@ namespace GSOOffline
     {
         public int node;
         public string npc;          // lower-case NPC name
+        public int npcType;         // 0 = every NPC with the name
+        public QuestCondition condition;   // extra requirements from content.json
         public int quest;           // 0 = unconditional
         public int phase;
         public int priority;        // advancing > reminder > unconditional
@@ -228,7 +230,10 @@ namespace GSOOffline
         {
             if (!EntriesByNpc.TryGetValue(e.npc, out var list))
                 EntriesByNpc[e.npc] = list = new List<DialogueEntry>();
-            list.RemoveAll(x => x.node == e.node);
+            // A content.json entry replaces the derived one for its node; several content entries for one
+            // node can coexist (different NPC copies or phases).
+            list.RemoveAll(x => x.node == e.node
+                && (x.condition == null || (x.npcType == e.npcType && x.quest == e.quest && x.phase == e.phase)));
             list.Add(e);
         }
 

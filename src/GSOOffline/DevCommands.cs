@@ -90,6 +90,14 @@ namespace GSOOffline
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
 
+        // worldnpcs [type...]: the server's NPCs of those types in this scene (all if none), including hidden quest copies.
+        private static void WorldNpcs(string[] args)
+        {
+            var types = new int[args.Length - 1];
+            for (int i = 1; i < args.Length; i++) types[i - 1] = int.Parse(args[i]);
+            OfflineServer.Instance.LogWorldNpcs(types);
+        }
+
         // buffs: the player's active buffs and what they do.
         private static void Buffs(string[] args) => OfflineServer.Instance.LogBuffs();
 

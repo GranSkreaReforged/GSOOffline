@@ -24,7 +24,7 @@ namespace GSOOffline
         private void InteractNpc(int uid)
         {
             var npc = world?.GetNpc(uid);
-            if (character == null || npc == null || npc.dead) return;
+            if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 
@@ -45,7 +45,9 @@ namespace GSOOffline
             {
                 foreach (var e in entries)
                 {
+                    if (e.npcType != 0 && e.npcType != npcType) continue;
                     if (e.quest != 0 && character.GetQuestPhase(e.quest) != e.phase) continue;
+                    if (e.condition != null && !e.condition.Holds(character, GetQuestVar)) continue;
                     if (!HasItems(e.requiredItems)) continue;
                     if (best == null || e.priority > best.priority || (e.priority == best.priority && e.node < best.node))
                         best = e;
@@ -115,10 +117,15 @@ namespace GSOOffline
                 CloseDialogue();
         }
 
+        private ActionDef pendingDialogueTeleport;
+
         private void CloseDialogue()
         {
             dialogueNode = null;
             if (character != null) Send(2, 3, character.name, "-");
+            var move = pendingDialogueTeleport;
+            pendingDialogueTeleport = null;
+            if (move != null && character != null) TeleportNear(move.scene, GameData.ParseVec(move.pos));
         }
 
         private void RunAction(int id, int nodeId)
@@ -133,7 +140,18 @@ namespace GSOOffline
             foreach (var t in a.take) TakeItems(t.type, t.Amount);
             if (a.silver != 0) SetSilver(character.silver + a.silver);
             if (a.window > 0) Send(3, 33, character.name, a.window);
-            if (a.scene > 0 && !string.IsNullOrEmpty(a.pos)) Teleport(a.scene, GameData.ParseVec(a.pos));
+            if (!string.IsNullOrEmpty(a.notice)) Notice(a.notice);
+            var v = Content.ParseInts(a.setVar);
+            if (v != null && v.Length >= 3) SetQuestVar(v[0], v[1], v[2]);
+            var q = Content.ParseInts(a.setQuest);
+            if (q != null && q.Length >= 2) SetQuestPhase(q[0], q[1]);
+            if (a.scene > 0 && !string.IsNullOrEmpty(a.pos))
+            {
+                // Mid-conversation, the move waits for the conversation to end (a scene change would cut it off).
+                if (dialogueNode != null) pendingDialogueTeleport = a;
+                else TeleportNear(a.scene, GameData.ParseVec(a.pos));
+            }
+            if (a.dialogue > 0) StartDialogue(a.dialogue, a.dialogueNpc);
         }
 
         // ---- quests --------------------------------------------------------------------------
@@ -186,9 +204,9 @@ namespace GSOOffline
             checkingTriggers = true;
             try
             {
-                foreach (var t in Content.Triggers)
-                    if (t.on == "item" && character.GetQuestPhase(t.quest) == t.phase && CountItem(t.item) >= Math.Max(1, t.amount))
-                        SetQuestPhase(t.quest, t.setPhase);
+                foreach (var t in Content.Triggers.ToArray())
+                    if (TriggerReady(t, "item") && CountItem(t.item) >= Math.Max(1, t.amount))
+                        FireTrigger(t);
             }
             finally
             {
@@ -198,16 +216,16 @@ namespace GSOOffline
 
         public void OnHealed()
         {
-            foreach (var t in Content.Triggers)
-                if (t.on == "heal" && character.GetQuestPhase(t.quest) == t.phase)
-                    SetQuestPhase(t.quest, t.setPhase);
+            foreach (var t in Content.Triggers.ToArray())
+                if (TriggerReady(t, "heal"))
+                    FireTrigger(t);
         }
 
         public void OnNpcKilled(int npcType)
         {
-            foreach (var t in Content.Triggers)
-                if (t.on == "kill" && t.npc == npcType && character.GetQuestPhase(t.quest) == t.phase)
-                    SetQuestPhase(t.quest, t.setPhase);
+            foreach (var t in Content.Triggers.ToArray())
+                if (TriggerReady(t, "kill") && t.npc == npcType && UnityEngine.Random.Range(0, 100) < t.chance)
+                    FireTrigger(t);
         }
 
         private string QuestsLine()

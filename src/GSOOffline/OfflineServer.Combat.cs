@@ -386,6 +386,11 @@ namespace GSOOffline
                     if (Time.time >= npc.respawnAt) RespawnNpc(npc);
                     continue;
                 }
+                if (!NpcShown(npc))
+                {
+                    npc.aggro = npc.attackingSent = npc.returning = false;
+                    continue;
+                }
                 GameData.Npcs.TryGetValue(npc.typeId, out var info);
                 Vector3 pos = NpcPosition(npc);
                 float dist = Vector3.Distance(pos, playerPos);

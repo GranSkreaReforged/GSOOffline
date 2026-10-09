@@ -1,9 +1,9 @@
 {
-  "_readme": "Server-side quest glue that died with the official server. Node/NPC/item ids refer to the game's own XML data. Entries: which NPC (by name) opens with which dialogue node; quest/phase are derived automatically from the dialogue graph unless given (quest 0 = derive, always=true = unconditional). Actions implement dialogue otheraction ids. Triggers advance quests on game events.",
+  "_readme": "Server-side quest glue that died with the official server. Node/NPC/item ids refer to the game's own XML data. Entries: which NPC (by name, optionally one copy by npcType) opens with which dialogue node; quest/phase are derived automatically from the dialogue graph unless given (quest 0 = derive, always=true = unconditional); after = quests that must be complete, var = 'quest,var,value'. Actions implement dialogue otheraction ids. Triggers advance quests on game events. NPC rules say which copy of a quest NPC exists in which phases, and spawn quest NPCs the scenes have no marker for. See the gso-content skill.",
 
   "entries": [
-    { "node": 20,  "npc": "Alden" },
-    { "node": 33,  "npc": "Alden" },
+    { "node": 20,  "npc": "Alden", "npcType": 8 },
+    { "node": 33,  "npc": "Alden", "npcType": 8 },
 
     { "node": 50,  "npc": "Merrick" },
     { "node": 65,  "npc": "Merrick" },
@@ -23,11 +23,29 @@
     { "node": 120, "npc": "Tailus" },
     { "node": 107, "npc": "Tailus" },
 
-    { "node": 150, "npc": "Gery" },
-    { "node": 165, "npc": "Gery", "requires": [ { "type": 10381, "amount": 1 } ] },
-    { "node": 180, "npc": "Gery" },
-    { "node": 160, "npc": "Willas" },
-    { "node": 185, "npc": "Willas" }
+    { "node": 150, "npc": "Gery", "npcType": 16 },
+    { "node": 160, "npc": "Willas", "npcType": 20 },
+    { "node": 165, "npc": "Gery", "npcType": 17, "quest": 2, "phase": 3, "requires": [ { "type": 10381, "amount": 1 } ] },
+    { "node": 165, "npc": "Gery", "npcType": 17, "quest": 2, "phase": 4 },
+    { "node": 180, "npc": "Gery", "npcType": 21, "quest": 2, "phase": 6 },
+    { "node": 185, "npc": "Willas", "npcType": 20, "quest": 2, "phase": -1, "var": "2,1,0" },
+
+    { "node": 300, "npc": "Alden", "npcType": 40, "quest": 5, "phase": 0, "after": [ 1 ] },
+    { "node": 301, "npc": "Merrick", "npcType": 33, "quest": 5, "phase": 1 },
+    { "node": 301, "npc": "Alden",   "npcType": 34, "quest": 5, "phase": 1 },
+    { "node": 301, "npc": "Nort",    "npcType": 35, "quest": 5, "phase": 1 },
+    { "node": 301, "npc": "Tailus",  "npcType": 36, "quest": 5, "phase": 1 },
+    { "node": 305, "npc": "Merrick", "npcType": 33, "quest": 5, "phase": 2 },
+    { "node": 305, "npc": "Alden",   "npcType": 34, "quest": 5, "phase": 2 },
+    { "node": 305, "npc": "Tailus",  "npcType": 36, "quest": 5, "phase": 2 },
+    { "node": 350, "npc": "Alden",   "npcType": 47, "quest": 5, "phase": 3 },
+    { "node": 353, "npc": "Alden",   "npcType": 47, "quest": 5, "phase": 4 },
+    { "node": 448, "npc": "Roke",    "npcType": 53, "quest": 5, "phase": 5 },
+    { "node": 327, "npc": "Farron",  "npcType": 50, "quest": 5, "phase": 5 },
+    { "node": 333, "npc": "Calon",   "npcType": 51, "quest": 5, "phase": 5 },
+
+    { "node": 501, "npc": "Alden", "npcType": 57, "quest": 6, "phase": 0, "after": [ 5 ] },
+    { "node": 504, "npc": "Roke",  "npcType": 56, "quest": 6, "phase": 3 }
   ],
 
   "actions": [
@@ -37,12 +55,84 @@
     { "id": 3,  "note": "Merrick inspects the forged gear (no effect)" },
     { "id": 4,  "note": "Merrick lets you keep the gear (no effect)" },
     { "id": 6,  "note": "Combat tutorial text (no effect)" },
-    { "id": 22, "note": "Bankers open your bank", "window": 14 }
+    { "id": 22, "note": "Bankers open your bank", "window": 14 },
+
+    { "id": 40, "note": "Q2: the yarrowroot is placed in the stone circle; three men approach", "dialogue": 170, "dialogueNpc": 17 },
+    { "id": 11, "note": "Q2: Gery and his followers attack (the NPC rules swap in the aggressive copies at phase 5)" },
+    { "id": 15, "note": "Q2: dying Gery speaks (no effect)" },
+    { "id": 12, "note": "Q2: Gery dies (no effect)" },
+    { "id": 14, "note": "Q2: Willas apologizes with a gift (reconstructed: the original gift is unknown)", "silver": 100, "setVar": "2,1,1" },
+    { "id": 13, "note": "Q2: Willas attacks", "setVar": "2,1,2" },
+    { "id": 41, "note": "Q2: Willas is defeated", "setVar": "2,1,3" },
+
+    { "id": 20, "note": "Q5 dinner cut-scene (no effect)" },
+    { "id": 24, "note": "Q5 dinner cut-scene (no effect)" },
+    { "id": 21, "note": "Q5: Tailus leaves for the Chronicle (no effect)" },
+    { "id": 23, "note": "Q5: Alden asks for a word (no effect)" },
+    { "id": 25, "note": "Q5 clue: the torn grimoire page (no effect)" },
+    { "id": 26, "note": "Q5 clue: Roke asked about Nort (no effect)" },
+    { "id": 27, "note": "Q5 clue: Roke searched Nort's belongings (no effect)" },
+    { "id": 28, "note": "Q5: Roke is exposed and flees", "setQuest": "5,-1" },
+
+    { "id": 29, "note": "Q6: Roke runs; you follow him deeper (the battle has its own scene)", "scene": 11, "pos": "640,118.6,1820" },
+    { "id": 42, "note": "Q6: back into the battle scene (e.g. after a relog or using the monastery door)", "scene": 11, "pos": "640,118.6,1820" },
+    { "id": 43, "note": "Q6: Roke falls; the scene after the battle", "scene": 12, "pos": "588,102.7,1682" },
+    { "id": 30, "note": "Q6: Roke's last stand (no effect)" },
+    { "id": 31, "note": "Q6: Roke escapes, wounding Alden", "setQuest": "6,4" },
+    { "id": 32, "note": "Q6: Alden fades (no effect)" },
+    { "id": 34, "note": "Q6: the monks arrive (no effect)" },
+    { "id": 33, "note": "Q6: the monks carry Alden back to the monastery, and you with them (the scene has no way out)", "setQuest": "6,5", "scene": 1, "pos": "725.31,34.44,1558.32" }
   ],
 
   "triggers": [
-    { "on": "item", "quest": 2, "phase": 1, "item": 10381, "amount": 1, "setPhase": 2 },
     { "on": "kill", "quest": 1, "phase": 4, "npc": 9, "setPhase": 5 },
-    { "on": "heal", "quest": 1, "phase": 11, "setPhase": 12 }
+    { "on": "heal", "quest": 1, "phase": 11, "setPhase": 12 },
+
+    { "on": "item", "quest": 2, "phase": 1, "item": 10381, "amount": 1, "setPhase": 2 },
+    { "on": "use",  "quest": 2, "phase": 4, "item": 10381, "consume": true, "scene": 1, "pos": "566.4,21.4,1334.1", "radius": 15, "action": 40, "note": "place the yarrowroot in the stone circle" },
+    { "on": "kill", "quest": 2, "phase": 5, "npc": 18, "setPhase": 6, "note": "Gery falls" },
+    { "on": "kill", "quest": 2, "phase": -1, "npc": 22, "var": "2,1,2", "action": 41 },
+
+    { "on": "kill", "quest": 6, "phase": 2, "npc": 45, "setPhase": 3, "action": 43, "note": "Roke defeated" },
+    { "on": "enter", "quest": 6, "phase": 2, "scene": 5, "action": 42, "note": "Roke's dungeon during the chase leads to the battle" },
+    { "on": "enter", "quest": 6, "phase": 3, "scene": 5, "action": 43 },
+    { "on": "enter", "quest": 6, "phase": 4, "scene": 5, "action": 43 }
+  ],
+
+  "npcs": [
+    { "type": 8,  "note": "Alden at the start of Q1", "quest": 1, "phases": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] },
+    { "type": 7,  "note": "Nort on the beach, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
+    { "type": 10, "note": "Nort in the kitchen, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
+
+    { "type": 16, "note": "Gery in the village", "quest": 2, "phases": [ 0, 1 ] },
+    { "type": 20, "note": "Willas in the village", "quest": 2, "phases": [ 2, 3, 4, 5, 6 ] },
+    { "type": 20, "quest": 2, "phases": [ -1 ], "var": "2,1,0" },
+    { "type": 20, "quest": 2, "phases": [ -1 ], "var": "2,1,1" },
+    { "type": 22, "note": "Willas turns on you", "quest": 2, "phases": [ -1 ], "var": "2,1,2", "scene": 1, "spawn": [ "699.9,4.6,1376.2" ] },
+    { "type": 17, "note": "Gery at the stone circle", "quest": 2, "phases": [ 3, 4 ] },
+    { "type": 18, "note": "Gery attacks", "quest": 2, "phases": [ 5 ], "scene": 1, "spawn": [ "566.4,21.4,1334.1" ] },
+    { "type": 19, "note": "Gery's Karasi followers", "quest": 2, "phases": [ 5 ], "scene": 1, "spawn": [ "570.4,21.4,1337.1", "562.4,21.4,1331.1" ] },
+    { "type": 21, "note": "Gery dying", "quest": 2, "phases": [ 6 ] },
+
+    { "type": 40, "note": "Alden in the library, inviting you to dinner", "quest": 5, "phases": [ 0 ], "after": [ 1 ] },
+    { "type": 33, "note": "Q5 dinner table", "quest": 5, "phases": [ 1, 2 ] },
+    { "type": 34, "quest": 5, "phases": [ 1, 2 ] },
+    { "type": 35, "quest": 5, "phases": [ 1, 2 ] },
+    { "type": 36, "quest": 5, "phases": [ 1, 2 ] },
+    { "type": 46, "note": "Q5 the monks in the yard", "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "type": 47, "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "type": 49, "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "type": 50, "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "type": 51, "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "type": 53, "quest": 5, "phases": [ 3, 4, 5 ] },
+
+    { "type": 57, "note": "Alden sends you after Roke", "quest": 6, "phases": [ 0 ], "after": [ 5 ] },
+    { "type": 55, "note": "Roke running in the tunnel", "quest": 6, "phases": [ 1 ] },
+    { "type": 81, "note": "weak skeletons in Roke's dungeon during the quest", "quest": 6, "phases": [ 1, 2, 3, 4 ] },
+    { "type": 45, "note": "Roke fights (level 5)", "quest": 6, "phases": [ 2 ] },
+    { "type": 56, "note": "Roke defeated", "quest": 6, "phases": [ 3 ] },
+    { "type": 59, "note": "Alden wounded", "quest": 6, "phases": [ 4 ] },
+    { "type": 63, "note": "Alden healed, back at the monastery", "quest": 6, "phases": [ 5, -1 ] },
+    { "type": 92, "note": "Roke (level 20) haunts his dungeon after the quest", "after": [ 6 ] }
   ]
 }
