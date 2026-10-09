@@ -48,6 +48,8 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
 | `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
 | `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
+| `setlevel <skillId> <level>` | Raises a skill to that level (Scr_SkillsHandler ids, e.g. 15 Swordsmanship, 24 Healing) |
+| `buffs` | Lists the player's active buffs with their effects, health and mana |
 | `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
 | `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |

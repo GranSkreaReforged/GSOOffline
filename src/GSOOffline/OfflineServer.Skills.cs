@@ -165,7 +165,7 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[skill] harvestable {uid}: {(h == null ? "unknown" : h.dead ? "depleted" : "no info for type " + h.typeId)}");
                 return false;
             }
-            time = info.harvestTime;
+            time = info.harvestTime * GatherTimeMultiplier();
             float dist = Vector3.Distance(LocalPlayer.transform.position, h.pos);
             // Loose: the client already gates harvesting on its own proximity prompt, and its node
             // transforms sit a few metres off the exported marker positions.
@@ -196,7 +196,7 @@ namespace GSOOffline
                 CancelJob();
                 return;
             }
-            job.due = Time.time + info.harvestTime;
+            job.due = Time.time + info.harvestTime * GatherTimeMultiplier();
             PlaySound(Pick(info.sfx), h.pos, 30);   // each swing: chopping, mining, splashing...
 
             int skill = SkillIdByName(info.skill);
@@ -212,7 +212,11 @@ namespace GSOOffline
             }
             if (!gotMain) return;   // keep swinging
 
-            if (skill != 0) AddXp(skill, SkillData.BaseXp(info.level));
+            if (skill != 0)
+            {
+                float boost = skill == 8 ? AlchemyXpMultiplier() : 1f;   // Ambitious apprentice
+                AddXp(skill, Mathf.RoundToInt(SkillData.BaseXp(info.level) * boost));
+            }
             if (--h.health > 0) return;
 
             h.dead = true;
@@ -242,7 +246,7 @@ namespace GSOOffline
         {
             time = 0f;
             if (!SkillData.Recipes.TryGetValue(recipeId, out var r)) return false;
-            time = Mathf.Max(0.5f, r.time);
+            time = Mathf.Max(0.5f, r.time * CraftTimeMultiplier());
             if (r.skill != 0 && SkillLevel(r.skill) < r.level)
             {
                 Notice($"You need level {r.level} {SkillById[r.skill]} to make that.", "red");

@@ -19,6 +19,11 @@ namespace GSOOffline
         public bool aggro, returning, attackingSent;
         public float nextSwing, nextWaypoint, respawnAt, nextWander, attackAnimUntil;
         public int anim = -1;   // animation id last sent to the client
+
+        // ability effects
+        public float stunnedUntil, rootedUntil;
+        public int dotDamage, dotTicks, dotSkill;
+        public float nextDot;
     }
 
     public class HarvestableEntity

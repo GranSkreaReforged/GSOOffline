@@ -174,6 +174,7 @@ namespace GSOOffline
             SaveCurrentCharacter();
             if (character != null)
                 Plugin.Log.LogInfo($"'{character.name}' logged out.");
+            ClearBuffs();
             character = null;
             ResetWorldState();
         }

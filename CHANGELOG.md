@@ -4,6 +4,18 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Buff abilities no longer hurt every monster around you. Thick skin, Heavy shield block, Frenzy, Flame barrier and other untargeted weapon abilities were treated as sweeping attacks.
+- Staffs, wands and lutes now count their damage. Only plain and physical damage stats were added to hits, so fire, ice, psychic and poison weapons hit like bare hands.
+- Bows and crossbows attack from as far away as the client lets you (50 m; staffs 25 m, wands and lutes 20 m). Standing at the client's range used to leave you there never firing.
+- Wands now train Mental grim and lutes train Healing, following each weapon's skill requirement, instead of Swordsmanship.
+
+### Added
+- Abilities do what their descriptions say. Buffs show their icon by the health bar and work: Strength and Immolate raise damage; Thick skin, Stability and the barriers cut damage taken; Heavy shield block, Truce and Traverse make you immune; Disperse and Flame barrier reflect damage; Frenzy, Hack and slash and Focus speed up attacks; Survivor raises health and takes it back when it ends; Peace and Truce calm monsters up to your Healing level; Mana surge and Embrace the pain restore mana. Area spells (Blast, Demolition, Firestorm, Fire wall, the ice spells, Slashing...) hit everything around you, Fire ball, Explosive arrow and Eruption splash around the target, stuns and roots stop monsters, poison, bleeding and Combustion deal damage over time, Tritone and the Condensed attacks spend your mana for one big hit, Vampiric arrow heals you and Taunt pulls nearby monsters. Heals (Charm, Purification, Healing bird) and heals over time (Healing music, Healing aura, Healing plant) heal you. Movement buffs show their icon only, because the client's run speed can't be changed. Summons, Portal and other abilities that need missing systems say they aren't available offline. The effect numbers are reconstructions.
+- All bandages work: flax and ramie too, and the "heal other" bandage abilities heal you (there's nobody else to heal).
+- Light and heavy armor train. If you were hit in the last 30 seconds before a kill, its XP is shared between your weapon skill and the armor skills you're wearing, as the community wiki describes.
+- Usable items: health and mana potions, mana regeneration, health boost, crafting and gathering speed potions (crafting or gathering 25% faster); experience scrolls (100, 300, 1000 and 5000 XP in the skill you pick, the amounts the wiki records; quest rewards hand these out); teleport scrolls to the wayshrines that exist offline, including the home wayshrine teleport; gear crates, which hold a random piece of equipment of their tier. Resistance, stamina and movement speed potions, beer and wine show their buff icon only.
+- `setlevel <skillId> <level>` and `buffs` bridge commands: set a skill level for testing, and list the active buffs.
 
 ## [1.1.0] - 2026-10-09
 ### Fixed
