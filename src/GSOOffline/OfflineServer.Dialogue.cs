@@ -49,7 +49,10 @@ namespace GSOOffline
                     if (e.quest != 0 && character.GetQuestPhase(e.quest) != e.phase) continue;
                     if (e.condition != null && !e.condition.Holds(character, GetQuestVar)) continue;
                     if (!HasItems(e.requiredItems)) continue;
-                    if (best == null || e.priority > best.priority || (e.priority == best.priority && e.node < best.node))
+                    // Ties: the entry that asks for items first ("you have the hide!" over "slain it yet?"), then the lower node.
+                    if (best == null || e.priority > best.priority
+                        || (e.priority == best.priority && (e.requiredItems.Count > best.requiredItems.Count
+                            || (e.requiredItems.Count == best.requiredItems.Count && e.node < best.node))))
                         best = e;
                 }
             }
@@ -86,6 +89,8 @@ namespace GSOOffline
             if (n.addItem != null) GiveItem(n.addItem[0], n.addItem.Length > 1 ? n.addItem[1] : 1);
             if (n.otherAction > 0) RunAction(n.otherAction, n.id);
             if (n.openShop > 0) OpenShop(n.openShop);
+            foreach (var t in Content.Triggers.ToArray())
+                if (t.node == n.id && TriggerReady(t, "node")) FireTrigger(t);
 
             var visible = new List<string>();
             foreach (var o in n.options)
@@ -135,6 +140,11 @@ namespace GSOOffline
                 Plugin.Log.LogWarning($"Dialogue action {id} (node {nodeId}) is not implemented yet; add it to content.json.");
                 return;
             }
+            if (a.silver < 0 && character.silver < -a.silver)
+            {
+                Notice("You don't have enough silver.", "red");
+                return;
+            }
             foreach (var g in a.give)
                 if (!a.onlyIfMissing || CountItem(g.type) == 0) GiveItem(g.type, g.Amount);
             foreach (var t in a.take) TakeItems(t.type, t.Amount);
@@ -151,6 +161,7 @@ namespace GSOOffline
                 if (dialogueNode != null) pendingDialogueTeleport = a;
                 else TeleportNear(a.scene, GameData.ParseVec(a.pos));
             }
+            if (a.spawnNear != null && a.spawnNear.Count > 0) SpawnNearPlayer(a.spawnNear);
             if (a.dialogue > 0) StartDialogue(a.dialogue, a.dialogueNpc);
         }
 
@@ -172,6 +183,7 @@ namespace GSOOffline
             Send(8, 9, character.name, quest, phase);
             if (phase == -1) CompleteQuest(quest);
             else CheckItemTriggers();
+            OnQuestPhaseReached(quest);
         }
 
         private static readonly Regex XpReward = new Regex(@"gained (\d+) XP in (.+?)\.", RegexOptions.IgnoreCase);
@@ -224,7 +236,7 @@ namespace GSOOffline
         public void OnNpcKilled(int npcType)
         {
             foreach (var t in Content.Triggers.ToArray())
-                if (TriggerReady(t, "kill") && t.npc == npcType && UnityEngine.Random.Range(0, 100) < t.chance)
+                if (TriggerReady(t, "kill") && t.npc == npcType && InTriggerArea(t) && UnityEngine.Random.Range(0, 100) < t.chance)
                     FireTrigger(t);
         }
 

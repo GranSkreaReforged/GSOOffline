@@ -80,6 +80,7 @@ namespace GSOOffline
         public int dialogue;       // open this dialogue node...
         public int dialogueNpc;    // ...with the nearest NPC of this type (the conversation's speaker)
         public string notice;      // a chat line for the player
+        public List<int> spawnNear = new List<int>();   // NPC types that appear next to the player (until the scene changes)
     }
 
     /// <summary>
@@ -87,7 +88,10 @@ namespace GSOOffline
     /// <see cref="amount"/> of the item; "kill": an NPC of type <see cref="npc"/> dies; "heal": a bandage is used;
     /// "enter": the player comes within <see cref="radius"/> of <see cref="pos"/> in <see cref="scene"/>;
     /// "say": the player says <see cref="text"/> in chat; "use": the player uses or drops the item.
-    /// "enter", "say" and "use" can also be limited to an area with scene/pos/radius.
+    /// "interact": the player clicks an object of interactable type <see cref="objectType"/> (limit it to one
+    /// object with scene/pos/radius); "quest": quest <see cref="quest"/> has just reached <see cref="phase"/>.
+    /// "node": a conversation reaches <see cref="node"/> (for nodes that hand out or take
+    /// items, or start a quest, without saying so in the data). Every kind can be limited to an area with scene/pos/radius.
     /// </summary>
     [Serializable]
     public class TriggerDef : QuestCondition
@@ -99,6 +103,8 @@ namespace GSOOffline
         public int item;
         public int amount;
         public int npc;
+        public int objectType;     // "interact": Scr_Interactable type id (43 = quest object)
+        public int node;           // "node": the conversation reaches this dialogue node
         public int setPhase;       // 0 = leave the phase as it is
         public int action;         // also run this content action
         public int chance = 100;   // percent, for kills that only sometimes drop a quest item

@@ -132,13 +132,12 @@ Working:
 - Chat
 
 Partially working:
-- Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
+- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book and No True Huntsman. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Sightseeing, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
 
 Not yet implemented:
 - Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
-- Showing only the right copy of a quest NPC (each appears in several places)
 
 Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
 

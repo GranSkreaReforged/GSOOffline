@@ -86,6 +86,49 @@ namespace GSOOffline
                     FireTrigger(t);
         }
 
+        /// <summary>Clicking an object (3/11): returns true if a quest trigger handled it.</summary>
+        private bool OnObjectClicked(int objectType)
+        {
+            if (character == null) return false;
+            bool hit = false;
+            foreach (var t in Content.Triggers.ToArray())
+                if (TriggerReady(t, "interact") && t.objectType == objectType && InTriggerArea(t)
+                    && (t.item == 0 || CountItem(t.item) >= System.Math.Max(1, t.amount)))
+                {
+                    FireTrigger(t);
+                    hit = true;
+                }
+            return hit;
+        }
+
+        /// <summary>"quest" triggers: run when a quest reaches a phase (e.g. finishing one quest starts the next).</summary>
+        private void OnQuestPhaseReached(int quest)
+        {
+            foreach (var t in Content.Triggers.ToArray())
+                if (t.quest == quest && TriggerReady(t, "quest") && InTriggerArea(t)) FireTrigger(t);
+        }
+
+        /// <summary>Puts NPCs next to the player for this visit to the scene (summoned ghosts, ambushes).</summary>
+        private void SpawnNearPlayer(List<int> types)
+        {
+            var player = LocalPlayer;
+            if (world == null || player == null || types == null) return;
+            foreach (int type in types)
+            {
+                if (world.npcs.Exists(n => n.typeId == type && !n.dead && Vector3.Distance(n.pos, player.transform.position) < 40f))
+                    continue;   // already here: saying the name twice doesn't summon two
+                Vector2 o = Random.insideUnitCircle.normalized * 4f;
+                Vector3 p = player.transform.position + new Vector3(o.x, 0f, o.y);
+                if (Physics.Raycast(p + Vector3.up * 10f, Vector3.down, out var hit, 30f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    p = hit.point;
+                int hp = GameData.Npcs.TryGetValue(type, out var info) ? info.health : 30;
+                int uid = world.sceneId * 10000 + 9500 + world.npcs.Count;
+                world.npcs.Add(new NpcEntity { uid = uid, typeId = type, spawnPos = p, pos = p, health = hp, maxHealth = hp });
+                Plugin.Log.LogInfo($"[quest] spawned {NpcName(type)} ({type}) as {uid} at {SceneWorld.Vec(p)}");
+            }
+            visibilityTimer = 0f;   // send the new NPC list right away
+        }
+
         /// <summary>Using or dropping an item: returns true if a quest took it (the normal use is skipped).</summary>
         private bool OnQuestItemUsed(int typeId)
         {

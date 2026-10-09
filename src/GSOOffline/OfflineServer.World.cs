@@ -222,6 +222,7 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleTravelInteract(typeId)) return;
+            OnObjectClicked(typeId);
             if (typeId == InteractWayshrine)
             {
                 var w = NearestWayshrine(30f);

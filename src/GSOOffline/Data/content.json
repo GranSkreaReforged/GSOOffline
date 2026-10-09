@@ -45,7 +45,58 @@
     { "node": 333, "npc": "Calon",   "npcType": 51, "quest": 5, "phase": 5 },
 
     { "node": 501, "npc": "Alden", "npcType": 57, "quest": 6, "phase": 0, "after": [ 5 ] },
-    { "node": 504, "npc": "Roke",  "npcType": 56, "quest": 6, "phase": 3 }
+    { "node": 504, "npc": "Roke",  "npcType": 56, "quest": 6, "phase": 3 },
+
+    { "node": 576, "npc": "Grieving woman", "npcType": 86, "quest": 7, "phase": 0 },
+    { "node": 588, "npc": "Myra", "npcType": 87, "quest": 7, "phase": 3 },
+    { "node": 626, "npc": "Myra", "npcType": 87, "quest": 7, "phase": -1 },
+
+    { "node": 826, "npc": "Ulan", "npcType": 113, "quest": 17, "phase": 0 },
+    { "node": 836, "npc": "Ulan", "npcType": 114, "quest": 17, "phase": 1 },
+
+    { "node": 1101, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 0 },
+    { "node": 1115, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 1 },
+    { "node": 1137, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 2 },
+    { "node": 1150, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 3 },
+    { "node": 1170, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 4 },
+    { "node": 1180, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 5 },
+    { "node": 1178, "npc": "Claudia", "npcType": 174, "quest": 18, "phase": 6 },
+
+    { "node": 1201, "npc": "Frightened Miner", "npcType": 176, "quest": 19, "phase": 0 },
+    { "node": 1207, "npc": "Frightened Miner", "npcType": 176, "quest": 19, "phase": 1 },
+    { "node": 1209, "npc": "Frightened Miner", "npcType": 176, "quest": 19, "phase": 2 },
+
+    { "node": 1226, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 0 },
+    { "node": 1231, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 1 },
+    { "node": 1231, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 2 },
+    { "node": 1231, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 3 },
+    { "node": 1231, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 4 },
+    { "node": 1232, "npc": "The Lone Hunter", "npcType": 177, "quest": 20, "phase": 5 },
+
+    { "node": 1960, "npc": "Kombra", "quest": 26, "phase": 6, "requires": [ { "type": 10594, "amount": 1 } ] },
+
+    { "node": 1985, "npc": "Lingard", "npcType": 281, "quest": 27, "phase": 1 },
+    { "node": 1986, "npc": "Lingard", "npcType": 281, "quest": 27, "phase": 2 },
+    { "node": 1993, "npc": "Lingard", "npcType": 281, "quest": 27, "phase": 3 },
+    { "node": 1993, "npc": "Lingard", "npcType": 281, "quest": 27, "phase": 4 },
+    { "node": 2008, "npc": "Lingard", "npcType": 281, "quest": 27, "phase": -1 },
+    { "node": 1995, "npc": "Valeria", "npcType": 282, "quest": 27, "phase": 3 },
+    { "node": 2004, "npc": "Valeria", "npcType": 282, "quest": 27, "phase": 4 },
+    { "node": 2005, "npc": "Valeria", "npcType": 282, "quest": 27, "phase": 4,
+      "requires": [ { "type": 10364, "amount": 5 }, { "type": 10544, "amount": 2 }, { "type": 10542, "amount": 3 }, { "type": 10318, "amount": 100 } ] },
+    { "node": 2009, "npc": "Valeria", "npcType": 282, "quest": 27, "phase": -1 },
+
+    { "node": 2223, "npc": "Guard", "npcType": 305, "quest": 31, "phase": 0 },
+    { "node": 2223, "npc": "Guard", "npcType": 305, "quest": 31, "phase": 1 },
+    { "node": 2226, "npc": "Guard", "npcType": 305, "quest": 31, "phase": 2 },
+
+    { "node": 2227, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 0 },
+    { "node": 2230, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 1 },
+    { "node": 2231, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 1, "requires": [ { "type": 10359, "amount": 1 } ] },
+    { "node": 2230, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 2, "var": "32,1,0" },
+    { "node": 2233, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 2, "var": "32,1,1" },
+    { "node": 2238, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 4 },
+    { "node": 2239, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 5 }
   ],
 
   "actions": [
@@ -57,13 +108,13 @@
     { "id": 6,  "note": "Combat tutorial text (no effect)" },
     { "id": 22, "note": "Bankers open your bank", "window": 14 },
 
-    { "id": 40, "note": "Q2: the yarrowroot is placed in the stone circle; three men approach", "dialogue": 170, "dialogueNpc": 17 },
+    { "id": 1001, "note": "Q2: the yarrowroot is placed in the stone circle; three men approach", "dialogue": 170, "dialogueNpc": 17 },
     { "id": 11, "note": "Q2: Gery and his followers attack (the NPC rules swap in the aggressive copies at phase 5)" },
     { "id": 15, "note": "Q2: dying Gery speaks (no effect)" },
     { "id": 12, "note": "Q2: Gery dies (no effect)" },
     { "id": 14, "note": "Q2: Willas apologizes with a gift (reconstructed: the original gift is unknown)", "silver": 100, "setVar": "2,1,1" },
     { "id": 13, "note": "Q2: Willas attacks", "setVar": "2,1,2" },
-    { "id": 41, "note": "Q2: Willas is defeated", "setVar": "2,1,3" },
+    { "id": 1002, "note": "Q2: Willas is defeated", "setVar": "2,1,3" },
 
     { "id": 20, "note": "Q5 dinner cut-scene (no effect)" },
     { "id": 24, "note": "Q5 dinner cut-scene (no effect)" },
@@ -75,13 +126,41 @@
     { "id": 28, "note": "Q5: Roke is exposed and flees", "setQuest": "5,-1" },
 
     { "id": 29, "note": "Q6: Roke runs; you follow him deeper (the battle has its own scene)", "scene": 11, "pos": "640,118.6,1820" },
-    { "id": 42, "note": "Q6: back into the battle scene (e.g. after a relog or using the monastery door)", "scene": 11, "pos": "640,118.6,1820" },
-    { "id": 43, "note": "Q6: Roke falls; the scene after the battle", "scene": 12, "pos": "588,102.7,1682" },
+    { "id": 1003, "note": "Q6: back into the battle scene (e.g. after a relog or using the monastery door)", "scene": 11, "pos": "640,118.6,1820" },
+    { "id": 1004, "note": "Q6: Roke falls; the scene after the battle", "scene": 12, "pos": "588,102.7,1682" },
     { "id": 30, "note": "Q6: Roke's last stand (no effect)" },
     { "id": 31, "note": "Q6: Roke escapes, wounding Alden", "setQuest": "6,4" },
     { "id": 32, "note": "Q6: Alden fades (no effect)" },
     { "id": 34, "note": "Q6: the monks arrive (no effect)" },
-    { "id": 33, "note": "Q6: the monks carry Alden back to the monastery, and you with them (the scene has no way out)", "setQuest": "6,5", "scene": 1, "pos": "725.31,34.44,1558.32" }
+    { "id": 33, "note": "Q6: the monks carry Alden back to the monastery, and you with them (the scene has no way out)", "setQuest": "6,5", "scene": 1, "pos": "725.31,34.44,1558.32" },
+
+    { "id": 40, "note": "Q7: the Pond Specter turns on you", "setVar": "7,1,1" },
+    { "id": 1005, "note": "Q7: the scroll by the pond", "notice": "Among the roots of an old stump you find a scroll. It speaks of a boy, a pond, and a mother who would not be disobeyed." },
+
+    { "id": 43, "note": "Q17: Ulan pays you off and you leave", "silver": 150, "setQuest": "17,-1" },
+    { "id": 44, "note": "Q17: Ulan pays you", "silver": 150, "setQuest": "17,-1" },
+    { "id": 45, "note": "Q17: you give Ulan money; he gives you what he has (reconstructed)", "silver": -100, "give": [ { "type": 10328, "amount": 1 } ], "setQuest": "17,-1" },
+    { "id": 46, "note": "Q17 after: buy Ulan's heirloom for 150 silver", "silver": -150, "give": [ { "type": 355, "amount": 1 } ] },
+
+    { "id": 1006, "note": "Q18: a crab coughs up Tesco's remains", "give": [ { "type": 10466, "amount": 1 } ], "onlyIfMissing": true, "notice": "Among the crab's remains you find human bones: Tesco's remains." },
+    { "id": 1007, "note": "Q18: Tesco is laid to rest", "notice": "Tesco: Thank you, stranger..." },
+    { "id": 1008, "note": "Q18: calling Wallace's name", "spawnNear": [ 175 ], "notice": "Wallace: Who calls me? Fight me!" },
+    { "id": 1009, "note": "Q18: Marcus's remains from the unmarked grave", "give": [ { "type": 10467, "amount": 1 } ], "onlyIfMissing": true },
+    { "id": 1010, "note": "Q18: Marcus laid in Claudia's grave", "take": [ { "type": 10467, "amount": 1 } ], "notice": "You lay Marcus's bones in Claudia's grave." },
+    { "id": 49, "note": "Q18: Claudia moves on (the quest rewards follow)" },
+
+    { "id": 63, "note": "Q27: Lingard sends you to the cellar (no effect)" },
+    { "id": 64, "note": "Q27: Lingard pays for your trouble", "silver": 50 },
+    { "id": 1011, "note": "Q27: the giant rat falls", "notice": "Behind the giant rat lie the boy's bones and a chewed-up locket." },
+    { "id": 1012, "note": "Q27: Valeria takes the ingredients", "take": [ { "type": 10364, "amount": 5 }, { "type": 10544, "amount": 2 }, { "type": 10542, "amount": 3 }, { "type": 10318, "amount": 100 } ] },
+
+    { "id": 1013, "note": "Q20 done: the Lone Hunter points you to the Hunters Guild", "setQuest": "35,1" },
+    { "id": 1014, "note": "Q26: fibervine planted", "notice": "You plant the fibervine seed in Barnes's field and tend it as the book describes. It sprouts almost at once." },
+    { "id": 1015, "note": "Q28: the rum crate at the harbor", "give": [ { "type": 410, "amount": 1 } ], "onlyIfMissing": true, "notice": "You pick up the rum crate." },
+    { "id": 1016, "note": "Q28: the inn keeper takes the crate", "take": [ { "type": 410, "amount": 1 } ] },
+    { "id": 1017, "note": "Q31: the cook book", "notice": "On the top right shelf you find a large cook book." },
+    { "id": 1018, "note": "Q32: the troll's hide", "give": [ { "type": 10359, "amount": 1 } ], "onlyIfMissing": true },
+    { "id": 1019, "note": "Q32: Vranye saw the troll fall", "setVar": "32,1,1" }
   ],
 
   "triggers": [
@@ -89,14 +168,49 @@
     { "on": "heal", "quest": 1, "phase": 11, "setPhase": 12 },
 
     { "on": "item", "quest": 2, "phase": 1, "item": 10381, "amount": 1, "setPhase": 2 },
-    { "on": "use",  "quest": 2, "phase": 4, "item": 10381, "consume": true, "scene": 1, "pos": "566.4,21.4,1334.1", "radius": 15, "action": 40, "note": "place the yarrowroot in the stone circle" },
+    { "on": "use",  "quest": 2, "phase": 4, "item": 10381, "consume": true, "scene": 1, "pos": "566.4,21.4,1334.1", "radius": 15, "action": 1001, "note": "place the yarrowroot in the stone circle" },
     { "on": "kill", "quest": 2, "phase": 5, "npc": 18, "setPhase": 6, "note": "Gery falls" },
-    { "on": "kill", "quest": 2, "phase": -1, "npc": 22, "var": "2,1,2", "action": 41 },
+    { "on": "kill", "quest": 2, "phase": -1, "npc": 22, "var": "2,1,2", "action": 1002 },
 
-    { "on": "kill", "quest": 6, "phase": 2, "npc": 45, "setPhase": 3, "action": 43, "note": "Roke defeated" },
-    { "on": "enter", "quest": 6, "phase": 2, "scene": 5, "action": 42, "note": "Roke's dungeon during the chase leads to the battle" },
-    { "on": "enter", "quest": 6, "phase": 3, "scene": 5, "action": 43 },
-    { "on": "enter", "quest": 6, "phase": 4, "scene": 5, "action": 43 }
+    { "on": "kill", "quest": 6, "phase": 2, "npc": 45, "setPhase": 3, "action": 1004, "note": "Roke defeated" },
+    { "on": "enter", "quest": 6, "phase": 2, "scene": 5, "action": 1003, "note": "Roke's dungeon during the chase leads to the battle" },
+    { "on": "enter", "quest": 6, "phase": 3, "scene": 5, "action": 1004 },
+    { "on": "enter", "quest": 6, "phase": 4, "scene": 5, "action": 1004 },
+
+    { "on": "interact", "quest": 7, "phase": 1, "objectType": 19, "scene": 1, "pos": "503.0,3.0,1311.8", "radius": 8, "setPhase": 2, "action": 1005, "note": "the scroll by the pond" },
+    { "on": "kill", "quest": 7, "phase": 2, "npc": 41, "setPhase": 3, "note": "the Pond Specter is banished" },
+
+    { "on": "enter", "quest": 17, "phase": 2, "scene": 25, "pos": "112.0,15.1,-198.0", "radius": 20, "setPhase": 3, "note": "the end of Ulan's dungeon" },
+
+    { "on": "kill", "quest": 18, "phase": 1, "npc": 173, "scene": 13, "chance": 35, "action": 1006, "note": "Tesco's remains from a peninsula crab" },
+    { "on": "use", "quest": 18, "phase": 1, "item": 10466, "scene": 13, "consume": true, "setPhase": 2, "action": 1007 },
+    { "on": "say", "quest": 18, "phase": 3, "text": "wallace", "action": 1008 },
+    { "on": "kill", "quest": 18, "phase": 3, "npc": 175, "setPhase": 4, "note": "Wallace is at peace" },
+    { "on": "interact", "quest": 18, "phase": 5, "objectType": 43, "scene": 8, "pos": "817.7,16.2,1382.8", "radius": 6, "action": 1009, "note": "the unmarked grave" },
+    { "on": "interact", "quest": 18, "phase": 5, "objectType": 43, "scene": 8, "pos": "812.1,16.4,1353.3", "radius": 6, "item": 10467, "action": 1010, "setPhase": 6, "note": "Claudia's grave" },
+
+    { "on": "kill", "quest": 19, "phase": 1, "npc": 27, "scene": 2, "setPhase": 2, "note": "the troll in Grimwall mine" },
+
+    { "on": "kill", "quest": 20, "phase": 1, "npc": 23, "setPhase": 2, "note": "a wolf" },
+    { "on": "kill", "quest": 20, "phase": 2, "npc": 43, "setPhase": 3, "note": "a crawler" },
+    { "on": "kill", "quest": 20, "phase": 3, "npc": 75, "setPhase": 4, "note": "a moose" },
+    { "on": "kill", "quest": 20, "phase": 4, "npc": 73, "setPhase": 5, "note": "a bear" },
+    { "on": "quest", "quest": 20, "phase": -1, "action": 1013 },
+
+    { "on": "use", "quest": 26, "phase": 7, "item": 10594, "scene": 8, "pos": "1010.4,16.6,1309.6", "radius": 40, "consume": true, "setPhase": 8, "action": 1014 },
+
+    { "on": "kill", "quest": 27, "phase": 1, "npc": 283, "setPhase": 2, "action": 1011 },
+    { "on": "node", "quest": 27, "phase": -1, "node": 2007, "action": 1012 },
+
+    { "on": "interact", "quest": 28, "phase": 1, "objectType": 43, "scene": 1, "pos": "974.6,6.6,1526.3", "radius": 8, "action": 1015, "note": "the rum crate at Yorkhill harbor" },
+    { "on": "node", "quest": 28, "phase": -1, "node": 2040, "action": 1016 },
+
+    { "on": "node", "quest": 31, "phase": 0, "node": 2225, "setPhase": 1, "note": "the guard asks for a book" },
+    { "on": "interact", "quest": 31, "phase": 1, "objectType": 43, "scene": 1, "pos": "751.4,36.7,1560.2", "radius": 8, "setPhase": 2, "action": 1017 },
+
+    { "on": "kill", "quest": 32, "phase": 1, "npc": 96, "scene": 13, "action": 1018, "note": "a troll near Trout: its hide" },
+    { "on": "kill", "quest": 32, "phase": 2, "npc": 96, "scene": 13, "action": 1019, "note": "a troll, with Vranye watching" },
+    { "on": "kill", "quest": 32, "phase": 4, "npc": 98, "scene": 13, "setPhase": 5, "note": "the dragon below Trout" }
   ],
 
   "npcs": [
@@ -133,6 +247,20 @@
     { "type": 56, "note": "Roke defeated", "quest": 6, "phases": [ 3 ] },
     { "type": 59, "note": "Alden wounded", "quest": 6, "phases": [ 4 ] },
     { "type": 63, "note": "Alden healed, back at the monastery", "quest": 6, "phases": [ 5, -1 ] },
-    { "type": 92, "note": "Roke (level 20) haunts his dungeon after the quest", "after": [ 6 ] }
+    { "type": 92, "note": "Roke (level 20) haunts his dungeon after the quest", "after": [ 6 ] },
+
+    { "type": 85, "note": "the Pond Specter talks", "quest": 7, "phases": [ 2 ], "var": "7,1,0" },
+    { "type": 41, "note": "the Pond Specter attacks", "quest": 7, "phases": [ 2 ], "var": "7,1,1", "scene": 1, "spawn": [ "499.6,3.2,1314.0" ] },
+    { "type": 41, "note": "...and comes back every night after the quest", "after": [ 7 ] },
+
+    { "type": 113, "note": "Ulan in Yorkhill", "quest": 17, "phases": [ 0 ] },
+    { "type": 114, "note": "Ulan at the dungeon entrance", "quest": 17, "phases": [ 1 ] },
+    { "type": 117, "note": "Ulan at the end of the dungeon", "quest": 17, "phases": [ 2, 3 ] },
+    { "type": 122, "note": "Ulan at home", "after": [ 17 ] },
+
+    { "type": 175, "note": "Wallace answers when called", "quest": 18, "phases": [ 3 ] },
+
+    { "type": 291, "note": "giant rats in the governor's cellar during the quest", "quest": 27, "phases": [ 1 ] },
+    { "type": 283, "note": "the boss rat", "quest": 27, "phases": [ 1 ], "scene": 20, "spawn": [ "1100.0,119.7,766.0" ] }
   ]
 }
