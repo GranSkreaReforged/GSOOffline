@@ -15,6 +15,7 @@ namespace GSOOffline
         public static float HitChance = 0.85f;
         public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
+        // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
@@ -279,6 +280,18 @@ namespace GSOOffline
             if (npc.health <= 0) KillNpc(npc, skill);
         }
 
+        /// <summary>Dev: kill a visible NPC as the player would (bridge command killnpc).</summary>
+        internal void DevKill(int uid)
+        {
+            var npc = world?.GetNpc(uid);
+            if (npc == null || npc.dead)
+            {
+                Plugin.Log.LogInfo($"[dev] killnpc: no live NPC {uid}");
+                return;
+            }
+            DealDamage(npc, npc.health, WeaponSkill(EquippedWeapon()));
+        }
+
         private void KillNpc(NpcEntity npc, int skill)
         {
             npc.dead = true;
@@ -293,12 +306,7 @@ namespace GSOOffline
 
             int level = info?.level ?? 1;
             AddXp(skill, CombatRules.KillXp(level));
-            int silver = CombatRules.SilverDrop(level);
-            if (silver > 0)
-            {
-                SetSilver(character.silver + silver);
-                Notice($"You loot {silver} silver.");
-            }
+            DropLoot(npc, info);
             OnNpcKilled(npc.typeId);
         }
 

@@ -1,0 +1,2278 @@
+{
+ "source": "Gran Skrea Online wiki (gran-skrea-online.fandom.com), CC BY-SA",
+ "generator": "GSODevTools tools/datamining/gen_loot.py",
+ "rarityChances": {
+  "always": 1.0,
+  "common": 0.5,
+  "common/uncommon": 0.3,
+  "uncommon": 0.15,
+  "rare": 0.04,
+  "very rare": 0.005
+ },
+ "defaultChance": 0.5,
+ "global": [
+  {
+   "typeId": 437,
+   "name": "Small upgrade stone",
+   "minLevel": 1,
+   "maxLevel": 24,
+   "chance": 0.02
+  },
+  {
+   "typeId": 438,
+   "name": "Medium upgrade stone",
+   "minLevel": 25,
+   "maxLevel": 49,
+   "chance": 0.02
+  },
+  {
+   "typeId": 439,
+   "name": "Large upgrade stone",
+   "minLevel": 50,
+   "maxLevel": 999,
+   "chance": 0.02
+  },
+  {
+   "typeId": 440,
+   "name": "Small grade stone",
+   "minLevel": 1,
+   "maxLevel": 24,
+   "chance": 0.005
+  },
+  {
+   "typeId": 441,
+   "name": "Medium grade stone",
+   "minLevel": 25,
+   "maxLevel": 49,
+   "chance": 0.005
+  },
+  {
+   "typeId": 442,
+   "name": "Large grade stone",
+   "minLevel": 50,
+   "maxLevel": 999,
+   "chance": 0.005
+  }
+ ],
+ "monsters": [
+  {
+   "name": "Aellope",
+   "wikiPages": [
+    "Aellope(Harpy)",
+    "Aellope"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10329,
+     "name": "Large experience scroll",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      95
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10416,
+     "name": "Shadow ingot",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10418,
+     "name": "Iridium ingot",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      95
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10444,
+     "name": "Ramie bandage",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10475,
+     "name": "Shadow mote",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10500,
+     "name": "Life mote",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10640,
+     "name": "Small potion of Salvation",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10645,
+     "name": "Piece of ancient cloth",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10655,
+     "name": "Harpy feather",
+     "min": 1,
+     "max": 20,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10656,
+     "name": "Raw harpy meat",
+     "min": 1,
+     "max": 20,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10658,
+     "name": "Aellope's claw",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Arachnid",
+   "wikiPages": [
+    "Arachnid"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10377,
+     "name": "Weak poison",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10495,
+     "name": "Arachnid skin",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10496,
+     "name": "Arachnid leg",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10497,
+     "name": "Arachnid eye",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10498,
+     "name": "Arachnid fang",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Argi",
+   "wikiPages": [
+    "Argi"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10094,
+     "name": "Paleshroom",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10235,
+     "name": "Human bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Bear",
+   "wikiPages": [
+    "Bear"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10060,
+     "name": "Bear leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      25
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10233,
+     "name": "Bear bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Beetle",
+   "wikiPages": [
+    "Beetle"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10223,
+     "name": "Beetle leg",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10319,
+     "name": "Redberries",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Brarrus",
+   "wikiPages": [
+    "Brarrus"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      80
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 442,
+     "name": "Large grade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10560,
+     "name": "Brarrus skin",
+     "min": 1,
+     "max": 2,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10561,
+     "name": "Brarrus tusk",
+     "min": 1,
+     "max": 2,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10562,
+     "name": "Brarrus bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      80
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10563,
+     "name": "Raw Brarrus meat",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Bruno",
+   "wikiPages": [
+    "Bruno"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 109,
+     "name": "Bear leather body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 110,
+     "name": "Bear leather chaps",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 203,
+     "name": "Bear leather boots",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 283,
+     "name": "Bear leather quiver",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 284,
+     "name": "Bear leather bracelet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 438,
+     "name": "Medium upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 441,
+     "name": "Medium grade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 451,
+     "name": "Bruno's bracers",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 452,
+     "name": "Bruno's boots",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10060,
+     "name": "Bear leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10233,
+     "name": "Bear bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10235,
+     "name": "Human bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      25
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10640,
+     "name": "Small potion of Salvation",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      25
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10670,
+     "name": "Verum gear crate",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10671,
+     "name": "Stranite gear crate",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Cave Dragon",
+   "wikiPages": [
+    "Cave dragon"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      80
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Crab",
+   "wikiPages": [
+    "Crab"
+   ],
+   "dropsSilver": true,
+   "silver": [
+    7,
+    7
+   ],
+   "drops": [
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [
+      2,
+      6
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10023,
+     "name": "Beach crab pincer",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10024,
+     "name": "Beach crab meat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10025,
+     "name": "Beach crab leg",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10400,
+     "name": "Coral key",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [
+      2,
+      6
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10466,
+     "name": "Tesco's remains",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      10
+     ],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Crawler",
+   "wikiPages": [
+    "Crawler"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10239,
+     "name": "Crawler leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Crow",
+   "wikiPages": [
+    "Crow"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10035,
+     "name": "Spruce log",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      12
+     ],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Dark warrior",
+   "wikiPages": [
+    "Dark Warrior"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10319,
+     "name": "Redberries",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Deer",
+   "wikiPages": [
+    "Deer"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 58,
+     "name": "Hatchet",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10378,
+     "name": "Deer skin",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10379,
+     "name": "Deer hair",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10380,
+     "name": "Deer bones",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Dragon",
+   "wikiPages": [
+    "Dragon"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 252,
+     "name": "Verum platebody",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10420,
+     "name": "Dragon claw",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Elder Cave Dragon",
+   "wikiPages": [
+    "Elder cave dragon",
+    "Elder Cave Dragon"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10065,
+     "name": "Coal",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 10250,
+     "name": "Fluorite crystal",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10264,
+     "name": "Zircon crystal",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10377,
+     "name": "Weak poison",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10412,
+     "name": "Dragon leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10416,
+     "name": "Shadow ingot",
+     "min": 1,
+     "max": 10,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10418,
+     "name": "Iridium ingot",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10420,
+     "name": "Dragon claw",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10512,
+     "name": "Furniture: Cave dragon wing",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10554,
+     "name": "Dragon bone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10617,
+     "name": "Furniture: Hanging cage",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10619,
+     "name": "Furniture: Hanging cage 2",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10621,
+     "name": "Furniture: Judas Cradle",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10631,
+     "name": "Vault key 2",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10673,
+     "name": "Iridium gear crate",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Ent",
+   "wikiPages": [
+    "Ent"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10035,
+     "name": "Spruce log",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [
+      55
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Fire elemental",
+   "wikiPages": [
+    "Fire Elemental"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10091,
+     "name": "Verum ore",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10251,
+     "name": "Garnet crystal",
+     "min": 2,
+     "max": 3,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Frog",
+   "wikiPages": [
+    "Frog"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10404,
+     "name": "Frog skin",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10406,
+     "name": "Frog eye",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Ghit",
+   "wikiPages": [
+    "Ghit"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10401,
+     "name": "Ghit hide",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      21
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Ghost",
+   "wikiPages": [
+    "Ghost"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10328,
+     "name": "Medium experience scroll",
+     "min": 1,
+     "max": 2,
+     "chance": 0.15,
+     "levels": [
+      45
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Giant spider",
+   "wikiPages": [
+    "Giant spider"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10377,
+     "name": "Weak poison",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Golem",
+   "wikiPages": [
+    "Golem"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 438,
+     "name": "Medium upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      40
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10076,
+     "name": "Golem crystal",
+     "min": 1,
+     "max": 1,
+     "chance": 0.3,
+     "levels": [
+      40
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10091,
+     "name": "Verum ore",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      40
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10394,
+     "name": "Copper",
+     "min": 1,
+     "max": 10,
+     "chance": 0.5,
+     "levels": [
+      40
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Infernal hound",
+   "wikiPages": [
+    "Infernal hound"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      65
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10065,
+     "name": "Coal",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [
+      65
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Lizard warrior",
+   "wikiPages": [
+    "Lizard warrior"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 375,
+     "name": "Lizard backpack",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [
+      50
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 377,
+     "name": "Sardanian buckler shield",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10473,
+     "name": "Sardanian brick",
+     "min": 1,
+     "max": 5,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10474,
+     "name": "Lizard skin",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      50
+     ],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Moose",
+   "wikiPages": [
+    "Moose"
+   ],
+   "dropsSilver": true,
+   "silver": [
+    17,
+    17
+   ],
+   "drops": []
+  },
+  {
+   "name": "Pirate",
+   "wikiPages": [
+    "Pirate"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 249,
+     "name": "Eyepatch",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10487,
+     "name": "Gunpowder",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Poacher",
+   "wikiPages": [
+    "Poacher"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      58,
+      65
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10235,
+     "name": "Human bones",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [
+      58,
+      65
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10401,
+     "name": "Ghit hide",
+     "min": 1,
+     "max": 3,
+     "chance": 0.5,
+     "levels": [
+      58,
+      65
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Ram",
+   "wikiPages": [
+    "Ram"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10017,
+     "name": "Wool",
+     "min": 0,
+     "max": 5,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10238,
+     "name": "Sheep bones",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10240,
+     "name": "Sheep leather",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Red crab",
+   "wikiPages": [
+    "Red Crab"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 194,
+     "name": "Silk robe top",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 195,
+     "name": "Silk robe bottom",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 219,
+     "name": "Silk pointy hat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 246,
+     "name": "Pirate shirt",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 247,
+     "name": "Pirate pants",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 248,
+     "name": "Pirate hat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 250,
+     "name": "Off-hand Iron Pistol",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 426,
+     "name": "Main-hand Iron Pistol",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 433,
+     "name": "Crab",
+     "min": 1,
+     "max": 1,
+     "chance": 0.001,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 442,
+     "name": "Large grade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10068,
+     "name": "Health potion",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10319,
+     "name": "Redberries",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10324,
+     "name": "Silk",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10328,
+     "name": "Medium experience scroll",
+     "min": 1,
+     "max": 2,
+     "chance": 0.15,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 10331,
+     "name": "Bag of sea salt",
+     "min": 1,
+     "max": 25,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10400,
+     "name": "Coral key",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 10426,
+     "name": "Flax",
+     "min": 1,
+     "max": 20,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10464,
+     "name": "Yorkhill teleport",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10513,
+     "name": "Furniture: Red crab's pincer",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10673,
+     "name": "Iridium gear crate",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Roke",
+   "wikiPages": [
+    "Roke"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 9,
+     "name": "Cotton robe top",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 16,
+     "name": "Cotton robe bottom",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 218,
+     "name": "Cotton pointy hat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 272,
+     "name": "Amulet of Frost",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 274,
+     "name": "Roke's staff",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Sea serpent",
+   "wikiPages": [
+    "Sea Serpent"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 252,
+     "name": "Verum platebody",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 438,
+     "name": "Medium upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 10413,
+     "name": "Sea serpent scale",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10422,
+     "name": "Sea serpent fang",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10536,
+     "name": "Raw serpent meat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Sheep",
+   "wikiPages": [
+    "Sheep"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10017,
+     "name": "Wool",
+     "min": 0,
+     "max": 4,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10238,
+     "name": "Sheep bones",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10240,
+     "name": "Sheep leather",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Silk crab",
+   "wikiPages": [
+    "Silk Crab"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      15
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10400,
+     "name": "Coral key",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      15
+     ],
+     "from": "item page"
+    }
+   ]
+  },
+  {
+   "name": "Skeleton",
+   "wikiPages": [
+    "Skeleton"
+   ],
+   "dropsSilver": true,
+   "silver": [
+    70,
+    70
+   ],
+   "drops": []
+  },
+  {
+   "name": "Snowman",
+   "wikiPages": [
+    "Snowman"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 398,
+     "name": "Top hat",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10337,
+     "name": "Carrot",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10558,
+     "name": "Snow",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Supreme Sea Serpent",
+   "wikiPages": [
+    "Supreme Sea Serpent"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 300,
+     "name": "Stranite plate helmet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 301,
+     "name": "Stranite chain helmet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 302,
+     "name": "Stranite platebody",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 303,
+     "name": "Stranite platelegs",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 304,
+     "name": "Stranite plate boots",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 305,
+     "name": "Stranite plate gloves",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 306,
+     "name": "Stranite heater shield",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 307,
+     "name": "Stranite buckler shield",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "item page"
+    },
+    {
+     "typeId": 10413,
+     "name": "Sea serpent scale",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10422,
+     "name": "Sea serpent fang",
+     "min": 1,
+     "max": 5,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10557,
+     "name": "Supreme Sea serpent scale",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Troll",
+   "wikiPages": [
+    "Troll"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 64,
+     "name": "Steel plate body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 438,
+     "name": "Medium upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      38
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10091,
+     "name": "Verum ore",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [
+      38
+     ],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10293,
+     "name": "Raw glassfish",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10312,
+     "name": "Steel ingot",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10359,
+     "name": "Troll leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10394,
+     "name": "Copper",
+     "min": 1,
+     "max": 10,
+     "chance": 0.5,
+     "levels": [
+      38
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10451,
+     "name": "Troll bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Wild snow wolf",
+   "wikiPages": [
+    "Wild snow wolf"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10382,
+     "name": "Wolf bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Wolf",
+   "wikiPages": [
+    "Wolf"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 10382,
+     "name": "Wolf bones",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10383,
+     "name": "Wolf fur",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Wraith",
+   "wikiPages": [
+    "Wraith"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      55
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10250,
+     "name": "Fluorite crystal",
+     "min": 1,
+     "max": 25,
+     "chance": 0.5,
+     "levels": [
+      55
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10394,
+     "name": "Copper",
+     "min": 1,
+     "max": 10,
+     "chance": 0.5,
+     "levels": [
+      55
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10475,
+     "name": "Shadow mote",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Young dragon",
+   "wikiPages": [
+    "Young dragon"
+   ],
+   "dropsSilver": false,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 64,
+     "name": "Steel plate body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10412,
+     "name": "Dragon leather",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Young troll",
+   "wikiPages": [
+    "Young Trolls",
+    "Young Troll"
+   ],
+   "dropsSilver": true,
+   "silver": [
+    0,
+    91
+   ],
+   "drops": [
+    {
+     "typeId": 61,
+     "name": "Iron plate body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 168,
+     "name": "Cow leather body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10084,
+     "name": "Raw whitefish",
+     "min": 0,
+     "max": 9,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10239,
+     "name": "Crawler leather",
+     "min": 0,
+     "max": 5,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10292,
+     "name": "Raw poyfish",
+     "min": 0,
+     "max": 9,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10293,
+     "name": "Raw glassfish",
+     "min": 0,
+     "max": 8,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10312,
+     "name": "Steel ingot",
+     "min": 0,
+     "max": 10,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10359,
+     "name": "Troll leather",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10451,
+     "name": "Troll bones",
+     "min": 0,
+     "max": 1,
+     "chance": 1.0,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Zalranaz",
+   "wikiPages": [
+    "Zalranaz"
+   ],
+   "dropsSilver": true,
+   "silver": [
+    100,
+    2000
+   ],
+   "drops": [
+    {
+     "typeId": 318,
+     "name": "Iridium platebody",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 428,
+     "name": "Pet Wraith",
+     "min": 1,
+     "max": 1,
+     "chance": 0.005,
+     "levels": [
+      90
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10250,
+     "name": "Fluorite crystal",
+     "min": 1,
+     "max": 25,
+     "chance": 0.5,
+     "levels": [
+      90
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10394,
+     "name": "Copper",
+     "min": 1,
+     "max": 10,
+     "chance": 0.5,
+     "levels": [
+      90
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10416,
+     "name": "Shadow ingot",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [
+      90
+     ],
+     "from": "item page"
+    },
+    {
+     "typeId": 10475,
+     "name": "Shadow mote",
+     "min": 1,
+     "max": 10,
+     "chance": 0.15,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10500,
+     "name": "Life mote",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10511,
+     "name": "Furniture: Zalranaz's head",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10555,
+     "name": "Zalranaz's fabric",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    },
+    {
+     "typeId": 10556,
+     "name": "Zalranaz's trinket",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "monster page"
+    }
+   ]
+  }
+ ]
+}

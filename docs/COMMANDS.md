@@ -43,6 +43,9 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
 | `playerstate` | The client's attack state for your character (attacking, combat stance, animation), action animation, weapon in hand and on the back |
+| `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
+| `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
+| `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
 | `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
 | `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |

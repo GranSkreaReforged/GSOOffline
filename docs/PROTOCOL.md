@@ -55,7 +55,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
   - 4/14 drop
   - 198/15 swap and 198/17 insert (index1, index2)
   - 198/16 sort (type, ascending). The client has already sorted its own list when it sends this; the server adopts that order.
-  - 3/17 collect loot (name, lootId)
+  - 3/17 collect loot (name, lootId): the server gives the bag's contents and removes it (198/35)
 - **Shops:** 8/8 buy (name, typeId, amount); 4/5 sell (name, typeId, uniqueId, amount).
 - **Bank:** 4/11 add and 4/12 remove items; 3/37 silver.
 - **Skills:** 8/4 start action (name, actionType, targetId), used for harvesting and crafting.
@@ -83,6 +83,9 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/4 start action (C→S) | name, type (1 harvest, 2 craft), target (harvestable uid / recipe id) |
 | 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. The gathering animation (from the node's tool type) only plays outside the attack stance, so send 7/2 first; the hand shows the equipped weapon, so equip the tool. |
 | 13/1 harvestable status | uid, depleted (bool) |
+
+| 198/34 add loot bags | `id_x,y,z_name_typeId` joined by `>`. The client only adds (sending a bag twice shows it twice) and loses bags with the scene, so resend a scene's bags once after it loads. `name` is the hover text (`-` = none); `typeId` picks the ground model (equipment with a model, else the default sack) and must be a real item. Also 2/6 (name, list). |
+| 198/35 remove loot bag | id. Also 25/14. |
 
 | 3/7 select target (C→S) → 3/19 | name, npc uid (0 clears) |
 | 3/0 use ability (C→S) → 3/1 | name, slot (0 = basic weapon attack) |
@@ -123,6 +126,7 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 | Dialogue trees with quest requirements and updates | `Resources/XMLs/Dialogue` |
 | Quests and phases | `Resources/XMLs/Quests` |
 | Harvestables, drop tables | `Resources/XMLs/HarvestableInfo` |
+| Monster drop tables | Not in the client. `Data/loot.json`, generated from the community wiki by GSODevTools `gen_loot.py` |
 | Items, crafting recipes | `Resources/Data/items` |
 | Abilities, buffs, projectiles | `Resources/XMLs/Abilities`, `Buffs`, `Projectiles` |
 | Wayshrines | `Resources/XMLs/Wayshrines` |
