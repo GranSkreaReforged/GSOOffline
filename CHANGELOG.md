@@ -10,6 +10,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Added
 - `openurl <url>` bridge command: calls `Application.OpenURL` as a menu link would.
 
+### Changed
+- Branching: work happens on `feature/<area>/<name>` branches merged into `dev`, and each release is one merge of `dev` into `main` (`docs/DEVELOPMENT.md`).
+
 ## [1.0.0] - 2026-10-08
 ### Changed
 - The DevBridge, `devbridge.ps1`, `decompile.ps1` and the datamining tools moved to the separate GSODevTools repo. The DevBridge is now its own plugin, and the `Debug.DevCommandFile` setting is gone. `checkrecipes` remains as a GSOOffline bridge command (`DevCommands.cs`), now joined by `npcbounds`, `animclips`, `door`, `clearspot`, `probe` and `playerstate`.

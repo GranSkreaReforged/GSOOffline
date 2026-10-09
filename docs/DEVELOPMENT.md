@@ -69,9 +69,41 @@ Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content
 
 ## 6. Branches and releases
 
-- `main` holds releases; `dev` is where work happens.
-- Merge with `git switch main; git merge --ff-only dev; git switch dev`.
-- Release with `.\release.ps1 -Version x.y.z` (try `-DryRun` first). The zips never contain game files.
+| Branch | Role |
+|---|---|
+| `main` | Releases only. Each release is one merge of `dev`. |
+| `dev` | Integration. Every feature merges here. |
+| `feature/<area>/<name>`, `fix/<area>/<name>` | One piece of work, branched from `dev`, e.g. `feature/inventory/stack-split`. |
+
+`<area>` names the system you're changing (`inventory`, `quests`, `combat`, `ui`, `build`, `docs`...). The prefix is `feature/` rather than `dev/` because git can't have a branch `dev` and branches under `dev/` at the same time.
+
+A feature:
+
+```powershell
+git switch dev; git pull --ff-only
+git switch -c feature/inventory/stack-split
+git push -u origin feature/inventory/stack-split
+# ...commit and push as you go...
+git switch dev; git pull --ff-only
+git merge --no-ff feature/inventory/stack-split
+git push
+git branch -d feature/inventory/stack-split; git push origin --delete feature/inventory/stack-split
+```
+
+`--no-ff` keeps each feature as one merge on `dev`, so `git log --first-parent dev` reads as a list of features. If `dev` moved on and the feature conflicts, merge `dev` into the feature branch and resolve there; don't rebase a branch that's already pushed. A single small commit (a typo, one doc line) can go straight on `dev`.
+
+A release:
+
+```powershell
+git switch main; git pull --ff-only
+git merge --no-ff dev -m "Merge dev for v0.2.0"
+.\release.ps1 -Version 0.2.0 -DryRun
+.\release.ps1 -Version 0.2.0
+git push --follow-tags
+git switch dev; git merge --ff-only main; git push
+```
+
+The zips never contain game files.
 
 ## Rules
 
