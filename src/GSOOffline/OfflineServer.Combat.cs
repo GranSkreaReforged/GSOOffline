@@ -37,6 +37,7 @@ namespace GSOOffline
         private int targetUid;
         private bool autoAttacking;
         private bool swingShown;   // a 3/20 attack animation was sent since the last 7/2
+        private float castEndsAt = -1f;   // when an ability's cast animation is over
         private float nextPlayerSwing;
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
@@ -65,6 +66,7 @@ namespace GSOOffline
         {
             bool wasAttacking = autoAttacking || swingShown;
             autoAttacking = swingShown = false;
+            castEndsAt = -1f;
             if (wasAttacking && character != null) Send(7, 2, character.name);
         }
 
@@ -209,6 +211,17 @@ namespace GSOOffline
             int projectile = WeaponProjectile(weapon);
             if (projectile > 0) ShootAtNpc(projectile, npc, () => { if (!npc.dead) DealDamage(npc, hit, skill); });
             else DealDamage(npc, hit, skill);
+        }
+
+        /// <summary>
+        /// An ability puts the client's player into its attack animation like a swing does. Buffs, heals and
+        /// sweeps with nothing to keep attacking would stay in it, so the cast ends once its attacktime is up.
+        /// </summary>
+        private void TickCastEnd()
+        {
+            if (castEndsAt < 0f || Time.time < castEndsAt) return;
+            castEndsAt = -1f;
+            if (!autoAttacking) StopAttacking();
         }
 
         // Every damage stat on the weapon: Damage, the physical kinds (SlashDamage...) and the elemental ones
@@ -592,6 +605,7 @@ namespace GSOOffline
             TickPlayerRespawn();
             TickBuffs();
             TickNpcEffects();
+            TickCastEnd();
             TickPlayerAttack(p);
             TickNpcs(p);
         }
