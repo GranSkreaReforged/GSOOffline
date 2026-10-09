@@ -123,6 +123,7 @@ Working:
 - Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything
+- Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
@@ -131,7 +132,8 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- Projectile/spell visuals for abilities, buffs from support abilities
+- Buffs from support abilities
+- Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
 

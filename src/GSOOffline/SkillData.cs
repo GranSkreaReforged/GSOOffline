@@ -19,6 +19,8 @@ namespace GSOOffline
         public int healthMin = 1, healthMax = 1;
         public float harvestTime = 1.5f;
         public float respawnTime = 60f;
+        public int[] sfx = new int[0];   // played on each swing
+        public int endGfx;               // played when the node is used up (trees falling)
         public readonly List<HarvestDrop> drops = new List<HarvestDrop>();
     }
 
@@ -47,6 +49,17 @@ namespace GSOOffline
         public float range;
         public float cooldown;      // seconds
         public int manaCost;
+        public int[] startSfx = new int[0], hitSfx = new int[0];
+        public int startGfx, hitGfx;
+    }
+
+    /// <summary>XMLs/Projectiles: the client flies these itself; impact effect and sound are the server's to send.</summary>
+    public class ProjectileInfo
+    {
+        public int id;
+        public string name;
+        public float speed = 30f;
+        public int startGfx, endGfx, endSound;
     }
 
     /// <summary>Harvestable nodes (XMLs/HarvestableInfo) and crafting recipes (items "Crafting" stats).</summary>
@@ -55,6 +68,7 @@ namespace GSOOffline
         public static readonly Dictionary<int, HarvestableInfo> Harvestables = new Dictionary<int, HarvestableInfo>();
         public static readonly Dictionary<int, CraftRecipe> Recipes = new Dictionary<int, CraftRecipe>();
         public static readonly Dictionary<int, AbilityInfo> Abilities = new Dictionary<int, AbilityInfo>();
+        public static readonly Dictionary<int, ProjectileInfo> Projectiles = new Dictionary<int, ProjectileInfo>();
 
         // Neither the harvesting nor the crafting XP formula survived; this level-scaled base keeps early
         // levels at a handful of actions each (level 5 needs 414 XP) and is the single place to rebalance.
@@ -85,6 +99,8 @@ namespace GSOOffline
                     healthMax = hp[1],
                     harvestTime = GameData.IntAttr(x, "harvesttime", 1500) / 1000f,
                     respawnTime = GameData.IntAttr(x, "respawntime", 60),
+                    sfx = GameData.IntListAttr(x, "sfx"),
+                    endGfx = GameData.IntAttr(x, "endgfx"),
                 };
                 foreach (XmlNode d in x.ChildNodes)
                 {
@@ -117,8 +133,27 @@ namespace GSOOffline
                     range = GameData.IntAttr(x, "range", 4),
                     cooldown = GameData.IntAttr(x, "cooldown", 4000) / 1000f,
                     manaCost = GameData.IntAttr(x, "manacost"),
+                    startSfx = GameData.IntListAttr(x, "startsfx"),
+                    hitSfx = GameData.IntListAttr(x, "hitsfx"),
+                    startGfx = GameData.IntAttr(x, "startgfx"),
+                    hitGfx = GameData.IntAttr(x, "hitgfx"),
                 };
                 Abilities[a.id] = a;
+            }
+
+            // <projectile><stat id="1"/><stat speed="50"/>...</projectile>: one attribute per stat element.
+            foreach (XmlNode x in GameData.LoadXml("XMLs/Projectiles").DocumentElement.ChildNodes)
+            {
+                if (x.NodeType != XmlNodeType.Element) continue;
+                var stats = new Dictionary<string, string>();
+                foreach (XmlNode s in x.ChildNodes)
+                    if (s.NodeType == XmlNodeType.Element)
+                        foreach (XmlAttribute a in s.Attributes) stats[a.Name] = a.Value;
+                string Get(string k) => stats.TryGetValue(k, out var v) ? v.Trim() : null;
+                int Int(string k) => int.TryParse(Get(k), out int r) ? r : 0;
+                var p = new ProjectileInfo { id = Int("id"), name = Get("name"), startGfx = Int("startgfx"), endGfx = Int("endgfx"), endSound = Int("endsound") };
+                if (Int("speed") > 0) p.speed = Int("speed");
+                if (p.id > 0) Projectiles[p.id] = p;
             }
 
             // Recipes: walk items in file order exactly like Scr_ItemHandler.LoadItems so ids line up.

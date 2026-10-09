@@ -379,8 +379,11 @@ namespace GSOOffline
         public void AddXp(int skillId, int amount)
         {
             if (character == null || amount <= 0 || !SkillById.TryGetValue(skillId, out var key)) return;
+            int before = LevelFromXp(character.GetXp(key));
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);
+            int after = LevelFromXp(character.GetXp(key));
+            if (after > before && sceneReady) OnLevelUp(key, after);   // not for the starter kit's levels at creation
         }
 
         // Same curve as Scr_LevelsHandler; evaluated in float like the client so rounding agrees.

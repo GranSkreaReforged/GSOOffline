@@ -71,6 +71,7 @@ namespace GSOOffline
             {
                 character.Position = pos;
                 Send(5, 3, character.name, 1, pos);
+                PlayArrivalGfx(pos);
             }
             else
             {
@@ -102,6 +103,7 @@ namespace GSOOffline
             if (pendingSpawn.HasValue)
             {
                 Send(5, 3, character.name, 0, pendingSpawn.Value);
+                PlayArrivalGfx(pendingSpawn.Value);
                 pendingSpawn = null;
             }
             if (Plugin.TimeOfDay.Value >= 0f)
@@ -185,6 +187,9 @@ namespace GSOOffline
                 Send(2, 41, "You have not discovered that wayshrine yet.");
                 return;
             }
+            var player = LocalPlayer;
+            if (player != null) PlayEffect(GfxTeleport, player.transform.position);
+            arrivalGfx = GfxTeleportLand;
             Teleport(w.scene, w.pos);
         }
 

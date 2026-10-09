@@ -100,6 +100,21 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 1/2 player dead | name, dead |
 | 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
 
+Effects, projectiles and sounds. The client plays nothing on its own: every effect is a server message. Effect ids are the game's "_GFX IDs" list (1 level up, 16/17 spruce/oak falling, 40/41 teleport/land...); the client's own level-up banner is never triggered.
+
+| Event | Payload |
+|---|---|
+| 9/0 effect at a position | effect id, Vector3 |
+| 5/1 effect following a player | name, effect id, Vector3 |
+| 16/2 effect following an NPC | npc uid, effect id |
+| 3/41 right-hand effect | name, effect id |
+| 17/3 sound | name (local player only), sound id, hearing distance, Vector3 |
+| 8/3 projectile player -> NPC | name, projectile id, npc uid. Starts 2 m above the player. |
+| 8/10 projectile NPC -> player | name, projectile id, npc uid |
+| 21/0 projectile between two points | projectile id, from, to |
+
+Projectiles (XMLs/Projectiles) fly at `speed` x 1.1 m/s and play their travel sound, but end silently: the impact effect (`endgfx`) and sound (`endsound`) are the server's to send when it arrives. Data that names sounds and effects: NPCInfo `sfxattack`/`sfxtakehit`/`sfxdeath` (comma lists) and `projectile`/`projectilerate` (percent of attacks)/`projectileattackdistance`; Abilities `startsfx`/`hitsfx`/`startgfx`/`hitgfx`; HarvestableInfo `sfx` (per swing) and `endgfx` (used up).
+
 Town guards are `aggressive` with 1500 damage in NPCInfo. The old server only aimed them at criminals.
 
 Recipe ids are the client's `Script_Crafting.craftingIdCounter`, which counts each `Crafting` stat in item file order. An item without a `Level` attribute has level 0, not 1. The basic tools are hard-coded in `Scr_ItemHandler` (e.g. `isPickaxe` = item 59), not flagged in the XML.
