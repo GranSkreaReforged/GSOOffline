@@ -4,7 +4,7 @@ Every command available for developing and running the GSO Offline Server. Run t
 
 ## build.ps1
 
-Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the game folder (`BepInEx\plugins\GSOOffline\GSOOffline.dll`) with an `INSTALL.txt`. It only reads the game; copying into it is opt-in.
+Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the game folder (`BepInEx\plugins\GSOOffline\GSOOffline.dll`) with an `INSTALL.txt`. It only reads the game; copying into it is opt-in. Every build it makes is a dev build, versioned `<version>-dev+<branch>.<commit>` (plus `.dirty` with uncommitted changes) and logged at startup.
 
 | Parameter | Default | Meaning |
 |---|---|---|
@@ -18,7 +18,7 @@ Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the gam
 
 | Parameter | Meaning |
 |---|---|
-| `-Version x.y.z` | Required. Bumps `Directory.Build.props`, dates `## [Unreleased]` in the CHANGELOG, commits, and tags `vX`. |
+| `-Version x.y.z` | Required. Run on `dev`. Makes the release build, bumps `Directory.Build.props`, dates `## [Unreleased]` in the CHANGELOG, commits "Release vX" with that version's notes as the message body, and tags `vX`. |
 | `-DryRun` | Build and package into `dist\` only; no version bump, commit or tag |
 | `-GameDir <path>` | Game folder override |
 
@@ -27,7 +27,7 @@ Output in `dist\`:
 - `GSOOffline-x.y.z-with-BepInEx.zip`
 - `SHA256SUMS.txt`
 
-It never pushes.
+It never pushes. Push `dev`, open the `dev` -> `main` pull request from the release commit, and push the tag after it's merged.
 
 ## Developer tools
 

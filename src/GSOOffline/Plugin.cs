@@ -56,7 +56,7 @@ namespace GSOOffline
             host.hideFlags = HideFlags.HideAndDontSave;
             host.AddComponent<OfflineServer>();
 
-            Log.LogInfo($"{Name} {Version} loaded. Saves: {SaveDir}");
+            Log.LogInfo($"{Name} {PluginInfo.BuildVersion} loaded{(PluginInfo.ReleaseBuild ? "" : " (dev build)")}. Saves: {SaveDir}");
         }
     }
 }
