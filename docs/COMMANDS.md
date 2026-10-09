@@ -43,6 +43,8 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
 | `playerstate` | The client's attack state for your character (attacking, combat stance, animation) |
+| `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
+| `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |
 
 ## In-game chat commands

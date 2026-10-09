@@ -52,6 +52,7 @@ namespace GSOOffline
             On(4, 1, OnChangeTab);
             On(198, 15, OnSwapItems);
             On(198, 17, OnInsertItem);
+            On(198, 16, c => MirrorClientOrder());
             On(3, 18, c => UseItem((int)c[2]));
         }
 
@@ -81,10 +82,16 @@ namespace GSOOffline
 
         // ---- client sync ---------------------------------------------------------------------
 
+        /// <summary>
+        /// The id the client knows an item by. Stacks are id 0 on the wire: the inventory and bank windows
+        /// only draw a stack's count when its id is 0, and the client matches bank removals on it.
+        /// </summary>
+        private static int WireId(ItemSave it) => ItemData.Get(it.typeId)?.Stacks == true ? 0 : it.id;
+
         private string ItemDataString(ItemSave it, int amount)
         {
             var sb = new StringBuilder();
-            sb.Append("Id=").Append(it.id).Append('\n');
+            sb.Append("Id=").Append(WireId(it)).Append('\n');
             sb.Append("Typeid=").Append(it.typeId).Append('\n');
             sb.Append("Amount=").Append(amount).Append('\n');
             sb.Append("Tab=").Append(it.tab).Append('\n');
@@ -194,7 +201,7 @@ namespace GSOOffline
             }
             it.amount -= amount;
             if (it.amount <= 0) character.items.Remove(it);
-            Send(4, 3, character.name, it.id, it.typeId, amount);
+            Send(4, 3, character.name, WireId(it), it.typeId, amount);
         }
 
         private void DestroyItem(int itemId, int typeId, int amount)
@@ -262,6 +269,54 @@ namespace GSOOffline
             items.RemoveAt(from);
             items.Insert(to, it);
             Send(198, 38, from, to);
+        }
+
+        /// <summary>
+        /// Sort (198/16 type, ascending): the client has already reordered its list when it sends this. Swaps
+        /// and inserts are sent as list indexes, so adopt the client's order rather than re-sorting here
+        /// (its name sort uses the client's string comparison, its price and weight come from its templates).
+        /// </summary>
+        private void MirrorClientOrder()
+        {
+            var items = character?.items;
+            var client = Inventory.instance?.items;
+            if (items == null || client == null) return;
+
+            var sorted = new List<ItemSave>(items.Count);
+            foreach (var stack in client)
+            {
+                int typeId = stack.item.itemTypeID, id = stack.item.itemID;
+                var match = items.Find(it => it.typeId == typeId && (WireId(it) == 0 || it.id == id) && !sorted.Contains(it));
+                if (match != null) sorted.Add(match);
+            }
+            int unmatched = 0;
+            foreach (var it in items)
+                if (!sorted.Contains(it)) { sorted.Add(it); unmatched++; }
+            if (unmatched > 0 || client.Count != items.Count)
+                Plugin.Log.LogWarning($"[inventory] sort: client has {client.Count} entries, server {items.Count}, {unmatched} unmatched kept at the end");
+            items.Clear();
+            items.AddRange(sorted);
+        }
+
+        /// <summary>Dev check: server vs client inventory and bank, row by row (order, wire id, amount).</summary>
+        internal void CompareInventories()
+        {
+            if (character == null || Inventory.instance == null) return;
+            Compare("inventory", character.items, Inventory.instance.items);
+            Compare("bank", character.bank, Inventory.instance.bankitems);
+        }
+
+        private static void Compare(string what, List<ItemSave> server, List<Inventory.ItemStack> client)
+        {
+            int bad = 0;
+            for (int i = 0; i < Mathf.Max(server.Count, client.Count); i++)
+            {
+                string s = i < server.Count ? $"{WireId(server[i])}:{server[i].typeId}x{server[i].amount}" : "-";
+                string c = i < client.Count ? $"{client[i].item.itemID}:{client[i].item.itemTypeID}x{client[i].amount}" : "-";
+                if (s != c) bad++;
+                Plugin.Log.LogInfo($"[dev] {what} {i}: server {s} client {c}{(s != c ? "  MISMATCH" : "")}");
+            }
+            Plugin.Log.LogInfo($"[dev] {what}: {server.Count} server, {client.Count} client, {bad} mismatched rows");
         }
 
         private void UseItem(int typeId)
