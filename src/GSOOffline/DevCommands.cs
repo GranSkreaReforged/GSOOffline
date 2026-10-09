@@ -134,6 +134,9 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev] anim {i}: {(clips[i] != null ? clips[i].name + " " + clips[i].length.ToString("F2") + "s" : "null")}");
         }
 
+        // npcground [n]: the nearest n client NPCs' height above the ground under them (sunken NPCs read negative).
+        private static void NpcGround(string[] args) => OfflineServer.Instance.LogNpcGround(args.Length > 1 ? int.Parse(args[1]) : 15);
+
         // npcbounds [n]: the nearest n client NPCs with their rendered size, how far the model's feet are
         // from the ground under them, and the animation playing. Finds giant, sunken or unanimated NPCs.
         private static void NpcBounds(string[] args)
