@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Cut a release: bump version, build Release, package zips + checksums, commit and tag.
+    Cut a release on dev: bump version, make the release build, package zips + checksums, commit and tag.
 
 .DESCRIPTION
     Produces in dist\:
@@ -8,7 +8,7 @@
       GSOOffline-<ver>-with-BepInEx.zip  extract into the game folder and play
       SHA256SUMS.txt
     Neither zip contains game files; players must own Gran Skrea Online.
-    Nothing is pushed; push the commit and tag yourself when happy.
+    Run it on dev: the release commit becomes the dev -> main pull request. Nothing is pushed.
 
 .EXAMPLE
     .\release.ps1 -Version 0.2.0
@@ -33,6 +33,8 @@ $tag = "v$Version"
 if (-not $DryRun) {
     if (git status --porcelain) { throw 'Working tree is not clean. Commit or stash first.' }
     if (git tag --list $tag) { throw "Tag $tag already exists." }
+    # Releases are cut on dev; the release commit is reviewed in the dev -> main pull request.
+    if ((git branch --show-current) -ne 'dev') { throw 'Run releases on dev: the release commit becomes the dev -> main pull request.' }
 }
 
 $GameDir = Resolve-GameDir $GameDir
@@ -55,7 +57,7 @@ try {
     $project = Join-Path $root 'src\GSOOffline\GSOOffline.csproj'
     $out = Join-Path $root 'artifacts\release'
     if (Test-Path $out) { Remove-Item $out -Recurse -Force }
-    Invoke-Checked dotnet @('build', $project, '-c', 'Release', '-nologo', "-p:Version=$Version", '-o', $out)
+    Invoke-Checked dotnet @('build', $project, '-c', 'Release', '-nologo', "-p:Version=$Version", '-p:ReleaseBuild=true', '-o', $out)
 
     $dist = Join-Path $root 'dist'
     $staging = Join-Path $root 'artifacts\staging'
@@ -98,7 +100,11 @@ catch {
 
 if (-not $DryRun) {
     Invoke-Checked git @('add', 'Directory.Build.props', 'CHANGELOG.md')
-    Invoke-Checked git @('commit', '-m', "Release $tag")
+    # Commit message = pull request title and description: "Release vX.Y.Z" and this version's CHANGELOG section.
+    $section = [regex]::Match((Get-Content $changelog -Raw), "(?ms)^## \[$([regex]::Escape($Version))\][^\n]*\n(.*?)(?=^## \[|\z)").Groups[1].Value.Trim()
+    $message = Join-Path $root 'artifacts\release-commit.txt'
+    [IO.File]::WriteAllText($message, "Release $tag`n`n$section`n")
+    Invoke-Checked git @('commit', '-F', $message)
     Invoke-Checked git @('tag', '-a', $tag, '-m', "GSO Offline Server $Version")
 }
 
@@ -106,5 +112,8 @@ Write-Host ''
 Write-Host "Packaged $Version (BepInEx $BepInExVersion):" -ForegroundColor Green
 Get-Content (Join-Path $dist 'SHA256SUMS.txt') | ForEach-Object { Write-Host "  $_" }
 if (-not $DryRun) {
-    Write-Host "Committed and tagged $tag. Publish with: git push --follow-tags"
+    Write-Host "Committed and tagged $tag on dev. Next:"
+    Write-Host "  git push origin dev   (not the tag yet)"
+    Write-Host "  Raise the pull request dev -> main: title and description are this commit's message (git log -1)."
+    Write-Host "  After it is merged: git push origin $tag; git switch main; git pull --ff-only; git switch dev; git merge --ff-only main; git push"
 }

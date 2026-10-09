@@ -85,8 +85,50 @@ namespace GSOOffline
                 return;
             }
 
+            // The client plays the action animation only outside its attack stance, and the hand shows the
+            // equipped weapon: leave combat and take the tool in hand first, or the player swings a sword at a rock.
+            StopAttacking();
+            if (type == ActionHarvest && SkillData.Harvestables.TryGetValue(world.GetHarvestable(target).typeId, out var info))
+                TakeToolInHand(info.tool);
+
             job = new SkillJob { type = type, target = target, due = Time.time + time, startPos = player.transform.position };
             Send(8, 5, character.name, type, target);
+        }
+
+        // The client's isTool covers every gathering tool except shovels.
+        private static bool IsAnyTool(int typeId) => Scr_ItemHandler.instance.isTool(typeId) || IsTool("shovel", typeId);
+
+        /// <summary>
+        /// Equips the best matching tool (highest item level) unless one is already in hand. Equip puts the
+        /// weapon it replaces on the back, and attacking or "Switch weapon" brings it back.
+        /// </summary>
+        private void TakeToolInHand(string tool)
+        {
+            if (string.IsNullOrEmpty(tool) || tool == "none") return;
+            var inHand = EquippedWeapon();
+            if (inHand != null && IsTool(tool, inHand.typeId)) return;
+
+            ItemSave best = null;
+            int bestLevel = int.MinValue;
+            foreach (var it in character.items)
+            {
+                if (!IsTool(tool, it.typeId)) continue;
+                int level = ItemData.Get(it.typeId)?.level ?? 0;
+                if (level > bestLevel) { best = it; bestLevel = level; }
+            }
+            if (best == null) return;
+            Plugin.Log.LogInfo($"[skill] taking {ItemData.Get(best.typeId)?.name} ({best.id}) in hand for {tool}; {(inHand != null ? ItemData.Get(inHand.typeId)?.name + " goes on the back" : "hand was empty")}");
+            Equip(best.id);
+        }
+
+        /// <summary>Attacking with a tool in hand: swap the weapon on the back into the hand first.</summary>
+        private void ReadyWeapon()
+        {
+            var inHand = EquippedWeapon();
+            var back = SecondaryWeapon();
+            if (inHand == null || back == null || !IsAnyTool(inHand.typeId) || IsAnyTool(back.typeId)) return;
+            Plugin.Log.LogInfo($"[skill] {ItemData.Get(back.typeId)?.name} back in hand to fight");
+            SwitchWeapon();
         }
 
         private void CancelJob(string reason = "cancelled")
@@ -155,6 +197,7 @@ namespace GSOOffline
                 return;
             }
             job.due = Time.time + info.harvestTime;
+            PlaySound(Pick(info.sfx), h.pos, 30);   // each swing: chopping, mining, splashing...
 
             int skill = SkillIdByName(info.skill);
             int level = skill != 0 ? SkillLevel(skill) : 1;
@@ -175,6 +218,8 @@ namespace GSOOffline
             h.dead = true;
             h.respawnAt = Time.time + info.respawnTime;
             Send(13, 1, h.uid, true);
+            PlayEffect(info.endGfx, h.pos);   // e.g. the tree falling
+            Plugin.Log.LogInfo($"[skill] {info.name} {h.uid} used up (respawns in {info.respawnTime}s)");
             Send(3, 13, character.name, ActionHarvest);
             job = null;
         }

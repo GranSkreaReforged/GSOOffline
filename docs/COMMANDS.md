@@ -4,7 +4,7 @@ Every command available for developing and running the GSO Offline Server. Run t
 
 ## build.ps1
 
-Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the game folder (`BepInEx\plugins\GSOOffline\GSOOffline.dll`) with an `INSTALL.txt`. It only reads the game; copying into it is opt-in.
+Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the game folder (`BepInEx\plugins\GSOOffline\GSOOffline.dll`) with an `INSTALL.txt`. It only reads the game; copying into it is opt-in. Every build it makes is a dev build, versioned `<version>-dev+<branch>.<commit>` (plus `.dirty` with uncommitted changes) and logged at startup.
 
 | Parameter | Default | Meaning |
 |---|---|---|
@@ -18,7 +18,7 @@ Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the gam
 
 | Parameter | Meaning |
 |---|---|
-| `-Version x.y.z` | Required. Bumps `Directory.Build.props`, dates `## [Unreleased]` in the CHANGELOG, commits, and tags `vX`. |
+| `-Version x.y.z` | Required. Run on `dev`. Makes the release build, bumps `Directory.Build.props`, dates `## [Unreleased]` in the CHANGELOG, commits "Release vX" with that version's notes as the message body, and tags `vX`. |
 | `-DryRun` | Build and package into `dist\` only; no version bump, commit or tag |
 | `-GameDir <path>` | Game folder override |
 
@@ -27,7 +27,7 @@ Output in `dist\`:
 - `GSOOffline-x.y.z-with-BepInEx.zip`
 - `SHA256SUMS.txt`
 
-It never pushes.
+It never pushes. Push `dev`, open the `dev` -> `main` pull request from the release commit, and push the tag after it's merged.
 
 ## Developer tools
 
@@ -42,7 +42,14 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
-| `playerstate` | The client's attack state for your character (attacking, combat stance, animation) |
+| `fx <id>` / `sfx <id>` | Plays an effect ("_GFX IDs") 3 m in front of the player, or a sound at the player |
+| `projectiles` | The client's projectiles in flight (id, position, speed, model) |
+| `playerstate` | The client's attack state for your character (attacking, combat stance, animation), action animation, weapon in hand and on the back |
+| `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
+| `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
+| `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
+| `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
+| `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |
 
 ## In-game chat commands
@@ -71,6 +78,6 @@ The client sends `/useportal` itself when you confirm the snowy portal.
 | World.NpcViewDistance | 120 | NPC streaming radius (m) |
 | World.HarvestableViewDistance | 90 | Harvestable streaming radius (m) |
 | World.UnlockAllWayshrines | true | All wayshrines unlocked |
-| World.StartTimeOfDay | 1000 | Time sent on scene load (negative = client default) |
+| World.StartTimeOfDay | 1000 | Time of day when you enter the world; the day/night cycle runs on from there (negative = client default) |
 | Convenience.AutoLogin / AutoCharacter | empty | Skip the menus |
 | Debug.LogUnhandledEvents | true | Log unimplemented client events |

@@ -61,7 +61,49 @@ namespace GSOOffline
         {
             var pl = Scr_PlayerHandler.instance.player;
             Plugin.Log.LogInfo($"[dev] player attacking={pl.attacking} attackId={pl.attackId} anim.combat={pl.anim.combat} anim.attackId={pl.anim.attackId} dead={pl.dead}");
+            var hand = Inventory.instance.equipSlots.Find(s => s.slot == Item.ItemSlot.Weapon)?.item;
+            Plugin.Log.LogInfo($"[dev] player actionId={pl.actionId} anim.actionId={pl.anim.actionId} hand={(hand != null ? hand.itemTypeID + " " + hand.itemName : "empty")} back={pl.secondaryWeaponId}/{pl.secondaryWeaponTypeId}");
         }
+
+        // invorder: server vs client inventory and bank row by row. Swaps and drags are sent as list indexes,
+        // so the two orders must match; stacks must be id 0 on the client or their counts aren't drawn.
+        private static void InvOrder(string[] args) => OfflineServer.Instance.CompareInventories();
+
+        // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
+        private static void SortInv(string[] args)
+        {
+            var inv = Inventory.instance;
+            inv.items.Sort((a, b) => string.Compare(a.item.itemName, b.item.itemName));
+            Scr_RPCSender.instance.IssueSortInventory(2, true);
+        }
+
+        // loot: the loot bags the server holds in this scene, and how many the client shows.
+        private static void Loot(string[] args) => OfflineServer.Instance.LogLoot();
+
+        // lootroll <npcType> [n]: rolls that NPC type's drop table n times (default 1000) and logs the totals.
+        private static void LootRoll(string[] args) =>
+            OfflineServer.LogLootRolls(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 1000);
+
+        // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
+        private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
+
+        // projectiles: the client's projectiles in flight (id, position, target).
+        private static void Projectiles(string[] args)
+        {
+            var list = Scr_ProjectileHandler.instance.projectiles;
+            int live = 0;
+            foreach (var p in list)
+            {
+                if (p == null) continue;
+                live++;
+                Plugin.Log.LogInfo($"[dev] projectile {p.id} at {p.transform.position} speed {p.speed} model={(p.projectileObject != null ? p.projectileObject.name : "none")}");
+            }
+            Plugin.Log.LogInfo($"[dev] projectiles in flight: {live}");
+        }
+
+        // fx <id> / sfx <id>: play an effect 3 m in front of the player ("_GFX IDs"), or a sound at the player.
+        private static void Fx(string[] args) => OfflineServer.Instance.DevEffect(int.Parse(args[1]), false);
+        private static void Sfx(string[] args) => OfflineServer.Instance.DevEffect(int.Parse(args[1]), true);
 
         // openurl <url>: Application.OpenURL as a menu link would call it (checks OpenUrlPatch).
         private static void OpenUrl(string[] args)

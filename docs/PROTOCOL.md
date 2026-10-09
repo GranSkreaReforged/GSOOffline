@@ -49,12 +49,13 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 - **Targeting and combat:** 3/7 select NPC; 3/0 use ability (name, slot); 6/25 cancel attack; 8/7 set ability slot.
 - **Items:**
   - 3/4 equip and 3/5 unequip (name, itemId)
+  - 6/5 switch to the secondary weapon, 6/6 unequip it (no arguments)
   - 3/18 use (name, typeId)
   - 4/4 remove (itemId, typeId, amount, name)
   - 4/14 drop
   - 198/15 swap and 198/17 insert (index1, index2)
-  - 198/16 sort
-  - 3/17 collect loot (name, lootId)
+  - 198/16 sort (type, ascending). The client has already sorted its own list when it sends this; the server adopts that order.
+  - 3/17 collect loot (name, lootId): the server gives the bag's contents and removes it (198/35)
 - **Shops:** 8/8 buy (name, typeId, amount); 4/5 sell (name, typeId, uniqueId, amount).
 - **Bank:** 4/11 add and 4/12 remove items; 3/37 silver.
 - **Skills:** 8/4 start action (name, actionType, targetId), used for harvesting and crafting.
@@ -68,8 +69,10 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 |---|---|
 | 2/1 add item | item data `Key=Value
 ...` (Id, Typeid, Amount, Tab, Grade, Slot, stat keys), player name. For stackables, Amount is the delta. |
+| Stackable ids | Stackables (`typeId > 10000` and not `isUnique`) are `Id=0` in every message: 2/1, 2/14, 4/3, 4/13. The inventory and bank windows only draw a stack's count when its id is 0, and the client finds bank stacks by id. |
 | 8/0 equip | name, itemId, replaced itemId (0 = none). Send after the world scene has loaded, or the slots stay empty. |
 | 3/6 unequip, 4/3 remove | name, itemId [, typeId, amount] |
+| 8/19 secondary weapon | name, itemId, typeId (0, 0 = none). Drawn on the back; the inventory hides that item. There's no client message to put a weapon there: the server does it when a weapon is equipped over another. Switch (C→S 6/5) swaps it into the hand; 6/6 takes it off. |
 | 198/37 swap, 198/38 insert | inventory indexes (server list order must match the client's) |
 | 3/16 silver, 8/1 XP | name, value / name, skillId, amount |
 | 8/13 health | name, current, max |
@@ -78,8 +81,11 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 0/2 open shop, 2/37 refresh | name, shop name, `0>type-price-stock,...` / shop name, `merchantSilver>type-price-stock,...` |
 
 | 8/4 start action (C→S) | name, type (1 harvest, 2 craft), target (harvestable uid / recipe id) |
-| 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. |
+| 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. The gathering animation (from the node's tool type) only plays outside the attack stance, so send 7/2 first; the hand shows the equipped weapon, so equip the tool. |
 | 13/1 harvestable status | uid, depleted (bool) |
+
+| 198/34 add loot bags | `id_x,y,z_name_typeId` joined by `>`. The client only adds (sending a bag twice shows it twice) and loses bags with the scene, so resend a scene's bags once after it loads. `name` is the hover text (`-` = none); `typeId` picks the ground model (equipment with a model, else the default sack) and must be a real item. Also 2/6 (name, list). |
+| 198/35 remove loot bag | id. Also 25/14. |
 
 | 3/7 select target (C→S) → 3/19 | name, npc uid (0 clears) |
 | 3/0 use ability (C→S) → 3/1 | name, slot (0 = basic weapon attack) |
@@ -93,6 +99,21 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/2 player damage | name, signed delta (negative = damage), damage type |
 | 1/2 player dead | name, dead |
 | 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
+
+Effects, projectiles and sounds. The client plays nothing on its own: every effect is a server message. Effect ids are the game's "_GFX IDs" list (1 level up, 16/17 spruce/oak falling, 40/41 teleport/land...); the client's own level-up banner is never triggered.
+
+| Event | Payload |
+|---|---|
+| 9/0 effect at a position | effect id, Vector3 |
+| 5/1 effect following a player | name, effect id, Vector3 |
+| 16/2 effect following an NPC | npc uid, effect id |
+| 3/41 right-hand effect | name, effect id |
+| 17/3 sound | name (local player only), sound id, hearing distance, Vector3 |
+| 8/3 projectile player -> NPC | name, projectile id, npc uid. Starts 2 m above the player. |
+| 8/10 projectile NPC -> player | name, projectile id, npc uid |
+| 21/0 projectile between two points | projectile id, from, to |
+
+Projectiles (XMLs/Projectiles) fly at `speed` x 1.1 m/s and play their travel sound, but end silently: the impact effect (`endgfx`) and sound (`endsound`) are the server's to send when it arrives. Data that names sounds and effects: NPCInfo `sfxattack`/`sfxtakehit`/`sfxdeath` (comma lists) and `projectile`/`projectilerate` (percent of attacks)/`projectileattackdistance`; Abilities `startsfx`/`hitsfx`/`startgfx`/`hitgfx`; HarvestableInfo `sfx` (per swing) and `endgfx` (used up).
 
 Town guards are `aggressive` with 1500 damage in NPCInfo. The old server only aimed them at criminals.
 
@@ -120,6 +141,7 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 | Dialogue trees with quest requirements and updates | `Resources/XMLs/Dialogue` |
 | Quests and phases | `Resources/XMLs/Quests` |
 | Harvestables, drop tables | `Resources/XMLs/HarvestableInfo` |
+| Monster drop tables | Not in the client. `Data/loot.json`, generated from the community wiki by GSODevTools `gen_loot.py` |
 | Items, crafting recipes | `Resources/Data/items` |
 | Abilities, buffs, projectiles | `Resources/XMLs/Abilities`, `Buffs`, `Projectiles` |
 | Wayshrines | `Resources/XMLs/Wayshrines` |

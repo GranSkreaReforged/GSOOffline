@@ -148,6 +148,7 @@ namespace GSOOffline
             character = ch;
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             ResetWorldState();
+            startTimeSent = false;   // zone changes reset the world state too, but keep the clock
             Plugin.Log.LogInfo($"'{ch.name}' entering world: scene {ch.scene} at {ch.Position}.");
 
             Send(2, 42, ch.name, BuildPlayerData(ch));

@@ -15,6 +15,7 @@ namespace GSOOffline
         public static float HitChance = 0.85f;
         public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
+        // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
@@ -90,6 +91,8 @@ namespace GSOOffline
             {
                 var npc = world?.GetNpc(targetUid);
                 if (npc == null || npc.dead || !CanFight(npc)) return;
+                CancelJob("attacking");
+                ReadyWeapon();
                 autoAttacking = true;
                 Send(3, 1, character.name, 0);
                 return;
@@ -116,6 +119,8 @@ namespace GSOOffline
                 UseAbility(0);
                 return;
             }
+            CancelJob("attacking");
+            ReadyWeapon();
             UseSkillAbility(slot, a);
         }
 
@@ -161,6 +166,8 @@ namespace GSOOffline
             Send(3, 20, character.name, a.id);
             swingShown = true;   // ability id doubles as the attack animation id
             if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
+            PlaySound(Pick(a.startSfx), LocalPlayer.transform.position);
+            PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
 
             var targets = new List<NpcEntity>();
             if (npc != null) targets.Add(npc);
@@ -173,11 +180,23 @@ namespace GSOOffline
                     if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), p) <= reach) targets.Add(n);
             }
             var weapon = EquippedWeapon();
+            int targetGfx = a.hitGfx > 0 ? a.hitGfx : AbilityTargetGfx.TryGetValue(a.id, out int g) ? g : 0;
+            AbilityProjectile.TryGetValue(a.id, out int projectile);
             foreach (var t in targets)
             {
                 Aggro(t);
-                int hit = RollPlayerHit(weapon, t);
-                DealDamage(t, Mathf.RoundToInt(hit * CombatRules.AbilityMultiplier), skill != 0 ? skill : WeaponSkill(weapon));
+                var target = t;
+                int hit = Mathf.RoundToInt(RollPlayerHit(weapon, t) * CombatRules.AbilityMultiplier);
+                int hitSkill = skill != 0 ? skill : WeaponSkill(weapon);
+                System.Action land = () =>
+                {
+                    if (target.dead) return;
+                    PlayNpcEffect(target, targetGfx);
+                    PlaySound(Pick(a.hitSfx), NpcPosition(target));
+                    DealDamage(target, hit, hitSkill);
+                };
+                if (projectile > 0) ShootAtNpc(projectile, target, land);
+                else land();
             }
             if (npc != null) autoAttacking = !npc.dead;
         }
@@ -255,7 +274,10 @@ namespace GSOOffline
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
 
-            DealDamage(npc, RollPlayerHit(weapon, npc), WeaponSkill(weapon));
+            int hit = RollPlayerHit(weapon, npc), skill = WeaponSkill(weapon);
+            int projectile = WeaponProjectile(weapon);
+            if (projectile > 0) ShootAtNpc(projectile, npc, () => { if (!npc.dead) DealDamage(npc, hit, skill); });
+            else DealDamage(npc, hit, skill);
         }
 
         private int RollPlayerHit(ItemSave weapon, NpcEntity npc)
@@ -270,9 +292,23 @@ namespace GSOOffline
 
         private void DealDamage(NpcEntity npc, int damage, int skill)
         {
+            if (damage > 0 && damage < npc.health && GameData.Npcs.TryGetValue(npc.typeId, out var hurt))
+                NpcSound(npc, hurt.sfxTakeHit);
             npc.health = Mathf.Max(0, npc.health - damage);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
             if (npc.health <= 0) KillNpc(npc, skill);
+        }
+
+        /// <summary>Dev: kill a visible NPC as the player would (bridge command killnpc).</summary>
+        internal void DevKill(int uid)
+        {
+            var npc = world?.GetNpc(uid);
+            if (npc == null || npc.dead)
+            {
+                Plugin.Log.LogInfo($"[dev] killnpc: no live NPC {uid}");
+                return;
+            }
+            DealDamage(npc, npc.health, WeaponSkill(EquippedWeapon()));
         }
 
         private void KillNpc(NpcEntity npc, int skill)
@@ -286,15 +322,11 @@ namespace GSOOffline
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);
             SetAnim(npc, info?.animDeath ?? NpcAnims.Death);
+            if (info != null) NpcSound(npc, info.sfxDeath);
 
             int level = info?.level ?? 1;
             AddXp(skill, CombatRules.KillXp(level));
-            int silver = CombatRules.SilverDrop(level);
-            if (silver > 0)
-            {
-                SetSilver(character.silver + silver);
-                Notice($"You loot {silver} silver.");
-            }
+            DropLoot(npc, info);
             OnNpcKilled(npc.typeId);
         }
 
@@ -418,7 +450,10 @@ namespace GSOOffline
                     continue;
                 }
 
-                if (dist > info.attackDistance)
+                // Ranged NPCs (a projectile and a share of attacks that use it) fight from projectileattackdistance.
+                bool ranged = info.projectile > 0 && info.projectileRate > 0;
+                float reach = ranged ? Mathf.Max(info.attackDistance, info.projectileDistance) : info.attackDistance;
+                if (dist > reach)
                 {
                     if (npc.attackingSent)
                     {
@@ -439,7 +474,14 @@ namespace GSOOffline
                 npc.nextSwing = Time.time + info.attackSpeed;
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
-                NpcHitsPlayer(info);
+                NpcSound(npc, info.sfxAttack);
+                if (ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate))
+                {
+                    var shooter = npc;
+                    var shooterInfo = info;
+                    NpcShoots(shooter, info.projectile, () => { if (!PlayerDead && !shooter.dead) NpcHitsPlayer(shooterInfo); });
+                }
+                else NpcHitsPlayer(info);
             }
         }
 

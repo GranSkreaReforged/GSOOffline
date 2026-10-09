@@ -43,6 +43,10 @@ namespace GSOOffline
             ResetCombat();
         }
 
+        // The start time goes out once per login: resending it on every zone change would turn the clock back
+        // (the client's day/night cycle runs on its own, and GSO HD Textures' weather keeps it going across zones).
+        private bool startTimeSent;
+
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
         private void ChangeScene(int sceneId, Vector3 spawn)
@@ -71,6 +75,7 @@ namespace GSOOffline
             {
                 character.Position = pos;
                 Send(5, 3, character.name, 1, pos);
+                PlayArrivalGfx(pos);
             }
             else
             {
@@ -102,13 +107,18 @@ namespace GSOOffline
             if (pendingSpawn.HasValue)
             {
                 Send(5, 3, character.name, 0, pendingSpawn.Value);
+                PlayArrivalGfx(pendingSpawn.Value);
                 pendingSpawn = null;
             }
-            if (Plugin.TimeOfDay.Value >= 0f)
+            if (Plugin.TimeOfDay.Value >= 0f && !startTimeSent)
+            {
                 Send(16, 1, (int)Plugin.TimeOfDay.Value, 20);
+                startTimeSent = true;
+            }
             SendWayshrines();
             SendPendingEquips();
             SendHealth();
+            SendSceneLoot();
 
             sceneReady = true;
             visibilityTimer = 0.5f;
@@ -184,6 +194,9 @@ namespace GSOOffline
                 Send(2, 41, "You have not discovered that wayshrine yet.");
                 return;
             }
+            var player = LocalPlayer;
+            if (player != null) PlayEffect(GfxTeleport, player.transform.position);
+            arrivalGfx = GfxTeleportLand;
             Teleport(w.scene, w.pos);
         }
 

@@ -195,11 +195,7 @@ namespace GSOOffline
 
             if (!t.Stacks)
             {
-                if (it.equipped)
-                {
-                    it.equipped = false;
-                    Send(3, 6, character.name, it.id);
-                }
+                ReleaseItem(it);
                 character.items.Remove(it);
                 Send(4, 3, character.name, it.id, it.typeId, 1);
                 character.bank.Add(it);
@@ -226,7 +222,7 @@ namespace GSOOffline
 
             it.amount -= amount;
             if (it.amount <= 0) character.bank.Remove(it);
-            Send(4, 13, character.name, it.id, typeId, amount);
+            Send(4, 13, character.name, WireId(it), typeId, amount);
 
             if (!t.Stacks)
             {

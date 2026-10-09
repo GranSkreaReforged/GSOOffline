@@ -4,11 +4,30 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.1.0] - 2026-10-09
 ### Fixed
+- Changing zones no longer turns the clock back to 10:00. The start time (`World.StartTimeOfDay`) is sent once when you enter the world, and the day/night cycle runs on from there, so GSO HD Textures' weather and days continue across zones.
+- Stack counts show again in the inventory and bank (e.g. "12" on a stack of logs). The windows only draw a count for items with id 0, which is how the original server sent stackable items; stacks now go to the client that way.
+- Sorting the inventory no longer scrambles it on the server. The client sorts its own list and sends only "sorted"; dragging or swapping items afterwards moved the wrong ones, and the order came back wrong after a relog. The server now adopts the client's order.
 - Steam no longer shows the game as running after you quit, with "Stop" stuck on "Stopping", when you opened an in-game link (Leaderboards, Discord, wiki...) while your browser was closed. The game started the browser as its own child process, with the Steam overlay injected, so Steam waited for the browser to close. Links now open through the Windows shell, outside the game's processes.
+- Harvesting right after a fight no longer swings your weapon at the node. Starting a harvest or craft now ends the attack stance; the client only plays the gathering animation outside it.
+- You now harvest with the tool in your hand. Starting to mine, chop, fish or gather puts your best matching tool in hand and your weapon on your back; attacking with a tool in hand brings the weapon back. Attacking also stops the harvest.
 
 ### Added
+- Loot bags. A kill drops a bag where the monster fell, showing what's in it when you hover over it; click it to take everything. Bags stay for 5 minutes and are still there if you leave the area and come back. Drop lists for 43 monsters come from the community wiki (e.g. sheep: wool, sheep leather and bones; wolves: fur and bones; Red crab: silk gear, pistols and its rare pet). Monsters the wiki doesn't cover drop silver by level, and every monster can drop upgrade and grade stones for its level band. Silver now comes in the bag instead of straight into your inventory.
+- `loot`, `lootroll <npcType> [n]` and `killnpc <uid>` bridge commands: list loot bags, check a drop table's rates over many kills, and kill an NPC as the player would.
+- Particles and sounds are back. Arrows, crossbow bolts, staff, wand, lute and pistol shots fly to the target, and the hit lands when they arrive, with the impact effect and sound. Abilities fire their projectiles (fire ball, sword throw, the elemental arrows, flame lance...) and play their cast and hit effects and sounds. Monsters make their attack, hurt and death sounds, and ranged monsters (crawlers, frogs, sorceresses, Roke, the pond specter...) shoot back from a distance. Harvesting makes its chopping, mining and fishing sounds, trees fall when cut down, wayshrine teleports flash where you leave and land, and levelling up shows the level-up effect with a chat message.
+- `fx <id>`, `sfx <id>` and `projectiles` bridge commands: play an effect or a sound, and list projectiles in flight.
+- Secondary weapon: equipping a weapon over another puts the old one on your back, as the original server did. Switch with the "Switch weapon" key or the button by the spell bar, or take it off from the equipment window. It is saved with the character.
 - `openurl <url>` bridge command: calls `Application.OpenURL` as a menu link would.
+- `invorder` and `sortinv` bridge commands: compare the server's and the client's inventory and bank row by row, and sort as the inventory's "By name" button does.
+- `playerstate` also shows the action animation, the weapon in hand and the one on the back.
+
+### Changed
+- Branching: work happens on `feature/<area>/<name>` branches merged into `dev`, and each release is one merge of `dev` into `main` (`docs/DEVELOPMENT.md`). Risky, large or core changes, and every release, go through a reviewed pull request.
+- Dev builds and release builds: every `build.ps1` build is a dev build, versioned like `1.0.0-dev+<branch>.<commit>` and logged at startup with "(dev build)", so you can tell which build you're playing. Only `release.ps1` makes release builds, with the plain version.
+- `release.ps1` runs on `dev`: its "Release vX" commit carries that version's CHANGELOG section, which becomes the `dev` -> `main` pull request.
 
 ## [1.0.0] - 2026-10-08
 ### Changed

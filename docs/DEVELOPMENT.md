@@ -69,9 +69,61 @@ Quest glue (which NPC says what, and when) lives in `src\GSOOffline\Data\content
 
 ## 6. Branches and releases
 
-- `main` holds releases; `dev` is where work happens.
-- Merge with `git switch main; git merge --ff-only dev; git switch dev`.
-- Release with `.\release.ps1 -Version x.y.z` (try `-DryRun` first). The zips never contain game files.
+| Branch | Role |
+|---|---|
+| `main` | Releases only. Each release is one reviewed pull request from `dev`. |
+| `dev` | Integration. Every feature merges here. |
+| `feature/<area>/<name>`, `fix/<area>/<name>` | One piece of work, branched from `dev`, e.g. `feature/inventory/stack-split`. |
+
+`<area>` names the system you're changing (`inventory`, `quests`, `combat`, `ui`, `build`, `docs`...). The prefix is `feature/` rather than `dev/` because git can't have a branch `dev` and branches under `dev/` at the same time.
+
+A feature:
+
+```powershell
+git switch dev; git pull --ff-only
+git switch -c feature/inventory/stack-split
+# ...commit as you go...
+git switch dev; git pull --ff-only
+git merge --no-ff feature/inventory/stack-split
+git push
+git branch -d feature/inventory/stack-split
+```
+
+Feature branches stay local; only `dev` and `main` live on GitHub. Push a feature branch only when you want it backed up or shared (`git push -u origin <branch>`, and `git push origin --delete <branch>` after merging).
+
+`--no-ff` keeps each feature as one merge on `dev`, so `git log --first-parent dev` reads as a list of features. If `dev` moved on and the feature conflicts, resolve it on the feature branch: rebase it onto `dev` while it's local, or merge `dev` into it if it has been pushed. A single small commit (a typo, one doc line) can go straight on `dev`.
+
+### Changes that need a reviewed pull request
+
+These go to `dev` through a pull request that the maintainer reviews and merges on GitHub, instead of a local merge:
+- **Could break the game or saves:** the save format (`SaveSystem.cs`, `Json.cs`), login and entering the world, Harmony patches, the message dispatch in `OfflineServer.cs`, plugin startup.
+- **Security:** anything that downloads, runs processes, deletes files, touches the network or adds a dependency, and what goes into release zips.
+- **Large:** roughly 300+ changed lines of code, 10+ files, or a new subsystem.
+- **Core build files:** `build.ps1`, `release.ps1`, `build\GSOBuild.psm1`, `Directory.Build.props`, the `.csproj`, `.gitignore`.
+
+Every release is a pull request too (`dev` into `main`).
+
+The pull request is opened by hand from the branch's final commit: its first line is the PR title and the rest is the description (summary, why, changes, testing, risk). Push the branch, use GitHub's **Compare & pull request** (base `dev`), and copy them in. Merge with **Create a merge commit**, not squash or rebase. Review fixes are new commits on the same branch. After the merge: `git switch dev; git pull --ff-only; git branch -d <branch>`.
+
+### Dev builds and release builds
+
+- **Dev build:** anything `build.ps1` makes, from any branch, Debug or Release configuration. It's for playtesting and never shipped. Its version says where it came from, e.g. `1.0.0-dev+feature-inventory-stack-split.4af9ce7` (`.dirty` if there were uncommitted changes), and the plugin logs it at startup with "(dev build)".
+- **Release build:** made only by `release.ps1`, from a clean `dev`. It carries the plain version (`1.0.1`), is tagged, and is packaged into the zips.
+
+### A release
+
+```powershell
+git switch dev; git pull --ff-only
+.\release.ps1 -Version 0.2.0 -DryRun   # package into dist\ and check it
+.\release.ps1 -Version 0.2.0           # bump, date the CHANGELOG, commit "Release v0.2.0" + notes, tag
+git push origin dev                    # not the tag yet
+# pull request dev -> main: title and description are the release commit's message (git log -1)
+# once it's merged:
+git push origin v0.2.0
+git switch main; git pull --ff-only; git switch dev; git merge --ff-only main; git push
+```
+
+The release commit's message is "Release v0.2.0" followed by that version's CHANGELOG section, so the pull request shows the release notes. The zips never contain game files.
 
 ## Rules
 

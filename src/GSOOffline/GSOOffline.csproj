@@ -39,6 +39,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Data\content.json" LogicalName="GSOOffline.content.json" />
     <EmbeddedResource Include="Data\doors.json" LogicalName="GSOOffline.doors.json" />
+    <EmbeddedResource Include="Data\loot.json" LogicalName="GSOOffline.loot.json" />
   </ItemGroup>
 
   <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">
@@ -54,7 +55,7 @@
       <PluginInfoFile>$(IntermediateOutputPath)PluginInfo.g.cs</PluginInfoFile>
     </PropertyGroup>
     <WriteLinesToFile File="$(PluginInfoFile)" Overwrite="true" WriteOnlyWhenDifferent="true"
-                      Lines="namespace GSOOffline { internal static class PluginInfo { public const string Version = &quot;$(Version)&quot;%3B } }" />
+                      Lines="namespace GSOOffline { internal static class PluginInfo { public const string Version = &quot;$(Version)&quot;%3B public const string BuildVersion = &quot;$(InformationalVersion)&quot;%3B public const bool ReleaseBuild = $(ReleaseBuild)%3B } }" />
     <ItemGroup>
       <Compile Include="$(PluginInfoFile)" />
       <FileWrites Include="$(PluginInfoFile)" />
@@ -64,7 +65,7 @@
   <Target Name="StagePlugin" AfterTargets="Build">
     <MakeDir Directories="$(StagePluginDir)" />
     <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(StagePluginDir)" />
-    <Message Importance="high" Text="Built $(TargetFileName) $(Version) -> $([System.IO.Path]::GetFullPath('$(StagePluginDir)'))" />
+    <Message Importance="high" Text="Built $(TargetFileName) $(InformationalVersion) -> $([System.IO.Path]::GetFullPath('$(StagePluginDir)'))" />
   </Target>
 
 </Project>

@@ -65,10 +65,12 @@ The game folder is found automatically by searching every Steam library. You can
 
 ### Releasing
 
+Work happens on `feature/<area>/<name>` branches from `dev`, merged back into `dev`; risky or large changes go through a reviewed pull request. `main` only receives releases, each one a pull request from `dev`. `build.ps1` makes dev builds (versioned like `1.0.0-dev+<branch>.<commit>`); only `release.ps1` makes release builds. The full flow is in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#6-branches-and-releases).
+
 ```powershell
-.\release.ps1 -Version 0.2.0 -DryRun   # build and package into dist\ only
-.\release.ps1 -Version 0.2.0           # also bump the version, date the CHANGELOG, commit, and tag v0.2.0
-git push --follow-tags
+.\release.ps1 -Version 0.2.0 -DryRun   # on dev: build and package into dist\ only
+.\release.ps1 -Version 0.2.0           # also bump the version, date the CHANGELOG, commit the release notes, and tag v0.2.0
+git push origin dev                    # then open the dev -> main pull request; push the tag once it's merged
 ```
 
 `dist\` receives the plugin-only zip, the zip with BepInEx included, and `SHA256SUMS.txt`. BepInEx is pinned to a specific version and SHA-256 in `build\GSOBuild.psm1`. The version number lives only in `Directory.Build.props`, and the plugin's `[BepInPlugin]` version is generated from it.
@@ -120,6 +122,8 @@ Working:
 - Doors, dungeon entrances and interiors
 - Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
+- Loot bags: kills drop a bag with the monster's loot; click it to take everything
+- Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
@@ -128,9 +132,12 @@ Partially working:
 - Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
 
 Not yet implemented:
-- NPC loot tables (kills drop silver), projectile/spell visuals for abilities, buffs from support abilities
+- Buffs from support abilities
+- Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 - Showing only the right copy of a quest NPC (each appears in several places)
+
+Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 
