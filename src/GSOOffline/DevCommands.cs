@@ -21,6 +21,13 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] recipes: {ok} match, {bad} mismatch, client {Script_Crafting.instance.craftingRecipes.Count}, server {SkillData.Recipes.Count}");
         }
 
+        // ferries: the server's ferry schedule next to the client's ferry objects, and whether the player is on a deck.
+        private static void Ferries(string[] args) => OfflineServer.Instance.LogFerries();
+
+        // ferryboard <id> [height]: drops the player onto a ferry's deck from that height above its origin (default 4 m).
+        private static void FerryBoard(string[] args) =>
+            OfflineServer.Instance.DevBoardFerry(int.Parse(args[1]), args.Length > 2 ? float.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 4f);
+
         // door <n>: goes through doors.json entry n exactly as clicking it would (arrival included). "door" alone lists them.
         private static void Door(string[] args)
         {
