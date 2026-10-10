@@ -79,6 +79,13 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] anim at {UnityEngine.Time.time:F2} attackId={a.GetInteger("AttackID")}{sb}");
         }
 
+        // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).
+        private static void NpcHp(string[] args) => OfflineServer.Instance.DevSetNpcHealth(int.Parse(args[1]), int.Parse(args[2]));
+
+        // swingprofile [seconds]: logs each attack animation's right-hand speed curve (when the blow strikes).
+        private static void SwingProfile(string[] args) =>
+            OfflineServer.Instance.DevProfileSwings(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 10f);
+
         // invorder: server vs client inventory and bank row by row. Swaps and drags are sent as list indexes,
         // so the two orders must match; stacks must be id 0 on the client or their counts aren't drawn.
         private static void InvOrder(string[] args) => OfflineServer.Instance.CompareInventories();

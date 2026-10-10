@@ -146,6 +146,7 @@ namespace GSOOffline
         /// </summary>
         private void ShootAtNpc(int projectile, NpcEntity npc, Action land)
         {
+            ProfileEvent("shot");
             Send(8, 3, character.name, projectile, npc.uid);
             SkillData.Projectiles.TryGetValue(projectile, out var p);
             if (p != null && p.startGfx > 0) PlayPlayerEffect(p.startGfx);

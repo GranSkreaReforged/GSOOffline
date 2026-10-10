@@ -40,6 +40,11 @@ namespace GSOOffline
         private float castEndsAt = -1f;   // when an ability's cast animation is over
         private float nextPlayerSwing;
         private float lastPlayerSwing, measureSwingAt = -1f;
+        // The current swing's hit or shot, waiting for its moment in the animation: called once per strike of the
+        // clip with (strike, strikes), so a flurry deals its damage a share at a time.
+        private System.Action<int, int> pendingBlow;
+        private bool measuringCast;          // the animation being measured is an ability's
+        private float pendingBlowFallback;   // a cast's blow time (its attackdelay) when the clip isn't in ClipImpact
         // Seconds the client's basic attack animation lasts, per weapon type (measured as it plays).
         private readonly Dictionary<int, float> swingLength = new Dictionary<int, float>();
         private float respawnPlayerAt = -1f;
@@ -58,6 +63,8 @@ namespace GSOOffline
         private void ResetCombat()
         {
             targetUid = 0;
+            pendingBlow = null;   // a swing from the old scene
+            measureSwingAt = -1f;
             StopAttacking();
         }
 
@@ -70,6 +77,7 @@ namespace GSOOffline
             bool wasAttacking = autoAttacking || swingShown;
             autoAttacking = swingShown = false;
             castEndsAt = -1f;
+            if (wasAttacking) ProfileEvent("end");
             if (wasAttacking && character != null) Send(7, 2, character.name);
         }
 
@@ -206,28 +214,66 @@ namespace GSOOffline
             var weapon = EquippedWeapon();
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
-            // One swing per play of the attack animation; damage per hit scales so damage per second stays
-            // that of a swing every WeaponSpeed seconds.
+            // One swing per play of the attack animation. Damage per hit scales so damage per second stays that of
+            // a swing every WeaponSpeed seconds, and attack speed buffs add damage rather than cut the animation short.
             float interval = swingLength.TryGetValue(weapon?.typeId ?? 0, out float len) ? len : WeaponSpeed(weapon);
-            nextPlayerSwing = Time.time + interval * AttackSpeedMultiplier();
+            nextPlayerSwing = Time.time + interval;
             lastPlayerSwing = Time.time;
-            measureSwingAt = Time.time + 0.3f;
+            ProfileSwingStarted(0);
+            ResolvePendingBlow();
+            measureSwingAt = Time.time + 0.25f;
+            measuringCast = false;
             Send(3, 20, character.name, 0);
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
             WeaponSounds(weapon, out int swingSfx, out int hitSfx);
-            PlaySound(swingSfx, playerPos);
-
-            int hit = RollPlayerHit(weapon, npc, interval / WeaponSpeed(weapon)), skill = WeaponSkill(weapon);
             int projectile = WeaponProjectile(weapon);
+            if (projectile == 0) PlaySound(swingSfx, playerPos);   // a shot's sound goes with the release
+
+            int hit = RollPlayerHit(weapon, npc, interval / (WeaponSpeed(weapon) * AttackSpeedMultiplier()));
+            int skill = WeaponSkill(weapon);
             System.Action land = () =>
             {
                 if (npc.dead) return;
                 if (hit > 0) PlaySound(hitSfx, NpcPosition(npc));
                 DealDamage(npc, hit, skill);
             };
-            if (projectile > 0) ShootAtNpc(projectile, npc, land);
-            else land();
+            pendingBlow = (strike, strikes) =>
+            {
+                if (npc.dead || PlayerDead || strike > 0) return;
+                if (projectile == 0)
+                {
+                    land();
+                    return;
+                }
+                var pl = LocalPlayer;
+                if (pl != null) PlaySound(swingSfx, pl.transform.position);
+                ShootAtNpc(projectile, npc, land);
+            };
+        }
+
+        // When the blows land (or the shot leaves) in each attack clip, in seconds, measured in-game with the
+        // swingprofile bridge command: the weapon hand's fastest movements, just before they stop. Unlisted basic
+        // attacks land 40% in; unlisted casts at their attackdelay. Generic clip names are keyed with their length.
+        private static readonly Dictionary<string, float[]> ClipImpact = new Dictionary<string, float[]>
+        {
+            { "169_standing_melee_attack_horizontal 1", new[] { 0.65f } },   // broadsword, dagger, mace; strike abilities
+            { "2Hand-Sword-Attack1", new[] { 0.7f } },                       // greatsword
+            { "Unarmed-Attack-R3", new[] { 0.5f } },                         // fists, wands
+            { "Standing_1H_Magic_Attack_02", new[] { 0.5f } },               // staffs, Fire ball
+            { "Standing_1H_Magic_Attack_03", new[] { 0.3f } },               // lutes
+            { "2Hand-Bow-Attack3", new[] { 1f } },                           // bows and arrow abilities: the release
+            { "Armature|Anim@3.2", new[] { 0.5f } },                         // halberds
+            { "Armature|Anim@3.6", new[] { 0.55f, 1.2f, 1.85f, 2.35f, 3f } },   // Slashing: a flurry of five
+            { "Armature|CrossbowShoot", new[] { 0.3f } },                    // crossbows (the hand doesn't move; a guess)
+        };
+
+        private void ResolvePendingBlow()
+        {
+            var blow = pendingBlow;
+            pendingBlow = null;
+            measureSwingAt = -1f;
+            blow?.Invoke(0, 1);
         }
 
         /// <summary>
@@ -239,15 +285,46 @@ namespace GSOOffline
         {
             if (measureSwingAt < 0f || Time.time < measureSwingAt) return;
             measureSwingAt = -1f;
+            var blow = pendingBlow;
+            pendingBlow = null;
+            float[] impacts = { 0f };
             var anim = LocalPlayer != null ? LocalPlayer.anim : null;
-            if (anim == null || anim.animator == null || anim.attackId < 0 || !autoAttacking) return;
-            var a = anim.animator;
-            int layer = a.GetLayerWeight(3) > a.GetLayerWeight(5) ? 3 : 5;   // 3 = attacking on the move, 5 = standing
-            var state = a.IsInTransition(layer) ? a.GetNextAnimatorStateInfo(layer) : a.GetCurrentAnimatorStateInfo(layer);
-            if (state.length < 0.5f || state.length > 5f) return;
-            var weapon = EquippedWeapon();
-            swingLength[weapon?.typeId ?? 0] = state.length;
-            nextPlayerSwing = lastPlayerSwing + state.length * AttackSpeedMultiplier();
+            if (anim != null && anim.animator != null && anim.attackId >= 0)
+            {
+                // Layer 5 holds the weapon's attack clip (layer 3, used on the move, has a placeholder).
+                var a = anim.animator;
+                bool next = a.IsInTransition(5);
+                var state = next ? a.GetNextAnimatorStateInfo(5) : a.GetCurrentAnimatorStateInfo(5);
+                var clips = next ? a.GetNextAnimatorClipInfo(5) : a.GetCurrentAnimatorClipInfo(5);
+                if (state.length >= 0.5f && state.length <= 5f)
+                {
+                    if (measuringCast)
+                    {
+                        // Abilities reuse weapon clips whose length differs from their attacktime: end the cast
+                        // (and resume basic attacks) when the clip does, rather than cut it or start it again.
+                        castEndsAt = lastPlayerSwing + state.length;
+                        nextPlayerSwing = castEndsAt;
+                    }
+                    else
+                    {
+                        swingLength[EquippedWeapon()?.typeId ?? 0] = state.length;
+                        nextPlayerSwing = lastPlayerSwing + state.length;
+                    }
+                }
+                string clip = clips.Length > 0 && clips[0].clip != null ? clips[0].clip.name : string.Empty;
+                string key = clip + "@" + state.length.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+                if (!ClipImpact.TryGetValue(key, out impacts) && !ClipImpact.TryGetValue(clip, out impacts))
+                    impacts = new[] { measuringCast ? pendingBlowFallback : 0.4f * Mathf.Min(state.length, 3f) };
+            }
+            else if (measuringCast) impacts = new[] { pendingBlowFallback };
+            if (blow == null) return;
+            for (int i = 0; i < impacts.Length; i++)
+            {
+                int strike = i, strikes = impacts.Length;
+                float wait = lastPlayerSwing + impacts[i] - Time.time;
+                if (wait > 0.02f) Later(wait, () => blow(strike, strikes));
+                else blow(strike, strikes);
+            }
         }
 
         /// <summary>
@@ -307,6 +384,7 @@ namespace GSOOffline
         {
             if (damage > 0 && damage < npc.health && GameData.Npcs.TryGetValue(npc.typeId, out var hurt))
                 NpcSound(npc, hurt.sfxTakeHit);
+            ProfileEvent("hit");
             npc.health = Mathf.Max(0, npc.health - damage);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
             if (npc.health <= 0) KillNpc(npc, skill);
@@ -691,6 +769,7 @@ namespace GSOOffline
             TickBuffs();
             TickNpcEffects();
             TickCastEnd();
+            TickSwingProfile();
             TickPlayerAttack(p);
             TickNpcs(p);
         }

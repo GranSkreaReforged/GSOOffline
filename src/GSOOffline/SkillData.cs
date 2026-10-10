@@ -49,6 +49,7 @@ namespace GSOOffline
         public float range;
         public float cooldown;      // seconds
         public float attackTime;    // seconds the cast animation plays
+        public float attackDelay;   // seconds into the cast when the blow lands or the shot leaves
         public int manaCost;
         public int[] startSfx = new int[0], hitSfx = new int[0];
         public int startGfx, hitGfx;
@@ -134,6 +135,7 @@ namespace GSOOffline
                     range = GameData.IntAttr(x, "range", 4),
                     cooldown = GameData.IntAttr(x, "cooldown", 4000) / 1000f,
                     attackTime = GameData.IntAttr(x, "attacktime", 2000) / 1000f,
+                    attackDelay = GameData.IntAttr(x, "attackdelay", 0) / 1000f,
                     manaCost = GameData.IntAttr(x, "manacost"),
                     startSfx = GameData.IntListAttr(x, "startsfx"),
                     hitSfx = GameData.IntListAttr(x, "hitsfx"),
