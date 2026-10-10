@@ -42,7 +42,7 @@ namespace GSOOffline
         private static Potion IconOnly(int buff, float seconds) => new Potion { buff = buff, seconds = seconds, effect = new BuffEffect() };
 
         // Teleport scrolls -> wayshrine (0 = the home wayshrine). Scrolls to places that don't exist offline
-        // (houses, guild halls, the auction house, boats) aren't here and stay in the bag.
+        // (houses, guild halls, the auction house) aren't here and stay in the bag.
         private static readonly Dictionary<int, int> TeleportScrolls = new Dictionary<int, int>
         {
             { 10388, 1 },    // Yorkhill Monastery
@@ -84,6 +84,7 @@ namespace GSOOffline
             else if (Potions.TryGetValue(typeId, out var p)) DrinkPotion(typeId, p);
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
             else if (GearCrates.TryGetValue(typeId, out var tiers)) OpenGearCrate(typeId, tiers);
+            else if (TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 

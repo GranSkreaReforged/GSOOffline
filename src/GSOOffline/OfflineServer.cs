@@ -59,6 +59,7 @@ namespace GSOOffline
             RegisterCombatHandlers();
             RegisterTravelHandlers();
             RegisterLootHandlers();
+            RegisterBoatHandlers();
         }
 
         public void Receive(byte ev, object[] c)

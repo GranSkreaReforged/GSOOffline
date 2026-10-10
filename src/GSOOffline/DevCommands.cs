@@ -21,6 +21,72 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] recipes: {ok} match, {bad} mismatch, client {Script_Crafting.instance.craftingRecipes.Count}, server {SkillData.Recipes.Count}");
         }
 
+        // boatprefabs: which ab_PlayerShip_<n> prefabs the client ships, with their names, seats and speeds.
+        private static void BoatPrefabs(string[] args)
+        {
+            for (int i = 0; i <= 30; i++)
+            {
+                var go = UnityEngine.Resources.Load("1LoadingAssets/PlayerShips/ab_PlayerShip_" + i, typeof(UnityEngine.GameObject)) as UnityEngine.GameObject;
+                var ship = go != null ? go.GetComponent<Scr_PlayerShip>() : null;
+                if (ship != null)
+                    Plugin.Log.LogInfo($"[dev] ship {i}: '{ship.boatName}' seats={ship.positions?.Length} speed={ship.movementSpeed} turn={ship.rotationSpeed} crane={go.GetComponent<Scr_FishingBoatCrane>() != null}");
+                else if (go != null)
+                    Plugin.Log.LogInfo($"[dev] ship {i}: prefab without Scr_PlayerShip");
+            }
+            Plugin.Log.LogInfo("[dev] boatprefabs done");
+        }
+
+        // sail <seconds> [heading]: drives the player's boat forward like holding "move forward" (optionally
+        // turning to a compass heading first), so the client's own sync and shore check run as in play.
+        private static void Sail(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            if (!p.inShip || p.ship == null)
+            {
+                Plugin.Log.LogInfo("[dev] sail: not in a boat");
+                return;
+            }
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            float seconds = float.Parse(args[1], inv);
+            if (args.Length > 2) p.ship.targetRotation = float.Parse(args[2], inv);
+            OfflineServer.Instance.StartCoroutine(SailFor(p.ship, seconds));
+        }
+
+        private static System.Collections.IEnumerator SailFor(Scr_PlayerShip ship, float seconds)
+        {
+            var cc = ship.GetComponent<UnityEngine.CharacterController>();
+            var start = ship.transform.position;
+            for (float t = 0f; t < seconds && ship != null; t += UnityEngine.Time.deltaTime)
+            {
+                cc.Move(ship.transform.forward * ship.movementSpeed * UnityEngine.Time.deltaTime);
+                yield return null;
+            }
+            Plugin.Log.LogInfo(ship != null
+                ? $"[dev] sailed {UnityEngine.Vector3.Distance(start, ship.transform.position):F1} m to {ship.transform.position}"
+                : "[dev] sail: the boat is gone");
+        }
+
+        // interactables <typeId>: positions of the scene's client-side interactables of one type.
+        private static void Interactables(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            foreach (var i in UnityEngine.Resources.FindObjectsOfTypeAll<Scr_Interactable>())
+                if (i.typeId == type && i.gameObject.scene.IsValid())
+                    Plugin.Log.LogInfo($"[dev] interactable {type} '{i.name}' at {i.transform.position} active={i.gameObject.activeInHierarchy} scene={i.gameObject.scene.name}");
+            Plugin.Log.LogInfo("[dev] interactables done");
+        }
+
+        // boatstate: the client's view of boats: whether the player swims or sits in one, and every boat object.
+        private static void BoatState(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            Plugin.Log.LogInfo($"[dev] player at {p.transform.position} swimming={p.swimming} inShip={p.inShip} seat={p.shipPosition} ship={(p.ship != null ? p.ship.ownername : "-")}");
+            foreach (var b in Scr_PlayerBoatHandler.instance.boats)
+                if (b != null)
+                    Plugin.Log.LogInfo($"[dev] boat '{b.boatName}' type {b.typeId} owner {b.ownername} at {b.transform.position} rot {b.transform.eulerAngles.y:F0} local={b.controlledLocally}");
+            Plugin.Log.LogInfo($"[dev] boatstate done ({Scr_PlayerBoatHandler.instance.boats.Count} boats)");
+        }
+
         // door <n>: goes through doors.json entry n exactly as clicking it would (arrival included). "door" alone lists them.
         private static void Door(string[] args)
         {
