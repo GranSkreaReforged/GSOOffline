@@ -418,8 +418,15 @@ namespace GSOOffline
             Send(4, 0, character.name, slot, cd, cd);
             Send(3, 20, character.name, a.id);
             swingShown = true;   // ability id doubles as the attack animation id
+            ProfileSwingStarted(a.id);
             castEndsAt = Time.time + a.attackTime;
-            PlaySound(Pick(a.startSfx), LocalPlayer.transform.position);
+            ResolvePendingBlow();
+            nextPlayerSwing = Mathf.Max(nextPlayerSwing, castEndsAt);   // basic attacks resume after the cast
+            lastPlayerSwing = Time.time;
+            measureSwingAt = Time.time + 0.25f;   // MeasureSwing moves castEndsAt to the clip's real end
+            measuringCast = true;
+            WeaponSounds(EquippedWeapon(), out int weaponSwingSfx, out int weaponHitSfx);
+            PlaySound(a.startSfx.Length > 0 ? Pick(a.startSfx) : DefaultCastSound(rule, weaponSwingSfx), LocalPlayer.transform.position);
             PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
             Plugin.Log.LogInfo($"[ability] {a.id} {a.name}: {rule.kind}");
 
@@ -493,26 +500,58 @@ namespace GSOOffline
             int targetGfx = a.hitGfx > 0 ? a.hitGfx : AbilityTargetGfx.TryGetValue(a.id, out int g) ? g : 0;
             AbilityProjectile.TryGetValue(a.id, out int projectile);
             bool vampiric = a.id == 144, execution = a.id == 138;
+            var releases = new List<System.Action<int, int>>();
             foreach (var t in targets)
             {
                 Aggro(t);
                 var target = t;
                 int hit = RollPlayerHit(weapon, t, power) + burst / 2;
                 if (execution && t.health * 4 <= t.maxHealth) hit *= 2;   // double damage on a badly hurt target
-                System.Action land = () =>
+                // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
+                int upFront = rule.dot > 0f ? hit / 2 : hit;
+                System.Action<int, int> land = (strike, strikes) =>
                 {
                     if (target.dead) return;
                     PlayNpcEffect(target, targetGfx);
-                    PlaySound(Pick(a.hitSfx), NpcPosition(target));
-                    if (hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
-                    // Damage over time replaces part of the up-front hit.
-                    DealDamage(target, rule.dot > 0f ? hit / 2 : hit, xpSkill);
-                    if (vampiric && hit > 0) Heal(hit / 2);
+                    PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : weaponHitSfx, NpcPosition(target));
+                    if (strike == 0 && hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
+                    int share = upFront / strikes + (strike == strikes - 1 ? upFront % strikes : 0);
+                    DealDamage(target, share, xpSkill);
+                    if (vampiric && share > 0) Heal(share / 2);
                 };
-                if (projectile > 0) ShootAtNpc(projectile, target, land);
-                else land();
+                releases.Add((strike, strikes) =>
+                {
+                    if (target.dead) return;
+                    if (projectile == 0) land(strike, strikes);
+                    else if (strike == 0) ShootAtNpc(projectile, target, () => land(0, 1));
+                });
+            }
+            // The blows land when the cast animation strikes: MeasureSwing finds the clip, and attackdelay is the
+            // fallback for clips that haven't been measured.
+            if (releases.Count > 0)
+            {
+                pendingBlow = (strike, strikes) => { foreach (var r in releases) r(strike, strikes); };
+                pendingBlowFallback = Mathf.Min(a.attackDelay, a.attackTime);
             }
             if (npc != null) autoAttacking = !npc.dead;
+        }
+
+        // Most abilities name no sound. Attacks sound like the weapon; heals and buffs use Charm's heal sound (308).
+        private static int DefaultCastSound(AbilityRule rule, int weaponSwing)
+        {
+            switch (rule.kind)
+            {
+                case AbilityKind.Heal:
+                case AbilityKind.HealOverTime:
+                case AbilityKind.Buff:
+                case AbilityKind.Taunt:
+                    return 308;
+                case AbilityKind.Utility:
+                case AbilityKind.Bandage:
+                    return 0;
+                default:
+                    return weaponSwing;
+            }
         }
 
         // Reconstructed: a bandage heals more the better it is and the higher the Healing level.

@@ -65,6 +65,27 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] player actionId={pl.actionId} anim.actionId={pl.anim.actionId} hand={(hand != null ? hand.itemTypeID + " " + hand.itemName : "empty")} back={pl.secondaryWeaponId}/{pl.secondaryWeaponTypeId}");
         }
 
+        // playeranim: the player's animator layers (weight, state length, progress) to time attack animations.
+        private static void PlayerAnim(string[] args)
+        {
+            var a = Scr_PlayerHandler.instance.player.anim.animator;
+            var sb = new System.Text.StringBuilder();
+            for (int l = 0; l < a.layerCount; l++)
+            {
+                var s = a.GetCurrentAnimatorStateInfo(l);
+                var clips = a.GetCurrentAnimatorClipInfo(l);
+                sb.Append($" L{l} w={a.GetLayerWeight(l):F2} len={s.length:F2} t={s.normalizedTime:F2} loop={s.loop} clip={(clips.Length > 0 ? clips[0].clip.name : "-")};");
+            }
+            Plugin.Log.LogInfo($"[dev] anim at {UnityEngine.Time.time:F2} attackId={a.GetInteger("AttackID")}{sb}");
+        }
+
+        // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).
+        private static void NpcHp(string[] args) => OfflineServer.Instance.DevSetNpcHealth(int.Parse(args[1]), int.Parse(args[2]));
+
+        // swingprofile [seconds]: logs each attack animation's right-hand speed curve (when the blow strikes).
+        private static void SwingProfile(string[] args) =>
+            OfflineServer.Instance.DevProfileSwings(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 10f);
+
         // invorder: server vs client inventory and bank row by row. Swaps and drags are sent as list indexes,
         // so the two orders must match; stacks must be id 0 on the client or their counts aren't drawn.
         private static void InvOrder(string[] args) => OfflineServer.Instance.CompareInventories();
@@ -132,6 +153,15 @@ namespace GSOOffline
             var clips = EasyAnimationHandler.instance.animations;
             for (int i = 0; i < clips.Length; i++)
                 Plugin.Log.LogInfo($"[dev] anim {i}: {(clips[i] != null ? clips[i].name + " " + clips[i].length.ToString("F2") + "s" : "null")}");
+        }
+
+        // sounds: the client's sounds playing right now (ids as in Audio_Sound_<id>.wav).
+        private static void Sounds(string[] args)
+        {
+            var ids = new System.Collections.Generic.List<string>();
+            foreach (var s in Scr_AudioHandler.instance.sounds)
+                if (s != null) ids.Add(s.id.ToString());
+            Plugin.Log.LogInfo($"[dev] sounds playing: {string.Join(" ", ids.ToArray())}");
         }
 
         // npcground [n]: the nearest n client NPCs' height above the ground under them (sunken NPCs read negative).

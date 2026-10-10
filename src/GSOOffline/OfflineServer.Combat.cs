@@ -39,6 +39,14 @@ namespace GSOOffline
         private bool swingShown;   // a 3/20 attack animation was sent since the last 7/2
         private float castEndsAt = -1f;   // when an ability's cast animation is over
         private float nextPlayerSwing;
+        private float lastPlayerSwing, measureSwingAt = -1f;
+        // The current swing's hit or shot, waiting for its moment in the animation: called once per strike of the
+        // clip with (strike, strikes), so a flurry deals its damage a share at a time.
+        private System.Action<int, int> pendingBlow;
+        private bool measuringCast;          // the animation being measured is an ability's
+        private float pendingBlowFallback;   // a cast's blow time (its attackdelay) when the clip isn't in ClipImpact
+        // Seconds the client's basic attack animation lasts, per weapon type (measured as it plays).
+        private readonly Dictionary<int, float> swingLength = new Dictionary<int, float>();
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
         private float lastHitTaken = -1000f;
@@ -55,6 +63,8 @@ namespace GSOOffline
         private void ResetCombat()
         {
             targetUid = 0;
+            pendingBlow = null;   // a swing from the old scene
+            measureSwingAt = -1f;
             StopAttacking();
         }
 
@@ -67,6 +77,7 @@ namespace GSOOffline
             bool wasAttacking = autoAttacking || swingShown;
             autoAttacking = swingShown = false;
             castEndsAt = -1f;
+            if (wasAttacking) ProfileEvent("end");
             if (wasAttacking && character != null) Send(7, 2, character.name);
         }
 
@@ -192,6 +203,7 @@ namespace GSOOffline
 
         private void TickPlayerAttack(Vector3 playerPos)
         {
+            MeasureSwing();
             if (!autoAttacking || PlayerDead || Time.time < nextPlayerSwing) return;
             var npc = world.GetNpc(targetUid);
             if (npc == null || npc.dead)
@@ -202,15 +214,138 @@ namespace GSOOffline
             var weapon = EquippedWeapon();
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
-            nextPlayerSwing = Time.time + WeaponSpeed(weapon) * AttackSpeedMultiplier();
+            // One swing per play of the attack animation. Damage per hit scales so damage per second stays that of
+            // a swing every WeaponSpeed seconds, and attack speed buffs add damage rather than cut the animation short.
+            float interval = swingLength.TryGetValue(weapon?.typeId ?? 0, out float len) ? len : WeaponSpeed(weapon);
+            nextPlayerSwing = Time.time + interval;
+            lastPlayerSwing = Time.time;
+            ProfileSwingStarted(0);
+            ResolvePendingBlow();
+            measureSwingAt = Time.time + 0.25f;
+            measuringCast = false;
             Send(3, 20, character.name, 0);
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
-
-            int hit = RollPlayerHit(weapon, npc), skill = WeaponSkill(weapon);
+            WeaponSounds(weapon, out int swingSfx, out int hitSfx);
             int projectile = WeaponProjectile(weapon);
-            if (projectile > 0) ShootAtNpc(projectile, npc, () => { if (!npc.dead) DealDamage(npc, hit, skill); });
-            else DealDamage(npc, hit, skill);
+            if (projectile == 0) PlaySound(swingSfx, playerPos);   // a shot's sound goes with the release
+
+            int hit = RollPlayerHit(weapon, npc, interval / (WeaponSpeed(weapon) * AttackSpeedMultiplier()));
+            int skill = WeaponSkill(weapon);
+            System.Action land = () =>
+            {
+                if (npc.dead) return;
+                if (hit > 0) PlaySound(hitSfx, NpcPosition(npc));
+                DealDamage(npc, hit, skill);
+            };
+            pendingBlow = (strike, strikes) =>
+            {
+                if (npc.dead || PlayerDead || strike > 0) return;
+                if (projectile == 0)
+                {
+                    land();
+                    return;
+                }
+                var pl = LocalPlayer;
+                if (pl != null) PlaySound(swingSfx, pl.transform.position);
+                ShootAtNpc(projectile, npc, land);
+            };
+        }
+
+        // When the blows land (or the shot leaves) in each attack clip, in seconds, measured in-game with the
+        // swingprofile bridge command: the weapon hand's fastest movements, just before they stop. Unlisted basic
+        // attacks land 40% in; unlisted casts at their attackdelay. Generic clip names are keyed with their length.
+        private static readonly Dictionary<string, float[]> ClipImpact = new Dictionary<string, float[]>
+        {
+            { "169_standing_melee_attack_horizontal 1", new[] { 0.65f } },   // broadsword, dagger, mace; strike abilities
+            { "2Hand-Sword-Attack1", new[] { 0.7f } },                       // greatsword
+            { "Unarmed-Attack-R3", new[] { 0.5f } },                         // fists, wands
+            { "Standing_1H_Magic_Attack_02", new[] { 0.5f } },               // staffs, Fire ball
+            { "Standing_1H_Magic_Attack_03", new[] { 0.3f } },               // lutes
+            { "2Hand-Bow-Attack3", new[] { 1f } },                           // bows and arrow abilities: the release
+            { "Armature|Anim@3.2", new[] { 0.5f } },                         // halberds
+            { "Armature|Anim@3.6", new[] { 0.55f, 1.2f, 1.85f, 2.35f, 3f } },   // Slashing: a flurry of five
+            { "Armature|CrossbowShoot", new[] { 0.3f } },                    // crossbows (the hand doesn't move; a guess)
+        };
+
+        private void ResolvePendingBlow()
+        {
+            var blow = pendingBlow;
+            pendingBlow = null;
+            measureSwingAt = -1f;
+            blow?.Invoke(0, 1);
+        }
+
+        /// <summary>
+        /// Each 3/20 restarts the client's attack animation, which loops while attacking. Swinging on a timer of our
+        /// own cut it off midway, so shortly after a swing starts (once the animator is in the attack state) this
+        /// reads the clip's length and times the next swing to its end. Standing and walking attacks differ.
+        /// </summary>
+        private void MeasureSwing()
+        {
+            if (measureSwingAt < 0f || Time.time < measureSwingAt) return;
+            measureSwingAt = -1f;
+            var blow = pendingBlow;
+            pendingBlow = null;
+            float[] impacts = { 0f };
+            var anim = LocalPlayer != null ? LocalPlayer.anim : null;
+            if (anim != null && anim.animator != null && anim.attackId >= 0)
+            {
+                // Layer 5 holds the weapon's attack clip (layer 3, used on the move, has a placeholder).
+                var a = anim.animator;
+                bool next = a.IsInTransition(5);
+                var state = next ? a.GetNextAnimatorStateInfo(5) : a.GetCurrentAnimatorStateInfo(5);
+                var clips = next ? a.GetNextAnimatorClipInfo(5) : a.GetCurrentAnimatorClipInfo(5);
+                if (state.length >= 0.5f && state.length <= 5f)
+                {
+                    if (measuringCast)
+                    {
+                        // Abilities reuse weapon clips whose length differs from their attacktime: end the cast
+                        // (and resume basic attacks) when the clip does, rather than cut it or start it again.
+                        castEndsAt = lastPlayerSwing + state.length;
+                        nextPlayerSwing = castEndsAt;
+                    }
+                    else
+                    {
+                        swingLength[EquippedWeapon()?.typeId ?? 0] = state.length;
+                        nextPlayerSwing = lastPlayerSwing + state.length;
+                    }
+                }
+                string clip = clips.Length > 0 && clips[0].clip != null ? clips[0].clip.name : string.Empty;
+                string key = clip + "@" + state.length.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+                if (!ClipImpact.TryGetValue(key, out impacts) && !ClipImpact.TryGetValue(clip, out impacts))
+                    impacts = new[] { measuringCast ? pendingBlowFallback : 0.4f * Mathf.Min(state.length, 3f) };
+            }
+            else if (measuringCast) impacts = new[] { pendingBlowFallback };
+            if (blow == null) return;
+            for (int i = 0; i < impacts.Length; i++)
+            {
+                int strike = i, strikes = impacts.Length;
+                float wait = lastPlayerSwing + impacts[i] - Time.time;
+                if (wait > 0.02f) Later(wait, () => blow(strike, strikes));
+                else blow(strike, strikes);
+            }
+        }
+
+        /// <summary>
+        /// The player's attack sounds were the server's to send and no data names them for basic attacks. These are
+        /// the ids the ability data gives weapon blows: "Swing" and Brutal slash (321 swing, 320 impact), Stab (93),
+        /// the arrows (34). Staffs, wands and lutes shoot projectiles, which bring their own impact sound.
+        /// </summary>
+        private static void WeaponSounds(ItemSave weapon, out int swing, out int hit)
+        {
+            swing = 321;
+            hit = 320;
+            if (weapon == null) return;
+            var ih = Scr_ItemHandler.instance;
+            int t = weapon.typeId;
+            if (ih.isBow(t) || ih.isCrossBow(t))
+            {
+                swing = 34;
+                hit = 0;
+            }
+            else if (ih.isStaff(t) || ih.isWand(t) || ih.isInstrument(t)) swing = hit = 0;
+            else if (ih.isDagger(t)) hit = 93;
         }
 
         /// <summary>
@@ -249,6 +384,7 @@ namespace GSOOffline
         {
             if (damage > 0 && damage < npc.health && GameData.Npcs.TryGetValue(npc.typeId, out var hurt))
                 NpcSound(npc, hurt.sfxTakeHit);
+            ProfileEvent("hit");
             npc.health = Mathf.Max(0, npc.health - damage);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
             if (npc.health <= 0) KillNpc(npc, skill);
@@ -387,7 +523,13 @@ namespace GSOOffline
                 float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
                 if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
             }
-            else npc.hasDest = false;
+            else if (flat.magnitude < 0.3f)
+            {
+                // Arrived. Without this the client keeps the run animation going until its own 2-second stall check.
+                npc.hasDest = false;
+                Send(13, 2, npc.uid, false);
+                return;
+            }
             Send(198, 25, npc.uid, from, to, to);
             Send(13, 2, npc.uid, true);
         }
@@ -421,7 +563,10 @@ namespace GSOOffline
             {
                 Vector3 p = list[i].transform.position;
                 string above = GroundAt(p, p.y + 5f, 30f, out var g) ? (p.y - g.y).ToString("F2") : "no ground";
-                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} above-ground={above}");
+                var server = world?.GetNpc(list[i].npcUniqueId);
+                Vector3 forward = list[i].transform.forward, toMe = me - p;
+                forward.y = toMe.y = 0f;
+                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above}");
             }
         }
 
@@ -520,20 +665,38 @@ namespace GSOOffline
                     npc.hasDest = false;
                     Send(13, 2, npc.uid, false);
                     Send(11, 0, npc.uid, true, character.name);   // client animates swings at attackSpeed
+                    Send(198, 28, npc.uid, playerPos);   // turn to the player: the client only turns NPCs as they walk
                 }
                 if (Time.time < npc.nextSwing) continue;
                 npc.nextSwing = Time.time + info.attackSpeed;
+                Send(198, 28, npc.uid, playerPos);
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
                 NpcSound(npc, info.sfxAttack);
-                if (ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate))
-                {
-                    var shooter = npc;
-                    var shooterInfo = info;
-                    NpcShoots(shooter, info.projectile, () => { if (!PlayerDead && !shooter.dead) NpcHitsPlayer(shooterInfo, shooter); });
-                }
-                else NpcHitsPlayer(info, npc);
+                bool shoot = ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate);
+                var attacker = npc;
+                var attackerInfo = info;
+                // The blow lands attackdelay into the swing, in time with the animation.
+                Later(Mathf.Min(info.attackDelay, info.attackSpeed), () => NpcSwingLands(attacker, attackerInfo, shoot));
             }
+        }
+
+        private void NpcSwingLands(NpcEntity npc, NpcInfo info, bool shoot)
+        {
+            var player = LocalPlayer;
+            if (npc.dead || !npc.aggro || PlayerDead || player == null || Time.time < npc.stunnedUntil) return;
+            if (shoot)
+            {
+                NpcShoots(npc, info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
+                return;
+            }
+            // Stepping out of reach during the wind-up dodges the blow.
+            if (Vector3.Distance(NpcPosition(npc), player.transform.position) > info.attackDistance + info.attackMissDistance)
+            {
+                Send(8, 2, character.name, 0, info.damageType);
+                return;
+            }
+            NpcHitsPlayer(info, npc);
         }
 
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)
@@ -606,6 +769,7 @@ namespace GSOOffline
             TickBuffs();
             TickNpcEffects();
             TickCastEnd();
+            TickSwingProfile();
             TickPlayerAttack(p);
             TickNpcs(p);
         }
