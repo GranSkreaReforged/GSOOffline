@@ -103,6 +103,7 @@ namespace GSOOffline
             TickRegen();
             TickLoot();
             TickImpacts();
+            TickFerries();
             TickAutoLogin();
         }
 

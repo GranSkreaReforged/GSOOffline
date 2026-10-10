@@ -38,6 +38,7 @@ namespace GSOOffline
             pendingSpawn = null;
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
+            pendingCrossing = null;
             lastNpcList = lastHarvestableList = null;
             job = null;
             ResetCombat();
@@ -72,6 +73,7 @@ namespace GSOOffline
         public void Teleport(int sceneId, Vector3 pos)
         {
             if (character == null) return;
+            ridingId = 0;   // off any ferry
             if (sceneReady && sceneId == character.scene)
             {
                 DisembarkForTeleport();
@@ -93,6 +95,7 @@ namespace GSOOffline
 
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
+            LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
             if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)
@@ -106,6 +109,9 @@ namespace GSOOffline
         private void FinishSceneLoad()
         {
             Send(198, 10);   // clears Script_sceneManager.loadingInProgress
+            SendSceneFerries();   // before the spawn: a ferry crossing lands the player on a deck
+            var deck = TakeFerryArrival();
+            if (deck.HasValue) pendingSpawn = deck;
             if (pendingSpawn.HasValue)
             {
                 Send(5, 3, character.name, 0, pendingSpawn.Value);

@@ -37,6 +37,8 @@ Types must match exactly, because the receiver casts with `(int)`, `(string)`, `
 | 2/17 wayshrines | name, `id,id,id_homeId` |
 | 2/28 boats | name, `x,y,z_rot_seats_owner_prefab` joined by `>` (empty = none). `seats` is `seat:name` joined by `,`; the client parses every entry as a number and a name, so an empty boat needs a placeholder (`0:`). `prefab` loads `1LoadingAssets/PlayerShips/ab_PlayerShip_<n>`: 1 small wooden boat, 2 longboat, 3 small fishing boat, 4 fishing vessel (the only one with a working crane), 5/6 Bal Sardan boats, 7 ornamental longboat, 8 old raft. Boats sit at y 3.15. Being in a seat pins the player to it each frame; the owner steers. |
 | 6/9 left the boat | — (clears the player's boat) |
+| 2/15 ferries | name, `id_type_x_y_z_waypoint_moving` joined by `>` (the position fields are `_`-separated). Ferries are `Resources/XMLs/transportData_<scene>` (`transport` id, type = `1LoadingAssets/Transports/ab_transport_<type>`, speed; `phase` destination and `waitingtime`, waypoint = phase order). The client sails toward the current waypoint itself and is created facing north. It keeps the previous zone's ferries in its list after they are destroyed and throws removing them, so the server calls its `clearTransports()` before a zone's first list. |
+| 20/2 ferry waypoint | id, waypoint index, moving (bool). The server runs the schedule: on arrival, a waypoint with `waitingtime` stops the ferry (moving false), then it sails to the next. |
 | 16/1 weather | int time (0–2400), int cloudiness |
 | 2/0 chat line | unused, text (optional `color=yellow\|` prefix), int channel |
 | 2/41 notification | text |

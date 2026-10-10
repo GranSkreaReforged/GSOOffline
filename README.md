@@ -102,6 +102,7 @@ src/GSOOffline/
   OfflineServer.World.cs       scenes, teleports, wayshrines, NPC/harvestable streaming
   OfflineServer.Chat.cs        chat and commands
   OfflineServer.Boats.cs       boats and sailing
+  OfflineServer.Ferries.cs     ferries (transports) and zone crossings
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
   SaveSystem.cs                JSON saves
@@ -120,6 +121,7 @@ Working:
 - Shops
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Sailing: launching, boarding and steering boats, Sailing XP, boat teleports
+- Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
