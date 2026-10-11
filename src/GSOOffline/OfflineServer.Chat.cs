@@ -39,6 +39,7 @@ namespace GSOOffline
             var player = LocalPlayer;
             try
             {
+                if (RunBoatCommand(a[0].ToLowerInvariant(), a)) return;
                 switch (a[0].ToLowerInvariant())
                 {
                     case "help":

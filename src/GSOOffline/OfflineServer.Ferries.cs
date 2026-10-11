@@ -161,7 +161,8 @@ namespace GSOOffline
         private void LateUpdate()
         {
             var player = LocalPlayer;
-            if (!sceneReady || player == null || PlayerDead)
+            // In a player boat the client already pins the player to its seat (boat teleports work from a deck).
+            if (!sceneReady || player == null || PlayerDead || player.inShip)
             {
                 ridingId = 0;
                 return;

@@ -62,6 +62,7 @@ namespace GSOOffline
                 sceneId = StartScene;
                 spawn = StartPos;
             }
+            StowBoat("zone change");
             ResetWorldState();
             pendingSpawn = spawn;
             character.scene = sceneId;
@@ -75,6 +76,7 @@ namespace GSOOffline
             ridingId = 0;   // off any ferry
             if (sceneReady && sceneId == character.scene)
             {
+                DisembarkForTeleport();
                 character.Position = pos;
                 Send(5, 3, character.name, 1, pos);
                 PlayArrivalGfx(pos);
@@ -125,6 +127,7 @@ namespace GSOOffline
             SendPendingEquips();
             SendHealth();
             SendSceneLoot();
+            SendBoats();
 
             sceneReady = true;
             visibilityTimer = 0.5f;

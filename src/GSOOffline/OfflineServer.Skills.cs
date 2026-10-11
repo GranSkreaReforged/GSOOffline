@@ -214,7 +214,7 @@ namespace GSOOffline
 
             if (skill != 0)
             {
-                float boost = skill == 8 ? AlchemyXpMultiplier() : 1f;   // Ambitious apprentice
+                float boost = skill == 8 ? AlchemyXpMultiplier() : skill == FishingSkill ? FishingBoatXpMultiplier() : 1f;   // Ambitious apprentice, fishing boat
                 AddXp(skill, Mathf.RoundToInt(SkillData.BaseXp(info.level) * boost));
             }
             if (--h.health > 0) return;
