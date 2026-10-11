@@ -28,6 +28,7 @@ namespace GSOOffline
                 return;
             }
             Send(2, 0, string.Empty, character.name + ": " + msg.Replace('|', '/'), 0);
+            OnSay(msg);
         }
 
         private static float F(string s) => float.Parse(s, CultureInfo.InvariantCulture);
@@ -38,6 +39,7 @@ namespace GSOOffline
             var player = LocalPlayer;
             try
             {
+                if (RunBoatCommand(a[0].ToLowerInvariant(), a)) return;
                 switch (a[0].ToLowerInvariant())
                 {
                     case "help":

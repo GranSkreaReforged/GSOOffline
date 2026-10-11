@@ -48,9 +48,32 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
 | `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
 | `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
+| `setlevel <skillId> <level>` | Raises a skill to that level (Scr_SkillsHandler ids, e.g. 15 Swordsmanship, 24 Healing) |
+| `buffs` | Lists the player's active buffs with their effects, health and mana |
+| `worldnpcs [type...]` | The server's NPCs in this scene (all, or those types), with position and whether quest rules show them |
 | `invorder` | Server vs client inventory and bank, row by row (order, client id, amount) |
 | `sortinv` | Sorts the inventory by name exactly as the window's "By name" button does |
 | `probe x y z` | Every collider on a vertical line through the point and within 4 m of it |
+| `npcground [n]` | The nearest *n* NPCs' height above the ground under them (sunken NPCs read negative), whether they're walking, their animation and facing |
+| `sounds` | The sounds the client is playing right now (ids as in `Audio_Sound_<id>.wav`) |
+| `playeranim` | The player's animator layers: weight, clip length and progress |
+| `swingprofile [seconds]` | Each attack animation's weapon-hand speed curve (when the blow strikes), with the moments hits land and shots leave |
+| `npchp <uid> <hp>` | Sets an NPC's health and max health (a training dummy for combat tests) |
+| `openurl <url>` | Calls `Application.OpenURL` as a menu link would (checks `OpenUrlPatch`) |
+| `boatprefabs` | The client's player-ship prefabs (`ab_PlayerShip_<n>`): name, seats, speed, crane and interactables |
+| `boatstate` | Whether the player swims or sits in a boat, and every boat object the client has |
+| `sail <seconds> [heading]` | Drives the player's boat forward like holding "move forward" (turning to a compass heading first), so the client's own sync and shore check run as in play |
+| `ferries` | The server's ferry schedule next to the client's ferry objects, and whether the player is on a deck |
+| `ferryboard <id> [height]` | Drops the player onto a ferry's deck from that height above its origin (default 4 m) |
+| `routecheck` | Where this zone's ferry routes run over land or rocks |
+| `routeplan <name> <margin> <cell> x,z x,z ...` | The shortest water route through the points (6 m clearance), printed as waypoints, with a map in `<game>\GSODevTools\<name>.png` |
+| `watermap x1 z1 x2 z2 [cell]` | A water/land map of that rectangle in `<game>\GSODevTools\watermap.png` (north up) |
+| `profile x1 z1 x2 z2 [step]` | The highest solid surface along a line (water is y 3.15) |
+| `interactables <typeId>` / `interactablesnear [radius]` | The scene's client-side interactables of one type, or every one within a radius of the player (default 150 m) |
+| `spawnprefabs [max]` | The client's spawned-object prefabs (`ab_spawnedObject_<n>`): size, components and interactables |
+| `spawnobj <type> [dx dz \| f <ahead> [up]]` / `despawnobj <uid>` | Shows a spawned-object prefab next to or in front of the player (client only), or removes it |
+| `oysters` | The Bal Sardan harbour oysters (position, stunned, time left), the gun being manned and the client's object count |
+| `netoyster [stun] [offset]` | Drops the fishing vessel's net on the first oyster, optionally stunning it first or offset metres east (needs the vessel boarded) |
 
 ## In-game chat commands
 

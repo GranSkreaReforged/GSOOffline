@@ -19,6 +19,13 @@ namespace GSOOffline
         public bool aggro, returning, attackingSent;
         public float nextSwing, nextWaypoint, respawnAt, nextWander, attackAnimUntil;
         public int anim = -1;   // animation id last sent to the client
+        public bool hasDest;    // walking to dest in ground-following steps
+        public Vector3 dest;
+
+        // ability effects
+        public float stunnedUntil, rootedUntil;
+        public int dotDamage, dotTicks, dotSkill;
+        public float nextDot;
     }
 
     public class HarvestableEntity
@@ -58,6 +65,13 @@ namespace GSOOffline
                 Vector3 p = d.transform.position;
                 w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = d.typeId, spawnPos = p, pos = p, health = hp, maxHealth = hp });
             }
+            // Quest NPCs the scene has no marker for (content.json "spawn").
+            i = 9000;
+            foreach (var kv in OfflineServer.SpawnsFor(sceneId))
+            {
+                int hp = GameData.Npcs.TryGetValue(kv.Key, out var info) ? info.health : 30;
+                w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = kv.Key, spawnPos = kv.Value, pos = kv.Value, health = hp, maxHealth = hp });
+            }
             i = 0;
             foreach (var d in Resources.FindObjectsOfTypeAll<Scr_HarvestableDummy>())
             {
@@ -94,13 +108,13 @@ namespace GSOOffline
             return null;
         }
 
-        public string BuildVisibleNpcList(Vector3 center, float range)
+        public string BuildVisibleNpcList(Vector3 center, float range, System.Func<NpcEntity, bool> shown)
         {
             var sb = new StringBuilder();
             float r2 = range * range;
             foreach (var n in npcs)
             {
-                if ((n.pos - center).sqrMagnitude > r2) continue;
+                if ((n.pos - center).sqrMagnitude > r2 || !shown(n)) continue;
                 if (sb.Length > 0) sb.Append('>');
                 int anim = n.anim >= 0 ? n.anim : NpcAnims.IdleOf(n.typeId);
                 // uid_type_x,y,z_hp_maxhp_dead_customName_anim  (see Scr_NpcHandler.updateVisibleNpcs)

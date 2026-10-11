@@ -48,12 +48,13 @@ namespace GSOOffline
             On(3, 4, c => Equip((int)c[2]));
             On(3, 5, c => Unequip((int)c[2]));
             On(4, 4, c => DestroyItem((int)c[1], (int)c[2], (int)c[3]));
-            On(4, 14, c => DestroyItem((int)c[2], (int)c[3], (int)c[4]));   // no ground loot yet: dropping destroys
+            On(4, 14, c => { if (!OnQuestItemUsed((int)c[3])) DestroyItem((int)c[2], (int)c[3], (int)c[4]); });   // no ground loot yet: dropping destroys
             On(4, 1, OnChangeTab);
             On(198, 15, OnSwapItems);
             On(198, 17, OnInsertItem);
             On(198, 16, c => MirrorClientOrder());
-            On(3, 18, c => UseItem((int)c[2]));
+            On(3, 18, c => { if (!OnQuestItemUsed((int)c[2])) UseItem((int)c[2]); });
+            On(16, 3, c => UseExperienceScroll((int)c[1], (int)c[2]));
             On(6, 5, c => SwitchWeapon());
             On(6, 6, c => SetSecondaryWeapon(null));
         }
@@ -356,18 +357,6 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev] {what} {i}: server {s} client {c}{(s != c ? "  MISMATCH" : "")}");
             }
             Plugin.Log.LogInfo($"[dev] {what}: {server.Count} server, {client.Count} client, {bad} mismatched rows");
-        }
-
-        private void UseItem(int typeId)
-        {
-            if (character == null || CountItem(typeId) == 0) return;
-            var t = ItemData.Get(typeId);
-            if (t != null && t.food > 0)
-            {
-                TakeItems(typeId, 1);
-                Heal(t.food);
-            }
-            Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps...)
         }
 
         public void SetSilver(int silver)

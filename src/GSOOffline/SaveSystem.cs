@@ -102,6 +102,7 @@ namespace GSOOffline
         public List<AbilitySlotSave> abilitySlots = new List<AbilitySlotSave>();
         public List<ItemSave> bank = new List<ItemSave>();
         public List<ReturnPoint> returnPoints = new List<ReturnPoint>();   // where interior exits lead back to
+        public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
 
         public int GetAbilitySlot(int slot)
         {

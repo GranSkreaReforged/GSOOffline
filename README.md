@@ -79,7 +79,7 @@ There is no CI build, because compiling needs the proprietary game assemblies.
 
 ### Developer tools (separate repo)
 
-Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps one bridge hook: `src/GSOOffline/DevCommands.cs` (`checkrecipes`), which GSODevTools discovers at runtime with no compile-time reference.
+Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps its own bridge commands in `src/GSOOffline/DevCommands.cs` (listed in [docs/COMMANDS.md](docs/COMMANDS.md)), which GSODevTools discovers at runtime with no compile-time reference.
 
 ## How it works
 
@@ -101,6 +101,10 @@ src/GSOOffline/
   OfflineServer.Account.cs     login, characters, enter world
   OfflineServer.World.cs       scenes, teleports, wayshrines, NPC/harvestable streaming
   OfflineServer.Chat.cs        chat and commands
+  OfflineServer.Boats.cs       boats and sailing
+  OfflineServer.Ferries.cs     ferries (transports) and zone crossings
+  OfflineServer.Oysters.cs     Bal Sardan oyster fishing
+  FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
   SaveSystem.cs                JSON saves
@@ -118,10 +122,17 @@ Working:
 - Quest progress and rewards
 - Shops
 - Harvesting (mining, woodcutting, fishing, gathering)
+- Sailing: launching, boarding and steering boats, Sailing XP, boat teleports
+- Oyster fishing in Bal Sardan: harpoon guns and the fishing vessel's crane
+- Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
+- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm)
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
+- Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
+- Light and heavy armor XP, shared from kills made shortly after being hit
+- Potions, food, experience scrolls, teleport scrolls and gear crates
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
@@ -129,13 +140,12 @@ Working:
 - Chat
 
 Partially working:
-- Quests. Conversations that progress through dialogue work, and the start of the tutorial quest plays through. Steps that depend on harvesting, crafting or combat wait on those systems. NPC/conversation links for older quests are being added to `src/GSOOffline/Data/content.json`.
+- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book and No True Huntsman. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Sightseeing, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
 
 Not yet implemented:
-- Buffs from support abilities
+- Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
-- Showing only the right copy of a quest NPC (each appears in several places)
 
 Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
 

@@ -38,6 +38,8 @@ namespace GSOOffline
             pendingSpawn = null;
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
+            pendingCrossing = null;
+            ResetOysters();
             lastNpcList = lastHarvestableList = null;
             job = null;
             ResetCombat();
@@ -61,6 +63,7 @@ namespace GSOOffline
                 sceneId = StartScene;
                 spawn = StartPos;
             }
+            StowBoat("zone change");
             ResetWorldState();
             pendingSpawn = spawn;
             character.scene = sceneId;
@@ -71,8 +74,10 @@ namespace GSOOffline
         public void Teleport(int sceneId, Vector3 pos)
         {
             if (character == null) return;
+            ridingId = 0;   // off any ferry
             if (sceneReady && sceneId == character.scene)
             {
+                DisembarkForTeleport();
                 character.Position = pos;
                 Send(5, 3, character.name, 1, pos);
                 PlayArrivalGfx(pos);
@@ -91,6 +96,7 @@ namespace GSOOffline
 
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
+            LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
             if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)
@@ -104,6 +110,9 @@ namespace GSOOffline
         private void FinishSceneLoad()
         {
             Send(198, 10);   // clears Script_sceneManager.loadingInProgress
+            SendSceneFerries();   // before the spawn: a ferry crossing lands the player on a deck
+            var deck = TakeFerryArrival();
+            if (deck.HasValue) pendingSpawn = deck;
             if (pendingSpawn.HasValue)
             {
                 Send(5, 3, character.name, 0, pendingSpawn.Value);
@@ -119,6 +128,7 @@ namespace GSOOffline
             SendPendingEquips();
             SendHealth();
             SendSceneLoot();
+            SendBoats();
 
             sceneReady = true;
             visibilityTimer = 0.5f;
@@ -145,6 +155,7 @@ namespace GSOOffline
             }
 
             if (!sceneReady || world == null) return;
+            TickQuestTriggers();
             visibilityTimer -= Time.deltaTime;
             if (visibilityTimer > 0f) return;
             visibilityTimer = 1f;
@@ -153,7 +164,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
 
-            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value);
+            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
             if (npcs != lastNpcList)
             {
                 lastNpcList = npcs;
@@ -221,6 +232,8 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleTravelInteract(typeId)) return;
+            HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
+            OnObjectClicked(typeId);
             if (typeId == InteractWayshrine)
             {
                 var w = NearestWayshrine(30f);
