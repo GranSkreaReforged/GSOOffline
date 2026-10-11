@@ -41,7 +41,8 @@ namespace GSOOffline
             pendingCrossing = null;
             ResetOysters();
             lastNpcList = lastHarvestableList = null;
-            job = null;
+            // Tell the client, or it keeps playing the gathering animation in the next zone.
+            CancelJob("changing zone");
             ResetCombat();
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using UnityEngine;
 
@@ -6,6 +7,13 @@ namespace GSOOffline
 {
     public partial class OfflineServer
     {
+        private static readonly HashSet<string> ClientCommands = new HashSet<string>
+        {
+            "togglebeautify", "changeappearance", "printevents", "stoprendering", "scalegui", "ping", "loadcinematics",
+            "debug", "resetgui", "clearcache", "resetachievements", "showgui", "fps", "dc", "hidecharacter",
+            "destroymusic", "loadoptions", "unloadassets", "resetstats", "resetoptions", "admindebug", "cinematic",
+        };
+
         private void RegisterChatHandlers()
         {
             On(2, 5, OnChat);
@@ -24,6 +32,8 @@ namespace GSOOffline
             if (msg.Length == 0) return;
             if (msg[0] == '/')
             {
+                // The client runs these itself (Menucontroller.checkClientCommand) and forwards them anyway.
+                if (ClientCommands.Contains(msg.Substring(1).Split(' ')[0].ToLowerInvariant())) return;
                 RunCommand(msg.Substring(1).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
                 return;
             }
