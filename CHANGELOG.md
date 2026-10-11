@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- "An Honest Day's Work" can be finished again: the large aggressive crab Nort asks you to slay at the fishing pier (step 4) now appears on the beach beside him. The game has no spawn point for it (the old server placed it), so nothing ever appeared and the quest was stuck.
+- Crabs and other creatures no longer walk through rocks. They walk around rocks, walls and trees, and only wander to spots they can reach. A rock taller than a creature's step used to fool the server's ground check, so creatures walked straight through it (on the monastery beach, about one crab in ten stood inside a rock at any moment). Creatures chasing you still reach you.
 
 ## [1.3.1] - 2026-10-11
 ### Changed

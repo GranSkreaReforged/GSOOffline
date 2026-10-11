@@ -514,24 +514,99 @@ namespace GSOOffline
             npc.pos = from;
             Vector3 flat = npc.dest - from;
             flat.y = 0f;
-            float step = Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed);   // about a second of walking
-            Vector3 to = npc.dest;
-            if (flat.magnitude > step)
-            {
-                to = from + flat.normalized * step;
-                to.y = Mathf.Lerp(from.y, npc.dest.y, step / flat.magnitude);
-                float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
-                if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
-            }
-            else if (flat.magnitude < 0.3f)
+            float dist = flat.magnitude;
+            if (dist < 0.3f)
             {
                 // Arrived. Without this the client keeps the run animation going until its own 2-second stall check.
                 npc.hasDest = false;
                 Send(13, 2, npc.uid, false);
                 return;
             }
+            float step = Mathf.Min(dist, Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed));   // about a second of walking
+            if (!TryStep(npc, from, flat / dist, step, dist, out var to) && !Detour(npc, from, flat / dist, step, dist, out to))
+            {
+                // Walled in: stop rather than walk through. A return home ends here.
+                npc.hasDest = false;
+                Send(13, 2, npc.uid, false);
+                if (npc.returning) FinishReturn(npc);
+                return;
+            }
             Send(198, 25, npc.uid, from, to, to);
             Send(13, 2, npc.uid, true);
+        }
+
+        private const float ObstacleRadius = 0.4f;
+        internal static bool NpcObstaclesOff;   // dev: npcobstacles off
+
+        /// <summary>
+        /// The waypoint one step from from in direction dir, on the ground, unless the step runs into something.
+        /// The last step straight at the destination ends on it exactly.
+        /// </summary>
+        private static bool TryStep(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        {
+            to = npc.dest;
+            if (Blocked(from, dir, step)) return false;
+            if (step >= dist) return !Inside(to);
+            to = from + dir * step;
+            to.y = Mathf.Lerp(from.y, npc.dest.y, step / dist);
+            float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
+            if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
+            return !Inside(to);
+        }
+
+        /// <summary>
+        /// Whether a step runs into something: a steep surface (rock, wall, tree) at body height, not a walkable
+        /// slope or a creature. Without it NPCs walked through rocks: the ground ray of a rock taller than its
+        /// start height finds the sand under the rock. Surfaces already touching at the start are ignored, so an
+        /// NPC that ends up inside a collider can walk out.
+        /// </summary>
+        private static bool Blocked(Vector3 from, Vector3 dir, float dist)
+        {
+            if (NpcObstaclesOff) return false;
+            Vector3 origin = from + Vector3.up * (ObstacleRadius + 0.3f);
+            foreach (var h in Physics.SphereCastAll(origin, ObstacleRadius, dir, dist, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (h.distance > 0f && h.normal.y < 0.5f && !IsCreature(h.collider)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Whether an NPC standing at p would have something solid through its body: a waypoint snapped to the
+        /// ground under a rock (a slope gentle enough to walk up, onto a rock taller than the ground ray's start).
+        /// </summary>
+        private static bool Inside(Vector3 p)
+        {
+            if (NpcObstaclesOff) return false;
+            foreach (var c in Physics.OverlapSphere(p + Vector3.up * (ObstacleRadius + 0.3f), ObstacleRadius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (!IsCreature(c)) return true;
+            return false;
+        }
+
+        /// <summary>A step around an obstacle, nearest direction first, keeping to the side last used.</summary>
+        private static bool Detour(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        {
+            if (npc.detourSide == 0) npc.detourSide = Random.value < 0.5f ? 1 : -1;
+            foreach (float angle in new[] { 35f, 70f, 105f, 140f })
+                for (int side = 0; side < 2; side++)
+                {
+                    int sign = side == 0 ? npc.detourSide : -npc.detourSide;
+                    // A sideways step is never the last one, so it doesn't end on the destination.
+                    if (!TryStep(npc, from, Quaternion.Euler(0f, angle * sign, 0f) * dir, step, float.MaxValue, out to)) continue;
+                    npc.detourSide = sign;
+                    return true;
+                }
+            to = from;
+            return false;
+        }
+
+        private static bool IsCreature(Collider c) =>
+            c.GetComponentInParent<Scr_Npc>() != null || c.GetComponentInParent<Scr_Player>() != null || c.GetComponentInParent<Scr_OtherPlayer>() != null;
+
+        private void FinishReturn(NpcEntity npc)
+        {
+            npc.returning = false;
+            npc.health = npc.maxHealth;
+            Send(13, 2, npc.uid, false);
+            Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
         }
 
         /// <summary>The first solid surface straight down from height top above p, ignoring NPCs and players.</summary>
@@ -541,9 +616,7 @@ namespace GSOOffline
             float best = float.MaxValue;
             foreach (var h in Physics.RaycastAll(new Vector3(p.x, top, p.z), Vector3.down, depth, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
-                if (h.distance >= best || h.collider.GetComponentInParent<Scr_Npc>() != null
-                    || h.collider.GetComponentInParent<Scr_Player>() != null || h.collider.GetComponentInParent<Scr_OtherPlayer>() != null)
-                    continue;
+                if (h.distance >= best || IsCreature(h.collider)) continue;
                 best = h.distance;
                 ground = h.point;
             }
@@ -566,7 +639,11 @@ namespace GSOOffline
                 var server = world?.GetNpc(list[i].npcUniqueId);
                 Vector3 forward = list[i].transform.forward, toMe = me - p;
                 forward.y = toMe.y = 0f;
-                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above}");
+                // Solid things overlapping its body (a rock it walked into), not the ground under it or creatures.
+                var inside = new List<string>();
+                foreach (var col in Physics.OverlapSphere(p + Vector3.up * (ObstacleRadius + 0.3f), ObstacleRadius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    if (!IsCreature(col)) inside.Add(col.name);
+                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above} inside={(inside.Count > 0 ? string.Join(",", inside.ToArray()) : "-")}");
             }
         }
 
@@ -576,6 +653,10 @@ namespace GSOOffline
             Vector2 offset = Random.insideUnitCircle * info.wanderDistance;
             // A spot on the ground within 5 m of the spawn's height (not a roof above it or a cliff below).
             if (!GroundAt(npc.spawnPos + new Vector3(offset.x, 0f, offset.y), npc.spawnPos.y + 5f, 10f, out var spot)) return;
+            // Only somewhere it can stroll to in a straight line: not behind or inside a rock.
+            Vector3 from = NpcPosition(npc), flat = spot - from;
+            flat.y = 0f;
+            if (Inside(spot) || flat.magnitude > 0.3f && Blocked(from, flat.normalized, flat.magnitude)) return;
             Send(198, 30, npc.uid, true);   // walk
             npc.nextWaypoint = 0f;
             MoveNpc(npc, spot);
@@ -622,13 +703,7 @@ namespace GSOOffline
 
                 if (npc.returning)
                 {
-                    if (Vector3.Distance(pos, npc.spawnPos) < 1.5f)
-                    {
-                        npc.returning = false;
-                        npc.health = npc.maxHealth;
-                        Send(13, 2, npc.uid, false);
-                        Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
-                    }
+                    if (Vector3.Distance(pos, npc.spawnPos) < 1.5f) FinishReturn(npc);
                     else MoveNpc(npc, npc.spawnPos);
                     continue;
                 }
