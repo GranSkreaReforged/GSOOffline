@@ -99,6 +99,7 @@ namespace GSOOffline
 
             TickWorld();
             TickSkills();
+            TickSitting();
             TickRespawns();
             TickCombat();
             TickRegen();

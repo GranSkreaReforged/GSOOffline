@@ -299,6 +299,15 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] anim at {UnityEngine.Time.time:F2} attackId={a.GetInteger("AttackID")}{sb}");
         }
 
+        // actionanim <id>: sets the player's animator ActionID (what 8/5 with action type 3 or 4 does), 0 to stop.
+        // With playeranim, finds which id plays which clip.
+        private static void ActionAnim(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            p.anim.actionId = int.Parse(args[1]);
+            Plugin.Log.LogInfo($"[dev] actionId {p.anim.actionId}");
+        }
+
         // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).
         private static void NpcHp(string[] args) => OfflineServer.Instance.DevSetNpcHealth(int.Parse(args[1]), int.Parse(args[2]));
 
