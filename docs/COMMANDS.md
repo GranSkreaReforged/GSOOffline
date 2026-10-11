@@ -45,6 +45,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `doorsigns` | Every shop sign in the scene with the three nearest doors, to tell which building a door belongs to |
 | `hover <npc uid>` / `hover obj <typeId>` / `hover off` | Acts as if the mouse cursor were over that NPC or the nearest object of that type, for the Interact key |
 | `interactprompt [press]` | What the Interact key (F) would use now, and the NPCs and objects within 8 m; `press` uses it as F would |
+| `actionanim <id>` | Sets the player's animator ActionID, as 8/5 with action type 3 or 4 does (12 = sit, 15 = sit on the ground, 0 = stop). Id 8 only ends once the player moves |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
 | `fx <id>` / `sfx <id>` | Plays an effect ("_GFX IDs") 3 m in front of the player, or a sound at the player |
 | `projectiles` | The client's projectiles in flight (id, position, speed, model) |
