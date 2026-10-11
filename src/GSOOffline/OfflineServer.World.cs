@@ -155,6 +155,7 @@ namespace GSOOffline
             SendWeaponAbilities();
             SendHealth();
             SendMana();
+            SendGearStats();
             SendSceneLoot();
             SendBoats();
 

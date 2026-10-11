@@ -11,6 +11,10 @@ namespace GSOOffline
     {
         public static int NpcHealth(int level) => 10 + 8 * Mathf.Max(1, level);
         public static int NpcMaxHit(NpcInfo n) => n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
+        // Share of a creature's hit that Damage block on your gear absorbs: diminishing, and less against stronger
+        // creatures (about a third for gear of the creature's level, ~200 block at 40). Never all of it.
+        public static float BlockReduction(int block, int attackerLevel) =>
+            block <= 0 ? 0f : block / (block + 10f * Mathf.Max(1, attackerLevel));
         public static int PlayerMaxHit(int weaponDamage, int skillLevel) => 4 + weaponDamage + skillLevel;
         public static float HitChance = 0.85f;
         public const float AbilityMultiplier = 1.6f;
@@ -195,16 +199,6 @@ namespace GSOOffline
             return 2.4f;
         }
 
-        private static int StatSum(ItemSave it, params string[] keys)
-        {
-            int sum = 0;
-            if (it == null) return 0;
-            foreach (var s in it.stats)
-                foreach (string k in keys)
-                    if (s.key == k) sum += s.value;
-            return sum;
-        }
-
         private void TickPlayerAttack(Vector3 playerPos)
         {
             MeasureSwing();
@@ -363,21 +357,23 @@ namespace GSOOffline
             if (!autoAttacking) StopAttacking();
         }
 
-        // Every damage stat on the weapon: Damage, the physical kinds (SlashDamage...) and the elemental ones
-        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count their damage too.
-        private static int WeaponDamage(ItemSave weapon)
+        // Every damage stat on everything worn: Damage, the physical kinds (SlashDamage...) and the elemental ones
+        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count theirs, and so do rings,
+        // amulets and armour (only the weapon's used to count). The weapon on your back isn't equipped.
+        private int GearDamage()
         {
             int sum = 0;
-            if (weapon == null) return 0;
-            foreach (var s in weapon.stats)
-                if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
+            foreach (var it in character.items)
+                if (it.equipped)
+                    foreach (var s in it.stats)
+                        if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
             return sum;
         }
 
         private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f)
         {
             if (Random.value >= CombatRules.HitChance) return 0;
-            int max = CombatRules.PlayerMaxHit(WeaponDamage(weapon), SkillLevel(WeaponSkill(weapon)));
+            int max = CombatRules.PlayerMaxHit(GearDamage(),SkillLevel(WeaponSkill(weapon)));
             int damage = Mathf.RoundToInt(Random.Range(1, max + 1) * power * DamageDealtMultiplier());
             if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
                 damage = Mathf.Max(1, damage - info.damageBlock / 10);
@@ -783,10 +779,8 @@ namespace GSOOffline
             int damage = 0;
             if (Random.value < CombatRules.HitChance)
             {
-                int block = 0;
-                foreach (var it in character.items)
-                    if (it.equipped) block += StatSum(it, "Damageblock");
-                damage = Mathf.Max(0, Random.Range(1, CombatRules.NpcMaxHit(info) + 1) - block / 2);
+                int roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1);
+                damage = Mathf.RoundToInt(roll * (1f - CombatRules.BlockReduction(GearStat("Damageblock"), info.level)));
                 lastHitTaken = Time.time;
                 damage = ApplyDefensiveBuffs(damage, attacker);
             }

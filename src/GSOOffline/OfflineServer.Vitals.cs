@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace GSOOffline
@@ -74,7 +75,33 @@ namespace GSOOffline
 
         private float regenTimer;
 
-        /// <summary>Out of combat: 1 health per 3 s; mana always ManaRegen() per 3 s.</summary>
+        // Health regained per out-of-combat tick: 1, plus Healthregen rolled on equipped items.
+        private int HealthRegen() => Mathf.Max(0, 1 + GearStat("Healthregen"));
+
+        // Gear stat key -> the client's bonus StatType (base type + 35), for the stats window. Health and mana go with
+        // their own updates. Movementspeed is left out: the client sets your run speed to base + bonus, and the
+        // server never sends a base, so any bonus would become your whole speed.
+        private static readonly KeyValuePair<string, int>[] GearBonusStats =
+        {
+            Pair("Healthregen", 37), Pair("Damage", 38), Pair("Damageblock", 39), Pair("StunResistance", 41),
+            Pair("Cooldown", 42), Pair("Healing", 45), Pair("DmgPoison", 46), Pair("ResPoison", 47), Pair("Range", 48),
+            Pair("Warmth", 49), Pair("Carryingcap", 50), Pair("ArcaneDamage", 51), Pair("ArcaneResistance", 52),
+            Pair("FireDamage", 53), Pair("EarthDamage", 54), Pair("WindDamage", 55), Pair("ElectricDamage", 56),
+            Pair("PsychicDamage", 57), Pair("IceDamage", 58), Pair("FireResistance", 59), Pair("EarthResistance", 60),
+            Pair("WindResistance", 61), Pair("ElectricResistance", 62), Pair("PsychicResistance", 63),
+            Pair("IceResistance", 64), Pair("SlashDamage", 65), Pair("BluntDamage", 66), Pair("PiercingDamage", 67),
+            Pair("SlashResistance", 68), Pair("BluntResistance", 69), Pair("PiercingResistance", 70),
+        };
+
+        private static KeyValuePair<string, int> Pair(string key, int stat) => new KeyValuePair<string, int>(key, stat);
+
+        /// <summary>16/5 for every gear bonus the stats window shows; it only knew health and mana before.</summary>
+        private void SendGearStats()
+        {
+            foreach (var kv in GearBonusStats) Send(16, 5, kv.Value, GearStat(kv.Key));
+        }
+
+        /// <summary>Out of combat: HealthRegen() per 3 s; mana always ManaRegen() per 3 s.</summary>
         private void TickRegen()
         {
             if (character == null || !sceneReady || PlayerDead) return;
@@ -82,7 +109,7 @@ namespace GSOOffline
             if (regenTimer > 0f) return;
             regenTimer = 3f;
             bool inCombat = autoAttacking || (world != null && world.npcs.Exists(n => n.aggro));
-            if (!inCombat && character.currentHealth < MaxHealth()) Heal(1);
+            if (!inCombat && character.currentHealth < MaxHealth()) Heal(HealthRegen());
             if (character.currentMana < MaxMana())
             {
                 character.currentMana = Mathf.Min(MaxMana(), character.currentMana + ManaRegen());

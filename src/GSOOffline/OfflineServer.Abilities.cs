@@ -360,7 +360,7 @@ namespace GSOOffline
         {
             foreach (var b in buffs)
                 Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: dealt x{b.effect.damageDealt} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} reflect {b.effect.reflect} absorbed {b.absorbed}");
-            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}");
+            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}, gear damage {(character != null ? GearDamage() : 0)}");
         }
 
         // ---- using abilities -----------------------------------------------------------------

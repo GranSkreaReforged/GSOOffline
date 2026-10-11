@@ -134,6 +134,23 @@ namespace GSOOffline
             Send(3, 61, AccountPacketJson(), 1);
         }
 
+        /// <summary>
+        /// Up to 1.3.1 items rolled Damage block under the key "blockDamage", which neither the client (tooltips,
+        /// stats window) nor the server's armour block read. Renamed in memory; the next save stores it fixed.
+        /// </summary>
+        private static void FixStatKeys(CharacterSave ch)
+        {
+            int fixedCount = 0;
+            foreach (var it in ch.items)
+                foreach (var s in it.stats)
+                    if (s.key == "blockDamage")
+                    {
+                        s.key = "Damageblock";
+                        fixedCount++;
+                    }
+            if (fixedCount > 0) Plugin.Log.LogInfo($"'{ch.name}': {fixedCount} item stats renamed blockDamage -> Damageblock.");
+        }
+
         private void OnCharacterLogin(object[] c)
         {
             GameData.EnsureLoaded();
@@ -147,6 +164,7 @@ namespace GSOOffline
 
             character = ch;
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
+            FixStatKeys(ch);
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it
             ResetWorldState();
             startTimeSent = false;   // zone changes reset the world state too, but keep the clock

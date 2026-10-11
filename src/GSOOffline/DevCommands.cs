@@ -338,6 +338,18 @@ namespace GSOOffline
         }
 
         // playerstate: the client's attack state for the local player (stuck-in-combat checks).
+        // clientstats: base + bonus of the client's combat stats, as its stats window shows them.
+        private static void ClientStats(string[] args)
+        {
+            var h = Scr_StatsHandler.instance;
+            var types = new[] { Scr_StatsHandler.StatType.Health, Scr_StatsHandler.StatType.Mana, Scr_StatsHandler.StatType.Manaregen,
+                Scr_StatsHandler.StatType.Damage, Scr_StatsHandler.StatType.DamageBlock, Scr_StatsHandler.StatType.ResistanceFire,
+                Scr_StatsHandler.StatType.DamageSlash, Scr_StatsHandler.StatType.Movementspeed };
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (var t in types) parts.Add(t + "=" + h.getStat(t));
+            Plugin.Log.LogInfo("[dev] client stats: " + string.Join(" ", parts.ToArray()));
+        }
+
         private static void PlayerState(string[] args)
         {
             var pl = Scr_PlayerHandler.instance.player;
