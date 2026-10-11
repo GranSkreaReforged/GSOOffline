@@ -122,6 +122,7 @@ Working:
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Sailing: launching, boarding and steering boats, Sailing XP, boat teleports
 - Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
+- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm)
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
