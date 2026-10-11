@@ -45,7 +45,8 @@ namespace GSOOffline
         public int level;
         public bool requiresTarget;
         public bool friendly;
-        public bool weaponSkill;   // weapon technique: without requirestarget it sweeps everything in range
+        public bool clickTarget;   // placed on a ground spot the player clicks (sent first as 23/1)
+        public bool weaponSkill;  // weapon technique: without requirestarget it sweeps everything in range
         public float range;
         public float cooldown;      // seconds
         public float attackTime;    // seconds the cast animation plays
@@ -131,6 +132,7 @@ namespace GSOOffline
                     level = GameData.IntAttr(x, "level", 1),
                     requiresTarget = GameData.IntAttr(x, "requirestarget") == 1,
                     friendly = GameData.IntAttr(x, "friendly") == 1,
+                    clickTarget = GameData.IntAttr(x, "clicktarget") == 1,
                     weaponSkill = GameData.IntAttr(x, "weaponskill") == 1,
                     range = GameData.IntAttr(x, "range", 4),
                     cooldown = GameData.IntAttr(x, "cooldown", 4000) / 1000f,
