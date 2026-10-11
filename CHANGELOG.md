@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.3.0] - 2026-10-11
 ### Fixed
 - Shop and bank windows close when you walk away or travel (a door, a wayshrine, a teleport), as crafting windows do. They stayed open, so you could keep buying, selling and banking from anywhere.
 - Closing a shop no longer says "Unknown or unavailable offline command: /closeshop".
