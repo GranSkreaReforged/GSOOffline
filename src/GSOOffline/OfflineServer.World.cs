@@ -144,6 +144,7 @@ namespace GSOOffline
             }
             SendWayshrines();
             SendPendingEquips();
+            SendWeaponAbilities();
             SendHealth();
             SendSceneLoot();
             SendBoats();

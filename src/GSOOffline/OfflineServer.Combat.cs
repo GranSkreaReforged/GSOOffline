@@ -108,7 +108,7 @@ namespace GSOOffline
                 return;
             }
 
-            int ability = character.GetAbilitySlot(slot);
+            int ability = slot <= WeaponAbilitySlots ? WeaponAbilityInSlot(slot) : character.GetAbilitySlot(slot);
             if (!SkillData.Abilities.TryGetValue(ability, out var a))
             {
                 UseAbility(0);
