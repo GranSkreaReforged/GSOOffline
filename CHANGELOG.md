@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.2.0] - 2026-10-11
 ### Fixed
 - Hits, shots and their sounds land when the attack animation strikes, for every weapon and ability, instead of the moment the attack starts. Swords, daggers and maces hit 0.65 seconds into the swing, greatswords 0.7, halberds and fists 0.5; bows release their arrow at 1 second, staffs and wands cast at 0.5 and lutes at 0.3. Abilities strike with the animation they play (Fire ball leaves the staff with its cast, arrow abilities with the bow's release), and Slashing deals its damage over its five slashes. Abilities end when their animation does, and basic attacks carry on after them without cutting into it.
 - Attack speed buffs (Frenzy, Hack and slash, Focus) raise damage per hit instead of cutting the attack animation short. Damage per second is the same as a faster swing would give.
