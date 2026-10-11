@@ -223,6 +223,7 @@
     { "type": 7,  "note": "Nort on the beach, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
     { "type": 10, "note": "Nort in the kitchen, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
 
+    { "type": 9, "note": "Q1: the large aggressive crab at Nort's fishing spot (no marker; the server spawned it after node 71)", "quest": 1, "phases": [ 4 ], "scene": 1, "spawn": [ "855.0,3.7,1569.0" ] },
     { "type": 16, "note": "Gery in the village", "quest": 2, "phases": [ 0, 1 ] },
     { "type": 20, "note": "Willas in the village", "quest": 2, "phases": [ 2, 3, 4, 5, 6 ] },
     { "type": 20, "quest": 2, "phases": [ -1 ], "var": "2,1,0" },

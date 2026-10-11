@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- "An Honest Day's Work" can be finished again: the large aggressive crab Nort asks you to slay at the fishing pier (step 4) now appears on the beach beside him. The game has no spawn point for it (the old server placed it), so nothing ever appeared and the quest was stuck.
 
 ## [1.3.1] - 2026-10-11
 ### Changed
