@@ -30,6 +30,7 @@ namespace GSOOffline
     public class DoorFile
     {
         public List<DoorDef> doors = new List<DoorDef>();
+        public List<DoorDef> buildings = new List<DoorDef>();   // generic doors (type 37) into rooms of another scene
         public List<InteriorDef> interiors = new List<InteriorDef>();
         public List<SpawnDef> interiorSpawns = new List<SpawnDef>();
         public SpawnDef portal;
@@ -94,6 +95,7 @@ namespace GSOOffline
             var player = LocalPlayer;
             if (player == null) return false;
             Vector3 p = player.transform.position;
+            if (typeId == DoorGeneric && HandleBuildingDoor(p)) return true;
 
             DoorDef door = null;
             float best = 15f;
@@ -148,7 +150,51 @@ namespace GSOOffline
             return false;
         }
 
+        /// <summary>
+        /// Shops and houses (Yorkhill's, from doors.json "buildings"): the generic door clicked outside opens its room
+        /// in the interiors scene, and any generic door in that scene leads back out where the player came in.
+        /// </summary>
+        private bool HandleBuildingDoor(Vector3 player)
+        {
+            var clicked = NearestInteractable(DoorGeneric);
+            if (clicked == null) return false;
+            Vector3 at = clicked.transform.position;
+            var entrance = Doors.buildings.Find(b => b.scene == character.scene && Vector3.Distance(V(b.pos), at) < 3f);
+            if (entrance != null)
+            {
+                PushReturnPoint(player);
+                TeleportNear(entrance.toScene, V(entrance.toPos));
+                return true;
+            }
+
+            if (!Doors.buildings.Exists(b => b.toScene == character.scene)) return false;
+            var rp = character.returnPoints;
+            if (rp.Count > 0 && Doors.buildings.Exists(b => b.toScene == character.scene && b.scene == rp[rp.Count - 1].scene))
+            {
+                ReturnToPreviousPoint();
+                return true;
+            }
+            // Came in some other way (a teleport): out through the door of the room the player is in.
+            DoorDef nearest = null;
+            float best = float.MaxValue;
+            foreach (var b in Doors.buildings)
+            {
+                if (b.toScene != character.scene) continue;
+                float d = Vector3.Distance(V(b.toPos), at);
+                if (d < best) { best = d; nearest = b; }
+            }
+            TeleportNear(nearest.scene, V(nearest.pos));
+            return true;
+        }
+
         internal List<DoorDef> DoorList => Doors.doors;
+        internal List<DoorDef> BuildingList => Doors.buildings;
+
+        internal void DevEnterBuilding(DoorDef b)
+        {
+            PushReturnPoint(V(b.pos));
+            TeleportNear(b.toScene, V(b.toPos));
+        }
 
         internal void UseDoor(DoorDef door) => TeleportNear(door.toScene, V(door.toPos));
 
@@ -178,7 +224,11 @@ namespace GSOOffline
 
         // ---- bank ----------------------------------------------------------------------------
 
-        private void OpenBank() => Send(3, 33, character.name, WindowBank);
+        private void OpenBank()
+        {
+            Send(3, 33, character.name, WindowBank);
+            WindowOpened(WindowBank);
+        }
 
         private void SendBank()
         {

@@ -223,6 +223,98 @@ namespace GSOOffline
             OfflineServer.Instance.UseDoor(doors[int.Parse(args[1])]);
         }
 
+        // building <n>: goes through doors.json building entrance n (arrival search included), recording the way back
+        // as a click would. "building" alone lists them.
+        private static void Building(string[] args)
+        {
+            var list = OfflineServer.Instance.BuildingList;
+            if (args.Length < 2)
+            {
+                for (int i = 0; i < list.Count; i++)
+                    Plugin.Log.LogInfo($"[dev] building {i}: scene {list[i].scene} -> {list[i].toScene} ({list[i].note})");
+                return;
+            }
+            OfflineServer.Instance.DevEnterBuilding(list[int.Parse(args[1])]);
+        }
+
+        // hover <npc uid> | hover obj <typeId> | hover off: acts as if the mouse cursor were over that NPC or the nearest
+        // object of that type, for the Interact key (F). With interactprompt, tests what F uses without a mouse.
+        private static void Hover(string[] args)
+        {
+            UnityEngine.Component c = null;
+            if (args.Length > 2 && args[1] == "obj")
+            {
+                int type = int.Parse(args[2]);
+                var p = Scr_PlayerHandler.instance.player.transform.position;
+                float best = float.MaxValue;
+                foreach (var i in Scr_Interactable.list)
+                    if (i != null && i.typeId == type && UnityEngine.Vector3.Distance(i.transform.position, p) < best)
+                    {
+                        best = UnityEngine.Vector3.Distance(i.transform.position, p);
+                        c = i;
+                    }
+            }
+            else if (args.Length > 1 && args[1] != "off")
+                c = Scr_NpcHandler.instance.npcList.Find(n => n != null && n.npcUniqueId == int.Parse(args[1]));
+            QuickInteract.DevHover = c;
+            Plugin.Log.LogInfo($"[dev] hover {(c != null ? c.name + " at " + c.transform.position : "off")}");
+        }
+
+        // useobj <typeId>: uses the nearest object of that type the way a mouse click does (the client's interact, with its
+        // reach checks and the chair's move onto the seat).
+        private static void UseObj(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var player = Scr_PlayerHandler.instance.player;
+            Scr_Interactable best = null;
+            foreach (var i in Scr_Interactable.list)
+                if (i != null && i.typeId == type && (best == null || UnityEngine.Vector3.Distance(i.transform.position, player.transform.position) < UnityEngine.Vector3.Distance(best.transform.position, player.transform.position)))
+                    best = i;
+            if (best == null) return;
+            Plugin.Log.LogInfo($"[dev] useobj {type} at {UnityEngine.Vector3.Distance(best.transform.position, player.transform.position):F1} m");
+            player.connecter.interactableHandler.interact(best);
+        }
+
+        // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
+        private static void Windows(string[] args)
+        {
+            var open = new System.Collections.Generic.List<string>();
+            foreach (var w in HarmonyLib.Traverse.Create(Script_WindowController.instance).Field("windows").GetValue<System.Collections.Generic.List<Script_Window>>())
+                if (w.windowActive) open.Add(w.windowType.ToString());
+            Plugin.Log.LogInfo($"[dev] windows open: {string.Join(" ", open.ToArray())}");
+        }
+
+        // interactprompt [press]: the "Press [F] to ..." text, i.e. what the Interact key would use now; "press" uses it.
+        private static void InteractPrompt(string[] args)
+        {
+            Plugin.Log.LogInfo($"[dev] interact prompt '{Menucontroller.instance.quickInteractText}'");
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            foreach (var i in Scr_Interactable.list)
+                if (i != null && UnityEngine.Vector3.Distance(i.transform.position, p) < 8f)
+                    Plugin.Log.LogInfo($"[dev]   object {i.typeId} '{i.interactableName}' {UnityEngine.Vector3.Distance(i.transform.position, p):F1} m noQuickInteract={i.noQuickInteract} extra={i.customDistance}");
+            foreach (var n in Scr_NpcHandler.instance.npcList)
+                if (n != null && UnityEngine.Vector3.Distance(n.transform.position, p) < 8f)
+                    Plugin.Log.LogInfo($"[dev]   npc '{n.npcName}' {UnityEngine.Vector3.Distance(n.transform.position, p):F1} m");
+            if (args.Length > 1 && args[1] == "press") QuickInteract.DevPress();
+        }
+
+        // doorsigns: every shop sign (Prefab_Object_Sign_*) in the scene with the three nearest doors and gates, to tell
+        // which building a door belongs to.
+        private static void DoorSigns(string[] args)
+        {
+            foreach (var t in UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.Transform>())
+            {
+                if (!t.name.StartsWith("Prefab_Object_Sign_") || !t.gameObject.scene.IsValid()) continue;   // culled signs are inactive
+                var near = new System.Collections.Generic.List<Scr_Interactable>(UnityEngine.Resources.FindObjectsOfTypeAll<Scr_Interactable>());
+                near.RemoveAll(i => !i.gameObject.scene.IsValid() || (i.typeId != 37 && i.typeId != 29));
+                near.Sort((a, b) => UnityEngine.Vector3.Distance(a.transform.position, t.position).CompareTo(UnityEngine.Vector3.Distance(b.transform.position, t.position)));
+                var parts = new System.Collections.Generic.List<string>();
+                for (int i = 0; i < near.Count && i < 3; i++)
+                    parts.Add($"{near[i].typeId} '{near[i].name}' {near[i].transform.position} {UnityEngine.Vector3.Distance(near[i].transform.position, t.position):F1} m");
+                Plugin.Log.LogInfo($"[dev] sign '{t.name.Substring("Prefab_Object_Sign_".Length)}' at {t.position}: {string.Join("; ", parts.ToArray())}");
+            }
+        }
+
         // probe x y z: every collider on a vertical line through the point (60 m up and down) and within 4 m of it.
         private static void Probe(string[] args)
         {
@@ -266,6 +358,15 @@ namespace GSOOffline
                 sb.Append($" L{l} w={a.GetLayerWeight(l):F2} len={s.length:F2} t={s.normalizedTime:F2} loop={s.loop} clip={(clips.Length > 0 ? clips[0].clip.name : "-")};");
             }
             Plugin.Log.LogInfo($"[dev] anim at {UnityEngine.Time.time:F2} attackId={a.GetInteger("AttackID")}{sb}");
+        }
+
+        // actionanim <id>: sets the player's animator ActionID (what 8/5 with action type 3 or 4 does), 0 to stop.
+        // With playeranim, finds which id plays which clip.
+        private static void ActionAnim(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            p.anim.actionId = int.Parse(args[1]);
+            Plugin.Log.LogInfo($"[dev] actionId {p.anim.actionId}");
         }
 
         // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).

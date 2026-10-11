@@ -41,8 +41,34 @@ namespace GSOOffline
             pendingCrossing = null;
             ResetOysters();
             lastNpcList = lastHarvestableList = null;
-            job = null;
+            // Tell the client, or it keeps playing the gathering animation in the next zone.
+            CancelJob("changing zone");
+            StandUp();
+            CloseWorkbench();
+            CloseOpenWindow();
+            // A conversation left open stays on screen in the next zone, hiding the HUD and holding the camera.
+            if (dialogueNode != null && character != null)
+            {
+                dialogueNode = null;
+                Send(2, 3, character.name, "-");
+            }
             ResetCombat();
+        }
+
+        /// <summary>
+        /// Closes the crafting window. The client only closes it on a movement key, its Close button or a
+        /// disconnect, so after a teleport the previous zone's workbench stayed open; Escape doesn't close it, and
+        /// under the cursor it blocks mouse-look. Same reset as the client's disconnect handler.
+        /// </summary>
+        private static void CloseWorkbench()
+        {
+            var mc = Menucontroller.instance;
+            if (mc == null || mc.showWorkbench == 0) return;
+            Plugin.Log.LogInfo($"[skill] closing workbench {mc.showWorkbench}: changing zone");
+            mc.clearWorkbench();
+            mc.showWorkbench = 0;
+            mc.craftingAmount = 1;
+            mc.craftingInProgress = false;
         }
 
         // The start time goes out once per login: resending it on every zone change would turn the clock back
@@ -126,6 +152,7 @@ namespace GSOOffline
             }
             SendWayshrines();
             SendPendingEquips();
+            SendWeaponAbilities();
             SendHealth();
             SendSceneLoot();
             SendBoats();
@@ -232,6 +259,7 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleTravelInteract(typeId)) return;
+            if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
             OnObjectClicked(typeId);
             if (typeId == InteractWayshrine)
@@ -246,6 +274,41 @@ namespace GSOOffline
             }
             // The client implements most interactables (workbenches, wayshrine window, banks...) once confirmed.
             Send(3, 12, character.name, typeId);
+        }
+
+        // ---- chairs --------------------------------------------------------------------------
+
+        // A chair click: the client puts the player on the seat itself, and the server plays the sitting animation
+        // (8/5 action type 4 sets the animator's ActionID; AC_Player state 12 is "Sit"). The client never ends it,
+        // so the server stands the player up when they leave the seat, attack, start a job or change zone.
+        private const int InteractChair = 54, ActionAnimation = 4, AnimSit = 12;
+        private Vector3? sittingAt;
+
+        private void SitDown()
+        {
+            var player = LocalPlayer;
+            if (player == null) return;
+            CancelJob("sitting down");
+            StopAttacking();
+            sittingAt = player.transform.position;
+            Send(8, 5, character.name, ActionAnimation, AnimSit);
+        }
+
+        private void TickSitting()
+        {
+            if (!sittingAt.HasValue) return;
+            var player = LocalPlayer;
+            if (player == null || !sceneReady || job != null || autoAttacking
+                || Vector3.Distance(player.transform.position, sittingAt.Value) > 0.5f)
+                StandUp();
+        }
+
+        private void StandUp()
+        {
+            if (!sittingAt.HasValue) return;
+            sittingAt = null;
+            // A job started from the seat already replaced the animation; only end ours.
+            if (character != null && job == null) Send(3, 14, character.name, ActionAnimation);
         }
 
         private void OnSetHomeWayshrine(object[] c)

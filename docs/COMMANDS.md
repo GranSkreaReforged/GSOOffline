@@ -41,6 +41,13 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `npcbounds [n]` | The nearest *n* NPCs: rendered size, feet height above the ground, animation playing |
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
+| `building [n]` | Lists doors.json's buildings (Yorkhill's shops and houses), or goes into building *n* as clicking its door would; a door inside leads back out |
+| `doorsigns` | Every shop sign in the scene with the three nearest doors, to tell which building a door belongs to |
+| `hover <npc uid>` / `hover obj <typeId>` / `hover off` | Acts as if the mouse cursor were over that NPC or the nearest object of that type, for the Interact key |
+| `interactprompt [press]` | What the Interact key (F) would use now, and the NPCs and objects within 8 m; `press` uses it as F would |
+| `useobj <typeId>` | Uses the nearest object of that type as a mouse click does (the client's reach checks and chair move included) |
+| `windows` | The client's open windows by type (2 inventory, 7 shop, 14 bank...) |
+| `actionanim <id>` | Sets the player's animator ActionID, as 8/5 with action type 3 or 4 does (12 = sit, 15 = sit on the ground, 0 = stop). Id 8 only ends once the player moves |
 | `clearspot x y z` | Runs the door arrival search at a point, logging why each candidate is rejected |
 | `fx <id>` / `sfx <id>` | Plays an effect ("_GFX IDs") 3 m in front of the player, or a sound at the player |
 | `projectiles` | The client's projectiles in flight (id, position, speed, model) |
