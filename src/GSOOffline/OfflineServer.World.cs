@@ -44,6 +44,12 @@ namespace GSOOffline
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
             CloseWorkbench();
+            // A conversation left open stays on screen in the next zone, hiding the HUD and holding the camera.
+            if (dialogueNode != null && character != null)
+            {
+                dialogueNode = null;
+                Send(2, 3, character.name, "-");
+            }
             ResetCombat();
         }
 
