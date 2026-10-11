@@ -79,7 +79,7 @@ There is no CI build, because compiling needs the proprietary game assemblies.
 
 ### Developer tools (separate repo)
 
-Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps one bridge hook: `src/GSOOffline/DevCommands.cs` (`checkrecipes`), which GSODevTools discovers at runtime with no compile-time reference.
+Decompiling, data mining (including the door table generator) and the DevBridge, which drives the real client by script for testing, live in the sibling **GSODevTools** repo (`..\GSODevTools`). See its README. This repo keeps its own bridge commands in `src/GSOOffline/DevCommands.cs` (listed in [docs/COMMANDS.md](docs/COMMANDS.md)), which GSODevTools discovers at runtime with no compile-time reference.
 
 ## How it works
 
@@ -104,6 +104,7 @@ src/GSOOffline/
   OfflineServer.Boats.cs       boats and sailing
   OfflineServer.Ferries.cs     ferries (transports) and zone crossings
   OfflineServer.Oysters.cs     Bal Sardan oyster fishing
+  FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
   SaveSystem.cs                JSON saves

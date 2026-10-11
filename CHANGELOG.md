@@ -36,6 +36,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - `swingprofile [seconds]` bridge command: when each attack animation strikes (the weapon hand's speed through the swing), with the moments hits land and shots leave. `npchp <uid> <hp>` sets a monster's health, for a training dummy.
 - `worldnpcs [type...]` bridge command: the server's NPCs in this scene, including hidden quest copies.
 - `setlevel <skillId> <level>` and `buffs` bridge commands: set a skill level for testing, and list the active buffs.
+- Bridge commands for boats, ferries and oyster fishing: `boatprefabs`, `boatstate`, `sail`, `ferries`, `ferryboard`, `routecheck`, `routeplan`, `watermap`, `profile`, `interactables`, `interactablesnear`, `spawnprefabs`, `spawnobj`/`despawnobj`, `oysters` and `netoyster`. See docs/COMMANDS.md.
 
 ## [1.1.0] - 2026-10-09
 ### Fixed
