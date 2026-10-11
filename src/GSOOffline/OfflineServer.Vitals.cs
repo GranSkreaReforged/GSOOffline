@@ -17,9 +17,21 @@ namespace GSOOffline
             return Mathf.Max(1, max + BonusHealth());
         }
 
+        // StatType 36: the client's bonus health (gear and Survivor) on top of the base stat. The client caps health at
+        // base + bonus and shows any change above the cap as a heal number, so it must hear the bonus before the health.
+        private const int StatBonusHealth = 36;
+
         private void SendHealth()
         {
+            Send(16, 5, StatBonusHealth, MaxHealth() - character.health);
             Send(8, 13, character.name, character.currentHealth, MaxHealth());
+        }
+
+        /// <summary>Gear changed: max health may have moved, so health is capped to it and both are sent.</summary>
+        private void HealthStatsChanged()
+        {
+            character.currentHealth = Mathf.Min(character.currentHealth, MaxHealth());
+            SendHealth();
         }
 
         private int MaxMana()
