@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Each release is packaged into its own folder, `dist\<version>\`, with both zips, `SHA256SUMS.txt` and the release notes (`RELEASE_NOTES-<version>.md`, written by hand). Releases used to share one `dist\` folder, where each release overwrote `SHA256SUMS.txt`.
 
 ## [1.3.0] - 2026-10-11
 ### Fixed

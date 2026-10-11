@@ -19,13 +19,15 @@ Builds the plugin into `artifacts\build\<Configuration>\`, laid out like the gam
 | Parameter | Meaning |
 |---|---|
 | `-Version x.y.z` | Required. Run on `dev`. Makes the release build, bumps `Directory.Build.props`, dates `## [Unreleased]` in the CHANGELOG, commits "Release vX" with that version's notes as the message body, and tags `vX`. |
-| `-DryRun` | Build and package into `dist\` only; no version bump, commit or tag |
+| `-DryRun` | Build and package into `dist\x.y.z\` only; no version bump, commit or tag |
 | `-GameDir <path>` | Game folder override |
 
-Output in `dist\`:
+Output in its own folder, `dist\x.y.z\`:
 - `GSOOffline-x.y.z.zip`
 - `GSOOffline-x.y.z-with-BepInEx.zip`
 - `SHA256SUMS.txt`
+
+The release notes for players, `RELEASE_NOTES-x.y.z.md`, are written by hand into the same folder.
 
 It never pushes. Push `dev`, open the `dev` -> `main` pull request from the release commit, and push the tag after it's merged.
 

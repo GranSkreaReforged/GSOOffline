@@ -3,10 +3,11 @@
     Cut a release on dev: bump version, make the release build, package zips + checksums, commit and tag.
 
 .DESCRIPTION
-    Produces in dist\:
+    Produces one folder per release, dist\<ver>\:
       GSOOffline-<ver>.zip               plugin only (for players who already have BepInEx)
       GSOOffline-<ver>-with-BepInEx.zip  extract into the game folder and play
       SHA256SUMS.txt
+    The player-facing RELEASE_NOTES-<ver>.md is written by hand into the same folder afterwards.
     Neither zip contains game files; players must own Gran Skrea Online.
     Run it on dev: the release commit becomes the dev -> main pull request. Nothing is pushed.
 
@@ -60,8 +61,9 @@ try {
     Invoke-Checked dotnet @('build', $project, '-c', 'Release', '-nologo', "-p:Version=$Version", '-p:ReleaseBuild=true', '-o', $out)
 
     $dist = Join-Path $root 'dist'
+    $release = Join-Path $dist $Version   # one folder per release: zips, SHA256SUMS.txt, release notes
     $staging = Join-Path $root 'artifacts\staging'
-    New-Item -ItemType Directory -Force -Path $dist | Out-Null
+    New-Item -ItemType Directory -Force -Path $release | Out-Null
     foreach ($d in $staging) { if (Test-Path $d) { Remove-Item $d -Recurse -Force } }
 
     # Layout mirrors the game folder so either zip can be extracted straight into it.
@@ -79,8 +81,8 @@ try {
     Expand-Archive -Path (Get-BepInExZip) -DestinationPath $full
     Copy-Item (Join-Path $plugin '*') $full -Recurse -Force
 
-    $zipPlugin = Join-Path $dist "GSOOffline-$Version.zip"
-    $zipFull = Join-Path $dist "GSOOffline-$Version-with-BepInEx.zip"
+    $zipPlugin = Join-Path $release "GSOOffline-$Version.zip"
+    $zipFull = Join-Path $release "GSOOffline-$Version-with-BepInEx.zip"
     foreach ($z in $zipPlugin, $zipFull) { if (Test-Path $z) { Remove-Item $z } }
     Compress-Archive -Path (Join-Path $plugin '*') -DestinationPath $zipPlugin
     Compress-Archive -Path (Join-Path $full '*') -DestinationPath $zipFull
@@ -88,7 +90,7 @@ try {
     $sums = foreach ($z in $zipPlugin, $zipFull) {
         "{0}  {1}" -f (Get-FileHash -Algorithm SHA256 $z).Hash.ToLowerInvariant(), (Split-Path $z -Leaf)
     }
-    $sums | Set-Content (Join-Path $dist 'SHA256SUMS.txt')
+    $sums | Set-Content (Join-Path $release 'SHA256SUMS.txt')
 }
 catch {
     if (-not $DryRun) {
@@ -110,7 +112,8 @@ if (-not $DryRun) {
 
 Write-Host ''
 Write-Host "Packaged $Version (BepInEx $BepInExVersion):" -ForegroundColor Green
-Get-Content (Join-Path $dist 'SHA256SUMS.txt') | ForEach-Object { Write-Host "  $_" }
+Get-Content (Join-Path $release 'SHA256SUMS.txt') | ForEach-Object { Write-Host "  $_" }
+Write-Host "In $release. Add the release notes there: RELEASE_NOTES-$Version.md"
 if (-not $DryRun) {
     Write-Host "Committed and tagged $tag on dev. Next:"
     Write-Host "  git push origin dev   (not the tag yet)"
