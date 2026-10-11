@@ -114,7 +114,7 @@ The pull request is opened by hand from the branch's final commit: its first lin
 
 ```powershell
 git switch dev; git pull --ff-only
-.\release.ps1 -Version 0.2.0 -DryRun   # package into dist\ and check it
+.\release.ps1 -Version 0.2.0 -DryRun   # package into dist\0.2.0\ and check it
 .\release.ps1 -Version 0.2.0           # bump, date the CHANGELOG, commit "Release v0.2.0" + notes, tag
 git push origin dev                    # not the tag yet
 # pull request dev -> main: title and description are the release commit's message (git log -1)

@@ -5,6 +5,10 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-10-11
+### Changed
+- Each release is packaged into its own folder, `dist\<version>\`, with both zips, `SHA256SUMS.txt` and the release notes (`RELEASE_NOTES-<version>.md`, written by hand). Releases used to share one `dist\` folder, where each release overwrote `SHA256SUMS.txt`.
+
 ## [1.3.0] - 2026-10-11
 ### Fixed
 - Shop and bank windows close when you walk away or travel (a door, a wayshrine, a teleport), as crafting windows do. They stayed open, so you could keep buying, selling and banking from anywhere.
