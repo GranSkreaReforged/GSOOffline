@@ -237,6 +237,43 @@ namespace GSOOffline
             OfflineServer.Instance.DevEnterBuilding(list[int.Parse(args[1])]);
         }
 
+        // hover <npc uid> | hover obj <typeId> | hover off: acts as if the mouse cursor were over that NPC or the nearest
+        // object of that type, for the Interact key (F). With interactprompt, tests what F uses without a mouse.
+        private static void Hover(string[] args)
+        {
+            UnityEngine.Component c = null;
+            if (args.Length > 2 && args[1] == "obj")
+            {
+                int type = int.Parse(args[2]);
+                var p = Scr_PlayerHandler.instance.player.transform.position;
+                float best = float.MaxValue;
+                foreach (var i in Scr_Interactable.list)
+                    if (i != null && i.typeId == type && UnityEngine.Vector3.Distance(i.transform.position, p) < best)
+                    {
+                        best = UnityEngine.Vector3.Distance(i.transform.position, p);
+                        c = i;
+                    }
+            }
+            else if (args.Length > 1 && args[1] != "off")
+                c = Scr_NpcHandler.instance.npcList.Find(n => n != null && n.npcUniqueId == int.Parse(args[1]));
+            QuickInteract.DevHover = c;
+            Plugin.Log.LogInfo($"[dev] hover {(c != null ? c.name + " at " + c.transform.position : "off")}");
+        }
+
+        // interactprompt [press]: the "Press [F] to ..." text, i.e. what the Interact key would use now; "press" uses it.
+        private static void InteractPrompt(string[] args)
+        {
+            Plugin.Log.LogInfo($"[dev] interact prompt '{Menucontroller.instance.quickInteractText}'");
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            foreach (var i in Scr_Interactable.list)
+                if (i != null && UnityEngine.Vector3.Distance(i.transform.position, p) < 8f)
+                    Plugin.Log.LogInfo($"[dev]   object {i.typeId} '{i.interactableName}' {UnityEngine.Vector3.Distance(i.transform.position, p):F1} m noQuickInteract={i.noQuickInteract} extra={i.customDistance}");
+            foreach (var n in Scr_NpcHandler.instance.npcList)
+                if (n != null && UnityEngine.Vector3.Distance(n.transform.position, p) < 8f)
+                    Plugin.Log.LogInfo($"[dev]   npc '{n.npcName}' {UnityEngine.Vector3.Distance(n.transform.position, p):F1} m");
+            if (args.Length > 1 && args[1] == "press") QuickInteract.DevPress();
+        }
+
         // doorsigns: every shop sign (Prefab_Object_Sign_*) in the scene with the three nearest doors and gates, to tell
         // which building a door belongs to.
         private static void DoorSigns(string[] args)
