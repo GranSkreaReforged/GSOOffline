@@ -20,6 +20,7 @@ namespace GSOOffline
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
+        public const int NpcRespawn = 120;   // seconds; the community wiki's "2 minutes" for ordinary creatures
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
         public const float RespawnProtection = 10f;
 
@@ -408,7 +409,7 @@ namespace GSOOffline
             npc.aggro = false;
             if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
-            npc.respawnAt = Time.time + (info?.respawnTime ?? 60);
+            npc.respawnAt = Time.time + (info?.respawnTime ?? CombatRules.NpcRespawn);
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);

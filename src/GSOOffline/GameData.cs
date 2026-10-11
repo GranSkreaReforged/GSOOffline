@@ -147,7 +147,9 @@ namespace GSOOffline
                     // Only a couple of entries carry explicit health; the rest was a server-side formula.
                     health = IntAttr(n, "health", CombatRules.NpcHealth(level)),
                     canFight = IntAttr(n, "canfight") == 1,
-                    respawnTime = IntAttr(n, "respawntime", 60),
+                    // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
+                    // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
+                    respawnTime = Attr(n, "respawntime") != null ? IntAttr(n, "respawntime") * 60 : CombatRules.NpcRespawn,
                     aggressive = IntAttr(n, "aggressive") == 1,
                     aggroDistance = IntAttr(n, "aggrodistance", 10),
                     attackDistance = Mathf.Max(2.5f, IntAttr(n, "attackdistance", 3)),
