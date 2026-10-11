@@ -7,6 +7,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Fixed
 - "An Honest Day's Work" can be finished again: the large aggressive crab Nort asks you to slay at the fishing pier (step 4) now appears on the beach beside him. The game has no spawn point for it (the old server placed it), so nothing ever appeared and the quest was stuck.
 - Crabs and other creatures no longer walk through rocks. They walk around rocks, walls and trees, and only wander to spots they can reach. A rock taller than a creature's step used to fool the server's ground check, so creatures walked straight through it (on the monastery beach, about one crab in ten stood inside a rock at any moment). Creatures chasing you still reach you.
+- Creatures respawn after 2 minutes, as the community wiki records, instead of 1. Bosses and quest creatures use the respawn times the game data gives them, which are in minutes, not seconds: Aellope comes back after an hour (the wiki agrees), Phraustie after five, Gery's ambush after one. They used to return within seconds to a few minutes.
+- Mana from gear counts on your mana bar. Items with Mana raised your maximum on the server, but the game was never told, so the bar and stats window stayed at your base mana. Gear Mana regeneration also works now: each point adds to the mana you regain every 3 seconds.
+- Every Elemental grimoire spell shows its effect. Fire wall, Blast and Landmine go where you click (within the spell's range) with their wall of fire or explosion; they used to go off around you with nothing to see. Trail blaze, Immolate and Dragon flames show their flames on you, and Flames and Eruption on your target. Which effect belongs to which spell is matched by name from the game's effect list.
 
 ## [1.3.1] - 2026-10-11
 ### Changed

@@ -20,6 +20,7 @@ namespace GSOOffline
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
+        public const int NpcRespawn = 120;   // seconds; the community wiki's "2 minutes" for ordinary creatures
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
         public const float RespawnProtection = 10f;
 
@@ -43,6 +44,7 @@ namespace GSOOffline
         // The current swing's hit or shot, waiting for its moment in the animation: called once per strike of the
         // clip with (strike, strikes), so a flurry deals its damage a share at a time.
         private System.Action<int, int> pendingBlow;
+        private Vector3? clickTargetPos;   // 23/1: where a click-target ability (Fire wall, Blast, Landmine) goes
         private bool measuringCast;          // the animation being measured is an ability's
         private float pendingBlowFallback;   // a cast's blow time (its attackdelay) when the clip isn't in ClipImpact
         // Seconds the client's basic attack animation lasts, per weapon type (measured as it plays).
@@ -58,11 +60,13 @@ namespace GSOOffline
             On(3, 0, c => UseAbility((int)c[2]));
             On(8, 7, c => AssignAbilitySlot((int)c[2], (int)c[3]));
             On(25, 12, c => { });   // auto-target slot hint
+            On(23, 1, c => clickTargetPos = (Vector3)c[2]);   // the ground spot for the click-target ability that follows
         }
 
         private void ResetCombat()
         {
             targetUid = 0;
+            clickTargetPos = null;
             pendingBlow = null;   // a swing from the old scene
             measureSwingAt = -1f;
             StopAttacking();
@@ -408,7 +412,7 @@ namespace GSOOffline
             npc.aggro = false;
             if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
-            npc.respawnAt = Time.time + (info?.respawnTime ?? 60);
+            npc.respawnAt = Time.time + (info?.respawnTime ?? CombatRules.NpcRespawn);
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);

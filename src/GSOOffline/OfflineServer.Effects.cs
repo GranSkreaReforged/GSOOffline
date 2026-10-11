@@ -43,8 +43,8 @@ namespace GSOOffline
             { 58, 13 },   // Rockslide
             { 57, 12 },   // Stranglevine: earth staff root
             { 112, 49 },  // Combustion
-            { 114, 50 },  // Trail blaze
-            { 117, 53 },  // Immolate
+            { 97, 31 },   // Flames: "Elemental grim lvl 1 fire attack"
+            { 120, 29 },  // Eruption: "HUGE and long explosion with rocks"
             { 121, 55 },  // Firestorm pulse
             { 123, 61 },  // Flashfreeze
             { 128, 64 },  // Glacial spike
@@ -63,6 +63,9 @@ namespace GSOOffline
             { 98, 32 }, { 99, 33 },    // Healing music / aura
             { 115, 56 },  // Flame barrier
             { 116, 51 },  // Flame lance (caster)
+            { 114, 50 },  // Trail blaze
+            { 117, 53 },  // Immolate
+            { 166, 57 },  // Dragon flames: "Dragons breath"
             { 125, 59 },  // Ice barrier
             { 124, 60 },  // Waterwalk
             { 126, 58 },  // Cryostasis
@@ -70,6 +73,14 @@ namespace GSOOffline
             { 140, 91 },  // Hack and slash
             { 168, 160 }, // Mana surge
             { 169, 161 }, // Embrace the pain
+        };
+
+        // Click-target ability -> effect on the clicked ground spot.
+        private static readonly Dictionary<int, int> AbilityGroundGfx = new Dictionary<int, int>
+        {
+            { 119, 4 },   // Fire wall: "Firewall"
+            { 113, 2 },   // Blast: "Fireball explosion"
+            { 122, 28 }, { 172, 28 },   // Landmine: "Big explosion with rocks"
         };
 
         private class Impact

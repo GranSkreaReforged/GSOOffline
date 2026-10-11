@@ -34,21 +34,43 @@ namespace GSOOffline
             SendHealth();
         }
 
-        private int MaxMana()
+        private int MaxMana() => Mathf.Max(0, character.mana + GearStat("Mana"));
+
+        // Mana regained per regeneration tick: 2, plus Manaregen rolled on equipped items.
+        private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen"));
+        private const int BaseManaRegen = 2;
+
+        private int GearStat(string key)
         {
-            int max = character.mana;
+            int sum = 0;
             foreach (var it in character.items)
                 if (it.equipped)
                     foreach (var s in it.stats)
-                        if (s.key == "Mana") max += s.value;
-            return Mathf.Max(0, max);
+                        if (s.key == key) sum += s.value;
+            return sum;
         }
 
-        private void SendMana() => Send(8, 15, character.name, character.currentMana, MaxMana());
+        // StatTypes 43 and 44: the client's bonus mana and mana regeneration, as 36 is for health. The HUD's mana bar
+        // and the stats window use base + bonus, so without them gear mana never showed.
+        private const int StatBonusMana = 43, StatBonusManaRegen = 44;
+
+        private void SendMana()
+        {
+            Send(16, 5, StatBonusMana, MaxMana() - character.mana);
+            Send(16, 5, StatBonusManaRegen, GearStat("Manaregen"));
+            Send(8, 15, character.name, character.currentMana, MaxMana());
+        }
+
+        /// <summary>Gear changed: max mana may have moved, so mana is capped to it and both are sent.</summary>
+        private void ManaStatsChanged()
+        {
+            character.currentMana = Mathf.Min(character.currentMana, MaxMana());
+            SendMana();
+        }
 
         private float regenTimer;
 
-        /// <summary>Out of combat: 1 health per 3 s; mana always 2 per 3 s.</summary>
+        /// <summary>Out of combat: 1 health per 3 s; mana always ManaRegen() per 3 s.</summary>
         private void TickRegen()
         {
             if (character == null || !sceneReady || PlayerDead) return;
@@ -59,7 +81,7 @@ namespace GSOOffline
             if (!inCombat && character.currentHealth < MaxHealth()) Heal(1);
             if (character.currentMana < MaxMana())
             {
-                character.currentMana = Mathf.Min(MaxMana(), character.currentMana + 2);
+                character.currentMana = Mathf.Min(MaxMana(), character.currentMana + ManaRegen());
                 SendMana();
             }
         }
