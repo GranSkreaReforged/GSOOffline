@@ -90,6 +90,39 @@ namespace GSOOffline
         // ferries: the server's ferry schedule next to the client's ferry objects, and whether the player is on a deck.
         private static void Ferries(string[] args) => OfflineServer.Instance.LogFerries();
 
+        // watermap x1 z1 x2 z2 [cell]: water/land map of that rectangle -> <game>\GSODevTools\watermap.png (north up).
+        private static void WaterMap(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            FerryRoutePlanner.WaterMap(new UnityEngine.Vector3(float.Parse(args[1], inv), 0f, float.Parse(args[2], inv)),
+                new UnityEngine.Vector3(float.Parse(args[3], inv), 0f, float.Parse(args[4], inv)),
+                args.Length > 5 ? float.Parse(args[5], inv) : 4f, DevImage("watermap"));
+        }
+
+        // routeplan <name> <margin> <cell> x,z x,z ...: shortest water route through the points, printed as waypoints,
+        // with a map -> <game>\GSODevTools\<name>.png.
+        private static void RoutePlan(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var pts = new System.Collections.Generic.List<UnityEngine.Vector3>();
+            for (int k = 4; k < args.Length; k++)
+            {
+                var xz = args[k].Split(',');
+                pts.Add(new UnityEngine.Vector3(float.Parse(xz[0], inv), 3.15f, float.Parse(xz[1], inv)));
+            }
+            var route = FerryRoutePlanner.Plan(pts, float.Parse(args[2], inv), float.Parse(args[3], inv), DevImage(args[1]));
+            if (route == null) return;
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (var p in route) parts.Add(p.x.ToString("F1", inv) + "," + p.z.ToString("F1", inv));
+            Plugin.Log.LogInfo($"[dev] route {args[1]} (scene {Script_sceneManager.instance.currentScene.id}): {route.Count} waypoints: {string.Join(" ", parts.ToArray())}");
+        }
+
+        private static string DevImage(string name) =>
+            System.IO.Path.Combine(System.IO.Path.Combine(BepInEx.Paths.GameRootPath, "GSODevTools"), name + ".png");
+
+        // routecheck: where this zone's ferry routes run over land or rocks.
+        private static void RouteCheck(string[] args) => OfflineServer.Instance.DevRouteCheck();
+
         // ferryboard <id> [height]: drops the player onto a ferry's deck from that height above its origin (default 4 m).
         private static void FerryBoard(string[] args) =>
             OfflineServer.Instance.DevBoardFerry(int.Parse(args[1]), args.Length > 2 ? float.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 4f);

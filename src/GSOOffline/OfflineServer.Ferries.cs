@@ -31,13 +31,58 @@ namespace GSOOffline
             public int toScene, toFerry, toWaypoint;   // ...onto this ferry, waiting at this waypoint
         }
 
+        // The routes in transportData were drawn for an older map: today they cross hills, forests and rocks (The
+        // Coral Lady's west leg ran 465 m over land). These replace them: water-only routes found with the
+        // routeplan dev command (FerryRoutePlanner, 6 m clearance either side) and checked with routecheck.
+        // The docks and their waiting times, the speeds and the ship models are the data's.
+        private class FerryStop
+        {
+            public float x, z, wait;
+            public FerryStop(float x, float z, float wait = 0f) { this.x = x; this.z = z; this.wait = wait; }
+        }
+
+        private static readonly Dictionary<int, FerryStop[]> FerryRoutes = new Dictionary<int, FerryStop[]>
+        {
+            // The Coral Lady: lighthouse jetty -> round the west coast and along the north shore -> Yorkhill, and back.
+            { 3, new[]
+            {
+                new FerryStop(520.9f, 881f, 20f),
+                new FerryStop(492.9f, 885f), new FerryStop(260.9f, 1125f), new FerryStop(156.9f, 1125f), new FerryStop(52.9f, 1197f),
+                new FerryStop(36.9f, 1269f), new FerryStop(108.9f, 1413f), new FerryStop(236.9f, 1517f), new FerryStop(332.9f, 1581f),
+                new FerryStop(476.9f, 1645f), new FerryStop(732.9f, 1685f), new FerryStop(772.9f, 1677f), new FerryStop(964.9f, 1557f),
+                new FerryStop(961f, 1557f, 20f),
+                new FerryStop(964.9f, 1557f), new FerryStop(748.9f, 1685f), new FerryStop(692.9f, 1685f), new FerryStop(452.9f, 1637f),
+                new FerryStop(308.9f, 1565f), new FerryStop(228.9f, 1509f), new FerryStop(92.9f, 1389f), new FerryStop(36.9f, 1253f),
+                new FerryStop(52.9f, 1197f), new FerryStop(180.9f, 1109f), new FerryStop(252.9f, 1109f), new FerryStop(372.9f, 1021f),
+                new FerryStop(476.9f, 893f),
+            } },
+            // Lighthouse -> down the coast to the crossing point out at sea (index 5) -> back to the lighthouse.
+            { 5, new[]
+            {
+                new FerryStop(563.3f, 882.3f, 15f),
+                new FerryStop(559.3f, 860f), new FerryStop(535.3f, 836f), new FerryStop(539.3f, 816f), new FerryStop(699.3f, 544f),
+                new FerryStop(715.3f, 536f),
+                new FerryStop(687.3f, 556f), new FerryStop(535.3f, 828f), new FerryStop(539.3f, 844f),
+                new FerryStop(559.3f, 864f), new FerryStop(563.3f, 876f),
+            } },
+            // Bal Sardan harbour -> out of the harbour mouth to the open sea west of the island (index 6) -> back.
+            { 4, new[]
+            {
+                new FerryStop(158.3f, 731.3f, 5f),
+                new FerryStop(158.5f, 742.8f), new FerryStop(149.5f, 748.8f), new FerryStop(134.5f, 733.8f), new FerryStop(131.5f, 721.8f),
+                new FerryStop(119.5f, 715.8f), new FerryStop(30f, 800f),
+                new FerryStop(119.5f, 715.8f), new FerryStop(131.5f, 721.8f), new FerryStop(146.5f, 748.8f), new FerryStop(155.5f, 745.8f),
+                new FerryStop(158.5f, 736.8f), new FerryStop(158.5f, 733.8f),
+            } },
+        };
+
         // Reconstruction: each Bal Sardan ferry turns back at a point out at sea (West Athagos: south-east of the
-        // lighthouse; Bal Sardan: north of the harbour). Arriving there swaps zones onto the other ferry at its own
+        // lighthouse; Bal Sardan: west of the island, toward Athagos). Arriving there swaps zones onto the other ferry at its own
         // far point, which then sails into its dock.
         private static readonly FerryCrossing[] FerryCrossings =
         {
-            new FerryCrossing { ferry = 5, waypoint = 4, toScene = 7, toFerry = 4, toWaypoint = 3 },   // lighthouse -> Bal Sardan
-            new FerryCrossing { ferry = 4, waypoint = 3, toScene = 1, toFerry = 5, toWaypoint = 4 },   // Bal Sardan -> lighthouse
+            new FerryCrossing { ferry = 5, waypoint = 5, toScene = 7, toFerry = 4, toWaypoint = 6 },   // lighthouse -> Bal Sardan
+            new FerryCrossing { ferry = 4, waypoint = 6, toScene = 1, toFerry = 5, toWaypoint = 5 },   // Bal Sardan -> lighthouse
         };
 
         private const float FerrySyncInterval = 2f;
@@ -73,12 +118,23 @@ namespace GSOOffline
                     type = GameData.IntAttr(x, "type"),
                     speed = GameData.IntAttr(x, "speed"),
                 };
-                foreach (XmlNode ph in x.ChildNodes)
+                if (FerryRoutes.TryGetValue(f.id, out var route))
                 {
-                    if (ph.NodeType != XmlNodeType.Element) continue;
-                    var d = GameData.Attr(ph, "destination").Split(',');
-                    f.waypoints.Add(new Vector3(F(d[0]), F(d[1]), F(d[2])));
-                    f.waits.Add(GameData.IntAttr(ph, "waitingtime"));
+                    foreach (var r in route)
+                    {
+                        f.waypoints.Add(new Vector3(r.x, 3.15f, r.z));
+                        f.waits.Add(r.wait);
+                    }
+                }
+                else
+                {
+                    foreach (XmlNode ph in x.ChildNodes)
+                    {
+                        if (ph.NodeType != XmlNodeType.Element) continue;
+                        var d = GameData.Attr(ph, "destination").Split(',');
+                        f.waypoints.Add(new Vector3(F(d[0]), F(d[1]), F(d[2])));
+                        f.waits.Add(GameData.IntAttr(ph, "waitingtime"));
+                    }
                 }
                 if (f.waypoints.Count == 0) continue;
                 f.pos = f.waypoints[0];
@@ -119,8 +175,11 @@ namespace GSOOffline
                     var c = ClientFerry(f.id);
                     if (c == null || !c.moving || !StandingOn(player, c)) continue;
                     ridingId = f.id;
-                    ridingOffset = Quaternion.Inverse(c.transform.rotation) * (player.transform.position - c.transform.position);
-                    Plugin.Log.LogInfo($"[ferry] riding ferry {f.id}");
+                    // Held on the deck under their feet, not wherever they stood or jumped (a boom, mid-air).
+                    var feet = player.transform.position;
+                    feet.y = DeckUnder(player, c);
+                    ridingOffset = Quaternion.Inverse(c.transform.rotation) * (feet - c.transform.position);
+                    Plugin.Log.LogInfo($"[ferry] riding ferry {f.id} (deck offset {ridingOffset})");
                     break;
                 }
                 if (ridingId == 0) return;
@@ -210,7 +269,12 @@ namespace GSOOffline
             var boat = ClientFerry(f.id);
             if (player == null || boat == null || PlayerDead) return false;
             if (ridingId == f.id) crossingOffset = ridingOffset;
-            else if (StandingOn(player, boat)) crossingOffset = Quaternion.Inverse(boat.transform.rotation) * (player.transform.position - boat.transform.position);
+            else if (StandingOn(player, boat))
+            {
+                var feet = player.transform.position;
+                feet.y = DeckUnder(player, boat);
+                crossingOffset = Quaternion.Inverse(boat.transform.rotation) * (feet - boat.transform.position);
+            }
             else return false;
             ridingId = 0;
             Plugin.Log.LogInfo($"[ferry] ferry {f.id} reached waypoint {f.index}: crossing to scene {c.toScene} on ferry {c.toFerry} (deck offset {crossingOffset})");
@@ -226,6 +290,17 @@ namespace GSOOffline
             foreach (var t in transportsHandler.transports)
                 if (t != null && t.id == id) return t;
             return null;
+        }
+
+        // Lowest surface of the ferry under the player: the deck (raycasts don't hit the hull's inside faces, and
+        // spars and sails are above it).
+        private static float DeckUnder(Scr_Player player, Scr_Transport boat)
+        {
+            float y = player.transform.position.y;
+            var from = player.transform.position + Vector3.up * 0.5f;
+            foreach (var hit in Physics.RaycastAll(from, Vector3.down, 6f, ~0, QueryTriggerInteraction.Ignore))
+                if (hit.collider.transform.IsChildOf(boat.transform) && hit.point.y < y) y = hit.point.y;
+            return y;
         }
 
         // On the deck: the ground under the player belongs to the ferry's model.
@@ -247,6 +322,51 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] dropped onto ferry {id} from {SceneWorld.Vec(player.transform.position)}");
         }
 
+        // Dev: walk every route segment of this zone's ferries in 1 m steps across a 4 m wide hull and report the
+        // stretches where something solid (terrain, rock, jetty) stands above the water.
+        internal void DevRouteCheck()
+        {
+            foreach (var f in ferries)
+            {
+                int n = f.waypoints.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    Vector3 a = f.waypoints[i], b = f.waypoints[(i + 1) % n];
+                    var dir = b - a; dir.y = 0f;
+                    float len = dir.magnitude;
+                    if (len < 0.5f) continue;
+                    var side = Vector3.Cross(Vector3.up, dir / len);
+                    Vector3? start = null, last = null;
+                    float top = 0f; string what = null;
+                    for (float d = 0f; d <= len + 0.01f; d += 1f)
+                    {
+                        var c = a + dir / len * Mathf.Min(d, len);
+                        float h = float.MinValue; string name = null;
+                        foreach (float s in new[] { -2f, 0f, 2f })
+                            foreach (var hit in Physics.RaycastAll(c + side * s + Vector3.up * 60f, Vector3.down, 70f, ~0, QueryTriggerInteraction.Ignore))
+                            {
+                                if (hit.collider.GetComponentInParent<Scr_Transport>() != null || hit.collider.GetComponentInParent<Scr_PlayerShip>() != null
+                                    || hit.collider.GetComponentInParent<Scr_Player>() != null) continue;
+                                if (hit.point.y > h) { h = hit.point.y; name = hit.collider.name; }
+                            }
+                        bool blocked = h > 3.4f;
+                        if (blocked)
+                        {
+                            if (start == null) { start = c; top = h; what = name; }
+                            if (h > top) { top = h; what = name; }
+                            last = c;
+                        }
+                        if ((!blocked || d + 1f > len + 0.01f) && start != null)
+                        {
+                            Plugin.Log.LogInfo($"[dev] route ferry {f.id} {i}->{(i + 1) % n}: blocked {SceneWorld.Vec(start.Value)} .. {SceneWorld.Vec(last.Value)} ({Vector3.Distance(start.Value, last.Value) + 1f:F0} m, top y {top:F1}, '{what}')");
+                            start = null;
+                        }
+                    }
+                }
+            }
+            Plugin.Log.LogInfo("[dev] routecheck done");
+        }
+
         internal void LogFerries()
         {
             var player = LocalPlayer;
@@ -266,7 +386,16 @@ namespace GSOOffline
         private void SendSceneFerries()
         {
             if (transportsHandler == null) transportsHandler = Object.FindObjectOfType<Scr_TransportsHandler>();
-            if (transportsHandler != null) transportsHandler.clearTransports();
+            if (transportsHandler != null)
+            {
+                transportsHandler.clearTransports();
+                // The client sails along its own copy of each route (read from transportData), so give it ours.
+                foreach (var t in transportsHandler.transportTypes)
+                {
+                    var f = t != null ? ferries.Find(e => e.id == t.id) : null;
+                    if (f != null) t.waypoints = new List<Vector3>(f.waypoints);
+                }
+            }
             SendFerries();
         }
 
