@@ -43,7 +43,24 @@ namespace GSOOffline
             lastNpcList = lastHarvestableList = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
+            CloseWorkbench();
             ResetCombat();
+        }
+
+        /// <summary>
+        /// Closes the crafting window. The client only closes it on a movement key, its Close button or a
+        /// disconnect, so after a teleport the previous zone's workbench stayed open; Escape doesn't close it, and
+        /// under the cursor it blocks mouse-look. Same reset as the client's disconnect handler.
+        /// </summary>
+        private static void CloseWorkbench()
+        {
+            var mc = Menucontroller.instance;
+            if (mc == null || mc.showWorkbench == 0) return;
+            Plugin.Log.LogInfo($"[skill] closing workbench {mc.showWorkbench}: changing zone");
+            mc.clearWorkbench();
+            mc.showWorkbench = 0;
+            mc.craftingAmount = 1;
+            mc.craftingInProgress = false;
         }
 
         // The start time goes out once per login: resending it on every zone change would turn the clock back

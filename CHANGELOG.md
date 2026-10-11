@@ -6,6 +6,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 ### Fixed
 - Changing zone while gathering no longer leaves your character mining, chopping or fishing forever. Teleporting, taking a door or a wayshrine stopped the harvest on the server but never told the client, so the gathering animation carried on in the next zone (in a boat, on a ferry...) until the next action.
+- Teleporting with a crafting window open closes it. It stayed open in the new zone until you pressed a movement key (Escape doesn't close it), and while it sat under the cursor the camera couldn't be turned with the mouse. A craft in progress is cancelled.
 - The game's own chat commands (`/showgui`, `/fps`, `/ping`...) no longer answer "Unknown or unavailable offline command". The client runs them itself and also sends them on to the server, which now leaves them alone.
 
 ## [1.2.0] - 2026-10-11
