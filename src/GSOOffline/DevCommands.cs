@@ -457,6 +457,13 @@ namespace GSOOffline
         // npcground [n]: the nearest n client NPCs' height above the ground under them (sunken NPCs read negative).
         private static void NpcGround(string[] args) => OfflineServer.Instance.LogNpcGround(args.Length > 1 ? int.Parse(args[1]) : 15);
 
+        // npcobstacles on|off: whether NPCs steer around rocks and walls (off = the old walk-through, to compare).
+        private static void NpcObstacles(string[] args)
+        {
+            OfflineServer.NpcObstaclesOff = args.Length > 1 && args[1] == "off";
+            Plugin.Log.LogInfo($"[dev] NPC obstacle checks {(OfflineServer.NpcObstaclesOff ? "off" : "on")}");
+        }
+
         // npcbounds [n]: the nearest n client NPCs with their rendered size, how far the model's feet are
         // from the ground under them, and the animation playing. Finds giant, sunken or unanimated NPCs.
         private static void NpcBounds(string[] args)
