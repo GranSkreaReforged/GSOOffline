@@ -242,6 +242,7 @@ namespace GSOOffline
             }
             it.equipped = true;
             Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
+            HealthStatsChanged();
 
             // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the
             // "Switch weapon" key). The client has no other way to fill that slot, so the old server did this.
@@ -278,6 +279,7 @@ namespace GSOOffline
             if (it == null || !it.equipped) return;
             it.equipped = false;
             Send(3, 6, character.name, it.id);
+            HealthStatsChanged();
         }
 
         private void OnChangeTab(object[] c)

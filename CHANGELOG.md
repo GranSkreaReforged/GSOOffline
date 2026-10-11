@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- No more green heal numbers ticking over your head after a fight while your health bar is full. Health on your gear (and Survivor's bonus) raised your maximum health on the server but was never sent to the client, which kept its bar capped at your base health and showed every regeneration tick above that cap as a heal. The client now gets the bonus with every health update, so the bar shows your real maximum (105 with the starter kit, for example). Equipping or removing gear updates it at once.
 - Changing zone while gathering no longer leaves your character mining, chopping or fishing forever. Teleporting, taking a door or a wayshrine stopped the harvest on the server but never told the client, so the gathering animation carried on in the next zone (in a boat, on a ferry...) until the next action.
 - Teleporting with a crafting window open closes it. It stayed open in the new zone until you pressed a movement key (Escape doesn't close it), and while it sat under the cursor the camera couldn't be turned with the mouse. A craft in progress is cancelled.
 - The game's own chat commands (`/showgui`, `/fps`, `/ping`...) no longer answer "Unknown or unavailable offline command". The client runs them itself and also sends them on to the server, which now leaves them alone.
