@@ -5,6 +5,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Shop and bank windows close when you walk away or travel (a door, a wayshrine, a teleport), as crafting windows do. They stayed open, so you could keep buying, selling and banking from anywhere.
+- Closing a shop no longer says "Unknown or unavailable offline command: /closeshop".
+- Chairs can't be used to hop across the room. Using a chair puts you on its seat, and the mouse cursor could reach chairs several metres away, so you could teleport short distances. Chairs now work from 2.5 m ("Move closer to sit down." otherwise), and the cursor reaches other things as far as F always did (5 m).
 - The Interact key (F) uses what your mouse cursor is over, if it's within reach, and otherwise the nearest thing. It used to pick any NPC within 5 m over everything else, and of the objects the first one the game listed rather than the nearest, so next to an NPC you couldn't use a chair or a door with F, and a chair could win over the door beside it (in the monastery, for example). The prompt shows what F will use, and says "sit down" for chairs instead of "interact with".
 - Sitting on chairs and benches plays the sitting animation. The game puts you on the seat and waits for the server to start the animation, which it never did, so your character stood in the chair. Walking off, attacking, gathering or changing zone stands you up again.
 - Weapons have their abilities again, on keys 2 to 5. Those four slots belong to the weapon in your hand: the game doesn't let you drag anything onto them, and the server never filled them, so no weapon ability could be used. Each weapon now brings its own, and its item window lists them: swords Brutal slash, Slashing, Cripple and Sword throw (or the fire, ice or electric attack on elemental swords); greatswords and halberds Stun instead of the throw (Halberd ice attack on icy halberds); daggers Stab, Poisonous stab, Frenzy and Slashing; maces Stun, Cripple and Thoracic trauma; bows Flame, Poison and Explosive arrow and Hunting net; crossbows Focus, Piercing shot, Wounding shot and Weakness arrow; staffs Fire ball, Flame bash, Fire wall and Flame barrier (earth staffs Rockslide and Landmine, ice staffs the ice spells); wands Condensed psyche or Condensed ice; lutes Tritone and Peace; torches Torch throw and Burn. Marcus's cutlass gives Broadsword fire attack and Sword throw, as the community wiki records. Which weapon gives which abilities was the server's and is a reconstruction from the ability descriptions. Switching weapons swaps them.
@@ -16,6 +19,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - The game's own chat commands (`/showgui`, `/fps`, `/ping`...) no longer answer "Unknown or unavailable offline command". The client runs them itself and also sends them on to the server, which now leaves them alone.
 
 ### Added
+- `useobj <typeId>` and `windows` bridge commands: use the nearest object of a type as a mouse click does, and list the open windows.
 - `hover` and `interactprompt` bridge commands: act as if the mouse cursor were over an NPC or object, and show (or press) what the Interact key would use.
 - `actionanim <id>` bridge command: sets the player's animation action (12 sits, 15 sits on the ground, 3 lies down...; the ids are the player animator's ActionID values).
 - `building [n]` and `doorsigns` bridge commands: go into each building as its door would, and list the shop signs with their nearest doors.

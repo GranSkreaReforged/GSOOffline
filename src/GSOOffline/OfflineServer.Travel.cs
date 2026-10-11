@@ -224,7 +224,11 @@ namespace GSOOffline
 
         // ---- bank ----------------------------------------------------------------------------
 
-        private void OpenBank() => Send(3, 33, character.name, WindowBank);
+        private void OpenBank()
+        {
+            Send(3, 33, character.name, WindowBank);
+            WindowOpened(WindowBank);
+        }
 
         private void SendBank()
         {

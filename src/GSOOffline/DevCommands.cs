@@ -260,6 +260,30 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] hover {(c != null ? c.name + " at " + c.transform.position : "off")}");
         }
 
+        // useobj <typeId>: uses the nearest object of that type the way a mouse click does (the client's interact, with its
+        // reach checks and the chair's move onto the seat).
+        private static void UseObj(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var player = Scr_PlayerHandler.instance.player;
+            Scr_Interactable best = null;
+            foreach (var i in Scr_Interactable.list)
+                if (i != null && i.typeId == type && (best == null || UnityEngine.Vector3.Distance(i.transform.position, player.transform.position) < UnityEngine.Vector3.Distance(best.transform.position, player.transform.position)))
+                    best = i;
+            if (best == null) return;
+            Plugin.Log.LogInfo($"[dev] useobj {type} at {UnityEngine.Vector3.Distance(best.transform.position, player.transform.position):F1} m");
+            player.connecter.interactableHandler.interact(best);
+        }
+
+        // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
+        private static void Windows(string[] args)
+        {
+            var open = new System.Collections.Generic.List<string>();
+            foreach (var w in HarmonyLib.Traverse.Create(Script_WindowController.instance).Field("windows").GetValue<System.Collections.Generic.List<Script_Window>>())
+                if (w.windowActive) open.Add(w.windowType.ToString());
+            Plugin.Log.LogInfo($"[dev] windows open: {string.Join(" ", open.ToArray())}");
+        }
+
         // interactprompt [press]: the "Press [F] to ..." text, i.e. what the Interact key would use now; "press" uses it.
         private static void InteractPrompt(string[] args)
         {

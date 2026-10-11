@@ -149,7 +149,8 @@ namespace GSOOffline
                 if (!a.onlyIfMissing || CountItem(g.type) == 0) GiveItem(g.type, g.Amount);
             foreach (var t in a.take) TakeItems(t.type, t.Amount);
             if (a.silver != 0) SetSilver(character.silver + a.silver);
-            if (a.window > 0) Send(3, 33, character.name, a.window);
+            if (a.window == WindowBank) OpenBank();   // bankers: closes again when the player walks away
+            else if (a.window > 0) Send(3, 33, character.name, a.window);
             if (!string.IsNullOrEmpty(a.notice)) Notice(a.notice);
             var v = Content.ParseInts(a.setVar);
             if (v != null && v.Length >= 3) SetQuestVar(v[0], v[1], v[2]);
@@ -259,6 +260,7 @@ namespace GSOOffline
             // which caps what the client will let you sell.
             Send(0, 2, character.name, openShop.name, "0>" + list);
             Send(2, 37, openShop.name, openShop.merchantSilver + ">" + list);
+            WindowOpened(WindowShop);
         }
 
         private void RefreshShop()

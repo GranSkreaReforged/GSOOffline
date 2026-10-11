@@ -14,6 +14,8 @@ namespace GSOOffline
     {
         private enum Kind { None, Loot, Npc, Interactable, Harvestable, Boat }
         private const int ChairType = 54;
+        // Using a chair puts the player on its seat (the client moves them), so from farther away it was a short teleport.
+        internal const float ChairReach = 2.5f;
 
         private static readonly AccessTools.FieldRef<Menucontroller, Scr_Npc> HoverNpc =
             AccessTools.FieldRefAccess<Menucontroller, Scr_Npc>("hoveringNpc");
@@ -61,7 +63,7 @@ namespace GSOOffline
 
             Kind kind = hoveredKind;
             Component target = hovered;
-            if (target == null || !Usable(kind, target, player, p, true))
+            if (target == null || !Usable(kind, target, player, p))
                 Nearest(player, p, out kind, out target);
             if (target == null) return;
 
@@ -77,7 +79,7 @@ namespace GSOOffline
         private static bool devPress;
         internal static void DevPress() => devPress = true;
 
-        private static bool Usable(Kind kind, Component c, Scr_Player player, Vector3 p, bool underCursor)
+        private static bool Usable(Kind kind, Component c, Scr_Player player, Vector3 p)
         {
             float d = Vector3.Distance(p, c.transform.position);
             switch (kind)
@@ -88,9 +90,10 @@ namespace GSOOffline
                     var n = (Scr_Npc)c;
                     return d < 5f && n.canInteract && !n.dead && n.npcLevel == 0;
                 case Kind.Interactable:
-                    // A click reaches 5 m plus the object's own extra distance; the client's F check only 5 m.
+                    // The client's F reach. Under the cursor too: a click's 5 m plus the object's extra distance let
+                    // F hop the player onto a chair from across the room.
                     var i = (Scr_Interactable)c;
-                    return !i.noQuickInteract && d < (underCursor ? 5f + i.customDistance : 5f);
+                    return !i.noQuickInteract && d < (i.typeId == ChairType ? ChairReach : 5f);
                 case Kind.Harvestable:
                     return d < 5f && ((Scr_Harvestable)c).currentHealth > 0;
                 case Kind.Boat:
@@ -113,7 +116,7 @@ namespace GSOOffline
 
         private static void Consider(Kind k, Component c, Scr_Player player, Vector3 p, ref float best, ref Kind kind, ref Component target)
         {
-            if (c == null || !Usable(k, c, player, p, false)) return;
+            if (c == null || !Usable(k, c, player, p)) return;
             float d = Vector3.Distance(p, c.transform.position);
             if (d >= best) return;
             best = d;
@@ -161,6 +164,20 @@ namespace GSOOffline
                     Scr_RPCSender.instance.sendChatMessage(player.playerName, "/enterboat " + ((Scr_PlayerShip)c).ownername);
                     break;
             }
+        }
+    }
+
+    // Clicking a chair (or F) moves the player onto its seat from wherever they are: only from close by.
+    [HarmonyPatch(typeof(Scr_InteractableHandler), nameof(Scr_InteractableHandler.interact), new[] { typeof(Scr_Interactable) })]
+    internal static class ChairReachPatch
+    {
+        private static bool Prefix(Scr_Interactable i)
+        {
+            var player = Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
+            if (i == null || i.typeId != 54 || player == null) return true;
+            if (Vector3.Distance(player.transform.position, i.transform.position) <= QuickInteract.ChairReach) return true;
+            Menucontroller.instance.sendChatMessage("Move closer to sit down.", 4);
+            return false;
         }
     }
 
