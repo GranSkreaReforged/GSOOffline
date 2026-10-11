@@ -45,6 +45,7 @@ namespace GSOOffline
             CancelJob("changing zone");
             StandUp();
             CloseWorkbench();
+            CloseOpenWindow();
             // A conversation left open stays on screen in the next zone, hiding the HUD and holding the camera.
             if (dialogueNode != null && character != null)
             {

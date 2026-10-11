@@ -55,6 +55,10 @@ namespace GSOOffline
                     case "help":
                         Notice("Offline commands: /pos, /tele x y z, /scene id [x y z], /wayshrine id, /wayshrines, /time 0-2400, /save, /give id [n], /silver n, /quest id [phase]");
                         break;
+                    case "closeshop":   // the client's shop window closing
+                        if (openWindow == WindowShop) ForgetWindow();
+                        openShop = null;
+                        break;
                     case "pos":
                         if (player != null)
                             Notice($"Scene {character.scene}: {SceneWorld.Vec(player.transform.position)}");
