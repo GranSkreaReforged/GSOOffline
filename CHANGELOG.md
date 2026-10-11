@@ -11,6 +11,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Mana from gear counts on your mana bar. Items with Mana raised your maximum on the server, but the game was never told, so the bar and stats window stayed at your base mana. Gear Mana regeneration also works now: each point adds to the mana you regain every 3 seconds.
 - Every Elemental grimoire spell shows its effect. Fire wall, Blast and Landmine go where you click (within the spell's range) with their wall of fire or explosion; they used to go off around you with nothing to see. Trail blaze, Immolate and Dragon flames show their flames on you, and Flames and Eruption on your target. Which effect belongs to which spell is matched by name from the game's effect list.
 
+### Changed
+- Your maximum mana grows by 5 with each Elemental grimoire level (105 at level 1, 300 at level 40), on top of your gear. Everyone had 100 whatever their level, so Fire wall (185 mana) and Flame barrier (120) could never be cast without mana gear. How the original game grew the mana pool is lost; this is a reconstruction.
+
 ## [1.3.1] - 2026-10-11
 ### Changed
 - Each release is packaged into its own folder, `dist\<version>\`, with both zips, `SHA256SUMS.txt` and the release notes (`RELEASE_NOTES-<version>.md`, written by hand). Releases used to share one `dist\` folder, where each release overwrote `SHA256SUMS.txt`.

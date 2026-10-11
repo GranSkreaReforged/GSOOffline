@@ -34,7 +34,11 @@ namespace GSOOffline
             SendHealth();
         }
 
-        private int MaxMana() => Mathf.Max(0, character.mana + GearStat("Mana"));
+        private int MaxMana() => Mathf.Max(0, character.mana + ManaPerGrimoireLevel * SkillLevel(SkillElementalGrim) + GearStat("Mana"));
+
+        // Reconstructed: the pool grows with Elemental grimoire, or its dearest spells (Fire wall 185, Flame barrier
+        // 120) could never be cast on the starting 100. The original server's rule is lost.
+        private const int ManaPerGrimoireLevel = 5, SkillElementalGrim = 20;
 
         // Mana regained per regeneration tick: 2, plus Manaregen rolled on equipped items.
         private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen"));
