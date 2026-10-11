@@ -85,6 +85,7 @@ namespace GSOOffline
         {
             HealthStatsChanged();
             ManaStatsChanged();
+            SendGearStats();
             SendWeaponAbilities();
         }
     }

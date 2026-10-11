@@ -41,6 +41,7 @@ namespace GSOOffline
             {
                 case "DamagePoison": return "DmgPoison";
                 case "ResistancePoison": return "ResPoison";
+                case "Damageblock": return "Damageblock";   // not a damage kind ("blockDamage" until 1.3.1)
             }
             if (xmlStat.StartsWith("Damage") && xmlStat.Length > "Damage".Length)
                 return xmlStat.Substring("Damage".Length) + "Damage";
