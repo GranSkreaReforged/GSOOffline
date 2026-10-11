@@ -223,6 +223,37 @@ namespace GSOOffline
             OfflineServer.Instance.UseDoor(doors[int.Parse(args[1])]);
         }
 
+        // building <n>: goes through doors.json building entrance n (arrival search included), recording the way back
+        // as a click would. "building" alone lists them.
+        private static void Building(string[] args)
+        {
+            var list = OfflineServer.Instance.BuildingList;
+            if (args.Length < 2)
+            {
+                for (int i = 0; i < list.Count; i++)
+                    Plugin.Log.LogInfo($"[dev] building {i}: scene {list[i].scene} -> {list[i].toScene} ({list[i].note})");
+                return;
+            }
+            OfflineServer.Instance.DevEnterBuilding(list[int.Parse(args[1])]);
+        }
+
+        // doorsigns: every shop sign (Prefab_Object_Sign_*) in the scene with the three nearest doors and gates, to tell
+        // which building a door belongs to.
+        private static void DoorSigns(string[] args)
+        {
+            foreach (var t in UnityEngine.Resources.FindObjectsOfTypeAll<UnityEngine.Transform>())
+            {
+                if (!t.name.StartsWith("Prefab_Object_Sign_") || !t.gameObject.scene.IsValid()) continue;   // culled signs are inactive
+                var near = new System.Collections.Generic.List<Scr_Interactable>(UnityEngine.Resources.FindObjectsOfTypeAll<Scr_Interactable>());
+                near.RemoveAll(i => !i.gameObject.scene.IsValid() || (i.typeId != 37 && i.typeId != 29));
+                near.Sort((a, b) => UnityEngine.Vector3.Distance(a.transform.position, t.position).CompareTo(UnityEngine.Vector3.Distance(b.transform.position, t.position)));
+                var parts = new System.Collections.Generic.List<string>();
+                for (int i = 0; i < near.Count && i < 3; i++)
+                    parts.Add($"{near[i].typeId} '{near[i].name}' {near[i].transform.position} {UnityEngine.Vector3.Distance(near[i].transform.position, t.position):F1} m");
+                Plugin.Log.LogInfo($"[dev] sign '{t.name.Substring("Prefab_Object_Sign_".Length)}' at {t.position}: {string.Join("; ", parts.ToArray())}");
+            }
+        }
+
         // probe x y z: every collider on a vertical line through the point (60 m up and down) and within 4 m of it.
         private static void Probe(string[] args)
         {
