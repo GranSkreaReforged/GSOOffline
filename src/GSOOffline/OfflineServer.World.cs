@@ -39,6 +39,7 @@ namespace GSOOffline
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
             pendingCrossing = null;
+            ResetOysters();
             lastNpcList = lastHarvestableList = null;
             job = null;
             ResetCombat();
@@ -231,6 +232,7 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleTravelInteract(typeId)) return;
+            HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
             OnObjectClicked(typeId);
             if (typeId == InteractWayshrine)
             {

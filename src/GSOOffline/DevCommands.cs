@@ -29,7 +29,12 @@ namespace GSOOffline
                 var go = UnityEngine.Resources.Load("1LoadingAssets/PlayerShips/ab_PlayerShip_" + i, typeof(UnityEngine.GameObject)) as UnityEngine.GameObject;
                 var ship = go != null ? go.GetComponent<Scr_PlayerShip>() : null;
                 if (ship != null)
-                    Plugin.Log.LogInfo($"[dev] ship {i}: '{ship.boatName}' seats={ship.positions?.Length} speed={ship.movementSpeed} turn={ship.rotationSpeed} crane={go.GetComponent<Scr_FishingBoatCrane>() != null}");
+                {
+                    var inter = new System.Collections.Generic.List<string>();
+                    foreach (var it in go.GetComponentsInChildren<Scr_Interactable>(true)) inter.Add(it.typeId + " '" + it.interactableName + "' at " + it.transform.localPosition);
+                    var crane = go.GetComponent<Scr_FishingBoatCrane>();
+                    Plugin.Log.LogInfo($"[dev] ship {i}: '{ship.boatName}' seats={ship.positions?.Length} speed={ship.movementSpeed} turn={ship.rotationSpeed} crane={(crane != null && crane.cranePosition != null ? crane.cranePosition.localPosition.ToString() : "none")} interactables [{string.Join("; ", inter.ToArray())}]");
+                }
                 else if (go != null)
                     Plugin.Log.LogInfo($"[dev] ship {i}: prefab without Scr_PlayerShip");
             }
@@ -64,6 +69,84 @@ namespace GSOOffline
             Plugin.Log.LogInfo(ship != null
                 ? $"[dev] sailed {UnityEngine.Vector3.Distance(start, ship.transform.position):F1} m to {ship.transform.position}"
                 : "[dev] sail: the boat is gone");
+        }
+
+        // spawnprefabs [max]: which 1LoadingAssets/SpawnedObjects/ab_spawnedObject_<n> prefabs exist, with their
+        // components and the interactables inside them.
+        private static void SpawnPrefabs(string[] args)
+        {
+            int max = args.Length > 1 ? int.Parse(args[1]) : 200;
+            for (int i = 0; i <= max; i++)
+            {
+                var go = UnityEngine.Resources.Load("1LoadingAssets/SpawnedObjects/ab_spawnedObject_" + i, typeof(UnityEngine.GameObject)) as UnityEngine.GameObject;
+                if (go == null) continue;
+                var comps = new System.Collections.Generic.List<string>();
+                foreach (var c in go.GetComponentsInChildren<UnityEngine.Component>(true))
+                    if (c != null && !(c is UnityEngine.Transform) && !comps.Contains(c.GetType().Name)) comps.Add(c.GetType().Name);
+                var inter = new System.Collections.Generic.List<string>();
+                foreach (var it in go.GetComponentsInChildren<Scr_Interactable>(true)) inter.Add(it.typeId + " '" + it.interactableName + "'");
+                var so = go.GetComponentInChildren<Scr_SpawnedObject>(true);
+                var size = UnityEngine.Vector3.zero;
+                foreach (var mf in go.GetComponentsInChildren<UnityEngine.MeshFilter>(true))
+                    if (mf.sharedMesh != null) size = UnityEngine.Vector3.Max(size, UnityEngine.Vector3.Scale(mf.sharedMesh.bounds.size, mf.transform.lossyScale));
+                foreach (var sm in go.GetComponentsInChildren<UnityEngine.SkinnedMeshRenderer>(true))
+                    if (sm.sharedMesh != null) size = UnityEngine.Vector3.Max(size, UnityEngine.Vector3.Scale(sm.sharedMesh.bounds.size, sm.transform.lossyScale));
+                if (args.Length > 2 && size.magnitude < 0.01f) continue;
+                Plugin.Log.LogInfo($"[dev] spawned {i} '{go.name}' size {size}: interactables [{string.Join(", ", inter.ToArray())}] {(so != null ? $"speed={so.movementSpeed} rotSpeed={so.rotationSpeed} slerp={so.slerpPos} " : "")}components: {string.Join(", ", comps.ToArray())}");
+            }
+            Plugin.Log.LogInfo("[dev] spawnprefabs done");
+        }
+
+        // profile x1 z1 x2 z2 [step]: the highest solid surface along a line (water is y 3.15; - = nothing solid).
+        private static void Profile(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var a = new UnityEngine.Vector3(float.Parse(args[1], inv), 0f, float.Parse(args[2], inv));
+            var b = new UnityEngine.Vector3(float.Parse(args[3], inv), 0f, float.Parse(args[4], inv));
+            float step = args.Length > 5 ? float.Parse(args[5], inv) : 2f;
+            var sb = new System.Text.StringBuilder();
+            float len = UnityEngine.Vector3.Distance(a, b);
+            for (float d = 0f; d <= len; d += step)
+            {
+                var c = UnityEngine.Vector3.Lerp(a, b, d / len);
+                float top = FerryRoutePlanner.SolidTop(c);
+                sb.Append($"{c.x:F0},{c.z:F0}={(top < -1000f ? "-" : top.ToString("F1", inv))} ");
+            }
+            Plugin.Log.LogInfo("[dev] profile " + sb);
+        }
+
+        // oysters: the harbour oysters in Bal Sardan, where they are and whether they're stunned.
+        private static void Oysters(string[] args) => OfflineServer.Instance.LogOysters();
+
+        // netoyster [stun] [offset]: drop the vessel's net on the first oyster (needs the fishing vessel boarded).
+        private static void NetOyster(string[] args) => OfflineServer.Instance.DevNetOyster(
+            args.Length > 1 && args[1] == "stun", args.Length > 2 ? float.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 0f);
+
+        // spawnobj <type> [dx dz] / despawnobj <uid>: show a spawned-object prefab next to the player (client only).
+        private static int devObjectUid = 900000;
+        private static void SpawnObj(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            var pl = Scr_PlayerHandler.instance.player.transform;
+            if (args.Length > 2 && args[2] == "f") p += pl.forward * float.Parse(args[3], inv) + UnityEngine.Vector3.up * (args.Length > 4 ? float.Parse(args[4], inv) : 0f);   // f <metres ahead> [up]
+            else if (args.Length > 3) p += new UnityEngine.Vector3(float.Parse(args[2], inv), 0f, float.Parse(args[3], inv));
+            int uid = ++devObjectUid;
+            Scr_SpawnedObjectHandler.instance.UpdateVisibleObjects(uid + "_" + args[1] + "_" + SceneWorld.Vec(p) + "_0");
+            Plugin.Log.LogInfo($"[dev] spawned object {uid} (type {args[1]}) at {SceneWorld.Vec(p)}");
+        }
+
+        private static void DespawnObj(string[] args) => Scr_SpawnedObjectHandler.instance.RemoveSpawnedObject(int.Parse(args[1]));
+
+        // interactablesnear [radius]: every scene interactable within radius of the player (default 150 m), active or not.
+        private static void InteractablesNear(string[] args)
+        {
+            float r = args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 150f;
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            foreach (var i in UnityEngine.Resources.FindObjectsOfTypeAll<Scr_Interactable>())
+                if (i.gameObject.scene.IsValid() && UnityEngine.Vector3.Distance(i.transform.position, p) <= r)
+                    Plugin.Log.LogInfo($"[dev] interactable {i.typeId} '{i.interactableName}' ({i.name}) at {i.transform.position} active={i.gameObject.activeInHierarchy}");
+            Plugin.Log.LogInfo("[dev] interactablesnear done");
         }
 
         // interactables <typeId>: positions of the scene's client-side interactables of one type.
