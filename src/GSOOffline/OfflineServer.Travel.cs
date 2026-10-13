@@ -97,16 +97,26 @@ namespace GSOOffline
             Vector3 p = player.transform.position;
             if (typeId == DoorGeneric && HandleBuildingDoor(p)) return true;
 
-            DoorDef door = null;
+            // Generic doors (gates, hatches, ladders) are everywhere, so match the one clicked, not any within reach.
+            Vector3 from = p;
             float best = 15f;
+            if (typeId == DoorGeneric)
+            {
+                var clicked = NearestInteractable(typeId);
+                if (clicked != null) from = clicked.transform.position;
+                best = 3f;
+            }
+            DoorDef door = null;
             foreach (var d in Doors.doors)
             {
                 if (d.type != typeId || d.scene != character.scene) continue;
-                float dist = Vector3.Distance(V(d.pos), p);
+                float dist = Vector3.Distance(V(d.pos), from);
                 if (dist < best) { best = dist; door = d; }
             }
             if (door != null)
             {
+                // An inn's room is left by its exit door (type 28), which goes back where the player came in.
+                if (door.type == DoorInterior) PushReturnPoint(p);
                 UseDoor(door);
                 return true;
             }
@@ -169,7 +179,10 @@ namespace GSOOffline
 
             if (!Doors.buildings.Exists(b => b.toScene == character.scene)) return false;
             var rp = character.returnPoints;
-            if (rp.Count > 0 && Doors.buildings.Exists(b => b.toScene == character.scene && b.scene == rp[rp.Count - 1].scene))
+            // Back where the player came in, if that was a door into this scene (a building's, or an inn's).
+            int from = rp.Count > 0 ? rp[rp.Count - 1].scene : -1;
+            if (Doors.buildings.Exists(b => b.toScene == character.scene && b.scene == from) ||
+                Doors.doors.Exists(d => d.type == DoorInterior && d.toScene == character.scene && d.scene == from))
             {
                 ReturnToPreviousPoint();
                 return true;
