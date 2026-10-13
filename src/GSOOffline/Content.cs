@@ -63,6 +63,16 @@ namespace GSOOffline
         public List<string> spawn = new List<string>();   // spawn: positions "x,y,z"
     }
 
+    /// <summary>
+    /// When a quest object is shown. Quest objects (Scr_QuestObject: the cook book, Nort's body...) start hidden in
+    /// the client; the server listed the ids each player should see. Same conditions as an NPC rule.
+    /// </summary>
+    [Serializable]
+    public class QuestObjectRule : NpcRule
+    {
+        public int id;
+    }
+
     [Serializable]
     public class ActionDef
     {
@@ -122,6 +132,7 @@ namespace GSOOffline
         public List<ActionDef> actions = new List<ActionDef>();
         public List<TriggerDef> triggers = new List<TriggerDef>();
         public List<NpcRule> npcs = new List<NpcRule>();
+        public List<QuestObjectRule> questObjects = new List<QuestObjectRule>();
     }
 
     /// <summary>
@@ -133,6 +144,7 @@ namespace GSOOffline
         public static readonly Dictionary<int, ActionDef> Actions = new Dictionary<int, ActionDef>();
         public static readonly List<TriggerDef> Triggers = new List<TriggerDef>();
         public static readonly Dictionary<int, List<NpcRule>> NpcRules = new Dictionary<int, List<NpcRule>>();
+        public static readonly List<QuestObjectRule> QuestObjects = new List<QuestObjectRule>();
 
         public static int[] ParseInts(string s)
         {
@@ -169,7 +181,7 @@ namespace GSOOffline
                 return;
             }
 
-            Plugin.Log.LogInfo($"content.json: {file.entries?.Count ?? -1} entries, {file.actions?.Count ?? -1} actions, {file.triggers?.Count ?? -1} triggers, {file.npcs?.Count ?? -1} NPC rules");
+            Plugin.Log.LogInfo($"content.json: {file.entries?.Count ?? -1} entries, {file.actions?.Count ?? -1} actions, {file.triggers?.Count ?? -1} triggers, {file.npcs?.Count ?? -1} NPC rules, {file.questObjects?.Count ?? -1} quest objects");
             if (file.entries == null) return;
             foreach (var d in file.entries)
             {
@@ -203,6 +215,8 @@ namespace GSOOffline
                     if (!NpcRules.TryGetValue(n.type, out var list)) NpcRules[n.type] = list = new List<NpcRule>();
                     list.Add(n);
                 }
+            if (file.questObjects != null)
+                QuestObjects.AddRange(file.questObjects);
         }
     }
 }
