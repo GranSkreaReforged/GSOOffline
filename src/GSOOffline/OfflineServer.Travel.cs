@@ -179,7 +179,10 @@ namespace GSOOffline
 
             if (!Doors.buildings.Exists(b => b.toScene == character.scene)) return false;
             var rp = character.returnPoints;
-            if (rp.Count > 0 && Doors.buildings.Exists(b => b.toScene == character.scene && b.scene == rp[rp.Count - 1].scene))
+            // Back where the player came in, if that was a door into this scene (a building's, or an inn's).
+            int from = rp.Count > 0 ? rp[rp.Count - 1].scene : -1;
+            if (Doors.buildings.Exists(b => b.toScene == character.scene && b.scene == from) ||
+                Doors.doors.Exists(d => d.type == DoorInterior && d.toScene == character.scene && d.scene == from))
             {
                 ReturnToPreviousPoint();
                 return true;

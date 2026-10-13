@@ -561,6 +561,38 @@
    "note": "lighthouse inn"
   },
   {
+   "type": 29,
+   "scene": 1,
+   "pos": [
+    1023.58,
+    7.9,
+    1441.86
+   ],
+   "toScene": 20,
+   "toPos": [
+    258.71,
+    100.67,
+    293.99
+   ],
+   "note": "harbour inn"
+  },
+  {
+   "type": 29,
+   "scene": 8,
+   "pos": [
+    1023.58,
+    7.9,
+    1441.86
+   ],
+   "toScene": 20,
+   "toPos": [
+    258.71,
+    100.67,
+    293.99
+   ],
+   "note": "harbour inn"
+  },
+  {
    "type": 43,
    "scene": 20,
    "pos": [
