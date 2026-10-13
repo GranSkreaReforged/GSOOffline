@@ -63,8 +63,10 @@ namespace GSOOffline
             foreach (var d in Resources.FindObjectsOfTypeAll<Scr_NPCDummy>())
             {
                 if (!InScene(d, unitySceneName)) continue;
-                int hp = GameData.Npcs.TryGetValue(d.typeId, out var info) ? info.health : 30;
                 Vector3 p = d.transform.position;
+                // A few markers were placed twice (Grimwall's banker and insurance advisor, a Goldon skeleton).
+                if (w.npcs.Exists(n => n.typeId == d.typeId && (n.spawnPos - p).sqrMagnitude < 1f)) continue;
+                int hp = GameData.Npcs.TryGetValue(d.typeId, out var info) ? info.health : 30;
                 w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = d.typeId, spawnPos = p, pos = p, health = hp, maxHealth = hp });
             }
             // Quest NPCs the scene has no marker for (content.json "spawn").
