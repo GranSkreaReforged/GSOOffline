@@ -520,7 +520,8 @@ namespace GSOOffline
             {
                 Aggro(t);
                 var target = t;
-                int hit = RollPlayerHit(weapon, t, power) + burst / 2;
+                int hit = RollPlayerHit(weapon, t, power, a);
+                if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
                 if (execution && t.health * 4 <= t.maxHealth) hit *= 2;   // double damage on a badly hurt target
                 // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
                 int upFront = rule.dot > 0f ? hit / 2 : hit;

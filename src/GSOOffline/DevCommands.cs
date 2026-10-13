@@ -338,6 +338,10 @@ namespace GSOOffline
         }
 
         // playerstate: the client's attack state for the local player (stuck-in-combat checks).
+        // hitcheck <npc type> [ability id]: how much of your hit gets through that NPC's resistances.
+        private static void HitCheck(string[] args) =>
+            OfflineServer.Instance.DevHitCheck(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 0);
+
         // clientstats: base + bonus of the client's combat stats, as its stats window shows them.
         private static void ClientStats(string[] args)
         {

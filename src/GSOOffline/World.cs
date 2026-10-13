@@ -22,6 +22,7 @@ namespace GSOOffline
         public bool hasDest;    // walking to dest in ground-following steps
         public Vector3 dest;
         public int detourSide;  // which way it last stepped around an obstacle (1 / -1)
+        public int hitSplash;   // style of the next hit splash on it (immune, weakness), set when the hit is rolled
 
         // ability effects
         public float stunnedUntil, rootedUntil;

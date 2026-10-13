@@ -31,7 +31,9 @@ namespace GSOOffline
         public int damage;             // explicit damage (rare); 0 = derive from level
         public int defence;
         public int damageBlock;
-        public int damageType;
+        public int damageType;         // DamageKinds index of its blows (9 slash, 10 blunt, 11 piercing...)
+        public int accuracy;           // 1-100: how often its blows land
+        public int[] resistance;       // percent per DamageKinds index; negative = weakness, 100+ = immune
         public bool wandering;
         public float wanderFrequency;  // seconds between strolls
         public float wanderDistance;
@@ -160,6 +162,8 @@ namespace GSOOffline
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),
+                    accuracy = IntAttr(n, "accuracy", 50),
+                    resistance = DamageKinds.ReadResistances(n),
                     wandering = IntAttr(n, "wandering") == 1,
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
