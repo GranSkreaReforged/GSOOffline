@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- "A Cook Book" can be finished: the large cook book now sits on the monastery kitchen shelf while the guard's errand is open, and disappears once you take it. The game hides such quest objects until the server lists them, which never happened. Nort's body now lies in the monastery yard during "A Deadly Investigation", and Kombra's book is in Yorkhill library during "Growing Pains".
 - Doors, gates, hatches and ladders that said "The door is locked." now take you through, both ways: the poacher dungeon (East Athagos), the Yorkhill sewers (the hatch in Yorkhill and the ladder below), the Bir Amez crypts (Bal Sardan), the Bal Sardan town gate, and Yorkhill's city gates. The old server knew where they led; that table is lost, so these were rebuilt from where players stood to use them.
 - The lighthouse inn's door opens the Innkeeper's room, and Yorkhill's harbour inn opens the Tavern keeper's. Both used to drop you in the wrong room (Yorkhill's opened Kombra's house). Leaving takes you back out where you came in.
 - Deepheart's doors stay locked on purpose: the area was never finished (its towers have no roof to stand on and its cave is empty).

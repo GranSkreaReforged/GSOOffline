@@ -33,6 +33,21 @@ namespace GSOOffline
             return r.Holds(character, GetQuestVar);
         }
 
+        /// <summary>
+        /// Shows the quest objects whose content.json rule holds and hides the rest (event 2/16 lists the ids to
+        /// show). The client ignores an empty list, so "0" (no object has it) hides them all.
+        /// </summary>
+        private void SendQuestObjects()
+        {
+            var ids = new List<string>();
+            foreach (var r in Content.QuestObjects)
+                if (RuleHolds(r) && !ids.Contains(r.id.ToString())) ids.Add(r.id.ToString());
+            string list = ids.Count > 0 ? string.Join(",", ids.ToArray()) : "0";
+            if (list == lastQuestObjects) return;
+            lastQuestObjects = list;
+            Send(2, 16, character.name, list);
+        }
+
         /// <summary>Quest NPCs with no marker in the scene, created where content.json says.</summary>
         internal static IEnumerable<KeyValuePair<int, Vector3>> SpawnsFor(int sceneId)
         {

@@ -149,6 +149,19 @@ namespace GSOOffline
             Plugin.Log.LogInfo("[dev] interactablesnear done");
         }
 
+        // questobjects: the scene's quest objects (hidden until the server lists their id in event 2/16), with the
+        // interactable on each, active or not.
+        private static void QuestObjects(string[] args)
+        {
+            foreach (var q in UnityEngine.Resources.FindObjectsOfTypeAll<Scr_QuestObject>())
+            {
+                if (!q.gameObject.scene.IsValid()) continue;
+                var i = q.GetComponentInChildren<Scr_Interactable>(true);
+                Plugin.Log.LogInfo($"[dev] questobject {q.id} '{q.name}' at {q.transform.position} active={q.gameObject.activeSelf} interactable={(i != null ? i.typeId + " '" + i.interactableName + "'" : "-")} scene={q.gameObject.scene.name}");
+            }
+            Plugin.Log.LogInfo("[dev] questobjects done");
+        }
+
         // interactables <typeId>: positions of the scene's client-side interactables of one type.
         private static void Interactables(string[] args)
         {

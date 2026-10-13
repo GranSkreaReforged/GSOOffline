@@ -277,5 +277,11 @@
     { "type": 229, "scene": 32, "spawn": [ "-103.0,200.5,-230.8" ] },
     { "type": 294, "note": "world boss: George, Storage Guard of the poacher dungeon", "scene": 38, "spawn": [ "-328.2,56.8,67.2" ] },
     { "type": 292, "note": "world boss: Sepitus, the Dark Tamer", "scene": 38, "spawn": [ "916.6,25.7,-643.1" ] }
+  ],
+
+  "questObjects": [
+    { "id": 1,  "note": "Q5: Nort's body by the monastery well, from when he's found until the culprit is confronted", "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "id": 10, "note": "Q26: Kombra's book in Yorkhill library (Flora of Keshk)", "quest": 26, "phases": [ 7 ] },
+    { "id": 12, "note": "Q31: the cook book on the monastery kitchen shelf", "quest": 31, "phases": [ 1 ] }
   ]
 }

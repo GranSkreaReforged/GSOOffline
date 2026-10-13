@@ -10,7 +10,7 @@ namespace GSOOffline
         private SceneWorld world;
         private bool sceneReady;
         private Vector3? pendingSpawn;
-        private string lastNpcList, lastHarvestableList;
+        private string lastNpcList, lastHarvestableList, lastQuestObjects;
         private float visibilityTimer, autosaveTimer;
 
         private void RegisterWorldHandlers()
@@ -39,7 +39,7 @@ namespace GSOOffline
             pendingSpawnNeedsClearing = false;
             pendingCrossing = null;
             ResetOysters();
-            lastNpcList = lastHarvestableList = null;
+            lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
             StandUp();
@@ -192,6 +192,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
 
+            SendQuestObjects();
             string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
             if (npcs != lastNpcList)
             {
