@@ -27,7 +27,6 @@ namespace GSOOffline
             Ignore(3, 47);
             Ignore(6, 27);
             Ignore(27, 0);
-            Ignore(23, 1);
             Ignore(198, 2, 3);
         }
 

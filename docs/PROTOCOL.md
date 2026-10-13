@@ -50,7 +50,7 @@ Types must match exactly, because the receiver casts with `(int)`, `(string)`, `
 
 Payloads are listed after the sub-opcode. "name" means the player name.
 
-- **Movement:** 17/1 sync (name, rot, scene, Vector3); 198/1 jump; 23/1 click-to-move target.
+- **Movement:** 17/1 sync (name, rot, scene, Vector3); 198/1 jump; 23/1 click-target position (name, Vector3): the ground spot for the click-target ability (Fire wall, Blast, Landmine) the client sends next (3/0).
 - **Chat:** 2/5 (name, msg). Messages starting with `/` are server commands.
 - **Interact:** 3/11 object (name, interactable typeId) → reply 3/12 confirm; 3/8 NPC (name, uid); 3/9 dialogue option (name, optionId).
 - **Targeting and combat:** 3/7 select NPC; 3/0 use ability (name, slot); 6/25 cancel attack; 8/7 set ability slot.

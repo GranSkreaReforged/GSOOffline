@@ -16,7 +16,14 @@ namespace GSOOffline
         public static float BlockReduction(int block, int attackerLevel) =>
             block <= 0 ? 0f : block / (block + 10f * Mathf.Max(1, attackerLevel));
         public static int PlayerMaxHit(int weaponDamage, int skillLevel) => 4 + weaponDamage + skillLevel;
-        public static float HitChance = 0.85f;
+        public static float HitChance = 0.85f;   // the player's blows
+        // An NPC's blows land by its accuracy (1-100): 70% at 1, 82% at 50, 95% at 100 (it was 85% for all).
+        public static float NpcHitChance(int accuracy) => 0.7f + 0.25f * Mathf.Clamp(accuracy, 0, 100) / 100f;
+        // Your gear's resistance to a blow's kind, in percent (a full set of one level gives about 40-60), up to 75%.
+        public static float PlayerResistance(int percent) => Mathf.Clamp(percent, -100, 75) / 100f;
+        // Block also takes a flat bite out of every blow, so well-armoured players shrug off weak creatures (a crab's
+        // few points against ~200 block at level 40) while creatures of their own level still hurt.
+        public static float FlatBlock(int block) => Mathf.Max(0, block) / 20f;
         public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
         // Armor skills share a kill's XP if the player was hit this recently before it (community wiki: 30 s).
@@ -370,14 +377,83 @@ namespace GSOOffline
             return sum;
         }
 
-        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f)
+        // Hit splash styles (Scr_EffectController.createHitSplash): 0 plain, 1 blocked, 3 weakened, 4 poisoned.
+        private const int SplashPlain = 0, SplashBlocked = 1, SplashWeakened = 3, SplashPoisoned = 4;
+        private const int AggressiveSnowball = 152;   // the only thing that hurts Snowmen and the winter bosses
+
+        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f, AbilityInfo ability = null)
         {
+            npc.hitSplash = SplashPlain;
             if (Random.value >= CombatRules.HitChance) return 0;
-            int max = CombatRules.PlayerMaxHit(GearDamage(),SkillLevel(WeaponSkill(weapon)));
-            int damage = Mathf.RoundToInt(Random.Range(1, max + 1) * power * DamageDealtMultiplier());
-            if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
-                damage = Mathf.Max(1, damage - info.damageBlock / 10);
-            return damage;
+            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
+            float damage = Random.Range(1, max + 1) * power * DamageDealtMultiplier();
+            if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) return Mathf.RoundToInt(damage);
+            if (ability == null || ability.id != AggressiveSnowball)
+            {
+                float through = HitThrough(weapon, info, ability, max);
+                if (through <= 0f)
+                {
+                    npc.hitSplash = SplashBlocked;   // immune: Snowmen to all but snowballs, Golems to poison...
+                    return 0;
+                }
+                if (through > 1.01f) npc.hitSplash = SplashWeakened;   // hit a weakness
+                damage *= through;
+            }
+            return Mathf.Max(1, Mathf.RoundToInt(damage) - info.damageBlock / 10);
+        }
+
+        /// <summary>
+        /// The share of a hit that gets through an NPC's resistances. A hit is the sum of its kinds: each damage stat
+        /// on your gear is its own kind (a staff's FireDamage, a ring's IceDamage), and the rest (the base, plain
+        /// Damage and your skill level) is the ability's element, or your weapon's main kind for plain blows.
+        /// </summary>
+        private float HitThrough(ItemSave weapon, NpcInfo info, AbilityInfo ability, int max)
+        {
+            int element = ability != null ? DamageKinds.OfAbility(ability.name) : DamageKinds.None;
+            int main = element != DamageKinds.None ? element : WeaponKind(weapon);
+            float through = 0f;
+            int typed = 0;
+            for (int k = 1; k < DamageKinds.Count; k++)
+            {
+                int part = GearStat(DamageKinds.DamageStat(k));
+                if (part <= 0) continue;
+                typed += part;
+                through += part * DamageKinds.Through(info.resistance[k]);
+            }
+            int rest = Mathf.Max(0, max - typed);
+            through += rest * DamageKinds.Through(info.resistance[main]);
+            return max > 0 ? through / max : 1f;
+        }
+
+        /// <summary>Dev: what share of your hit (plain, or with an ability) gets through an NPC (bridge command hitcheck).</summary>
+        internal void DevHitCheck(int typeId, int abilityId)
+        {
+            if (character == null || !GameData.Npcs.TryGetValue(typeId, out var info)) return;
+            var weapon = EquippedWeapon();
+            SkillData.Abilities.TryGetValue(abilityId, out var ability);
+            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
+            var res = new List<string>();
+            for (int k = 1; k < DamageKinds.Count; k++)
+                if (info.resistance[k] != 0) res.Add(DamageKinds.Name(k) + " " + info.resistance[k]);
+            string through = ability != null && ability.id == AggressiveSnowball ? "100% (snowball)" : (HitThrough(weapon, info, ability, max) * 100f).ToString("F0") + "%";
+            Plugin.Log.LogInfo($"[dev] hit on {info.name} ({typeId}) with {(ability != null ? ability.name + " (" + DamageKinds.Name(DamageKinds.OfAbility(ability.name)) + ")" : "plain blows")}, " +
+                $"weapon kind {DamageKinds.Name(WeaponKind(weapon))}, max hit {max}: {through} gets through; resistances [{string.Join(", ", res.ToArray())}]; " +
+                $"its blows: {DamageKinds.Name(info.damageType)}, land {CombatRules.NpcHitChance(info.accuracy) * 100f:F0}%");
+        }
+
+        /// <summary>The kind of the weapon's blows: its largest damage stat; slash for a sword, blunt for fists.</summary>
+        private static int WeaponKind(ItemSave weapon)
+        {
+            int best = DamageKinds.Blunt, bestValue = 0;
+            if (weapon == null) return best;
+            for (int k = 1; k < DamageKinds.Count; k++)
+                foreach (var s in weapon.stats)
+                    if (s.key == DamageKinds.DamageStat(k) && s.value > bestValue)
+                    {
+                        best = k;
+                        bestValue = s.value;
+                    }
+            return best;
         }
 
         private void DealDamage(NpcEntity npc, int damage, int skill)
@@ -386,7 +462,8 @@ namespace GSOOffline
                 NpcSound(npc, hurt.sfxTakeHit);
             ProfileEvent("hit");
             npc.health = Mathf.Max(0, npc.health - damage);
-            Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
+            Send(12, 0, npc.uid, npc.health, npc.maxHealth, npc.hitSplash);
+            npc.hitSplash = SplashPlain;
             if (npc.health <= 0) KillNpc(npc, skill);
         }
 
@@ -768,7 +845,7 @@ namespace GSOOffline
             // Stepping out of reach during the wind-up dodges the blow.
             if (Vector3.Distance(NpcPosition(npc), player.transform.position) > info.attackDistance + info.attackMissDistance)
             {
-                Send(8, 2, character.name, 0, info.damageType);
+                Send(8, 2, character.name, 0, PlayerSplash(info));
                 return;
             }
             NpcHitsPlayer(info, npc);
@@ -777,18 +854,27 @@ namespace GSOOffline
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)
         {
             int damage = 0;
-            if (Random.value < CombatRules.HitChance)
+            if (Random.value < CombatRules.NpcHitChance(info.accuracy))
             {
-                int roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1);
-                damage = Mathf.RoundToInt(roll * (1f - CombatRules.BlockReduction(GearStat("Damageblock"), info.level)));
+                // Your resistance to the blow's kind, then your damage block against every blow, whatever its kind.
+                float roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1);
+                if (info.damageType > 0 && info.damageType < DamageKinds.Count)
+                    roll *= 1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(info.damageType)));
+                int block = GearStat("Damageblock");
+                roll *= 1f - CombatRules.BlockReduction(block, info.level);
+                damage = Mathf.Max(0, Mathf.RoundToInt(roll - CombatRules.FlatBlock(block)));
                 lastHitTaken = Time.time;
                 damage = ApplyDefensiveBuffs(damage, attacker);
             }
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
-            Send(8, 2, character.name, -damage, info.damageType);
+            Send(8, 2, character.name, -damage, PlayerSplash(info));
             SendHealth();
             if (character.currentHealth <= 0) PlayerDies();
         }
+
+        // The splash style for a blow on you. damagetype used to go straight through, but splash styles aren't damage
+        // kinds: spiders' poison (1) showed as "blocked", hounds' fire (3) as "weakened", Ents' earth (4) as "poisoned".
+        private static int PlayerSplash(NpcInfo info) => info.damageType == DamageKinds.Poison ? SplashPoisoned : SplashPlain;
 
         private void RespawnNpc(NpcEntity npc)
         {
@@ -839,6 +925,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
             TickPlayerRespawn();
+            if (world == null || !sceneReady) return;   // respawned into another zone: this world is gone
             TickBuffs();
             TickNpcEffects();
             TickCastEnd();
