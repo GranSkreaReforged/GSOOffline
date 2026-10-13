@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Eight bosses the game has no spawn point for are back in the world: Nirish, King of the Sewers (Yorkhill sewers), Sarah, Camp Overseer (the poacher camp in East Athagos), the Supreme Sea Serpent (the Blue Sea), the three Tomb guardians in Lakhmu's basement, and George, Storage Guard, and Sepitus, the Dark Tamer (the poacher dungeon). The old server placed them, so they never appeared. Their positions come from players' memory and may be a little off.
 - "An Honest Day's Work" can be finished again: the large aggressive crab Nort asks you to slay at the fishing pier (step 4) now appears on the beach beside him. The game has no spawn point for it (the old server placed it), so nothing ever appeared and the quest was stuck.
 - Crabs and other creatures no longer walk through rocks. They walk around rocks, walls and trees, and only wander to spots they can reach. A rock taller than a creature's step used to fool the server's ground check, so creatures walked straight through it (on the monastery beach, about one crab in ten stood inside a rock at any moment). Creatures chasing you still reach you.
 - Creatures respawn after 2 minutes, as the community wiki records, instead of 1. Bosses and quest creatures use the respawn times the game data gives them, which are in minutes, not seconds: Aellope comes back after an hour (the wiki agrees), Phraustie after five, Gery's ambush after one. They used to return within seconds to a few minutes.
