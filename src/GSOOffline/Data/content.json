@@ -267,6 +267,15 @@
     { "type": 175, "note": "Wallace answers when called", "quest": 18, "phases": [ 3 ] },
 
     { "type": 291, "note": "giant rats in the governor's cellar during the quest", "quest": 27, "phases": [ 1 ] },
-    { "type": 283, "note": "the boss rat", "quest": 27, "phases": [ 1 ], "scene": 20, "spawn": [ "1100.0,119.7,766.0" ] }
+    { "type": 283, "note": "the boss rat", "quest": 27, "phases": [ 1 ], "scene": 20, "spawn": [ "1100.0,119.7,766.0" ] },
+
+    { "type": 275, "note": "world boss: Nirish, King of the Sewers (no marker; positions from a player's memory)", "scene": 4, "spawn": [ "145.9,58.0,392.5" ] },
+    { "type": 371, "note": "world boss: Sarah, Camp Overseer, in the poacher camp", "scene": 13, "spawn": [ "1272.5,32.5,539.3" ] },
+    { "type": 102, "note": "world boss: the Supreme Sea Serpent", "scene": 19, "spawn": [ "872.2,1.3,1011.8" ] },
+    { "type": 227, "note": "world boss: the three Tomb guardians in Lakhmu's basement", "scene": 32, "spawn": [ "-99.0,200.5,-230.8" ] },
+    { "type": 228, "scene": 32, "spawn": [ "-95.0,200.5,-230.8" ] },
+    { "type": 229, "scene": 32, "spawn": [ "-103.0,200.5,-230.8" ] },
+    { "type": 294, "note": "world boss: George, Storage Guard of the poacher dungeon", "scene": 38, "spawn": [ "-328.2,56.8,67.2" ] },
+    { "type": 292, "note": "world boss: Sepitus, the Dark Tamer", "scene": 38, "spawn": [ "916.6,25.7,-643.1" ] }
   ]
 }
