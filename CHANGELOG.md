@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Drag an item from your inventory onto the bank window to deposit it, as double-clicking does: a single item goes straight in, a stack asks how many, and holding Ctrl deposits the whole stack.
 - The mod's version is shown in small text in the top-left corner, with "NEW UPDATE AVAILABLE" in gold when a newer release is out on GitHub. The game asks GitHub once at startup; only the version number is read and nothing is downloaded. Turn either off with `Updates.ShowVersion` and `Updates.CheckForUpdates` in the config.
 
 ### Fixed
