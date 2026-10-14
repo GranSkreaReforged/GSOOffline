@@ -300,10 +300,13 @@ namespace GSOOffline
         {
             if (!sittingAt.HasValue) return;
             var player = LocalPlayer;
-            if (player == null || !sceneReady || job != null || autoAttacking
-                || Vector3.Distance(player.transform.position, sittingAt.Value) > 0.5f)
+            if (player == null || !sceneReady || job != null || autoAttacking || LeftSeat(player.transform.position - sittingAt.Value))
                 StandUp();
         }
+
+        // Walking off. Height doesn't count: after the client puts the player on a seat point, physics drops them onto
+        // some benches (Yorkhill's tavern) or briefly pops them up (Grimwall) by about 0.5 m, which stood them straight back up.
+        private static bool LeftSeat(Vector3 moved) => new Vector2(moved.x, moved.z).magnitude > 0.5f;
 
         private void StandUp()
         {

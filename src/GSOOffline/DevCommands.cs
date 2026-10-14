@@ -273,6 +273,70 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] hover {(c != null ? c.name + " at " + c.transform.position : "off")}");
         }
 
+        // chairs [n]: the nearest n seats (type 54 interactables and Scr_Chair components) with their seat offsets.
+        private static void Chairs(string[] args)
+        {
+            int n = args.Length > 1 ? int.Parse(args[1]) : 10;
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            var seen = new System.Collections.Generic.List<UnityEngine.Component>();
+            foreach (var i in Scr_Interactable.list) if (i != null && i.typeId == 54) seen.Add(i);
+            foreach (var c in UnityEngine.Object.FindObjectsOfType<Scr_Chair>()) if (c.GetComponent<Scr_Interactable>() == null) seen.Add(c);
+            seen.Sort((a, b) => UnityEngine.Vector3.Distance(a.transform.position, p).CompareTo(UnityEngine.Vector3.Distance(b.transform.position, p)));
+            Plugin.Log.LogInfo($"[dev] chairs: {seen.Count} in scene");
+            for (int k = 0; k < seen.Count && k < n; k++)
+            {
+                var c = seen[k];
+                var chair = c.GetComponent<Scr_Chair>();
+                var inter = c.GetComponent<Scr_Interactable>();
+                string seat = chair == null ? "no Scr_Chair" : chair.positionObject == null ? "no positionObject" : (chair.positionObject.position - c.transform.position).ToString();
+                Plugin.Log.LogInfo($"[dev] chair '{c.name}' root='{c.transform.root.name}' at {c.transform.position} {UnityEngine.Vector3.Distance(c.transform.position, p):F1} m interactable={(inter != null ? inter.typeId.ToString() : "none")} seat {seat} childChairs={c.GetComponentsInChildren<Scr_Chair>().Length}");
+            }
+        }
+
+        // sitall [from]: sits on every seat in the scene in turn, as a click does, and logs whether the sit held.
+        private static void SitAll(string[] args) =>
+            OfflineServer.Instance.StartCoroutine(SitAllRoutine(args.Length > 1 ? int.Parse(args[1]) : 0));
+
+        private static System.Collections.IEnumerator SitAllRoutine(int from)
+        {
+            var seats = new System.Collections.Generic.List<Scr_Interactable>();
+            foreach (var i in Scr_Interactable.list) if (i != null && i.typeId == 54) seats.Add(i);
+            seats.Sort((a, b) => a.transform.position.x != b.transform.position.x ? a.transform.position.x.CompareTo(b.transform.position.x) : a.transform.position.z.CompareTo(b.transform.position.z));
+            var player = Scr_PlayerHandler.instance.player;
+            var server = HarmonyLib.Traverse.Create(OfflineServer.Instance).Field("sittingAt");
+            int bad = 0;
+            for (int k = from; k < seats.Count; k++)
+            {
+                var s = seats[k];
+                var chair = s.GetComponent<Scr_Chair>();
+                if (chair == null || chair.positionObject == null) { Plugin.Log.LogWarning($"[dev] sit {k} '{s.transform.root.name}' at {s.transform.position}: no seat point"); bad++; continue; }
+                var seat = chair.positionObject.position;
+                HarmonyLib.Traverse.Create(OfflineServer.Instance).Method("StandUp").GetValue();
+                player.transform.position = seat + UnityEngine.Vector3.up * 0.2f;   // within chair reach
+                yield return new UnityEngine.WaitForSeconds(0.6f);
+                player.connecter.interactableHandler.interact(s);   // the client moves the player onto the seat, as a click does
+                yield return new UnityEngine.WaitForSeconds(0.2f);
+                Plugin.Log.LogInfo($"[dev] sit {k} after 0.2 s: server sitting={server.GetValue<UnityEngine.Vector3?>().HasValue} actionId={player.anim.actionId} player {player.transform.position}");
+                yield return new UnityEngine.WaitForSeconds(2f);
+                bool held = server.GetValue<UnityEngine.Vector3?>().HasValue;
+                int action = player.anim.actionId;
+                float drift = UnityEngine.Vector3.Distance(player.transform.position, seat);
+                bool ok = held && action == 12 && drift < 0.5f;
+                if (ok && k == from)
+                {
+                    player.transform.position += UnityEngine.Vector3.forward * 1f;   // stepping off must still stand up
+                    yield return new UnityEngine.WaitForSeconds(0.5f);
+                    bool stood = !server.GetValue<UnityEngine.Vector3?>().HasValue;
+                    Plugin.Log.LogInfo($"[dev] sit {k}: stepping off {(stood ? "stood up" : "FAIL: still sitting")}");
+                    if (!stood) bad++;
+                }
+                if (!ok) bad++;
+                var log = $"[dev] sit {k} {(ok ? "ok" : "FAIL")} '{s.transform.root.name}/{s.name}' at {s.transform.position}: server sitting={held} actionId={action} drift={drift:F2} m (player {player.transform.position}, seat {seat})";
+                if (ok) Plugin.Log.LogInfo(log); else Plugin.Log.LogWarning(log);
+            }
+            Plugin.Log.LogInfo($"[dev] sitall done: {seats.Count - from} seats, {bad} failed");
+        }
+
         // useobj <typeId>: uses the nearest object of that type the way a mouse click does (the client's interact, with its
         // reach checks and the chair's move onto the seat).
         private static void UseObj(string[] args)
