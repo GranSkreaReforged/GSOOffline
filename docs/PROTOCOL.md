@@ -107,6 +107,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 13/0 NPC dead, 9/1 set NPC position | uid, dead / uid, pos |
 | 8/2 player damage | name, signed delta (negative = damage), damage type |
 | 1/2 player dead | name, dead |
+| 1/4 player can move | name, can move. The client never stops movement by itself (not even when dead); `false` also zeroes the velocity. Sent on character creation, death and respawn. |
 | 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
 | 4/9 add buff, 3/35 end buff | name, buff id (XMLs/Buffs), time left, total time (tenths of a second) / name, buff id. The icon shows by the health bar; the effect is the server's. |
 | 3/18 use item (C→S) → 3/24 | name, item type id / name, type id. The reply opens item UIs (knife, mortar, experience scroll picker, furniture placement). |

@@ -352,6 +352,21 @@ namespace GSOOffline
             player.connecter.interactableHandler.interact(best);
         }
 
+        // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
+        private static void Die(string[] args)
+        {
+            var server = HarmonyLib.Traverse.Create(OfflineServer.Instance);
+            server.Field("character").Field("currentHealth").SetValue(0);
+            server.Method("PlayerDies").GetValue();
+        }
+
+        // canmove: whether the client lets the player move, and where they are.
+        private static void CanMove(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            Plugin.Log.LogInfo($"[dev] canmove dead={p.dead} canControl={p.characterMovement.canControl} at {p.transform.position}");
+        }
+
         // workbench: the crafting window the client shows (0 = none) and whether a craft is in progress.
         private static void Workbench(string[] args) =>
             Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
