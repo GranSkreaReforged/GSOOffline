@@ -355,6 +355,30 @@ namespace GSOOffline
         // updatecheck <version>: reruns the GitHub update check as if that version were installed (e.g. 1.0.0).
         private static void UpdateCheck(string[] args) => UpdateOverlay.Recheck(args[1]);
 
+        // weight: carried weight against capacity (server and client counts), and the player's run speed.
+        private static void Weight(string[] args)
+        {
+            var server = OfflineServer.Instance;
+            var m = Scr_PlayerHandler.instance.player.characterMovement.movement;
+            Plugin.Log.LogInfo($"[dev] weight server {server.CarriedWeight()}/{server.CarryingCapacity()} client {Inventory.instance.GetInventoryWeight()}/{Scr_StatsHandler.instance.getStat(Scr_StatsHandler.StatType.CarryingCap)} speed fwd={m.maxForwardSpeed:0.00} back={m.maxBackwardsSpeed:0.00} side={m.maxSidewaysSpeed:0.00}");
+        }
+
+        // runtest [seconds]: autoruns forward (the game's Autorun) and logs the distance covered, to measure run speed.
+        private static void RunTest(string[] args) =>
+            OfflineServer.Instance.StartCoroutine(RunTestRoutine(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 1f));
+
+        private static System.Collections.IEnumerator RunTestRoutine(float seconds)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            var start = p.transform.position;
+            p.autoMoving = true;
+            yield return new UnityEngine.WaitForSeconds(seconds);
+            p.autoMoving = false;
+            var moved = p.transform.position - start;
+            float d = new UnityEngine.Vector2(moved.x, moved.z).magnitude;
+            Plugin.Log.LogInfo($"[dev] runtest {d:0.00} m in {seconds:0.0} s = {d / seconds:0.00} m/s (max {p.characterMovement.movement.maxForwardSpeed:0.00})");
+        }
+
         // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
         private static void Die(string[] args)
         {
