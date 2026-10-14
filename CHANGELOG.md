@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Escape closes the crafting window (anvil, stove, loom and every other workbench), like its Close button. It used to open the game menu on top and leave the crafting window open; the original game did the same. As with the Close button, it waits while an item is being crafted.
 - Sitting works on every bench. On some (the west bench at the Yorkhill tavern's long table, a bench in another Yorkhill building, a bench by the monastery and two seats in Grimwall) you stood straight back up: settling onto the seat counted as walking away. Stepping off still stands you up.
 - Grimwall has one banker and one insurance advisor again, not two of each standing in the same spot. The game places a few creatures and people twice on the same spot (also a skeleton on Goldon); the second copy is now skipped.
 - "A Cook Book" can be finished: the large cook book now sits on the monastery kitchen shelf while the guard's errand is open, and disappears once you take it. The game hides such quest objects until the server lists them, which never happened. Nort's body now lies in the monastery yard during "A Deadly Investigation", and Kombra's book is in Yorkhill library during "Growing Pains".
