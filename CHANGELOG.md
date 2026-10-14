@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Fixed
+- Log out (in the Escape menu or the options) takes you back to character select, where you can pick another character or the same one again. It did nothing. Your character is saved first; logging out while dead wakes you at full health on your next login.
 - You can't move while dead. WASD used to drag your body along the ground until you woke at the wayshrine.
 - Escape closes the crafting window (anvil, stove, loom and every other workbench), like its Close button. It used to open the game menu on top and leave the crafting window open; the original game did the same. As with the Close button, it waits while an item is being crafted.
 - Sitting works on every bench. On some (the west bench at the Yorkhill tavern's long table, a bench in another Yorkhill building, a bench by the monastery and two seats in Grimwall) you stood straight back up: settling onto the seat counted as walking away. Stepping off still stands you up.
