@@ -24,6 +24,8 @@ Step-by-step guides for installing from a release zip or from your own build, up
 
 Characters are saved in `OfflineSaves/` inside the game folder. Settings are in `BepInEx/config/gso.offline.server.cfg`; `AutoLogin` and `AutoCharacter` skip the menus.
 
+The mod's version is shown in the top-left corner. At startup it asks GitHub for the latest release (only the version number is read) and adds "NEW UPDATE AVAILABLE" if there's a newer one; download it from the [releases page](https://github.com/GranSkreaReforged/GSOOffline/releases). `Updates.ShowVersion` and `Updates.CheckForUpdates` in the config turn these off.
+
 In-game chat commands: `/help`, `/pos`, `/tele x y z`, `/scene id [x y z]`, `/wayshrine id`, `/wayshrines`, `/time 0-2400`, `/save`.
 
 To uninstall, delete `winhttp.dll`, `doorstop_config.ini`, `BepInEx/` and `steam_appid.txt` from the game folder.

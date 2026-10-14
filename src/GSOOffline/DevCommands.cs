@@ -352,6 +352,9 @@ namespace GSOOffline
             player.connecter.interactableHandler.interact(best);
         }
 
+        // updatecheck <version>: reruns the GitHub update check as if that version were installed (e.g. 1.0.0).
+        private static void UpdateCheck(string[] args) => UpdateOverlay.Recheck(args[1]);
+
         // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
         private static void Die(string[] args)
         {
