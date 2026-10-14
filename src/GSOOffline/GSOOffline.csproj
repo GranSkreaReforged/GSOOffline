@@ -33,6 +33,9 @@
     <Reference Include="UnityEngine.AnimationModule" HintPath="$(ManagedDir)UnityEngine.AnimationModule.dll" Private="false" />
     <Reference Include="UnityEngine.JSONSerializeModule" HintPath="$(ManagedDir)UnityEngine.JSONSerializeModule.dll" Private="false" />
     <Reference Include="UnityEngine.PhysicsModule" HintPath="$(ManagedDir)UnityEngine.PhysicsModule.dll" Private="false" />
+    <Reference Include="UnityEngine.IMGUIModule" HintPath="$(ManagedDir)UnityEngine.IMGUIModule.dll" Private="false" />
+    <Reference Include="UnityEngine.TextRenderingModule" HintPath="$(ManagedDir)UnityEngine.TextRenderingModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UnityWebRequestModule" HintPath="$(ManagedDir)UnityEngine.UnityWebRequestModule.dll" Private="false" />
     <Reference Include="System.Xml" HintPath="$(ManagedDir)System.Xml.dll" Private="false" />
   </ItemGroup>
 

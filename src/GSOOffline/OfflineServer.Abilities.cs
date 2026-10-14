@@ -360,7 +360,7 @@ namespace GSOOffline
         {
             foreach (var b in buffs)
                 Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: dealt x{b.effect.damageDealt} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} reflect {b.effect.reflect} absorbed {b.absorbed}");
-            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}");
+            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}, gear damage {(character != null ? GearDamage() : 0)}");
         }
 
         // ---- using abilities -----------------------------------------------------------------
@@ -409,6 +409,20 @@ namespace GSOOffline
                 }
             }
 
+            // Click-target abilities land on the ground spot the client sent just before (23/1), else at your feet.
+            Vector3 center = LocalPlayer.transform.position;
+            if (a.clickTarget && clickTargetPos.HasValue)
+            {
+                Vector3 spot = clickTargetPos.Value;
+                clickTargetPos = null;
+                if (Vector3.Distance(spot, center) > a.range + 1f)
+                {
+                    Notice("You are too far away.", "gray");
+                    return;
+                }
+                center = spot;
+            }
+
             // Costs, cooldown and the cast itself
             character.currentMana -= a.manaCost;
             if (a.manaCost > 0) SendMana();
@@ -428,6 +442,7 @@ namespace GSOOffline
             WeaponSounds(EquippedWeapon(), out int weaponSwingSfx, out int weaponHitSfx);
             PlaySound(a.startSfx.Length > 0 ? Pick(a.startSfx) : DefaultCastSound(rule, weaponSwingSfx), LocalPlayer.transform.position);
             PlayPlayerEffect(a.startGfx > 0 ? a.startGfx : AbilityCasterGfx.TryGetValue(a.id, out int casterGfx) ? casterGfx : 0);
+            if (AbilityGroundGfx.TryGetValue(a.id, out int groundGfx)) PlayEffect(groundGfx, center);
             Plugin.Log.LogInfo($"[ability] {a.id} {a.name}: {rule.kind}");
 
             int xpSkill = skill != 0 ? skill : WeaponSkill(EquippedWeapon());
@@ -466,13 +481,13 @@ namespace GSOOffline
 
             // Attacks
             if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-            Vector3 p = LocalPlayer.transform.position;
             var targets = new List<NpcEntity>();
             if (rule.kind == AbilityKind.Sweep)
             {
-                float reach = Mathf.Max(rule.radius, WeaponRange(EquippedWeapon()));
+                // Around the player, or around the clicked spot for click-target abilities.
+                float reach = a.clickTarget ? rule.radius : Mathf.Max(rule.radius, WeaponRange(EquippedWeapon()));
                 foreach (var n in world.npcs)
-                    if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), p) <= reach) targets.Add(n);
+                    if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), center) <= reach) targets.Add(n);
                 if (targets.Count == 0) Plugin.Log.LogInfo($"[ability] {a.name}: nothing within {reach}m");
             }
             else
@@ -505,7 +520,8 @@ namespace GSOOffline
             {
                 Aggro(t);
                 var target = t;
-                int hit = RollPlayerHit(weapon, t, power) + burst / 2;
+                int hit = RollPlayerHit(weapon, t, power, a);
+                if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
                 if (execution && t.health * 4 <= t.maxHealth) hit *= 2;   // double damage on a badly hurt target
                 // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
                 int upFront = rule.dot > 0f ? hit / 2 : hit;

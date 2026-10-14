@@ -149,6 +149,19 @@ namespace GSOOffline
             Plugin.Log.LogInfo("[dev] interactablesnear done");
         }
 
+        // questobjects: the scene's quest objects (hidden until the server lists their id in event 2/16), with the
+        // interactable on each, active or not.
+        private static void QuestObjects(string[] args)
+        {
+            foreach (var q in UnityEngine.Resources.FindObjectsOfTypeAll<Scr_QuestObject>())
+            {
+                if (!q.gameObject.scene.IsValid()) continue;
+                var i = q.GetComponentInChildren<Scr_Interactable>(true);
+                Plugin.Log.LogInfo($"[dev] questobject {q.id} '{q.name}' at {q.transform.position} active={q.gameObject.activeSelf} interactable={(i != null ? i.typeId + " '" + i.interactableName + "'" : "-")} scene={q.gameObject.scene.name}");
+            }
+            Plugin.Log.LogInfo("[dev] questobjects done");
+        }
+
         // interactables <typeId>: positions of the scene's client-side interactables of one type.
         private static void Interactables(string[] args)
         {
@@ -260,6 +273,70 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] hover {(c != null ? c.name + " at " + c.transform.position : "off")}");
         }
 
+        // chairs [n]: the nearest n seats (type 54 interactables and Scr_Chair components) with their seat offsets.
+        private static void Chairs(string[] args)
+        {
+            int n = args.Length > 1 ? int.Parse(args[1]) : 10;
+            var p = Scr_PlayerHandler.instance.player.transform.position;
+            var seen = new System.Collections.Generic.List<UnityEngine.Component>();
+            foreach (var i in Scr_Interactable.list) if (i != null && i.typeId == 54) seen.Add(i);
+            foreach (var c in UnityEngine.Object.FindObjectsOfType<Scr_Chair>()) if (c.GetComponent<Scr_Interactable>() == null) seen.Add(c);
+            seen.Sort((a, b) => UnityEngine.Vector3.Distance(a.transform.position, p).CompareTo(UnityEngine.Vector3.Distance(b.transform.position, p)));
+            Plugin.Log.LogInfo($"[dev] chairs: {seen.Count} in scene");
+            for (int k = 0; k < seen.Count && k < n; k++)
+            {
+                var c = seen[k];
+                var chair = c.GetComponent<Scr_Chair>();
+                var inter = c.GetComponent<Scr_Interactable>();
+                string seat = chair == null ? "no Scr_Chair" : chair.positionObject == null ? "no positionObject" : (chair.positionObject.position - c.transform.position).ToString();
+                Plugin.Log.LogInfo($"[dev] chair '{c.name}' root='{c.transform.root.name}' at {c.transform.position} {UnityEngine.Vector3.Distance(c.transform.position, p):F1} m interactable={(inter != null ? inter.typeId.ToString() : "none")} seat {seat} childChairs={c.GetComponentsInChildren<Scr_Chair>().Length}");
+            }
+        }
+
+        // sitall [from]: sits on every seat in the scene in turn, as a click does, and logs whether the sit held.
+        private static void SitAll(string[] args) =>
+            OfflineServer.Instance.StartCoroutine(SitAllRoutine(args.Length > 1 ? int.Parse(args[1]) : 0));
+
+        private static System.Collections.IEnumerator SitAllRoutine(int from)
+        {
+            var seats = new System.Collections.Generic.List<Scr_Interactable>();
+            foreach (var i in Scr_Interactable.list) if (i != null && i.typeId == 54) seats.Add(i);
+            seats.Sort((a, b) => a.transform.position.x != b.transform.position.x ? a.transform.position.x.CompareTo(b.transform.position.x) : a.transform.position.z.CompareTo(b.transform.position.z));
+            var player = Scr_PlayerHandler.instance.player;
+            var server = HarmonyLib.Traverse.Create(OfflineServer.Instance).Field("sittingAt");
+            int bad = 0;
+            for (int k = from; k < seats.Count; k++)
+            {
+                var s = seats[k];
+                var chair = s.GetComponent<Scr_Chair>();
+                if (chair == null || chair.positionObject == null) { Plugin.Log.LogWarning($"[dev] sit {k} '{s.transform.root.name}' at {s.transform.position}: no seat point"); bad++; continue; }
+                var seat = chair.positionObject.position;
+                HarmonyLib.Traverse.Create(OfflineServer.Instance).Method("StandUp").GetValue();
+                player.transform.position = seat + UnityEngine.Vector3.up * 0.2f;   // within chair reach
+                yield return new UnityEngine.WaitForSeconds(0.6f);
+                player.connecter.interactableHandler.interact(s);   // the client moves the player onto the seat, as a click does
+                yield return new UnityEngine.WaitForSeconds(0.2f);
+                Plugin.Log.LogInfo($"[dev] sit {k} after 0.2 s: server sitting={server.GetValue<UnityEngine.Vector3?>().HasValue} actionId={player.anim.actionId} player {player.transform.position}");
+                yield return new UnityEngine.WaitForSeconds(2f);
+                bool held = server.GetValue<UnityEngine.Vector3?>().HasValue;
+                int action = player.anim.actionId;
+                float drift = UnityEngine.Vector3.Distance(player.transform.position, seat);
+                bool ok = held && action == 12 && drift < 0.5f;
+                if (ok && k == from)
+                {
+                    player.transform.position += UnityEngine.Vector3.forward * 1f;   // stepping off must still stand up
+                    yield return new UnityEngine.WaitForSeconds(0.5f);
+                    bool stood = !server.GetValue<UnityEngine.Vector3?>().HasValue;
+                    Plugin.Log.LogInfo($"[dev] sit {k}: stepping off {(stood ? "stood up" : "FAIL: still sitting")}");
+                    if (!stood) bad++;
+                }
+                if (!ok) bad++;
+                var log = $"[dev] sit {k} {(ok ? "ok" : "FAIL")} '{s.transform.root.name}/{s.name}' at {s.transform.position}: server sitting={held} actionId={action} drift={drift:F2} m (player {player.transform.position}, seat {seat})";
+                if (ok) Plugin.Log.LogInfo(log); else Plugin.Log.LogWarning(log);
+            }
+            Plugin.Log.LogInfo($"[dev] sitall done: {seats.Count - from} seats, {bad} failed");
+        }
+
         // useobj <typeId>: uses the nearest object of that type the way a mouse click does (the client's interact, with its
         // reach checks and the chair's move onto the seat).
         private static void UseObj(string[] args)
@@ -274,6 +351,52 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] useobj {type} at {UnityEngine.Vector3.Distance(best.transform.position, player.transform.position):F1} m");
             player.connecter.interactableHandler.interact(best);
         }
+
+        // updatecheck <version>: reruns the GitHub update check as if that version were installed (e.g. 1.0.0).
+        private static void UpdateCheck(string[] args) => UpdateOverlay.Recheck(args[1]);
+
+        // weight: carried weight against capacity (server and client counts), and the player's run speed.
+        private static void Weight(string[] args)
+        {
+            var server = OfflineServer.Instance;
+            var m = Scr_PlayerHandler.instance.player.characterMovement.movement;
+            Plugin.Log.LogInfo($"[dev] weight server {server.CarriedWeight()}/{server.CarryingCapacity()} client {Inventory.instance.GetInventoryWeight()}/{Scr_StatsHandler.instance.getStat(Scr_StatsHandler.StatType.CarryingCap)} speed fwd={m.maxForwardSpeed:0.00} back={m.maxBackwardsSpeed:0.00} side={m.maxSidewaysSpeed:0.00}");
+        }
+
+        // runtest [seconds]: autoruns forward (the game's Autorun) and logs the distance covered, to measure run speed.
+        private static void RunTest(string[] args) =>
+            OfflineServer.Instance.StartCoroutine(RunTestRoutine(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 1f));
+
+        private static System.Collections.IEnumerator RunTestRoutine(float seconds)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            var start = p.transform.position;
+            p.autoMoving = true;
+            yield return new UnityEngine.WaitForSeconds(seconds);
+            p.autoMoving = false;
+            var moved = p.transform.position - start;
+            float d = new UnityEngine.Vector2(moved.x, moved.z).magnitude;
+            Plugin.Log.LogInfo($"[dev] runtest {d:0.00} m in {seconds:0.0} s = {d / seconds:0.00} m/s (max {p.characterMovement.movement.maxForwardSpeed:0.00})");
+        }
+
+        // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
+        private static void Die(string[] args)
+        {
+            var server = HarmonyLib.Traverse.Create(OfflineServer.Instance);
+            server.Field("character").Field("currentHealth").SetValue(0);
+            server.Method("PlayerDies").GetValue();
+        }
+
+        // canmove: whether the client lets the player move, and where they are.
+        private static void CanMove(string[] args)
+        {
+            var p = Scr_PlayerHandler.instance.player;
+            Plugin.Log.LogInfo($"[dev] canmove dead={p.dead} canControl={p.characterMovement.canControl} at {p.transform.position}");
+        }
+
+        // workbench: the crafting window the client shows (0 = none) and whether a craft is in progress.
+        private static void Workbench(string[] args) =>
+            Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
 
         // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
         private static void Windows(string[] args)
@@ -338,6 +461,22 @@ namespace GSOOffline
         }
 
         // playerstate: the client's attack state for the local player (stuck-in-combat checks).
+        // hitcheck <npc type> [ability id]: how much of your hit gets through that NPC's resistances.
+        private static void HitCheck(string[] args) =>
+            OfflineServer.Instance.DevHitCheck(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 0);
+
+        // clientstats: base + bonus of the client's combat stats, as its stats window shows them.
+        private static void ClientStats(string[] args)
+        {
+            var h = Scr_StatsHandler.instance;
+            var types = new[] { Scr_StatsHandler.StatType.Health, Scr_StatsHandler.StatType.Mana, Scr_StatsHandler.StatType.Manaregen,
+                Scr_StatsHandler.StatType.Damage, Scr_StatsHandler.StatType.DamageBlock, Scr_StatsHandler.StatType.ResistanceFire,
+                Scr_StatsHandler.StatType.DamageSlash, Scr_StatsHandler.StatType.Movementspeed };
+            var parts = new System.Collections.Generic.List<string>();
+            foreach (var t in types) parts.Add(t + "=" + h.getStat(t));
+            Plugin.Log.LogInfo("[dev] client stats: " + string.Join(" ", parts.ToArray()));
+        }
+
         private static void PlayerState(string[] args)
         {
             var pl = Scr_PlayerHandler.instance.player;
@@ -456,6 +595,13 @@ namespace GSOOffline
 
         // npcground [n]: the nearest n client NPCs' height above the ground under them (sunken NPCs read negative).
         private static void NpcGround(string[] args) => OfflineServer.Instance.LogNpcGround(args.Length > 1 ? int.Parse(args[1]) : 15);
+
+        // npcobstacles on|off: whether NPCs steer around rocks and walls (off = the old walk-through, to compare).
+        private static void NpcObstacles(string[] args)
+        {
+            OfflineServer.NpcObstaclesOff = args.Length > 1 && args[1] == "off";
+            Plugin.Log.LogInfo($"[dev] NPC obstacle checks {(OfflineServer.NpcObstaclesOff ? "off" : "on")}");
+        }
 
         // npcbounds [n]: the nearest n client NPCs with their rendered size, how far the model's feet are
         // from the ground under them, and the animation playing. Finds giant, sunken or unanimated NPCs.

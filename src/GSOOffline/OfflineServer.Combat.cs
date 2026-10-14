@@ -11,8 +11,19 @@ namespace GSOOffline
     {
         public static int NpcHealth(int level) => 10 + 8 * Mathf.Max(1, level);
         public static int NpcMaxHit(NpcInfo n) => n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
+        // Share of a creature's hit that Damage block on your gear absorbs: diminishing, and less against stronger
+        // creatures (about a third for gear of the creature's level, ~200 block at 40). Never all of it.
+        public static float BlockReduction(int block, int attackerLevel) =>
+            block <= 0 ? 0f : block / (block + 10f * Mathf.Max(1, attackerLevel));
         public static int PlayerMaxHit(int weaponDamage, int skillLevel) => 4 + weaponDamage + skillLevel;
-        public static float HitChance = 0.85f;
+        public static float HitChance = 0.85f;   // the player's blows
+        // An NPC's blows land by its accuracy (1-100): 70% at 1, 82% at 50, 95% at 100 (it was 85% for all).
+        public static float NpcHitChance(int accuracy) => 0.7f + 0.25f * Mathf.Clamp(accuracy, 0, 100) / 100f;
+        // Your gear's resistance to a blow's kind, in percent (a full set of one level gives about 40-60), up to 75%.
+        public static float PlayerResistance(int percent) => Mathf.Clamp(percent, -100, 75) / 100f;
+        // Block also takes a flat bite out of every blow, so well-armoured players shrug off weak creatures (a crab's
+        // few points against ~200 block at level 40) while creatures of their own level still hurt.
+        public static float FlatBlock(int block) => Mathf.Max(0, block) / 20f;
         public const float AbilityMultiplier = 1.6f;
         public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
         // Armor skills share a kill's XP if the player was hit this recently before it (community wiki: 30 s).
@@ -20,8 +31,22 @@ namespace GSOOffline
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
+        public const int NpcRespawn = 120;   // seconds; the community wiki's "2 minutes" for ordinary creatures
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
         public const float RespawnProtection = 10f;
+
+        // Carrying capacity before gear (the client's "Weight: x/150"). Over it you slow down: straight to
+        // OverweightStart of your run speed, then faster the more you carry (to 40% at a quarter over), never
+        // below OverweightFloor. The original game's rule is lost; this is a reconstruction.
+        public const int BaseCarryingCapacity = 150;
+        public const float OverweightStart = 0.8f, OverweightSoftness = 0.25f, OverweightFloor = 0.1f;
+
+        public static float OverweightSpeed(int weight, int capacity)
+        {
+            if (capacity <= 0 || weight <= capacity) return 1f;
+            float over = (weight - capacity) / (float)capacity / OverweightSoftness;
+            return Mathf.Max(OverweightFloor, OverweightStart / (1f + over * over));
+        }
 
         // Town guards are flagged aggressive with huge damage: on the real server they only went after
         // criminals. There is no crime system offline, so they only fight back when attacked.
@@ -43,6 +68,7 @@ namespace GSOOffline
         // The current swing's hit or shot, waiting for its moment in the animation: called once per strike of the
         // clip with (strike, strikes), so a flurry deals its damage a share at a time.
         private System.Action<int, int> pendingBlow;
+        private Vector3? clickTargetPos;   // 23/1: where a click-target ability (Fire wall, Blast, Landmine) goes
         private bool measuringCast;          // the animation being measured is an ability's
         private float pendingBlowFallback;   // a cast's blow time (its attackdelay) when the clip isn't in ClipImpact
         // Seconds the client's basic attack animation lasts, per weapon type (measured as it plays).
@@ -58,11 +84,13 @@ namespace GSOOffline
             On(3, 0, c => UseAbility((int)c[2]));
             On(8, 7, c => AssignAbilitySlot((int)c[2], (int)c[3]));
             On(25, 12, c => { });   // auto-target slot hint
+            On(23, 1, c => clickTargetPos = (Vector3)c[2]);   // the ground spot for the click-target ability that follows
         }
 
         private void ResetCombat()
         {
             targetUid = 0;
+            clickTargetPos = null;
             pendingBlow = null;   // a swing from the old scene
             measureSwingAt = -1f;
             StopAttacking();
@@ -189,16 +217,6 @@ namespace GSOOffline
             if (flags.Contains("isDagger")) return 1.8f;
             if (flags.Contains("isGreatsword") || flags.Contains("isHalberd")) return 3.2f;
             return 2.4f;
-        }
-
-        private static int StatSum(ItemSave it, params string[] keys)
-        {
-            int sum = 0;
-            if (it == null) return 0;
-            foreach (var s in it.stats)
-                foreach (string k in keys)
-                    if (s.key == k) sum += s.value;
-            return sum;
         }
 
         private void TickPlayerAttack(Vector3 playerPos)
@@ -359,25 +377,96 @@ namespace GSOOffline
             if (!autoAttacking) StopAttacking();
         }
 
-        // Every damage stat on the weapon: Damage, the physical kinds (SlashDamage...) and the elemental ones
-        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count their damage too.
-        private static int WeaponDamage(ItemSave weapon)
+        // Every damage stat on everything worn: Damage, the physical kinds (SlashDamage...) and the elemental ones
+        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count theirs, and so do rings,
+        // amulets and armour (only the weapon's used to count). The weapon on your back isn't equipped.
+        private int GearDamage()
         {
             int sum = 0;
-            if (weapon == null) return 0;
-            foreach (var s in weapon.stats)
-                if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
+            foreach (var it in character.items)
+                if (it.equipped)
+                    foreach (var s in it.stats)
+                        if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
             return sum;
         }
 
-        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f)
+        // Hit splash styles (Scr_EffectController.createHitSplash): 0 plain, 1 blocked, 3 weakened, 4 poisoned.
+        private const int SplashPlain = 0, SplashBlocked = 1, SplashWeakened = 3, SplashPoisoned = 4;
+        private const int AggressiveSnowball = 152;   // the only thing that hurts Snowmen and the winter bosses
+
+        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f, AbilityInfo ability = null)
         {
+            npc.hitSplash = SplashPlain;
             if (Random.value >= CombatRules.HitChance) return 0;
-            int max = CombatRules.PlayerMaxHit(WeaponDamage(weapon), SkillLevel(WeaponSkill(weapon)));
-            int damage = Mathf.RoundToInt(Random.Range(1, max + 1) * power * DamageDealtMultiplier());
-            if (GameData.Npcs.TryGetValue(npc.typeId, out var info))
-                damage = Mathf.Max(1, damage - info.damageBlock / 10);
-            return damage;
+            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
+            float damage = Random.Range(1, max + 1) * power * DamageDealtMultiplier();
+            if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) return Mathf.RoundToInt(damage);
+            if (ability == null || ability.id != AggressiveSnowball)
+            {
+                float through = HitThrough(weapon, info, ability, max);
+                if (through <= 0f)
+                {
+                    npc.hitSplash = SplashBlocked;   // immune: Snowmen to all but snowballs, Golems to poison...
+                    return 0;
+                }
+                if (through > 1.01f) npc.hitSplash = SplashWeakened;   // hit a weakness
+                damage *= through;
+            }
+            return Mathf.Max(1, Mathf.RoundToInt(damage) - info.damageBlock / 10);
+        }
+
+        /// <summary>
+        /// The share of a hit that gets through an NPC's resistances. A hit is the sum of its kinds: each damage stat
+        /// on your gear is its own kind (a staff's FireDamage, a ring's IceDamage), and the rest (the base, plain
+        /// Damage and your skill level) is the ability's element, or your weapon's main kind for plain blows.
+        /// </summary>
+        private float HitThrough(ItemSave weapon, NpcInfo info, AbilityInfo ability, int max)
+        {
+            int element = ability != null ? DamageKinds.OfAbility(ability.name) : DamageKinds.None;
+            int main = element != DamageKinds.None ? element : WeaponKind(weapon);
+            float through = 0f;
+            int typed = 0;
+            for (int k = 1; k < DamageKinds.Count; k++)
+            {
+                int part = GearStat(DamageKinds.DamageStat(k));
+                if (part <= 0) continue;
+                typed += part;
+                through += part * DamageKinds.Through(info.resistance[k]);
+            }
+            int rest = Mathf.Max(0, max - typed);
+            through += rest * DamageKinds.Through(info.resistance[main]);
+            return max > 0 ? through / max : 1f;
+        }
+
+        /// <summary>Dev: what share of your hit (plain, or with an ability) gets through an NPC (bridge command hitcheck).</summary>
+        internal void DevHitCheck(int typeId, int abilityId)
+        {
+            if (character == null || !GameData.Npcs.TryGetValue(typeId, out var info)) return;
+            var weapon = EquippedWeapon();
+            SkillData.Abilities.TryGetValue(abilityId, out var ability);
+            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
+            var res = new List<string>();
+            for (int k = 1; k < DamageKinds.Count; k++)
+                if (info.resistance[k] != 0) res.Add(DamageKinds.Name(k) + " " + info.resistance[k]);
+            string through = ability != null && ability.id == AggressiveSnowball ? "100% (snowball)" : (HitThrough(weapon, info, ability, max) * 100f).ToString("F0") + "%";
+            Plugin.Log.LogInfo($"[dev] hit on {info.name} ({typeId}) with {(ability != null ? ability.name + " (" + DamageKinds.Name(DamageKinds.OfAbility(ability.name)) + ")" : "plain blows")}, " +
+                $"weapon kind {DamageKinds.Name(WeaponKind(weapon))}, max hit {max}: {through} gets through; resistances [{string.Join(", ", res.ToArray())}]; " +
+                $"its blows: {DamageKinds.Name(info.damageType)}, land {CombatRules.NpcHitChance(info.accuracy) * 100f:F0}%");
+        }
+
+        /// <summary>The kind of the weapon's blows: its largest damage stat; slash for a sword, blunt for fists.</summary>
+        private static int WeaponKind(ItemSave weapon)
+        {
+            int best = DamageKinds.Blunt, bestValue = 0;
+            if (weapon == null) return best;
+            for (int k = 1; k < DamageKinds.Count; k++)
+                foreach (var s in weapon.stats)
+                    if (s.key == DamageKinds.DamageStat(k) && s.value > bestValue)
+                    {
+                        best = k;
+                        bestValue = s.value;
+                    }
+            return best;
         }
 
         private void DealDamage(NpcEntity npc, int damage, int skill)
@@ -386,7 +475,8 @@ namespace GSOOffline
                 NpcSound(npc, hurt.sfxTakeHit);
             ProfileEvent("hit");
             npc.health = Mathf.Max(0, npc.health - damage);
-            Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
+            Send(12, 0, npc.uid, npc.health, npc.maxHealth, npc.hitSplash);
+            npc.hitSplash = SplashPlain;
             if (npc.health <= 0) KillNpc(npc, skill);
         }
 
@@ -408,7 +498,7 @@ namespace GSOOffline
             npc.aggro = false;
             if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
-            npc.respawnAt = Time.time + (info?.respawnTime ?? 60);
+            npc.respawnAt = Time.time + (info?.respawnTime ?? CombatRules.NpcRespawn);
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);
@@ -514,24 +604,99 @@ namespace GSOOffline
             npc.pos = from;
             Vector3 flat = npc.dest - from;
             flat.y = 0f;
-            float step = Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed);   // about a second of walking
-            Vector3 to = npc.dest;
-            if (flat.magnitude > step)
-            {
-                to = from + flat.normalized * step;
-                to.y = Mathf.Lerp(from.y, npc.dest.y, step / flat.magnitude);
-                float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
-                if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
-            }
-            else if (flat.magnitude < 0.3f)
+            float dist = flat.magnitude;
+            if (dist < 0.3f)
             {
                 // Arrived. Without this the client keeps the run animation going until its own 2-second stall check.
                 npc.hasDest = false;
                 Send(13, 2, npc.uid, false);
                 return;
             }
+            float step = Mathf.Min(dist, Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed));   // about a second of walking
+            if (!TryStep(npc, from, flat / dist, step, dist, out var to) && !Detour(npc, from, flat / dist, step, dist, out to))
+            {
+                // Walled in: stop rather than walk through. A return home ends here.
+                npc.hasDest = false;
+                Send(13, 2, npc.uid, false);
+                if (npc.returning) FinishReturn(npc);
+                return;
+            }
             Send(198, 25, npc.uid, from, to, to);
             Send(13, 2, npc.uid, true);
+        }
+
+        private const float ObstacleRadius = 0.4f;
+        internal static bool NpcObstaclesOff;   // dev: npcobstacles off
+
+        /// <summary>
+        /// The waypoint one step from from in direction dir, on the ground, unless the step runs into something.
+        /// The last step straight at the destination ends on it exactly.
+        /// </summary>
+        private static bool TryStep(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        {
+            to = npc.dest;
+            if (Blocked(from, dir, step)) return false;
+            if (step >= dist) return !Inside(to);
+            to = from + dir * step;
+            to.y = Mathf.Lerp(from.y, npc.dest.y, step / dist);
+            float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
+            if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
+            return !Inside(to);
+        }
+
+        /// <summary>
+        /// Whether a step runs into something: a steep surface (rock, wall, tree) at body height, not a walkable
+        /// slope or a creature. Without it NPCs walked through rocks: the ground ray of a rock taller than its
+        /// start height finds the sand under the rock. Surfaces already touching at the start are ignored, so an
+        /// NPC that ends up inside a collider can walk out.
+        /// </summary>
+        private static bool Blocked(Vector3 from, Vector3 dir, float dist)
+        {
+            if (NpcObstaclesOff) return false;
+            Vector3 origin = from + Vector3.up * (ObstacleRadius + 0.3f);
+            foreach (var h in Physics.SphereCastAll(origin, ObstacleRadius, dir, dist, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (h.distance > 0f && h.normal.y < 0.5f && !IsCreature(h.collider)) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// Whether an NPC standing at p would have something solid through its body: a waypoint snapped to the
+        /// ground under a rock (a slope gentle enough to walk up, onto a rock taller than the ground ray's start).
+        /// </summary>
+        private static bool Inside(Vector3 p)
+        {
+            if (NpcObstaclesOff) return false;
+            foreach (var c in Physics.OverlapSphere(p + Vector3.up * (ObstacleRadius + 0.3f), ObstacleRadius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (!IsCreature(c)) return true;
+            return false;
+        }
+
+        /// <summary>A step around an obstacle, nearest direction first, keeping to the side last used.</summary>
+        private static bool Detour(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        {
+            if (npc.detourSide == 0) npc.detourSide = Random.value < 0.5f ? 1 : -1;
+            foreach (float angle in new[] { 35f, 70f, 105f, 140f })
+                for (int side = 0; side < 2; side++)
+                {
+                    int sign = side == 0 ? npc.detourSide : -npc.detourSide;
+                    // A sideways step is never the last one, so it doesn't end on the destination.
+                    if (!TryStep(npc, from, Quaternion.Euler(0f, angle * sign, 0f) * dir, step, float.MaxValue, out to)) continue;
+                    npc.detourSide = sign;
+                    return true;
+                }
+            to = from;
+            return false;
+        }
+
+        private static bool IsCreature(Collider c) =>
+            c.GetComponentInParent<Scr_Npc>() != null || c.GetComponentInParent<Scr_Player>() != null || c.GetComponentInParent<Scr_OtherPlayer>() != null;
+
+        private void FinishReturn(NpcEntity npc)
+        {
+            npc.returning = false;
+            npc.health = npc.maxHealth;
+            Send(13, 2, npc.uid, false);
+            Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
         }
 
         /// <summary>The first solid surface straight down from height top above p, ignoring NPCs and players.</summary>
@@ -541,9 +706,7 @@ namespace GSOOffline
             float best = float.MaxValue;
             foreach (var h in Physics.RaycastAll(new Vector3(p.x, top, p.z), Vector3.down, depth, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
             {
-                if (h.distance >= best || h.collider.GetComponentInParent<Scr_Npc>() != null
-                    || h.collider.GetComponentInParent<Scr_Player>() != null || h.collider.GetComponentInParent<Scr_OtherPlayer>() != null)
-                    continue;
+                if (h.distance >= best || IsCreature(h.collider)) continue;
                 best = h.distance;
                 ground = h.point;
             }
@@ -566,7 +729,11 @@ namespace GSOOffline
                 var server = world?.GetNpc(list[i].npcUniqueId);
                 Vector3 forward = list[i].transform.forward, toMe = me - p;
                 forward.y = toMe.y = 0f;
-                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above}");
+                // Solid things overlapping its body (a rock it walked into), not the ground under it or creatures.
+                var inside = new List<string>();
+                foreach (var col in Physics.OverlapSphere(p + Vector3.up * (ObstacleRadius + 0.3f), ObstacleRadius, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                    if (!IsCreature(col)) inside.Add(col.name);
+                Plugin.Log.LogInfo($"[dev] {list[i].npcUniqueId} type={list[i].npcTypeId} d={Vector3.Distance(p, me):F1} moving={list[i].moving} anim={server?.anim} facing-me-off={Vector3.Angle(forward, toMe):F0}deg above-ground={above} inside={(inside.Count > 0 ? string.Join(",", inside.ToArray()) : "-")}");
             }
         }
 
@@ -576,6 +743,10 @@ namespace GSOOffline
             Vector2 offset = Random.insideUnitCircle * info.wanderDistance;
             // A spot on the ground within 5 m of the spawn's height (not a roof above it or a cliff below).
             if (!GroundAt(npc.spawnPos + new Vector3(offset.x, 0f, offset.y), npc.spawnPos.y + 5f, 10f, out var spot)) return;
+            // Only somewhere it can stroll to in a straight line: not behind or inside a rock.
+            Vector3 from = NpcPosition(npc), flat = spot - from;
+            flat.y = 0f;
+            if (Inside(spot) || flat.magnitude > 0.3f && Blocked(from, flat.normalized, flat.magnitude)) return;
             Send(198, 30, npc.uid, true);   // walk
             npc.nextWaypoint = 0f;
             MoveNpc(npc, spot);
@@ -622,13 +793,7 @@ namespace GSOOffline
 
                 if (npc.returning)
                 {
-                    if (Vector3.Distance(pos, npc.spawnPos) < 1.5f)
-                    {
-                        npc.returning = false;
-                        npc.health = npc.maxHealth;
-                        Send(13, 2, npc.uid, false);
-                        Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
-                    }
+                    if (Vector3.Distance(pos, npc.spawnPos) < 1.5f) FinishReturn(npc);
                     else MoveNpc(npc, npc.spawnPos);
                     continue;
                 }
@@ -693,7 +858,7 @@ namespace GSOOffline
             // Stepping out of reach during the wind-up dodges the blow.
             if (Vector3.Distance(NpcPosition(npc), player.transform.position) > info.attackDistance + info.attackMissDistance)
             {
-                Send(8, 2, character.name, 0, info.damageType);
+                Send(8, 2, character.name, 0, PlayerSplash(info));
                 return;
             }
             NpcHitsPlayer(info, npc);
@@ -702,20 +867,27 @@ namespace GSOOffline
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)
         {
             int damage = 0;
-            if (Random.value < CombatRules.HitChance)
+            if (Random.value < CombatRules.NpcHitChance(info.accuracy))
             {
-                int block = 0;
-                foreach (var it in character.items)
-                    if (it.equipped) block += StatSum(it, "Damageblock");
-                damage = Mathf.Max(0, Random.Range(1, CombatRules.NpcMaxHit(info) + 1) - block / 2);
+                // Your resistance to the blow's kind, then your damage block against every blow, whatever its kind.
+                float roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1);
+                if (info.damageType > 0 && info.damageType < DamageKinds.Count)
+                    roll *= 1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(info.damageType)));
+                int block = GearStat("Damageblock");
+                roll *= 1f - CombatRules.BlockReduction(block, info.level);
+                damage = Mathf.Max(0, Mathf.RoundToInt(roll - CombatRules.FlatBlock(block)));
                 lastHitTaken = Time.time;
                 damage = ApplyDefensiveBuffs(damage, attacker);
             }
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
-            Send(8, 2, character.name, -damage, info.damageType);
+            Send(8, 2, character.name, -damage, PlayerSplash(info));
             SendHealth();
             if (character.currentHealth <= 0) PlayerDies();
         }
+
+        // The splash style for a blow on you. damagetype used to go straight through, but splash styles aren't damage
+        // kinds: spiders' poison (1) showed as "blocked", hounds' fire (3) as "weakened", Ents' earth (4) as "poisoned".
+        private static int PlayerSplash(NpcInfo info) => info.damageType == DamageKinds.Poison ? SplashPoisoned : SplashPlain;
 
         private void RespawnNpc(NpcEntity npc)
         {
@@ -741,6 +913,7 @@ namespace GSOOffline
             ClearBuffs();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
+            Send(1, 4, character.name, false);   // the client only stops movement when told: WASD dragged the body along the floor
             foreach (var npc in world.npcs)
                 if (npc.aggro) Disengage(npc);
         }
@@ -752,6 +925,7 @@ namespace GSOOffline
             aggroImmuneUntil = Time.time + CombatRules.RespawnProtection;
             character.currentHealth = MaxHealth();
             Send(1, 2, character.name, false);
+            Send(1, 4, character.name, true);
             SendHealth();
             if (GameData.Wayshrines.TryGetValue(character.homeWayshrine, out var w))
                 Teleport(w.scene, w.pos);
@@ -766,6 +940,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
             TickPlayerRespawn();
+            if (world == null || !sceneReady) return;   // respawned into another zone: this world is gone
             TickBuffs();
             TickNpcEffects();
             TickCastEnd();

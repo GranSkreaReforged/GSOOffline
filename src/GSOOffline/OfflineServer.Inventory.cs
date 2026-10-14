@@ -375,7 +375,11 @@ namespace GSOOffline
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);
             int after = LevelFromXp(character.GetXp(key));
-            if (after > before && sceneReady) OnLevelUp(key, after);   // not for the starter kit's levels at creation
+            if (after > before && sceneReady)
+            {
+                OnLevelUp(key, after);   // not for the starter kit's levels at creation
+                if (skillId == SkillElementalGrim) SendMana();   // the mana pool grew
+            }
         }
 
         // Same curve as Scr_LevelsHandler; evaluated in float like the client so rounding agrees.

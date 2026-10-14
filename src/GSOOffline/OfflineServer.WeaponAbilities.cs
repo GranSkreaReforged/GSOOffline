@@ -80,10 +80,12 @@ namespace GSOOffline
                 Send(8, 6, character.name, slot, WeaponAbilityInSlot(slot));
         }
 
-        /// <summary>Equipment changed: max health and the weapon's abilities may have too.</summary>
+        /// <summary>Equipment changed: max health and mana and the weapon's abilities may have too.</summary>
         private void GearChanged()
         {
             HealthStatsChanged();
+            ManaStatsChanged();
+            SendGearStats();
             SendWeaponAbilities();
         }
     }

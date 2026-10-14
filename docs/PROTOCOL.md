@@ -41,6 +41,7 @@ Types must match exactly, because the receiver casts with `(int)`, `(string)`, `
 | 14/1 move spawned object | uid, int rot, Vector3. The client glides there (slerp) when it's more than 1 m away. |
 | 25/10 remove spawned object | uid |
 | 2/15 ferries | name, `id_type_x_y_z_waypoint_moving` joined by `>` (the position fields are `_`-separated). Ferries are `Resources/XMLs/transportData_<scene>` (`transport` id, type = `1LoadingAssets/Transports/ab_transport_<type>`, speed; `phase` destination and `waitingtime`, waypoint = phase order). The client sails toward the current waypoint itself and is created facing north. The data's routes predate the current terrain (they run over land), so the server replaces them in `OfflineServer.Ferries.cs` and writes its routes into the client's `Scr_TransportsHandler.transportTypes[].waypoints` before the first list. It keeps the previous zone's ferries in its list after they are destroyed and throws removing them, so the server calls its `clearTransports()` before a zone's first list. |
+| 2/16 quest objects | name, the ids of the quest objects to show, `,`-separated. Every `Scr_QuestObject` (the cook book, Nort's body, Kombra's book...) hides itself on load; the client shows those listed and hides the rest, and ignores an empty list, so the server sends `0` to hide them all. Rules: content.json `questObjects`; `questobjects` (bridge) lists a scene's objects and ids. |
 | 20/2 ferry waypoint | id, waypoint index, moving (bool). The server runs the schedule: on arrival, a waypoint with `waitingtime` stops the ferry (moving false), then it sails to the next. |
 | 16/1 weather | int time (0–2400), int cloudiness |
 | 2/0 chat line | unused, text (optional `color=yellow\|` prefix), int channel |
@@ -50,7 +51,7 @@ Types must match exactly, because the receiver casts with `(int)`, `(string)`, `
 
 Payloads are listed after the sub-opcode. "name" means the player name.
 
-- **Movement:** 17/1 sync (name, rot, scene, Vector3); 198/1 jump; 23/1 click-to-move target.
+- **Movement:** 17/1 sync (name, rot, scene, Vector3); 198/1 jump; 23/1 click-target position (name, Vector3): the ground spot for the click-target ability (Fire wall, Blast, Landmine) the client sends next (3/0).
 - **Chat:** 2/5 (name, msg). Messages starting with `/` are server commands.
 - **Interact:** 3/11 object (name, interactable typeId) → reply 3/12 confirm; 3/8 NPC (name, uid); 3/9 dialogue option (name, optionId).
 - **Targeting and combat:** 3/7 select NPC; 3/0 use ability (name, slot); 6/25 cancel attack; 8/7 set ability slot.
@@ -106,6 +107,8 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 13/0 NPC dead, 9/1 set NPC position | uid, dead / uid, pos |
 | 8/2 player damage | name, signed delta (negative = damage), damage type |
 | 1/2 player dead | name, dead |
+| 7/7 log out (C→S) → 7/1 | name / name. The client waits for 7/1, then tears down the world (sending 7/7 again, ignored) and returns to the login screen; the server logs the account back in, which shows character select. |
+| 1/4 player can move | name, can move. The client never stops movement by itself (not even when dead); `false` also zeroes the velocity. Sent on character creation, death and respawn. |
 | 4/0 ability cooldown | name, slot, current, total (hundredths of a second) |
 | 4/9 add buff, 3/35 end buff | name, buff id (XMLs/Buffs), time left, total time (tenths of a second) / name, buff id. The icon shows by the health bar; the effect is the server's. |
 | 3/18 use item (C→S) → 3/24 | name, item type id / name, type id. The reply opens item UIs (knife, mortar, experience scroll picker, furniture placement). |

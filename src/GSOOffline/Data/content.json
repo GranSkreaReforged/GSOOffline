@@ -223,6 +223,7 @@
     { "type": 7,  "note": "Nort on the beach, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
     { "type": 10, "note": "Nort in the kitchen, until he dies in Q5", "quest": 5, "phases": [ 0 ] },
 
+    { "type": 9, "note": "Q1: the large aggressive crab at Nort's fishing spot (no marker; the server spawned it after node 71)", "quest": 1, "phases": [ 4 ], "scene": 1, "spawn": [ "855.0,3.7,1569.0" ] },
     { "type": 16, "note": "Gery in the village", "quest": 2, "phases": [ 0, 1 ] },
     { "type": 20, "note": "Willas in the village", "quest": 2, "phases": [ 2, 3, 4, 5, 6 ] },
     { "type": 20, "quest": 2, "phases": [ -1 ], "var": "2,1,0" },
@@ -266,6 +267,21 @@
     { "type": 175, "note": "Wallace answers when called", "quest": 18, "phases": [ 3 ] },
 
     { "type": 291, "note": "giant rats in the governor's cellar during the quest", "quest": 27, "phases": [ 1 ] },
-    { "type": 283, "note": "the boss rat", "quest": 27, "phases": [ 1 ], "scene": 20, "spawn": [ "1100.0,119.7,766.0" ] }
+    { "type": 283, "note": "the boss rat", "quest": 27, "phases": [ 1 ], "scene": 20, "spawn": [ "1100.0,119.7,766.0" ] },
+
+    { "type": 275, "note": "world boss: Nirish, King of the Sewers (no marker; positions from a player's memory)", "scene": 4, "spawn": [ "145.9,58.0,392.5" ] },
+    { "type": 371, "note": "world boss: Sarah, Camp Overseer, in the poacher camp", "scene": 13, "spawn": [ "1272.5,32.5,539.3" ] },
+    { "type": 102, "note": "world boss: the Supreme Sea Serpent", "scene": 19, "spawn": [ "872.2,1.3,1011.8" ] },
+    { "type": 227, "note": "world boss: the three Tomb guardians in Lakhmu's basement", "scene": 32, "spawn": [ "-99.0,200.5,-230.8" ] },
+    { "type": 228, "scene": 32, "spawn": [ "-95.0,200.5,-230.8" ] },
+    { "type": 229, "scene": 32, "spawn": [ "-103.0,200.5,-230.8" ] },
+    { "type": 294, "note": "world boss: George, Storage Guard of the poacher dungeon", "scene": 38, "spawn": [ "-328.2,56.8,67.2" ] },
+    { "type": 292, "note": "world boss: Sepitus, the Dark Tamer", "scene": 38, "spawn": [ "916.6,25.7,-643.1" ] }
+  ],
+
+  "questObjects": [
+    { "id": 1,  "note": "Q5: Nort's body by the monastery well, from when he's found until the culprit is confronted", "quest": 5, "phases": [ 3, 4, 5 ] },
+    { "id": 10, "note": "Q26: Kombra's book in Yorkhill library (Flora of Keshk)", "quest": 26, "phases": [ 7 ] },
+    { "id": 12, "note": "Q31: the cook book on the monastery kitchen shelf", "quest": 31, "phases": [ 1 ] }
   ]
 }

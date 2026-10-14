@@ -21,6 +21,8 @@ namespace GSOOffline
         public int anim = -1;   // animation id last sent to the client
         public bool hasDest;    // walking to dest in ground-following steps
         public Vector3 dest;
+        public int detourSide;  // which way it last stepped around an obstacle (1 / -1)
+        public int hitSplash;   // style of the next hit splash on it (immune, weakness), set when the hit is rolled
 
         // ability effects
         public float stunnedUntil, rootedUntil;
@@ -61,8 +63,10 @@ namespace GSOOffline
             foreach (var d in Resources.FindObjectsOfTypeAll<Scr_NPCDummy>())
             {
                 if (!InScene(d, unitySceneName)) continue;
-                int hp = GameData.Npcs.TryGetValue(d.typeId, out var info) ? info.health : 30;
                 Vector3 p = d.transform.position;
+                // A few markers were placed twice (Grimwall's banker and insurance advisor, a Goldon skeleton).
+                if (w.npcs.Exists(n => n.typeId == d.typeId && (n.spawnPos - p).sqrMagnitude < 1f)) continue;
+                int hp = GameData.Npcs.TryGetValue(d.typeId, out var info) ? info.health : 30;
                 w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = d.typeId, spawnPos = p, pos = p, health = hp, maxHealth = hp });
             }
             // Quest NPCs the scene has no marker for (content.json "spawn").

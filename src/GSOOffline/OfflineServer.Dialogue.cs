@@ -101,6 +101,8 @@ namespace GSOOffline
                 return;
             }
             Plugin.Log.LogInfo($"[dialogue] node {n.id} options [{string.Join(",", visible.ToArray())}]");
+            var player = LocalPlayer;
+            dialogueAt = player != null ? player.transform.position : Vector3.zero;
             // nodeId>opt|opt>var1|var2  ($1 in node text = player name)
             Send(2, 3, character.name, n.id + ">" + string.Join("|", visible.ToArray()) + ">" + character.name + "|-");
         }
@@ -123,6 +125,20 @@ namespace GSOOffline
         }
 
         private ActionDef pendingDialogueTeleport;
+        private Vector3 dialogueAt;   // where the player stood when the current node was shown
+
+        // A conversation (quest NPC or shopkeeper) closes when the player walks away, as shop and bank windows do.
+        // The client can't close one itself: it stays on screen, hiding the HUD, until the server ends it.
+        private void TickDialogue()
+        {
+            if (dialogueNode == null) return;
+            var player = LocalPlayer;
+            if (player == null || !sceneReady) return;
+            var moved = player.transform.position - dialogueAt;
+            if (new Vector2(moved.x, moved.z).magnitude <= WindowLeaveDistance) return;
+            Plugin.Log.LogInfo($"[dialogue] closed node {dialogueNode.id}: player left");
+            CloseDialogue();   // a trip already agreed to (pendingDialogueTeleport) still happens
+        }
 
         private void CloseDialogue()
         {

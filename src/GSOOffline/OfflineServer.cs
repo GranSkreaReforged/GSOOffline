@@ -101,9 +101,11 @@ namespace GSOOffline
             TickSkills();
             TickSitting();
             TickWindows();
+            TickDialogue();
             TickRespawns();
             TickCombat();
             TickRegen();
+            TickWeight();
             TickLoot();
             TickImpacts();
             TickFerries();
@@ -114,16 +116,18 @@ namespace GSOOffline
 
         private float autoLoginAt = -1f;
         private bool autoCharacterDone;
+        private string reloginAccount;   // set by Log out: the account to log back into, for character select
 
         private void TickAutoLogin()
         {
-            string user = Plugin.AutoLogin.Value.Trim();
+            string user = reloginAccount ?? Plugin.AutoLogin.Value.Trim();
             if (user.Length == 0) return;
 
             if (autoLoginAt > 0f && Time.realtimeSinceStartup >= autoLoginAt)
             {
                 autoLoginAt = -1f;
-                autoCharacterDone = false;
+                autoCharacterDone = reloginAccount != null;   // after Log out the player picks the character
+                reloginAccount = null;
                 Scr_RPCSender.instance.attemptLogin(user, string.Empty, Scr_ConnectionHandler.instance.steamId);
             }
 
@@ -191,7 +195,7 @@ namespace GSOOffline
             ch.connectionStatus = "Joined server";
             if (Scr_Options.instance != null && Scr_Options.instance.useLUI && Scr_UI_LoginScreen.instance != null)
                 Scr_UI_LoginScreen.instance.Activate();
-            if (Plugin.AutoLogin.Value.Trim().Length > 0)
+            if (reloginAccount != null || Plugin.AutoLogin.Value.Trim().Length > 0)
                 autoLoginAt = Time.realtimeSinceStartup + 1.5f;
         }
 

@@ -16,6 +16,7 @@ namespace GSOOffline
         public string slot;   // null for non-equippable
         public int level;
         public int price;
+        public float weight;   // per item; some are fractions (0.1, 0.5)
         public readonly HashSet<string> flags = new HashSet<string>();   // isBroadsword, isLightArmor, Food, isFurniture...
         public int baseGrade = 2;
         public int food;
@@ -41,6 +42,7 @@ namespace GSOOffline
             {
                 case "DamagePoison": return "DmgPoison";
                 case "ResistancePoison": return "ResPoison";
+                case "Damageblock": return "Damageblock";   // not a damage kind ("blockDamage" until 1.3.1)
             }
             if (xmlStat.StartsWith("Damage") && xmlStat.Length > "Damage".Length)
                 return xmlStat.Substring("Damage".Length) + "Damage";
@@ -61,6 +63,7 @@ namespace GSOOffline
                     slot = GameData.Attr(n, "Slot"),
                     level = GameData.IntAttr(n, "Level", 1),
                     price = GameData.IntAttr(n, "Price"),
+                    weight = float.TryParse(GameData.Attr(n, "Weight"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var w) ? w : 0f,
                 };
                 if (string.IsNullOrEmpty(t.slot)) t.slot = null;
                 foreach (XmlNode s in n.ChildNodes)

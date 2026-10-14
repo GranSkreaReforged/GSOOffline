@@ -10,7 +10,7 @@ namespace GSOOffline
         private SceneWorld world;
         private bool sceneReady;
         private Vector3? pendingSpawn;
-        private string lastNpcList, lastHarvestableList;
+        private string lastNpcList, lastHarvestableList, lastQuestObjects;
         private float visibilityTimer, autosaveTimer;
 
         private void RegisterWorldHandlers()
@@ -27,7 +27,6 @@ namespace GSOOffline
             Ignore(3, 47);
             Ignore(6, 27);
             Ignore(27, 0);
-            Ignore(23, 1);
             Ignore(198, 2, 3);
         }
 
@@ -40,7 +39,7 @@ namespace GSOOffline
             pendingSpawnNeedsClearing = false;
             pendingCrossing = null;
             ResetOysters();
-            lastNpcList = lastHarvestableList = null;
+            lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
             StandUp();
@@ -154,6 +153,8 @@ namespace GSOOffline
             SendPendingEquips();
             SendWeaponAbilities();
             SendHealth();
+            SendMana();
+            SendGearStats();
             SendSceneLoot();
             SendBoats();
 
@@ -191,6 +192,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 p = player.transform.position;
 
+            SendQuestObjects();
             string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
             if (npcs != lastNpcList)
             {
@@ -298,10 +300,13 @@ namespace GSOOffline
         {
             if (!sittingAt.HasValue) return;
             var player = LocalPlayer;
-            if (player == null || !sceneReady || job != null || autoAttacking
-                || Vector3.Distance(player.transform.position, sittingAt.Value) > 0.5f)
+            if (player == null || !sceneReady || job != null || autoAttacking || LeftSeat(player.transform.position - sittingAt.Value))
                 StandUp();
         }
+
+        // Walking off. Height doesn't count: after the client puts the player on a seat point, physics drops them onto
+        // some benches (Yorkhill's tavern) or briefly pops them up (Grimwall) by about 0.5 m, which stood them straight back up.
+        private static bool LeftSeat(Vector3 moved) => new Vector2(moved.x, moved.z).magnitude > 0.5f;
 
         private void StandUp()
         {

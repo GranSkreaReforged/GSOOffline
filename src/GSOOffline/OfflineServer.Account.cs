@@ -134,6 +134,23 @@ namespace GSOOffline
             Send(3, 61, AccountPacketJson(), 1);
         }
 
+        /// <summary>
+        /// Up to 1.3.1 items rolled Damage block under the key "blockDamage", which neither the client (tooltips,
+        /// stats window) nor the server's armour block read. Renamed in memory; the next save stores it fixed.
+        /// </summary>
+        private static void FixStatKeys(CharacterSave ch)
+        {
+            int fixedCount = 0;
+            foreach (var it in ch.items)
+                foreach (var s in it.stats)
+                    if (s.key == "blockDamage")
+                    {
+                        s.key = "Damageblock";
+                        fixedCount++;
+                    }
+            if (fixedCount > 0) Plugin.Log.LogInfo($"'{ch.name}': {fixedCount} item stats renamed blockDamage -> Damageblock.");
+        }
+
         private void OnCharacterLogin(object[] c)
         {
             GameData.EnsureLoaded();
@@ -147,6 +164,7 @@ namespace GSOOffline
 
             character = ch;
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
+            FixStatKeys(ch);
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it
             ResetWorldState();
             startTimeSent = false;   // zone changes reset the world state too, but keep the clock
@@ -170,14 +188,26 @@ namespace GSOOffline
             SaveCurrentCharacter();
         }
 
+        // The menu's Log out (7/7). The client waits for the server's 7/1, which takes it back to the login screen;
+        // the account then logs straight back in (FakeJoin, TickAutoLogin), so the player lands on character select.
+        // The client sends 7/7 again while tearing down the world: by then there's no character, so it's ignored.
         private void OnDisconnect(object[] c)
         {
+            if (character != null && PlayerDead)
+            {
+                // Logging out while dead: wake up on the next login rather than dying on whoever is picked next.
+                respawnPlayerAt = -1f;
+                character.currentHealth = MaxHealth();
+            }
             SaveCurrentCharacter();
-            if (character != null)
-                Plugin.Log.LogInfo($"'{character.name}' logged out.");
+            string name = character?.name;
             ClearBuffs();
             character = null;
             ResetWorldState();
+            if (name == null) return;
+            Plugin.Log.LogInfo($"'{name}' logged out.");
+            reloginAccount = account?.name;
+            Send(7, 1, name);
         }
 
         private void SaveCurrentCharacter()
@@ -210,7 +240,7 @@ namespace GSOOffline
             Line("Health", ch.health);
             Line("Currenthealth", ch.currentHealth);
             Line("Mana", ch.mana);
-            Line("CarryingCap", 150);
+            Line("CarryingCap", CombatRules.BaseCarryingCapacity);
             Line("Currentmana", ch.currentMana);
             Line("Position", SceneWorld.Vec(ch.Position));
             Line("HomeWayshrine", ch.homeWayshrine);
