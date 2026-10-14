@@ -188,14 +188,26 @@ namespace GSOOffline
             SaveCurrentCharacter();
         }
 
+        // The menu's Log out (7/7). The client waits for the server's 7/1, which takes it back to the login screen;
+        // the account then logs straight back in (FakeJoin, TickAutoLogin), so the player lands on character select.
+        // The client sends 7/7 again while tearing down the world: by then there's no character, so it's ignored.
         private void OnDisconnect(object[] c)
         {
+            if (character != null && PlayerDead)
+            {
+                // Logging out while dead: wake up on the next login rather than dying on whoever is picked next.
+                respawnPlayerAt = -1f;
+                character.currentHealth = MaxHealth();
+            }
             SaveCurrentCharacter();
-            if (character != null)
-                Plugin.Log.LogInfo($"'{character.name}' logged out.");
+            string name = character?.name;
             ClearBuffs();
             character = null;
             ResetWorldState();
+            if (name == null) return;
+            Plugin.Log.LogInfo($"'{name}' logged out.");
+            reloginAccount = account?.name;
+            Send(7, 1, name);
         }
 
         private void SaveCurrentCharacter()
