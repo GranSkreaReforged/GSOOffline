@@ -900,6 +900,7 @@ namespace GSOOffline
             ClearBuffs();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
+            Send(1, 4, character.name, false);   // the client only stops movement when told: WASD dragged the body along the floor
             foreach (var npc in world.npcs)
                 if (npc.aggro) Disengage(npc);
         }
@@ -911,6 +912,7 @@ namespace GSOOffline
             aggroImmuneUntil = Time.time + CombatRules.RespawnProtection;
             character.currentHealth = MaxHealth();
             Send(1, 2, character.name, false);
+            Send(1, 4, character.name, true);
             SendHealth();
             if (GameData.Wayshrines.TryGetValue(character.homeWayshrine, out var w))
                 Teleport(w.scene, w.pos);
