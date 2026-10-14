@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Added
+- The mod's version is shown in small text in the top-left corner, with "NEW UPDATE AVAILABLE" in gold when a newer release is out on GitHub. The game asks GitHub once at startup; only the version number is read and nothing is downloaded. Turn either off with `Updates.ShowVersion` and `Updates.CheckForUpdates` in the config.
+
 ### Fixed
 - Log out (in the Escape menu or the options) takes you back to character select, where you can pick another character or the same one again. It did nothing. Your character is saved first; logging out while dead wakes you at full health on your next login.
 - You can't move while dead. WASD used to drag your body along the ground until you woke at the wayshrine.

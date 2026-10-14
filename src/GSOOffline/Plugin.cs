@@ -26,6 +26,8 @@ namespace GSOOffline
         internal static ConfigEntry<float> TimeOfDay;
         internal static ConfigEntry<string> AutoLogin;
         internal static ConfigEntry<string> AutoCharacter;
+        internal static ConfigEntry<bool> ShowVersion;
+        internal static ConfigEntry<bool> CheckForUpdates;
 
         private void Awake()
         {
@@ -43,6 +45,8 @@ namespace GSOOffline
             LogUnhandledEvents = Config.Bind("Debug", "LogUnhandledEvents", true, "Log client->server events the offline server does not implement yet.");
             AutoLogin = Config.Bind("Convenience", "AutoLogin", "", "If set, log in automatically with this account name (skips the login screen).");
             AutoCharacter = Config.Bind("Convenience", "AutoCharacter", "", "If set together with AutoLogin, enter the world with this character (created if missing).");
+            ShowVersion = Config.Bind("Updates", "ShowVersion", true, "Show the mod's version in the top-left corner.");
+            CheckForUpdates = Config.Bind("Updates", "CheckForUpdates", true, "At startup, ask GitHub for the latest release and add \"NEW UPDATE AVAILABLE\" to the version line if there is a newer one. Only the version is read; nothing is downloaded.");
 
             SaveDir = Path.Combine(Paths.GameRootPath, "OfflineSaves");
             Directory.CreateDirectory(SaveDir);
@@ -55,6 +59,8 @@ namespace GSOOffline
             DontDestroyOnLoad(host);
             host.hideFlags = HideFlags.HideAndDontSave;
             host.AddComponent<OfflineServer>();
+            if (ShowVersion.Value)
+                UpdateOverlay.Create(host, Name, Version, PluginInfo.ReleaseBuild, "GSOOffline", Guid, CheckForUpdates.Value);
 
             Log.LogInfo($"{Name} {PluginInfo.BuildVersion} loaded{(PluginInfo.ReleaseBuild ? "" : " (dev build)")}. Saves: {SaveDir}");
         }
