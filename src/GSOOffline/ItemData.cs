@@ -16,6 +16,7 @@ namespace GSOOffline
         public string slot;   // null for non-equippable
         public int level;
         public int price;
+        public float weight;   // per item; some are fractions (0.1, 0.5)
         public readonly HashSet<string> flags = new HashSet<string>();   // isBroadsword, isLightArmor, Food, isFurniture...
         public int baseGrade = 2;
         public int food;
@@ -62,6 +63,7 @@ namespace GSOOffline
                     slot = GameData.Attr(n, "Slot"),
                     level = GameData.IntAttr(n, "Level", 1),
                     price = GameData.IntAttr(n, "Price"),
+                    weight = float.TryParse(GameData.Attr(n, "Weight"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var w) ? w : 0f,
                 };
                 if (string.IsNullOrEmpty(t.slot)) t.slot = null;
                 foreach (XmlNode s in n.ChildNodes)

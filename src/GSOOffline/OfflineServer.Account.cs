@@ -240,7 +240,7 @@ namespace GSOOffline
             Line("Health", ch.health);
             Line("Currenthealth", ch.currentHealth);
             Line("Mana", ch.mana);
-            Line("CarryingCap", 150);
+            Line("CarryingCap", CombatRules.BaseCarryingCapacity);
             Line("Currentmana", ch.currentMana);
             Line("Position", SceneWorld.Vec(ch.Position));
             Line("HomeWayshrine", ch.homeWayshrine);

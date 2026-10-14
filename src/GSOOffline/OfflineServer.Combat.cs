@@ -35,6 +35,19 @@ namespace GSOOffline
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
         public const float RespawnProtection = 10f;
 
+        // Carrying capacity before gear (the client's "Weight: x/150"). Over it you slow down: straight to
+        // OverweightStart of your run speed, then faster the more you carry (to 40% at a quarter over), never
+        // below OverweightFloor. The original game's rule is lost; this is a reconstruction.
+        public const int BaseCarryingCapacity = 150;
+        public const float OverweightStart = 0.8f, OverweightSoftness = 0.25f, OverweightFloor = 0.1f;
+
+        public static float OverweightSpeed(int weight, int capacity)
+        {
+            if (capacity <= 0 || weight <= capacity) return 1f;
+            float over = (weight - capacity) / (float)capacity / OverweightSoftness;
+            return Mathf.Max(OverweightFloor, OverweightStart / (1f + over * over));
+        }
+
         // Town guards are flagged aggressive with huge damage: on the real server they only went after
         // criminals. There is no crime system offline, so they only fight back when attacked.
         public static bool IsGuard(NpcInfo n)
