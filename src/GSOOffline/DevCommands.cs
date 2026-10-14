@@ -352,6 +352,10 @@ namespace GSOOffline
             player.connecter.interactableHandler.interact(best);
         }
 
+        // workbench: the crafting window the client shows (0 = none) and whether a craft is in progress.
+        private static void Workbench(string[] args) =>
+            Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
+
         // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
         private static void Windows(string[] args)
         {
