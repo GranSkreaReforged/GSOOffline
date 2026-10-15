@@ -288,10 +288,8 @@ namespace GSOOffline
                 fallingRocks.RemoveAt(i);
                 PlayEffect(GfxRocksFall, pos + Vector3.up * 6f);
                 if (PlayerDead || Vector3.Distance(pos, me) >= 4f) continue;
-                float share = Random.Range(1500, 3001) / (Mathf.Max(1, CombatLevel()) * 100f);
-                float dmg = MaxHealth() * Mathf.Min(1f, share) * (1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Blunt))));
-                Plugin.Log.LogInfo($"[quest] falling rocks hit the player for {Mathf.RoundToInt(dmg)}");
-                HurtPlayer(Mathf.RoundToInt(dmg), SplashPlain);
+                int dmg = HurtByOriginal(Random.Range(1500, 3001), DamageKinds.Blunt);
+                Plugin.Log.LogInfo($"[quest] falling rocks hit the player for {dmg}");
             }
         }
 

@@ -107,6 +107,7 @@ namespace GSOOffline
             TickSightseeing();
             TickLakhmusBasement();
             TickUlansDungeon();
+            TickPoacherDungeon();
             TickPet();
             TickRespawns();
             TickCombat();

@@ -41,6 +41,7 @@ namespace GSOOffline
             ResetOysters();
             ResetLakhmusBasement();
             ResetUlansDungeon();
+            ResetPoacherDungeon();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -293,6 +294,7 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
