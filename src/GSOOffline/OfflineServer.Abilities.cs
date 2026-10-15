@@ -293,7 +293,7 @@ namespace GSOOffline
             return m;
         }
 
-        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt) * AlignmentDamageDealt();
+        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt) * AlignmentDamageDealt() * FlyingPetDamage();
         private float AttackSpeedMultiplier() => BuffProduct(e => e.attackSpeed);
         internal float CraftTimeMultiplier() => BuffProduct(e => e.craftTime);
         internal float GatherTimeMultiplier() => BuffProduct(e => e.gatherTime);
