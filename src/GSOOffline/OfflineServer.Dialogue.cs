@@ -25,6 +25,7 @@ namespace GSOOffline
         {
             var npc = world?.GetNpc(uid);
             if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
+            if (ResumeSightseeing(npc)) return;
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 
@@ -117,11 +118,12 @@ namespace GSOOffline
                 return;
             }
             if (o.questUpdate != null) SetQuestPhase(o.questUpdate.quest, o.questUpdate.phase);
+            var shown = dialogueNode;
             if (o.otherAction > 0) RunAction(o.otherAction, dialogueNode.id);
             if (o.next > 0)
                 EnterNode(o.next);
-            else
-                CloseDialogue();
+            else if (dialogueNode == shown)
+                CloseDialogue();   // unless the action opened another conversation
         }
 
         private ActionDef pendingDialogueTeleport;
@@ -151,6 +153,7 @@ namespace GSOOffline
 
         private void RunAction(int id, int nodeId)
         {
+            if (RunCodedAction(id)) return;
             if (!Content.Actions.TryGetValue(id, out var a))
             {
                 Plugin.Log.LogWarning($"Dialogue action {id} (node {nodeId}) is not implemented yet; add it to content.json.");

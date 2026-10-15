@@ -102,6 +102,7 @@ namespace GSOOffline
             TickSitting();
             TickWindows();
             TickDialogue();
+            TickSightseeing();
             TickRespawns();
             TickCombat();
             TickRegen();

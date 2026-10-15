@@ -96,7 +96,13 @@
     { "node": 2230, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 2, "var": "32,1,0" },
     { "node": 2233, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 2, "var": "32,1,1" },
     { "node": 2238, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 4 },
-    { "node": 2239, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 5 }
+    { "node": 2239, "npc": "Vranye", "npcType": 304, "quest": 32, "phase": 5 },
+    { "node": 2120, "npc": "Nora", "npcType": 289, "quest": 30, "phase": 0 },
+    { "node": 2130, "npc": "Nora", "npcType": 290, "quest": 30, "phase": 1 },
+    { "node": 2130, "npc": "Nora", "npcType": 290, "quest": 30, "phase": 2 },
+    { "node": 2130, "npc": "Nora", "npcType": 290, "quest": 30, "phase": 3 },
+    { "node": 2130, "npc": "Nora", "npcType": 290, "quest": 30, "phase": 4 },
+    { "node": 2130, "npc": "Nora", "npcType": 290, "quest": 30, "phase": 5 }
   ],
 
   "actions": [
@@ -165,7 +171,12 @@
     { "id": 1016, "note": "Q28: the inn keeper takes the crate", "take": [ { "type": 410, "amount": 1 } ] },
     { "id": 1017, "note": "Q31: the cook book", "notice": "On the top right shelf you find a large cook book." },
     { "id": 1018, "note": "Q32: the troll's hide", "give": [ { "type": 10359, "amount": 1 } ], "onlyIfMissing": true },
-    { "id": 1019, "note": "Q32: Vranye saw the troll fall", "setVar": "32,1,1" }
+    { "id": 1019, "note": "Q32: Vranye saw the troll fall", "setVar": "32,1,1" },
+    { "id": 68, "note": "Q30: Nora comes along (OfflineServer.Sightseeing.cs walks her after you)", "setVar": "30,1,1" },
+    { "id": 69, "note": "Q30: Nora goes back to the inn (talk to her there to carry on)", "setVar": "30,1,0" },
+    { "id": 70, "note": "Q30: 'Yes, we're here' - checked in code (OfflineServer.Sightseeing.cs)" },
+    { "id": 1020, "note": "Q30: Nora sees the golem", "setVar": "30,2,1", "dialogue": 2150, "dialogueNpc": 290 },
+    { "id": 1021, "note": "Q30: the golem is dead; back to the inn", "setQuest": "30,5", "dialogue": 2160, "dialogueNpc": 290 }
   ],
 
   "triggers": [
@@ -215,7 +226,9 @@
 
     { "on": "kill", "quest": 32, "phase": 1, "npc": 96, "scene": 13, "action": 1018, "note": "a troll near Trout: its hide" },
     { "on": "kill", "quest": 32, "phase": 2, "npc": 96, "scene": 13, "action": 1019, "note": "a troll, with Vranye watching" },
-    { "on": "kill", "quest": 32, "phase": 4, "npc": 98, "scene": 13, "setPhase": 5, "note": "the dragon below Trout" }
+    { "on": "kill", "quest": 32, "phase": 4, "npc": 98, "scene": 13, "setPhase": 5, "note": "the dragon below Trout" },
+    { "on": "enter", "quest": 30, "phase": 4, "var": "30,2,0", "scene": 1, "pos": "153,17,1262", "radius": 35, "action": 1020, "note": "the golem in the forest west of Grimwall" },
+    { "on": "kill", "quest": 30, "phase": 4, "var": "30,2,1", "npc": 99, "scene": 1, "action": 1021, "note": "the golem, with Nora watching" }
   ],
 
   "npcs": [
@@ -276,7 +289,10 @@
     { "type": 228, "scene": 32, "spawn": [ "-95.0,200.5,-230.8" ] },
     { "type": 229, "scene": 32, "spawn": [ "-103.0,200.5,-230.8" ] },
     { "type": 294, "note": "world boss: George, Storage Guard of the poacher dungeon", "scene": 38, "spawn": [ "-328.2,56.8,67.2" ] },
-    { "type": 292, "note": "world boss: Sepitus, the Dark Tamer", "scene": 38, "spawn": [ "916.6,25.7,-643.1" ] }
+    { "type": 292, "note": "world boss: Sepitus, the Dark Tamer", "scene": 38, "spawn": [ "916.6,25.7,-643.1" ] },
+    { "type": 289, "note": "Q30: Nora in the Salty Wound inn, Grimwall: before and after the tour", "quest": 30, "phases": [ 0, -1 ] },
+    { "type": 289, "note": "Q30: ...and while the tour is paused", "quest": 30, "phases": [ 1, 2, 3, 4, 5 ], "var": "30,1,0" },
+    { "type": 290, "note": "Q30: Nora following you (spawned beside you in code)", "quest": 30, "phases": [ 1, 2, 3, 4, 5 ], "var": "30,1,1" }
   ],
 
   "questObjects": [

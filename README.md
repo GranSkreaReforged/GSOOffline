@@ -142,7 +142,7 @@ Working:
 - Chat
 
 Partially working:
-- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book and No True Huntsman. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Sightseeing, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
+- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman and Sightseeing. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
 
 Not yet implemented:
 - Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
