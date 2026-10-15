@@ -22,6 +22,9 @@ namespace GSOOffline
     internal static class ShopData
     {
         private const int MaxItems = 40;
+
+        // A shop id of our own (the game's run 1-47) for the Tool vendor, who has no dialogue to name one.
+        public const int ToolVendorShop = 1000;
         private static readonly Dictionary<int, ShopStock> cache = new Dictionary<int, ShopStock>();
 
         private static bool Has(ItemTemplate t, params string[] flags) => flags.Any(f => t.flags.Contains(f));
@@ -35,6 +38,11 @@ namespace GSOOffline
         private static readonly string[] ArmorSlots = { "Head", "Body", "Legs", "Feet" };
 
         private static bool Weapon(ItemTemplate t) => Has(t, WeaponFlags);
+        // The client hard-codes the basic tools (hatchets 58 and 166, pickaxe 59, fishing rod 90...) rather than
+        // flagging them in the item data, so ask it; flags alone left them out of every shop.
+        // Basic ones only: not the Dragon torch (a level 56 craft) or named keepsakes such as Owen's hatchet.
+        private static bool Tool(ItemTemplate t) =>
+            (Has(t, ToolFlags) || Scr_ItemHandler.instance.isTool(t.typeId)) && t.level <= 10 && !t.name.Contains("'s ");
         private static bool Armor(ItemTemplate t) => ArmorSlots.Contains(t.slot) && Has(t, "isLightArmor", "isHeavyArmor");
         private static bool Food(ItemTemplate t) => t.food > 0;
         private static bool Drink(ItemTemplate t) => Named(t, "beer", "ale", "wine", "mead", "cider", "milk", "tea");
@@ -57,7 +65,8 @@ namespace GSOOffline
             Rule("Arcane goods", t => (Has(t, "isStaff", "isFireStaff", "isIceStaff", "isWand") || Named(t, "robe", "rune")) && t.level <= 15, 6, 24, 39);
             Rule("Mining supplies", t => Has(t, "isPickaxe") || Named(t, " ore", "coal"), 7);
             Rule("Healing supplies", t => Named(t, "bandage", "potion", "salve") || Has(t, "isInstrument"), 8);
-            Rule("General store", t => Has(t, ToolFlags) || Named(t, "rope", "needle", "vial", "bucket"), 10, 19, 3, 26, 27, 28, 42);
+            Rule("General store", t => Tool(t) || Named(t, "rope", "needle", "vial", "bucket"), 10, 19, 3, 26, 27, 28, 42);
+            Rule("Tools", Tool, ToolVendorShop);
             Rule("Fishing supplies", t => Has(t, "isFishingRod", "isFishingNet") || Named(t, "bait"), 11);
             Rule("Farming supplies", t => Has(t, "FarmingSeed", "isSickle", "isScythe", "isShovel") || Named(t, "seed"), 12, 15);
             Rule("Alchemy supplies", t => Named(t, "vial", "flask", "mortar", "berries", "shroom", "herb", "root") && t.level <= 10, 13);
