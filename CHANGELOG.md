@@ -16,6 +16,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - No single blow takes more than 48% of your maximum health (update 140).
 
 ### Fixed
+- The Tool vendor in Grimwall's market can be talked to: he opens a shop of basic gathering tools (hatchet, pickaxe, fishing rod and net, sickle, scythe, shears, shovel and torch). The game gives him no dialogue, so clicking him did nothing. General stores now stock those tools too, as update 135 says they did: the basic ones were missing because the game marks them in code rather than in the item data. They no longer sell the Dragon torch, a level 56 craft.
 - Execution deals double damage to stunned targets, as its tooltip says. It doubled against badly hurt targets instead.
 
 ## [1.4.0] - 2026-10-14

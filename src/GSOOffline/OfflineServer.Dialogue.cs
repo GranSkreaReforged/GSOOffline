@@ -31,9 +31,18 @@ namespace GSOOffline
             int node = PickEntryNode(npc.typeId);
             if (node > 0)
                 EnterNode(node);
+            else if (ShopkeepersWithoutDialogue.TryGetValue(npc.typeId, out int shop))
+                OpenShop(shop);
             else
                 Plugin.Log.LogInfo($"NPC type {npc.typeId} ('{NpcName(npc.typeId)}') has no available dialogue.");
         }
+
+        // Merchants the game data gives no dialogue: clicking them opens their shop straight away.
+        // The Tool vendor (type 24) stands in Grimwall's market and sells gathering tools.
+        private static readonly Dictionary<int, int> ShopkeepersWithoutDialogue = new Dictionary<int, int>
+        {
+            { 24, ShopData.ToolVendorShop },
+        };
 
         private static string NpcName(int typeId) => DialogueData.NpcNames.TryGetValue(typeId, out var n) ? n : "?";
 
