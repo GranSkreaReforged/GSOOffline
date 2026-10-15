@@ -580,7 +580,8 @@ namespace GSOOffline
             npc.aggro = false;
             if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
-            npc.respawnAt = Time.time + (info?.respawnTime ?? CombatRules.NpcRespawn);
+            // A summoned minion's body fades a few seconds after it falls (TickBossMechanics removes it).
+            npc.respawnAt = Time.time + (npc.master != null ? 5f : info?.respawnTime ?? CombatRules.NpcRespawn);
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);
@@ -589,8 +590,9 @@ namespace GSOOffline
 
             int level = info?.level ?? 1;
             AwardKillXp(skill, CombatRules.KillXp(level) * (info != null && info.boss ? CombatRules.BossXpMultiplier : 1));
-            DropLoot(npc, info);
+            if (npc.master == null) DropLoot(npc, info);   // summoned minions carry nothing
             OnNpcKilled(npc.typeId);
+            OnBossKilled(npc);
         }
 
         /// <summary>
@@ -853,7 +855,7 @@ namespace GSOOffline
             {
                 if (npc.dead)
                 {
-                    if (Time.time >= npc.respawnAt) RespawnNpc(npc);
+                    if (npc.master == null && Time.time >= npc.respawnAt) RespawnNpc(npc);
                     continue;
                 }
                 if (!NpcShown(npc))
@@ -966,8 +968,15 @@ namespace GSOOffline
                 damage = Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
             }
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} (health {character.currentHealth - damage}/{MaxHealth()})");
+            HurtPlayer(damage, PlayerSplash(info));
+        }
+
+        /// <summary>Takes damage off the player (already reduced) with a hit splash; at 0 they die.</summary>
+        private void HurtPlayer(int damage, int splash)
+        {
+            if (PlayerDead) return;
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
-            Send(8, 2, character.name, -damage, PlayerSplash(info));
+            Send(8, 2, character.name, -damage, splash);
             SendHealth();
             if (character.currentHealth <= 0) PlayerDies();
         }
@@ -1035,6 +1044,7 @@ namespace GSOOffline
             TickSwingProfile();
             TickPlayerAttack(p);
             TickNpcs(p);
+            TickBossMechanics(p);
         }
     }
 }
