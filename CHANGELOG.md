@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.5.0] - 2026-10-15
 ### Added
 - Boss fights have their mechanics back, as the patch notes describe them. Nirish drops poison clouds at your feet (2 seconds to get out) and calls a spiderling that heals him until you kill it. The Supreme Sea Serpent calls two sea serpents, leaves fog fields that cost 5% of your health each second you stand in them, and sets off water explosions after a warning mist. Zalranaz winds up psychic explosions around himself and stuns you for 2 seconds; the Tomb guardians explode every 30 seconds. Sepitus summons lava hounds, Lydia her skeletal berserk and scout, and Jotnar slams the ground around him. Each uses the effect the game made for it. Summoned creatures carry no loot and vanish with their boss. Timings and damage are reconstructions.
 - Absorb, for Zalranaz and the Tomb guardians (the patch notes name it but never describe it, so this one is made up): the boss warns you in a speech bubble ("I will drink your strength...") and chat says to stop attacking; 2 seconds later, for 4 seconds, every blow or spell you land comes back at you. Another bubble and a green chat line say when the shield is down. Zalranaz's red aura now shimmers only during Absorb.
