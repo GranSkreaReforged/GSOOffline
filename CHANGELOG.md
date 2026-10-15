@@ -6,7 +6,6 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 ### Added
 - The quest "Sightseeing" can be played. Talk to Nora in the Salty Wound inn in Grimwall and show her West Athagos: she walks with you (and catches up if you teleport) to the Yorkhill Monastery, the farm's cows, the beach by the Coral Cave and the golem in the forest west of Grimwall, then back to the inn for her reward. Tell her "Yes, we're here" at each stop. "Can we continue later?" sends her back to the inn; talk to her there to carry on. The old server walked her and knew the stops, so these were rebuilt from the quest log's descriptions.
-### Added
 - Armor alignment, from the game's update 135: wear enough light or heavy armor (chest 4 points, legs 3, head 2, back, gloves and boots 1 each; 7 needed) for its passive. Light armor deals 15% more damage, heavy armor takes 10% less. The game's "Light armor" / "Heavy armor" icon shows next to your health bar while it's active.
 - Your combat level shows in the character window (update 136: your three best combat skills, plus a twelfth of the others). It used to read 0, and so did every "Effective res" line, which now shows your resistance after the soft cap.
 - Bosses give double experience (update 137).
