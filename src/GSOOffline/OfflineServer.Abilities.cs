@@ -572,6 +572,7 @@ namespace GSOOffline
             foreach (var t in targets)
             {
                 Aggro(t);
+                OnAbilityCastAt(t, a);   // quests that ask for a spell on something (A Magical Journey)
                 var target = t;
                 int hit = RollPlayerHit(weapon, t, power, a);
                 if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included

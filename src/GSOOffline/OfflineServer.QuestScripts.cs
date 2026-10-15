@@ -20,6 +20,21 @@ namespace GSOOffline
         {
             switch (id)
             {
+                case 78:   // Hunters Guild: the Porter lets members in
+                    if (CountItem(ItemInsignia) > 0)
+                    {
+                        if (dialogueNode != null) pendingInsideGuild = true;
+                        else TeleportNear(SceneAthagosInteriors, HuntersGuildHall);
+                    }
+                    else if (dialogueNpc != null) NpcSay(dialogueNpc, "That's no insignia.");
+                    return true;
+                case 79:   // Hunters Guild: a member who lost the insignia gets another
+                    if (character.GetQuestPhase(QuestHuntersGuild) == -1 && CountItem(ItemInsignia) == 0)
+                    {
+                        GiveItem(ItemInsignia);
+                        if (dialogueNpc != null) NpcSay(dialogueNpc, "Here, a new one. Don't lose it again.");
+                    }
+                    return true;
                 case 61:
                     foreach (int b in Bandages)
                     {
@@ -49,6 +64,30 @@ namespace GSOOffline
                     return true;
             }
             return false;
+        }
+
+        // ---- reconstructed quests (2020 content the original's 2019 code doesn't have) --------------
+
+        private const int QuestMagicalJourney = 16, QuestHuntersGuild = 35, QuestGrantsGloves = 34;
+        private const int ItemInsignia = 10730, SceneAthagosInteriors = 23, SceneMagesGuild = 21, AbilityFlameLance = 116, TrainingDummy = 80;
+        private static readonly Vector3 HuntersGuildHall = new Vector3(108f, 139.5f, 447f);
+        private bool pendingInsideGuild;
+
+        /// <summary>A Magical Journey: Flame Lance cast at one of Kromwell's training dummies.</summary>
+        private void OnAbilityCastAt(NpcEntity target, AbilityInfo a)
+        {
+            if (a.id != AbilityFlameLance || target.typeId != TrainingDummy || character.scene != SceneMagesGuild) return;
+            if (character.GetQuestPhase(QuestMagicalJourney) != 3) return;
+            SetQuestPhase(QuestMagicalJourney, 4);
+            Notice("Your Flame Lance scorches the training dummy. Kromwell saw it.");
+        }
+
+        /// <summary>The Porter's "Go on in": once the conversation closes, into the guild hall.</summary>
+        private void TickHuntersGuildDoor()
+        {
+            if (!pendingInsideGuild || dialogueNode != null || character == null) return;
+            pendingInsideGuild = false;
+            TeleportNear(SceneAthagosInteriors, HuntersGuildHall);
         }
 
         /// <summary>The next node for options whose next is -1: the original chose it in code. 0 = close.</summary>
