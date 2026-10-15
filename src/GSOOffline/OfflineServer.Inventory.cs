@@ -143,7 +143,8 @@ namespace GSOOffline
 
         private ItemSave NewItem(ItemTemplate t, int amount)
         {
-            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.baseGrade };
+            // Gear rolls its grade around the item's base grade (stacking resources keep theirs), as on the original server.
+            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.Stacks ? t.baseGrade : RollNewItemGrade(t.baseGrade) };
             foreach (var r in t.stats)
                 it.stats.Add(new ItemStat { key = r.key, value = Random.Range(Mathf.Min(r.min, r.max), Mathf.Max(r.min, r.max) + 1) });
             return it;

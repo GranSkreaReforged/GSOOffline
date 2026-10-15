@@ -13,7 +13,7 @@ namespace GSOOffline
             {
                 if (!it.equipped) continue;
                 foreach (var s in it.stats)
-                    if (s.key == "Health") max += s.value;
+                    if (s.key == "Health") max += Graded(it, s.value);
             }
             return Mathf.Max(1, max + BonusHealth());
         }
@@ -51,7 +51,7 @@ namespace GSOOffline
             foreach (var it in character.items)
                 if (it.equipped)
                     foreach (var s in it.stats)
-                        if (s.key == key) sum += s.value;
+                        if (s.key == key) sum += Graded(it, s.value);
             return sum;
         }
 
