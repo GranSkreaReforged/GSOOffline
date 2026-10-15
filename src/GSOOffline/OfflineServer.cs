@@ -106,6 +106,7 @@ namespace GSOOffline
             TickPet();
             TickRespawns();
             TickCombat();
+            TickHarpy();
             TickRegen();
             TickWeight();
             TickLoot();

@@ -140,6 +140,7 @@ Working:
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
+- Aellope, Goldon's flying world boss: patrols one of five routes over the island, dives when shot, fights on the ground, takes off again after 20 seconds without damage, feeds on a fallen player, and returns an hour after she's killed (the original server's behaviour)
 - Boss mechanics: poison clouds, fog fields, water and psychic explosions, stuns, ground slams and summoned minions (Nirish, the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Sepitus, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
 - Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)
 

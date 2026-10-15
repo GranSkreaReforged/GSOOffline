@@ -107,7 +107,8 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 12/0 NPC health | uid, current, max, damage type (the client shows the difference as a hit splash) |
 | 11/0 NPC attacking | uid, attacking, target player name (combat state only; it plays no animation) |
 | 198/26 NPC animation | uid, animation id. The client plays only what the server sends: idle, run, attack (each swing) and death. Ids index the client's shared clip table (`EasyAnimationHandler.animations`) and come from `anim_idle`/`anim_run`/`anim_attack`/`anim_death` in NPCInfo (client defaults 28/29/39/30). Id 0 is an empty clip that leaves models in their bind pose. |
-| 198/25 + 13/2 NPC move | uid, current pos, waypoint1, waypoint2 / uid, moving. The client walks in a straight line. |
+| 198/25 + 13/2 NPC move | uid, current pos, waypoint1, waypoint2 / uid, moving. The client walks in a straight line, height included (never put on the ground), so a waypoint in the air flies the NPC there (Aellope). |
+| 198/31 NPC movement speed | **speed, uid** (this order: the client's `UpdateNpcMovementSpeed(v1, uniqueId)`), int metres per second. |
 | 13/0 NPC dead, 9/1 set NPC position | uid, dead / uid, pos |
 | 8/2 player damage | name, signed delta (negative = damage), damage type |
 | 1/2 player dead | name, dead |
