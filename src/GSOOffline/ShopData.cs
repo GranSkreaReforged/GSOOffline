@@ -6,6 +6,29 @@ using UnityEngine;
 
 namespace GSOOffline
 {
+    [Serializable]
+    public class ShopFileItem
+    {
+        public int typeId;
+        public string name;
+        public int price;     // 0 = the item's own price
+        public int max, stock, restock;   // the original's stock cap, starting stock and restock time (not used yet)
+    }
+
+    [Serializable]
+    public class ShopFileShop
+    {
+        public int id;
+        public string name;
+        public List<ShopFileItem> items = new List<ShopFileItem>();
+    }
+
+    [Serializable]
+    public class ShopFile
+    {
+        public List<ShopFileShop> shops = new List<ShopFileShop>();
+    }
+
     public class ShopStock
     {
         public string name;
@@ -14,17 +37,36 @@ namespace GSOOffline
     }
 
     /// <summary>
-    /// NPC shop inventories. The real stock lists lived on the server and are lost, so each shop id
-    /// (dialogue openshop=) gets thematically matching items from the item database, chosen by
-    /// item flags / slot / name, at their listed price. Owners were identified by walking each NPC's
-    /// dialogue tree to its openshop node.
+    /// NPC shop inventories, by shop id (dialogue openshop=). Data/shops.json is the original server's stock
+    /// (Shops.xml, sent by the game's developer; built by GSODevTools' gen_shops.py), at each item's price
+    /// unless the shop sets one. A shop id it lacks falls back to the themed rules below, which picked
+    /// matching items from the item database before the original lists were known.
     /// </summary>
     internal static class ShopData
     {
         private const int MaxItems = 40;
 
-        // A shop id of our own (the game's run 1-47) for the Tool vendor, who has no dialogue to name one.
-        public const int ToolVendorShop = 1000;
+        // The Tool vendor has no dialogue to name a shop; the original's "Tools" shop is his stock.
+        public const int ToolVendorShop = 3;
+
+        private static Dictionary<int, ShopFileShop> original;
+
+        private static Dictionary<int, ShopFileShop> Original
+        {
+            get
+            {
+                if (original != null) return original;
+                original = new Dictionary<int, ShopFileShop>();
+                using (var s = typeof(ShopData).Assembly.GetManifestResourceStream("GSOOffline.shops.json"))
+                {
+                    if (s == null) return original;
+                    using (var r = new StreamReader(s))
+                        foreach (var shop in Json.Deserialize<ShopFile>(r.ReadToEnd()).shops) original[shop.id] = shop;
+                }
+                Plugin.Log.LogInfo($"[shop] {original.Count} shops from the original server's stock lists");
+                return original;
+            }
+        }
         private static readonly Dictionary<int, ShopStock> cache = new Dictionary<int, ShopStock>();
 
         private static bool Has(ItemTemplate t, params string[] flags) => flags.Any(f => t.flags.Contains(f));
@@ -66,7 +108,6 @@ namespace GSOOffline
             Rule("Mining supplies", t => Has(t, "isPickaxe") || Named(t, " ore", "coal"), 7);
             Rule("Healing supplies", t => Named(t, "bandage", "potion", "salve") || Has(t, "isInstrument"), 8);
             Rule("General store", t => Tool(t) || Named(t, "rope", "needle", "vial", "bucket"), 10, 19, 3, 26, 27, 28, 42);
-            Rule("Tools", Tool, ToolVendorShop);
             Rule("Fishing supplies", t => Has(t, "isFishingRod", "isFishingNet") || Named(t, "bait"), 11);
             Rule("Farming supplies", t => Has(t, "FarmingSeed", "isSickle", "isScythe", "isShovel") || Named(t, "seed"), 12, 15);
             Rule("Alchemy supplies", t => Named(t, "vial", "flask", "mortar", "berries", "shroom", "herb", "root") && t.level <= 10, 13);
@@ -91,6 +132,18 @@ namespace GSOOffline
         public static ShopStock Get(int shopId)
         {
             if (cache.TryGetValue(shopId, out var stock)) return stock;
+            if (Original.TryGetValue(shopId, out var real))
+            {
+                stock = new ShopStock { name = real.name };
+                foreach (var it in real.items)
+                {
+                    var t = ItemData.Get(it.typeId);
+                    if (t == null) continue;
+                    stock.items.Add(new[] { it.typeId, it.price > 0 ? it.price : t.price });
+                }
+                cache[shopId] = stock;
+                return stock;
+            }
             if (!rules.TryGetValue(shopId, out var rule)) rule = rules[10];
             stock = Build(rule.Key, rule.Value);
             if (stock.items.Count == 0) stock = Build("General store", rules[10].Value);
