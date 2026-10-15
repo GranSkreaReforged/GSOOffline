@@ -174,6 +174,40 @@ namespace GSOOffline
 
         private static AbilityRule Of(AbilityKind kind) => AbilityRule.Of(kind);
 
+        // Snowball event abilities are listed under Archery but are thrown by hand.
+        private static readonly HashSet<int> AnyWeaponAbilities = new HashSet<int> { 151, 152, 153 };
+
+        /// <summary>
+        /// What a skill ability needs in hand or worn that the player lacks, or null. Weapon abilities (keys 2-5)
+        /// come from the weapon in hand already. Elemental grimoire is the staff skill and Healing the lute skill
+        /// (community wiki; bandage heals only need bandages), Swordsmanship needs a broadsword, greatsword or
+        /// halberd (update 121), Archery a bow or crossbow, and the armor skills 7 alignment points (update 135).
+        /// </summary>
+        private string MissingEquipmentFor(AbilityInfo a, AbilityRule rule)
+        {
+            if (a.weaponSkill || AnyWeaponAbilities.Contains(a.id) || rule.kind == AbilityKind.Bandage) return null;
+            var w = EquippedWeapon();
+            int t = w != null ? w.typeId : 0;
+            var ih = Scr_ItemHandler.instance;
+            switch ((a.skill ?? string.Empty).Replace(" ", string.Empty).ToLowerInvariant())
+            {
+                case "elementalgrim":
+                    return w != null && (ih.isStaff(t) || ih.isWand(t)) ? null : "a staff or wand in hand";
+                case "healing":
+                    return w != null && ih.isInstrument(t) ? null : "a lute in hand";
+                case "swordsmanship":
+                    return w != null && (ih.isBroadsword(t) || ih.isGreatsword(t) || ih.isHalberd(t)) ? null
+                        : "a broadsword, greatsword or halberd in hand";
+                case "archery":
+                    return w != null && (ih.isBow(t) || ih.isCrossBow(t)) ? null : "a bow or crossbow in hand";
+                case "lightarmor":
+                    return WornAlignment() == Alignment.Light ? null : "more light armor on (chest, legs, head...)";
+                case "heavyarmor":
+                    return WornAlignment() == Alignment.Heavy ? null : "more heavy armor on (chest, legs, head...)";
+            }
+            return null;
+        }
+
         private static AbilityRule RuleFor(AbilityInfo a)
         {
             if (AbilityRules.TryGetValue(a.id, out var r)) return r;
@@ -384,6 +418,12 @@ namespace GSOOffline
             if (skill != 0 && SkillLevel(skill) < a.level)
             {
                 Notice($"You need level {a.level} {a.skill} to use {a.name}.", "red");
+                return;
+            }
+            string needs = MissingEquipmentFor(a, rule);
+            if (needs != null)
+            {
+                Notice($"You need {needs} to use {a.name}.", "red");
                 return;
             }
             if (character.currentMana < a.manaCost)

@@ -16,6 +16,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - No single blow takes more than 48% of your maximum health (update 140).
 
 ### Fixed
+- Skill abilities need the right gear, as in the original game: Elemental grimoire spells a staff or wand in hand, Healing's lute songs and spells a lute (bandage heals only need bandages), Swordsmanship skills a broadsword, greatsword or halberd (update 121), Archery skills a bow or crossbow, and the light and heavy armor skills 7 points of that armor worn (update 135). Any of them used to work with any weapon. Without the gear you get a message saying what's missing.
 - Execution deals double damage to stunned targets, as its tooltip says. It doubled against badly hurt targets instead.
 
 ## [1.4.0] - 2026-10-14
