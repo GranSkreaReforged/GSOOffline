@@ -477,6 +477,73 @@ namespace GSOOffline
             Plugin.Log.LogInfo("[dev] client stats: " + string.Join(" ", parts.ToArray()));
         }
 
+        // devhealth <n>: the test character's base health (only for throwaway characters: it's saved).
+        private static void DevHealth(string[] args) => OfflineServer.Instance.DevSetHealth(int.Parse(args[1]));
+
+        // blowlog on|off: log every creature blow aimed at the player ([blow] lines), to check who attacks.
+        private static void BlowLog(string[] args) => OfflineServer.LogBlows = args.Length < 2 || args[1] != "off";
+
+        // flyers: the client's flying followers (parrot, bats): prefab type, model, and distance from the player.
+        private static void Flyers(string[] args)
+        {
+            var me = Scr_PlayerHandler.instance.player.transform.position;
+            foreach (var f in Scr_FlyingFollowers.instance.list)
+            {
+                if (f == null || f.gameObject == null) continue;
+                var model = f.gameObject.transform.childCount > 0 ? f.gameObject.transform.GetChild(0).name : "-";
+                Plugin.Log.LogInfo($"[dev] flyer {f.uniqueId} type {f.typeId} '{f.petname}' of {f.playerName} model {model} at {UnityEngine.Vector3.Distance(f.gameObject.transform.position, me):F1} m, found={f.playerFound}");
+                foreach (var r in f.gameObject.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                    Plugin.Log.LogInfo($"[dev]   renderer {r.name} enabled={r.enabled} active={r.gameObject.activeInHierarchy} size={r.bounds.size} mat={(r.sharedMaterial != null ? r.sharedMaterial.name : "-")}");
+            }
+            Plugin.Log.LogInfo($"[dev] {Scr_FlyingFollowers.instance.list.Count} flying followers");
+        }
+
+        // spawnedobjects [from] [to]: what each spawned-object prefab (Resources/1LoadingAssets/SpawnedObjects/
+        // ab_spawnedObject_N) contains: its objects, materials and particle systems, to identify them by name.
+        private static void SpawnedObjects(string[] args)
+        {
+            int from = args.Length > 1 ? int.Parse(args[1]) : 1, to = args.Length > 2 ? int.Parse(args[2]) : 60;
+            for (int i = from; i <= to; i++)
+            {
+                var go = UnityEngine.Resources.Load("1LoadingAssets/SpawnedObjects/ab_spawnedObject_" + i, typeof(UnityEngine.GameObject)) as UnityEngine.GameObject;
+                if (go == null) continue;
+                var names = new System.Collections.Generic.List<string>();
+                foreach (var t in go.GetComponentsInChildren<UnityEngine.Transform>(true))
+                    if (names.Count < 12) names.Add(t.name);
+                var mats = new System.Collections.Generic.List<string>();
+                foreach (var r in go.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                    if (r.sharedMaterial != null && !mats.Contains(r.GetType().Name + ":" + r.sharedMaterial.name)) mats.Add(r.GetType().Name + ":" + r.sharedMaterial.name);
+                var scripts = new System.Collections.Generic.List<string>();
+                foreach (var m in go.GetComponentsInChildren<UnityEngine.MonoBehaviour>(true))
+                    if (m != null && !scripts.Contains(m.GetType().Name)) scripts.Add(m.GetType().Name);
+                Plugin.Log.LogInfo($"[dev] spawned object {i}: {string.Join("/", names.ToArray())} | materials {string.Join(",", mats.ToArray())} | scripts {string.Join(",", scripts.ToArray())}");
+            }
+        }
+
+        // npcparts <uid>: a client NPC's child objects with renderers: type, material, active and enabled, to find
+        // an aura or effect that's part of its model.
+        private static void NpcParts(string[] args)
+        {
+            var npc = Scr_NpcHandler.instance.getNpc(int.Parse(args[1]));
+            if (npc == null) { Plugin.Log.LogInfo("[dev] npcparts: no such NPC"); return; }
+            foreach (var r in npc.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                Plugin.Log.LogInfo($"[dev]   {r.transform.parent?.name}/{r.name} {r.GetType().Name} mat={(r.sharedMaterial != null ? r.sharedMaterial.name : "-")} active={r.gameObject.activeInHierarchy} enabled={r.enabled}");
+            foreach (var l in npc.GetComponentsInChildren<UnityEngine.Light>(true))
+                Plugin.Log.LogInfo($"[dev]   light {l.transform.parent?.name}/{l.name} {l.type} color={l.color} range={l.range:F1} intensity={l.intensity:F1} active={l.gameObject.activeInHierarchy} enabled={l.enabled}");
+        }
+
+        // npcpart <uid> <child name> on|off: shows or hides a named part of a client NPC's model (an aura, an orb).
+        private static void NpcPart(string[] args)
+        {
+            var npc = Scr_NpcHandler.instance.getNpc(int.Parse(args[1]));
+            string name = args[2].Replace('_', ' ');
+            foreach (var t in npc.GetComponentsInChildren<UnityEngine.Transform>(true))
+                if (t.name == name) { t.gameObject.SetActive(args[3] == "on"); Plugin.Log.LogInfo($"[dev] {name} {args[3]}"); }
+        }
+
+        // combatstats: combat level, armor alignment and effective resistances, server against client.
+        private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
+
         private static void PlayerState(string[] args)
         {
             var pl = Scr_PlayerHandler.instance.player;

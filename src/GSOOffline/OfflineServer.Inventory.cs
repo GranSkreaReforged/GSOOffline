@@ -378,6 +378,7 @@ namespace GSOOffline
             if (after > before && sceneReady)
             {
                 OnLevelUp(key, after);   // not for the starter kit's levels at creation
+                SendCombatLevel();
                 if (skillId == SkillElementalGrim) SendMana();   // the mana pool grew
             }
         }

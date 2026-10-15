@@ -174,6 +174,40 @@ namespace GSOOffline
 
         private static AbilityRule Of(AbilityKind kind) => AbilityRule.Of(kind);
 
+        // Snowball event abilities are listed under Archery but are thrown by hand.
+        private static readonly HashSet<int> AnyWeaponAbilities = new HashSet<int> { 151, 152, 153 };
+
+        /// <summary>
+        /// What a skill ability needs in hand or worn that the player lacks, or null. Weapon abilities (keys 2-5)
+        /// come from the weapon in hand already. Elemental grimoire is the staff skill and Healing the lute skill
+        /// (community wiki; bandage heals only need bandages), Swordsmanship needs a broadsword, greatsword or
+        /// halberd (update 121), Archery a bow or crossbow, and the armor skills 7 alignment points (update 135).
+        /// </summary>
+        private string MissingEquipmentFor(AbilityInfo a, AbilityRule rule)
+        {
+            if (a.weaponSkill || AnyWeaponAbilities.Contains(a.id) || rule.kind == AbilityKind.Bandage) return null;
+            var w = EquippedWeapon();
+            int t = w != null ? w.typeId : 0;
+            var ih = Scr_ItemHandler.instance;
+            switch ((a.skill ?? string.Empty).Replace(" ", string.Empty).ToLowerInvariant())
+            {
+                case "elementalgrim":
+                    return w != null && (ih.isStaff(t) || ih.isWand(t)) ? null : "a staff or wand in hand";
+                case "healing":
+                    return w != null && ih.isInstrument(t) ? null : "a lute in hand";
+                case "swordsmanship":
+                    return w != null && (ih.isBroadsword(t) || ih.isGreatsword(t) || ih.isHalberd(t)) ? null
+                        : "a broadsword, greatsword or halberd in hand";
+                case "archery":
+                    return w != null && (ih.isBow(t) || ih.isCrossBow(t)) ? null : "a bow or crossbow in hand";
+                case "lightarmor":
+                    return WornAlignment() == Alignment.Light ? null : "more light armor on (chest, legs, head...)";
+                case "heavyarmor":
+                    return WornAlignment() == Alignment.Heavy ? null : "more heavy armor on (chest, legs, head...)";
+            }
+            return null;
+        }
+
         private static AbilityRule RuleFor(AbilityInfo a)
         {
             if (AbilityRules.TryGetValue(a.id, out var r)) return r;
@@ -259,7 +293,7 @@ namespace GSOOffline
             return m;
         }
 
-        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt);
+        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt) * AlignmentDamageDealt() * FlyingPetDamage();
         private float AttackSpeedMultiplier() => BuffProduct(e => e.attackSpeed);
         internal float CraftTimeMultiplier() => BuffProduct(e => e.craftTime);
         internal float GatherTimeMultiplier() => BuffProduct(e => e.gatherTime);
@@ -279,7 +313,9 @@ namespace GSOOffline
         /// </summary>
         private int ApplyDefensiveBuffs(int damage, NpcEntity attacker)
         {
-            if (damage <= 0 || buffs.Count == 0) return damage;
+            if (damage <= 0) return damage;
+            damage = Mathf.RoundToInt(damage * AlignmentDamageTaken());
+            if (buffs.Count == 0) return damage;
             int raw = damage;
             foreach (var b in buffs)
                 if (b.effect.absorb)
@@ -382,6 +418,12 @@ namespace GSOOffline
             if (skill != 0 && SkillLevel(skill) < a.level)
             {
                 Notice($"You need level {a.level} {a.skill} to use {a.name}.", "red");
+                return;
+            }
+            string needs = MissingEquipmentFor(a, rule);
+            if (needs != null)
+            {
+                Notice($"You need {needs} to use {a.name}.", "red");
                 return;
             }
             if (character.currentMana < a.manaCost)
@@ -522,7 +564,11 @@ namespace GSOOffline
                 var target = t;
                 int hit = RollPlayerHit(weapon, t, power, a);
                 if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
-                if (execution && t.health * 4 <= t.maxHealth) hit *= 2;   // double damage on a badly hurt target
+                if (execution && Time.time < t.stunnedUntil)
+                {
+                    hit *= 2;   // "Double damage for stunned targets"
+                    Plugin.Log.LogInfo($"[ability] Execution doubled on stunned {t.uid}: {hit}");
+                }
                 // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
                 int upFront = rule.dot > 0f ? hit / 2 : hit;
                 System.Action<int, int> land = (strike, strikes) =>
@@ -532,7 +578,7 @@ namespace GSOOffline
                     PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : weaponHitSfx, NpcPosition(target));
                     if (strike == 0 && hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
                     int share = upFront / strikes + (strike == strikes - 1 ? upFront % strikes : 0);
-                    DealDamage(target, share, xpSkill);
+                    DealDamage(target, share, xpSkill, reflectable: true);
                     if (vampiric && share > 0) Heal(share / 2);
                 };
                 releases.Add((strike, strikes) =>
@@ -601,11 +647,13 @@ namespace GSOOffline
 
         private void ApplyNpcEffects(NpcEntity npc, AbilityRule rule, int hit, int skill)
         {
-            if (rule.stun > 0f)
+            if (rule.stun > 0f && Time.time >= npc.stunImmuneUntil)
             {
-                npc.stunnedUntil = Mathf.Max(npc.stunnedUntil, Time.time + rule.stun);
+                npc.stunnedUntil = Time.time + rule.stun;
+                npc.stunImmuneUntil = npc.stunnedUntil + CombatRules.StunImmunity;
                 PlayNpcEffect(npc, 21);
             }
+            else if (rule.stun > 0f) Plugin.Log.LogInfo($"[ability] {npc.uid} is immune to stuns for {npc.stunImmuneUntil - Time.time:0.0}s");
             if (rule.root > 0f) npc.rootedUntil = Mathf.Max(npc.rootedUntil, Time.time + rule.root);
             if (rule.stun > 0f || rule.root > 0f) HoldNpc(npc);
             if (rule.dot > 0f)

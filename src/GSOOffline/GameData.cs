@@ -29,6 +29,7 @@ namespace GSOOffline
         public float attackDelay;      // seconds into a swing before the blow lands
         public float attackMissDistance;   // a melee blow misses if the player got this much beyond reach
         public int damage;             // explicit damage (rare); 0 = derive from level
+        public bool boss;              // boss="1": double experience
         public int defence;
         public int damageBlock;
         public int damageType;         // DamageKinds index of its blows (9 slash, 10 blunt, 11 piercing...)
@@ -135,6 +136,12 @@ namespace GSOOffline
             }
         }
 
+        // Bosses the data doesn't flag: Argus ("New lvl 35 boss Argus", update 139). His damage value (8) is on
+        // the pets' scale, so unflagged he barely scratched you.
+        private static readonly HashSet<int> UnflaggedBosses = new HashSet<int> { 358 };
+
+        private static bool IsBoss(XmlNode n) => IntAttr(n, "boss") == 1 || UnflaggedBosses.Contains(IntAttr(n, "id"));
+
         private static void LoadNpcs()
         {
             foreach (XmlNode n in LoadXml("XMLs/NPCInfo").DocumentElement.ChildNodes)
@@ -147,7 +154,7 @@ namespace GSOOffline
                     name = Attr(n, "name"),
                     level = level,
                     // Only a couple of entries carry explicit health; the rest was a server-side formula.
-                    health = IntAttr(n, "health", CombatRules.NpcHealth(level)),
+                    health = IntAttr(n, "health", IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)),
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
@@ -155,10 +162,12 @@ namespace GSOOffline
                     aggressive = IntAttr(n, "aggressive") == 1,
                     aggroDistance = IntAttr(n, "aggrodistance", 10),
                     attackDistance = Mathf.Max(2.5f, IntAttr(n, "attackdistance", 3)),
-                    attackSpeed = IntAttr(n, "attackspeed", 3000) / 1000f,
+                    // 0 (Phraustie) would swing every frame: treat it as unset.
+                    attackSpeed = (IntAttr(n, "attackspeed", 3000) > 0 ? IntAttr(n, "attackspeed", 3000) : 3000) / 1000f,
                     attackDelay = IntAttr(n, "attackdelay", 600) / 1000f,
                     attackMissDistance = IntAttr(n, "attackmissdistance", 1),
                     damage = IntAttr(n, "damage"),
+                    boss = IsBoss(n),
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),

@@ -46,6 +46,10 @@ Types must match exactly, because the receiver casts with `(int)`, `(string)`, `
 | 16/1 weather | int time (0–2400), int cloudiness |
 | 2/0 chat line | unused, text (optional `color=yellow\|` prefix), int channel |
 | 2/41 notification | text |
+| 7/41 flying followers | `uid_type_owner_petName` joined by `>`. Loads `1LoadingAssets/FlyingFollowers/Prefab_FlyingFollower_<type>` (1 parrot, 2 bat) onto the owner's right shoulder; it survives scene loads (`DontDestroyOnLoad`), so send it once. |
+| 25/22 remove flying follower | uid |
+| 2/55 flying follower says | owner, text: a chat bubble over the owner's flying follower (`/parrotsay`). |
+| Walking pets | no message of their own: the PET creature type (NPCInfo `isPet="1"`, named like the item) goes in the 2/2 NPC list like any NPC. |
 
 ## Client → server, by area
 

@@ -140,16 +140,18 @@ Working:
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
+- Boss mechanics: poison clouds, fog fields, water and psychic explosions, stuns, ground slams and summoned minions (Nirish, the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Sepitus, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
+- Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)
 
 Partially working:
-- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book and No True Huntsman. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Sightseeing, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
+- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman and Sightseeing. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
 
 Not yet implemented:
 - Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 
-Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
+Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes. Boss uniques and pets the wiki misses come from the official patch notes on Steam.
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 

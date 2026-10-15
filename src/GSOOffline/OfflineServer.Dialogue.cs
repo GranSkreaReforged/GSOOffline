@@ -25,15 +25,25 @@ namespace GSOOffline
         {
             var npc = world?.GetNpc(uid);
             if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
+            if (ResumeSightseeing(npc)) return;
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 
             int node = PickEntryNode(npc.typeId);
             if (node > 0)
                 EnterNode(node);
+            else if (ShopkeepersWithoutDialogue.TryGetValue(npc.typeId, out int shop))
+                OpenShop(shop);
             else
                 Plugin.Log.LogInfo($"NPC type {npc.typeId} ('{NpcName(npc.typeId)}') has no available dialogue.");
         }
+
+        // Merchants the game data gives no dialogue: clicking them opens their shop straight away.
+        // The Tool vendor (type 24) stands in Grimwall's market and sells gathering tools.
+        private static readonly Dictionary<int, int> ShopkeepersWithoutDialogue = new Dictionary<int, int>
+        {
+            { 24, ShopData.ToolVendorShop },
+        };
 
         private static string NpcName(int typeId) => DialogueData.NpcNames.TryGetValue(typeId, out var n) ? n : "?";
 
@@ -117,11 +127,12 @@ namespace GSOOffline
                 return;
             }
             if (o.questUpdate != null) SetQuestPhase(o.questUpdate.quest, o.questUpdate.phase);
+            var shown = dialogueNode;
             if (o.otherAction > 0) RunAction(o.otherAction, dialogueNode.id);
             if (o.next > 0)
                 EnterNode(o.next);
-            else
-                CloseDialogue();
+            else if (dialogueNode == shown)
+                CloseDialogue();   // unless the action opened another conversation
         }
 
         private ActionDef pendingDialogueTeleport;
@@ -151,6 +162,7 @@ namespace GSOOffline
 
         private void RunAction(int id, int nodeId)
         {
+            if (RunCodedAction(id)) return;
             if (!Content.Actions.TryGetValue(id, out var a))
             {
                 Plugin.Log.LogWarning($"Dialogue action {id} (node {nodeId}) is not implemented yet; add it to content.json.");
