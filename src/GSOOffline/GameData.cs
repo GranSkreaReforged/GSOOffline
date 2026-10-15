@@ -148,7 +148,7 @@ namespace GSOOffline
                     name = Attr(n, "name"),
                     level = level,
                     // Only a couple of entries carry explicit health; the rest was a server-side formula.
-                    health = IntAttr(n, "health", CombatRules.NpcHealth(level)),
+                    health = IntAttr(n, "health", IntAttr(n, "boss") == 1 ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)),
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
