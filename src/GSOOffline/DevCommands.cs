@@ -498,6 +498,28 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] {Scr_FlyingFollowers.instance.list.Count} flying followers");
         }
 
+        // spawnedobjects [from] [to]: what each spawned-object prefab (Resources/1LoadingAssets/SpawnedObjects/
+        // ab_spawnedObject_N) contains: its objects, materials and particle systems, to identify them by name.
+        private static void SpawnedObjects(string[] args)
+        {
+            int from = args.Length > 1 ? int.Parse(args[1]) : 1, to = args.Length > 2 ? int.Parse(args[2]) : 60;
+            for (int i = from; i <= to; i++)
+            {
+                var go = UnityEngine.Resources.Load("1LoadingAssets/SpawnedObjects/ab_spawnedObject_" + i, typeof(UnityEngine.GameObject)) as UnityEngine.GameObject;
+                if (go == null) continue;
+                var names = new System.Collections.Generic.List<string>();
+                foreach (var t in go.GetComponentsInChildren<UnityEngine.Transform>(true))
+                    if (names.Count < 12) names.Add(t.name);
+                var mats = new System.Collections.Generic.List<string>();
+                foreach (var r in go.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                    if (r.sharedMaterial != null && !mats.Contains(r.GetType().Name + ":" + r.sharedMaterial.name)) mats.Add(r.GetType().Name + ":" + r.sharedMaterial.name);
+                var scripts = new System.Collections.Generic.List<string>();
+                foreach (var m in go.GetComponentsInChildren<UnityEngine.MonoBehaviour>(true))
+                    if (m != null && !scripts.Contains(m.GetType().Name)) scripts.Add(m.GetType().Name);
+                Plugin.Log.LogInfo($"[dev] spawned object {i}: {string.Join("/", names.ToArray())} | materials {string.Join(",", mats.ToArray())} | scripts {string.Join(",", scripts.ToArray())}");
+            }
+        }
+
         // combatstats: combat level, armor alignment and effective resistances, server against client.
         private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
 
