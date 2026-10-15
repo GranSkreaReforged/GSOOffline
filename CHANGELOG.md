@@ -4,6 +4,19 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Added
+- Armor alignment, from the game's update 135: wear enough light or heavy armor (chest 4 points, legs 3, head 2, back, gloves and boots 1 each; 7 needed) for its passive. Light armor deals 15% more damage, heavy armor takes 10% less. The game's "Light armor" / "Heavy armor" icon shows next to your health bar while it's active.
+- Your combat level shows in the character window (update 136: your three best combat skills, plus a twelfth of the others). It used to read 0, and so did every "Effective res" line, which now shows your resistance after the soft cap.
+- Bosses give double experience (update 137).
+
+### Changed
+- Resistances follow the game's soft cap (update 136): full value up to 60%, then diminishing to a hard cap of 90%. They were cut off flat at 75%.
+- Broadswords and bows always deal at least half their maximum hit with basic attacks, greatswords 30% and halberds 65% (update 130). Brutal slash deals at least 75%, Cripple 50% and Fire ball 60%. Every hit used to roll from 1.
+- After a stun wears off, a creature can't be stunned again for 4 seconds (updates 117 and 131), so stuns can't chain forever.
+- No single blow takes more than 48% of your maximum health (update 140).
+
+### Fixed
+- Execution deals double damage to stunned targets, as its tooltip says. It doubled against badly hurt targets instead.
 
 ## [1.4.0] - 2026-10-14
 ### Added

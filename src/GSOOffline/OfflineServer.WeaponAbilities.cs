@@ -87,6 +87,7 @@ namespace GSOOffline
             ManaStatsChanged();
             SendGearStats();
             SendWeaponAbilities();
+            RefreshAlignment();
         }
     }
 }

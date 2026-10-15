@@ -155,6 +155,7 @@ namespace GSOOffline
             SendHealth();
             SendMana();
             SendGearStats();
+            RefreshAlignment(true);
             SendSceneLoot();
             SendBoats();
 

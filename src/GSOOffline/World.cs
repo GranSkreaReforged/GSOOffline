@@ -26,6 +26,7 @@ namespace GSOOffline
 
         // ability effects
         public float stunnedUntil, rootedUntil;
+        public float stunImmuneUntil;   // a fresh stun can't land before this (CombatRules.StunImmunity)
         public int dotDamage, dotTicks, dotSkill;
         public float nextDot;
     }

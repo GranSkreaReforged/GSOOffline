@@ -99,6 +99,8 @@ namespace GSOOffline
         private void SendGearStats()
         {
             foreach (var kv in GearBonusStats) Send(16, 5, kv.Value, GearStat(kv.Key));
+            SendEffectiveResistances();
+            SendCombatLevel();
         }
 
         /// <summary>Out of combat: HealthRegen() per 3 s; mana always ManaRegen() per 3 s.</summary>
