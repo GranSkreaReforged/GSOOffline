@@ -17,6 +17,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ### Fixed
 - The Tool vendor in Grimwall's market can be talked to: he opens a shop of basic gathering tools (hatchet, pickaxe, fishing rod and net, sickle, scythe, shears, shovel and torch). The game gives him no dialogue, so clicking him did nothing. General stores now stock those tools too, as update 135 says they did: the basic ones were missing because the game marks them in code rather than in the item data. They no longer sell the Dragon torch, a level 56 craft.
+- Skill abilities need the right gear, as in the original game: Elemental grimoire spells a staff or wand in hand, Healing's lute songs and spells a lute (bandage heals only need bandages), Swordsmanship skills a broadsword, greatsword or halberd (update 121), Archery skills a bow or crossbow, and the light and heavy armor skills 7 points of that armor worn (update 135). Any of them used to work with any weapon. Without the gear you get a message saying what's missing.
 - Execution deals double damage to stunned targets, as its tooltip says. It doubled against badly hurt targets instead.
 
 ## [1.4.0] - 2026-10-14
