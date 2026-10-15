@@ -19,6 +19,7 @@ namespace GSOOffline
         /// </summary>
         private bool NpcShown(NpcEntity npc)
         {
+            if (npc.typeId == LakhmuTrapped && LakhmuFollower != null) return false;   // he's following the player out
             if (character == null || !Content.NpcRules.TryGetValue(npc.typeId, out var rules)) return true;
             foreach (var r in rules)
                 if (RuleHolds(r)) return true;

@@ -39,6 +39,7 @@ namespace GSOOffline
             pendingSpawnNeedsClearing = false;
             pendingCrossing = null;
             ResetOysters();
+            ResetLakhmusBasement();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -291,6 +292,7 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
             if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
