@@ -97,6 +97,9 @@ namespace GSOOffline
                     case "useportal":   // sent by the client when confirming the snowy portal
                         UsePortal();
                         break;
+                    case "parrotsay":
+                        ParrotSay(string.Join(" ", a, 1, a.Length - 1));
+                        break;
                     case "save":
                         SaveCurrentCharacter();
                         Notice("Character saved.");

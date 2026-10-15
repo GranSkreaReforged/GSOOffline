@@ -45,6 +45,14 @@ namespace GSOOffline
         public const float MaxHitShare = 0.48f;
         // After a stun wears off, the target can't be stunned again for this long (updates 117 and 131; NPCs too, 126).
         public const float StunImmunity = 4f;
+        // Pets (update 132): a pet's blow is this share of its owner's basic hit (reconstruction; the notes only
+        // say it comes from the owner's damage and weapon level), times its grade: 94% Damaged to 136% Mythic
+        // (update 138). Flying followers instead add 8.5% (Damaged) to 19% (Mythic) to your damage (update 136;
+        // update 140 lowered it by an unrecorded amount).
+        public const float PetDamageShare = 0.5f;
+        public static float PetGradeMultiplier(int grade) => 1f + 0.06f * (Mathf.Clamp(grade, 1, 8) - 2);
+        public static float FlyingPetBonus(int grade) => 0.085f + 0.015f * (Mathf.Clamp(grade, 1, 8) - 1);
+
         // Bosses give double experience (update 137).
         public const int BossXpMultiplier = 2;
 

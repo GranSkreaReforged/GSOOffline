@@ -483,6 +483,21 @@ namespace GSOOffline
         // blowlog on|off: log every creature blow aimed at the player ([blow] lines), to check who attacks.
         private static void BlowLog(string[] args) => OfflineServer.LogBlows = args.Length < 2 || args[1] != "off";
 
+        // flyers: the client's flying followers (parrot, bats): prefab type, model, and distance from the player.
+        private static void Flyers(string[] args)
+        {
+            var me = Scr_PlayerHandler.instance.player.transform.position;
+            foreach (var f in Scr_FlyingFollowers.instance.list)
+            {
+                if (f == null || f.gameObject == null) continue;
+                var model = f.gameObject.transform.childCount > 0 ? f.gameObject.transform.GetChild(0).name : "-";
+                Plugin.Log.LogInfo($"[dev] flyer {f.uniqueId} type {f.typeId} '{f.petname}' of {f.playerName} model {model} at {UnityEngine.Vector3.Distance(f.gameObject.transform.position, me):F1} m, found={f.playerFound}");
+                foreach (var r in f.gameObject.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                    Plugin.Log.LogInfo($"[dev]   renderer {r.name} enabled={r.enabled} active={r.gameObject.activeInHierarchy} size={r.bounds.size} mat={(r.sharedMaterial != null ? r.sharedMaterial.name : "-")}");
+            }
+            Plugin.Log.LogInfo($"[dev] {Scr_FlyingFollowers.instance.list.Count} flying followers");
+        }
+
         // combatstats: combat level, armor alignment and effective resistances, server against client.
         private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
 

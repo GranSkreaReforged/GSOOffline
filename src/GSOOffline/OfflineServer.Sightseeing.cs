@@ -107,23 +107,30 @@ namespace GSOOffline
             }
             if (dialogueNpc != null && dialogueNpc.uid == nora.uid && dialogueNode != null) return;   // she's talking
 
-            Vector3 me = player.transform.position;
-            Vector3 her = NpcPosition(nora);
-            float dist = Vector3.Distance(me, her);
+            KeepBeside(nora, player.transform.position);
+        }
+
+        /// <summary>
+        /// Walks a companion (Nora, a pet) after the player: it catches up at once if left far behind (a teleport,
+        /// a cart, a run it couldn't keep up with) and otherwise walks to stay about 2 m away.
+        /// </summary>
+        private void KeepBeside(NpcEntity n, Vector3 me)
+        {
+            Vector3 at = NpcPosition(n);
+            float dist = Vector3.Distance(me, at);
             if (dist > 25f)
             {
-                // Left behind (a teleport, a cart, a run she couldn't keep up with): she catches up.
                 Vector3 p = BesidePlayer(me);
-                nora.pos = nora.spawnPos = p;
-                nora.hasDest = false;
-                Send(9, 1, nora.uid, p);
+                n.pos = n.spawnPos = p;
+                n.hasDest = false;
+                Send(9, 1, n.uid, p);
             }
             else if (dist > 3.5f)
             {
-                Vector3 toHer = her - me;
-                toHer.y = 0f;
-                MoveNpc(nora, me + toHer.normalized * 2f);
-                nora.spawnPos = me;
+                Vector3 away = at - me;
+                away.y = 0f;
+                MoveNpc(n, me + away.normalized * 2f);
+                n.spawnPos = me;
             }
         }
     }
