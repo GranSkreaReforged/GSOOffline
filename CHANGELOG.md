@@ -4,6 +4,13 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Every shop sells what it sold in the original game: 43 shops, 650 items, from the original server's stock lists (the game's developer sent us the server). Shopkeepers used to sell items picked by theme. The Grimwall Tool vendor now sells the original Tools stock, which includes the knife and the mortar and pestle.
+
+### Fixed
+- Bosses stand where the original server put them: Nirish, the Supreme Sea Serpent, George and Sepitus a few metres from where players remembered, the three Tomb guardians spread across Lakhmu's basement instead of huddled together, Phraustie a little west, and Sytrax, who turns out to be Sepitus's dragon, beside Sepitus instead of in the graveyard. Positions from the original server's spawn code.
+- A zone could get stuck reloading: when the game's own scene setup failed part-way (its minimap broke), it re-ran every frame, and the server rebuilt the zone each time, resetting every creature and boss and killing a character who had just arrived. A failed setup now runs once, and a repeat is ignored.
+
 
 ## [1.5.0] - 2026-10-15
 ### Added

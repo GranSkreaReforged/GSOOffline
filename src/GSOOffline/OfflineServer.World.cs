@@ -116,7 +116,19 @@ namespace GSOOffline
         private void OnNewSceneLoaded(object[] c)
         {
             if (character == null) return;
-            var current = Script_sceneManager.instance.currentScene;
+            var manager = Script_sceneManager.instance;
+            // The client sends this from Script_sceneManager.OnNewSceneLoaded and clears its `async` only when that
+            // method returns. If anything after this message throws (Scr_UI_Minimap.UpdateMap does once the minimap's
+            // image has been destroyed), it runs again every frame: the black fade-in, the camera setup and this
+            // message, which rebuilt the world each frame (bosses reset, the player killed again on arrival). Clearing
+            // `async` here ends it after one pass, and a repeat for the zone we already have is ignored.
+            manager.async = null;
+            var current = manager.currentScene;
+            if (sceneReady && world != null && world.sceneId == current.id && character.scene == current.id)
+            {
+                Plugin.Log.LogWarning($"Scene {current.id} reported loaded again; ignored (the client's scene setup threw?)");
+                return;
+            }
             character.scene = current.id;
 
             GameData.EnsureLoaded();
