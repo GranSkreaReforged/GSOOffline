@@ -32,6 +32,10 @@ namespace GSOOffline
         public float reflectFrom;       // ...and from then the player's hits come back at them        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
         public int dotDamage, dotTicks, dotSkill;
         public float nextDot;
+
+        // scripted NPCs (Aellope, OfflineServer.Harpy.cs)
+        public bool flying;       // in the air: its script moves and animates it, the ground AI leaves it alone
+        public bool ownRespawn;   // its script brings it back, not the respawn timer
     }
 
     public class HarvestableEntity
@@ -73,6 +77,13 @@ namespace GSOOffline
                 int hp = GameData.Npcs.TryGetValue(d.typeId, out var info) ? info.health : 30;
                 w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = d.typeId, spawnPos = p, pos = p, health = hp, maxHealth = hp });
             }
+            // What the original server spawned where the client has no markers (Data/spawns.json).
+            i = 7000;
+            foreach (var r in SpawnData.Npcs(sceneId))
+            {
+                int hp = GameData.Npcs.TryGetValue(r.type, out var info) ? info.health : 30;
+                w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = r.type, spawnPos = r.Position, pos = r.Position, health = hp, maxHealth = hp });
+            }
             // Quest NPCs the scene has no marker for (content.json "spawn").
             i = 9000;
             foreach (var kv in OfflineServer.SpawnsFor(sceneId))
@@ -90,6 +101,12 @@ namespace GSOOffline
                     health = w.RollHarvestableHealth(d.typeId),
                 });
             }
+            foreach (var r in SpawnData.Harvestables(sceneId))
+                w.harvestables.Add(new HarvestableEntity
+                {
+                    uid = 5000000 + sceneId * 10000 + i++, typeId = r.type, pos = r.Position,
+                    health = w.RollHarvestableHealth(r.type),
+                });
             Plugin.Log.LogInfo($"Scene {sceneId} ({unitySceneName}): {w.npcs.Count} NPCs, {w.harvestables.Count} harvestables.");
             return w;
         }

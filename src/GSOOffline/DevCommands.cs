@@ -575,6 +575,9 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] actionId {p.anim.actionId}");
         }
 
+        // npcpercent <uid> <percent>: sets an NPC's current health to that share of its maximum (boss health thresholds).
+        private static void NpcPercent(string[] args) => OfflineServer.Instance.DevNpcPercent(int.Parse(args[1]), int.Parse(args[2]));
+
         // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).
         private static void NpcHp(string[] args) => OfflineServer.Instance.DevSetNpcHealth(int.Parse(args[1]), int.Parse(args[2]));
 
@@ -603,6 +606,39 @@ namespace GSOOffline
 
         // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
         private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
+
+        // spawnground: checks the original server's spawns in this scene (Data/spawns.json) against the ground.
+        private static void SpawnGround(string[] args) => OfflineServer.Instance.LogSpawnGround();
+
+        // setgrade <itemId> <grade>: sets an item's grade (1 damaged - 8 mythic), for testing upgrades.
+        private static void SetGrade(string[] args) => OfflineServer.Instance.DevSetGrade(int.Parse(args[1]), int.Parse(args[2]));
+
+        // where <name>: every loaded object whose name contains the word, with its position and renderer bounds.
+        private static void Where(string[] args)
+        {
+            foreach (var t in UnityEngine.Object.FindObjectsOfType<UnityEngine.Transform>())
+            {
+                if (t.name.IndexOf(args[1], System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+                var r = t.GetComponent<UnityEngine.Renderer>();
+                Plugin.Log.LogInfo($"[dev] where '{t.name}' at {t.position}" + (r != null ? $" bounds {r.bounds.min} - {r.bounds.max}" : ""));
+            }
+            Plugin.Log.LogInfo("[dev] where done");
+        }
+
+        // objs: the spawned objects the client shows (gates, lifts, oysters...), with their positions.
+        private static void Objs(string[] args)
+        {
+            foreach (var so in Scr_SpawnedObjectHandler.instance.objectList)
+                if (so != null) Plugin.Log.LogInfo($"[dev] object {so.uniqueId} type {so.typeId} at {so.transform.position} rot {so.transform.eulerAngles.y:0}");
+            Plugin.Log.LogInfo("[dev] objs done");
+        }
+
+        // silver <amount>: sets the test character's silver (boat rides, shops).
+        private static void Silver(string[] args) => OfflineServer.Instance.SetSilver(int.Parse(args[1]));
+
+        // harpy [spawn [route 0-4] | hit [damage] | takeoff | back]: where Aellope is and what she's doing; spawn puts her on a
+        // route now, hit deals her damage (default 1) as the player (in the air: she dives at you).
+        private static void Harpy(string[] args) => OfflineServer.Instance.DevHarpy(args);
 
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));

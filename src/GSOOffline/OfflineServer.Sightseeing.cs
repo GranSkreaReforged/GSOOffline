@@ -37,6 +37,8 @@ namespace GSOOffline
         /// <summary>Dialogue actions done in code; true if <paramref name="id"/> was one.</summary>
         private bool RunCodedAction(int id)
         {
+            if (RunLakhmuAction(id)) return true;
+            if (RunQuestScriptAction(id)) return true;
             if (id != ActionWereHere) return false;
             SightseeingArrived();
             return true;

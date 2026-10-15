@@ -6,25 +6,83 @@ using UnityEngine;
 
 namespace GSOOffline
 {
+    [Serializable]
+    public class ShopFileItem
+    {
+        public int typeId;
+        public string name;
+        public int price;     // 0 = the item's own price
+        public int max, stock, restock;   // the original's stock cap, starting stock and restock seconds (0 = its defaults)
+    }
+
+    [Serializable]
+    public class ShopFileShop
+    {
+        public int id;
+        public string name;
+        public List<ShopFileItem> items = new List<ShopFileItem>();
+    }
+
+    [Serializable]
+    public class ShopFile
+    {
+        public List<ShopFileShop> shops = new List<ShopFileShop>();
+    }
+
     public class ShopStock
     {
         public string name;
         public int merchantSilver = 5000;
-        public List<int[]> items = new List<int[]>();   // typeId, price
+        public List<ShopEntry> items = new List<ShopEntry>();
     }
 
     /// <summary>
-    /// NPC shop inventories. The real stock lists lived on the server and are lost, so each shop id
-    /// (dialogue openshop=) gets thematically matching items from the item database, chosen by
-    /// item flags / slot / name, at their listed price. Owners were identified by walking each NPC's
-    /// dialogue tree to its openshop node.
+    /// One item a shop sells. Original shops keep stock as the original server did (Scr_ShopHandler): it starts at
+    /// the list's starting stock (else its cap, else 1), comes back one at a time every restock seconds (default 5)
+    /// up to the cap (default 1), and resources sold to the shop go back on its shelf. Themed fallback shops have
+    /// no stock limit (stock -1).
+    /// </summary>
+    public class ShopEntry
+    {
+        public int typeId, price;
+        public int stock = -1, max, restock;
+        public float nextRestock;
+
+        public bool Limited => stock >= 0;
+        public int Shown => Limited ? stock : 99;
+    }
+
+    /// <summary>
+    /// NPC shop inventories, by shop id (dialogue openshop=). Data/shops.json is the original server's stock
+    /// (Shops.xml, sent by the game's developer; built by GSODevTools' gen_shops.py), at each item's price
+    /// unless the shop sets one. A shop id it lacks falls back to the themed rules below, which picked
+    /// matching items from the item database before the original lists were known.
     /// </summary>
     internal static class ShopData
     {
         private const int MaxItems = 40;
 
-        // A shop id of our own (the game's run 1-47) for the Tool vendor, who has no dialogue to name one.
-        public const int ToolVendorShop = 1000;
+        // The Tool vendor has no dialogue to name a shop; the original's "Tools" shop is his stock.
+        public const int ToolVendorShop = 3;
+
+        private static Dictionary<int, ShopFileShop> original;
+
+        private static Dictionary<int, ShopFileShop> Original
+        {
+            get
+            {
+                if (original != null) return original;
+                original = new Dictionary<int, ShopFileShop>();
+                using (var s = typeof(ShopData).Assembly.GetManifestResourceStream("GSOOffline.shops.json"))
+                {
+                    if (s == null) return original;
+                    using (var r = new StreamReader(s))
+                        foreach (var shop in Json.Deserialize<ShopFile>(r.ReadToEnd()).shops) original[shop.id] = shop;
+                }
+                Plugin.Log.LogInfo($"[shop] {original.Count} shops from the original server's stock lists");
+                return original;
+            }
+        }
         private static readonly Dictionary<int, ShopStock> cache = new Dictionary<int, ShopStock>();
 
         private static bool Has(ItemTemplate t, params string[] flags) => flags.Any(f => t.flags.Contains(f));
@@ -66,7 +124,6 @@ namespace GSOOffline
             Rule("Mining supplies", t => Has(t, "isPickaxe") || Named(t, " ore", "coal"), 7);
             Rule("Healing supplies", t => Named(t, "bandage", "potion", "salve") || Has(t, "isInstrument"), 8);
             Rule("General store", t => Tool(t) || Named(t, "rope", "needle", "vial", "bucket"), 10, 19, 3, 26, 27, 28, 42);
-            Rule("Tools", Tool, ToolVendorShop);
             Rule("Fishing supplies", t => Has(t, "isFishingRod", "isFishingNet") || Named(t, "bait"), 11);
             Rule("Farming supplies", t => Has(t, "FarmingSeed", "isSickle", "isScythe", "isShovel") || Named(t, "seed"), 12, 15);
             Rule("Alchemy supplies", t => Named(t, "vial", "flask", "mortar", "berries", "shroom", "herb", "root") && t.level <= 10, 13);
@@ -91,11 +148,45 @@ namespace GSOOffline
         public static ShopStock Get(int shopId)
         {
             if (cache.TryGetValue(shopId, out var stock)) return stock;
+            if (Original.TryGetValue(shopId, out var real))
+            {
+                stock = new ShopStock { name = real.name };
+                foreach (var it in real.items)
+                {
+                    var t = ItemData.Get(it.typeId);
+                    if (t == null) continue;
+                    int max = it.max > 0 ? it.max : 1;
+                    stock.items.Add(new ShopEntry
+                    {
+                        typeId = it.typeId, price = it.price > 0 ? it.price : t.price,
+                        max = max, stock = it.stock > 0 ? it.stock : max, restock = it.restock > 0 ? it.restock : 5,
+                    });
+                }
+                cache[shopId] = stock;
+                return stock;
+            }
             if (!rules.TryGetValue(shopId, out var rule)) rule = rules[10];
             stock = Build(rule.Key, rule.Value);
             if (stock.items.Count == 0) stock = Build("General store", rules[10].Value);
             cache[shopId] = stock;
             return stock;
+        }
+
+        /// <summary>Puts restocked items back on the shelves of every shop opened this session; true if the given one changed.</summary>
+        public static bool Restock(ShopStock watched)
+        {
+            bool changed = false;
+            foreach (var shop in cache.Values)
+                foreach (var e in shop.items)
+                {
+                    if (!e.Limited || e.stock >= e.max) { e.nextRestock = 0f; continue; }
+                    if (e.nextRestock <= 0f) { e.nextRestock = Time.time + e.restock; continue; }
+                    if (Time.time < e.nextRestock) continue;
+                    e.stock++;
+                    e.nextRestock = e.stock < e.max ? Time.time + e.restock : 0f;
+                    if (shop == watched) changed = true;
+                }
+            return changed;
         }
 
         // Items without an icon file are unused/test entries; the client would show a "?" for them.
@@ -108,7 +199,7 @@ namespace GSOOffline
             foreach (var t in ItemData.Templates.Values
                          .Where(t => t.price > 0 && !string.IsNullOrEmpty(t.name) && !t.flags.Contains("untradeable") && HasIcon(t.typeId) && filter(t))
                          .OrderBy(t => t.level).ThenBy(t => t.price).Take(MaxItems))
-                stock.items.Add(new[] { t.typeId, t.price });
+                stock.items.Add(new ShopEntry { typeId = t.typeId, price = t.price });
             return stock;
         }
     }

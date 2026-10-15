@@ -33,16 +33,10 @@ namespace GSOOffline
 
     public partial class OfflineServer
     {
-        // Boss type -> its moves. Sources: the official patch notes (updates 130-140) and the client's effects list.
+        // Boss type -> its moves (Nirish, George, Sytrax and Sepitus run the original server's scripts instead:
+        // OfflineServer.OriginalBosses.cs). Sources: the official patch notes (updates 130-140) and the client's effects list.
         private static readonly Dictionary<int, BossMove[]> BossMoves = new Dictionary<int, BossMove[]>
         {
-            // Nirish, King of the Sewers: poison clouds you get 2 seconds to leave (update 137), and a healing
-            // spiderling that mends him while it lives (update 140).
-            { 275, new[] {
-                new BossMove { kind = BossMoveKind.Hazard, every = 12f, delay = 2f, radius = 4f, share = 1.2f, warnGfx = 110, hitGfx = 110,
-                    damageKind = DamageKinds.Poison, note = "poison cloud" },
-                new BossMove { kind = BossMoveKind.Summon, every = 30f, minions = new[] { 276 }, cap = 1, note = "healing spiderling" },
-            } },
             // Supreme Sea Serpent: 2 serpents, 2 fog fields at 5% health, water explosions (update 139).
             { 102, new[] {
                 new BossMove { kind = BossMoveKind.Summon, every = 30f, minions = new[] { 101 }, cap = 2, note = "sea serpents" },
@@ -59,10 +53,6 @@ namespace GSOOffline
             } },
             // Tomb guardians: psychic explosions on a 30 second cycle (update 139).
             { 227, TombGuardian() }, { 228, TombGuardian() }, { 229, TombGuardian() },
-            // Sepitus, the Dark Tamer: summons lava hounds ("poacher dungeon boss / spawn lava doggo" effect).
-            { 292, new[] {
-                new BossMove { kind = BossMoveKind.Summon, every = 30f, minions = new[] { 296 }, cap = 2, hitGfx = 155, note = "infernal hounds" },
-            } },
             // Lydia, the Tamer's Apprentice: the data's "summoner boss minions".
             { 362, new[] {
                 new BossMove { kind = BossMoveKind.Summon, every = 30f, minions = new[] { 364, 365 }, cap = 2, note = "skeletal berserk and scout" },
@@ -88,8 +78,6 @@ namespace GSOOffline
 
         private static BossMove Absorb() => new BossMove { kind = BossMoveKind.Absorb, every = 35f, note = "absorb" };
 
-        private const int NirishSpiderling = 276;
-        private const float SpiderlingHealPerSecond = 0.01f;   // of Nirish's health (reconstruction)
 
         // Per boss uid: when each move is next due.
         private readonly Dictionary<int, float[]> bossMoveAt = new Dictionary<int, float[]>();
@@ -125,7 +113,6 @@ namespace GSOOffline
                     due[i] = Time.time + moves[i].every;
                     UseBossMove(boss, moves[i], playerPos);
                 }
-                if (boss.typeId == 275) MendNirish(boss);
             }
             foreach (var n in world.npcs)
                 if (BossMoves.TryGetValue(n.typeId, out var m) && System.Array.Exists(m, x => x.kind == BossMoveKind.Absorb))
@@ -274,15 +261,6 @@ namespace GSOOffline
         }
 
         private int nextMinion;
-
-        /// <summary>Nirish's spiderling mends him while it lives (update 140).</summary>
-        private void MendNirish(NpcEntity nirish)
-        {
-            if (nirish.health >= nirish.maxHealth || !world.npcs.Exists(n => n.master == nirish && n.typeId == NirishSpiderling && !n.dead)) return;
-            int heal = Mathf.Max(1, Mathf.RoundToInt(nirish.maxHealth * SpiderlingHealPerSecond * 0.5f));   // per half-second tick
-            nirish.health = Mathf.Min(nirish.maxHealth, nirish.health + heal);
-            Send(12, 0, nirish.uid, nirish.health, nirish.maxHealth, 0);
-        }
 
         /// <summary>A boss died or the fight ended: its minions go too.</summary>
         private void DismissMinions(NpcEntity boss)

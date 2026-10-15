@@ -1,0 +1,3945 @@
+{
+ "source": "the original Gran Skrea Online server's Shops.xml (sent by the game's developer)",
+ "generator": "GSODevTools tools/datamining/gen_shops.py",
+ "shops": [
+  {
+   "id": 1,
+   "name": "Iron weapons",
+   "items": [
+    {
+     "typeId": 81,
+     "name": "Iron halberd"
+    },
+    {
+     "typeId": 83,
+     "name": "Iron greatsword"
+    },
+    {
+     "typeId": 183,
+     "name": "Iron broadsword"
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "name": "Iron armor",
+   "items": [
+    {
+     "typeId": 60,
+     "name": "Iron plate helmet"
+    },
+    {
+     "typeId": 61,
+     "name": "Iron plate body"
+    },
+    {
+     "typeId": 62,
+     "name": "Iron plate legs"
+    },
+    {
+     "typeId": 191,
+     "name": "Iron heater shield"
+    },
+    {
+     "typeId": 19,
+     "name": "Cow leather boots"
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "name": "Tools",
+   "items": [
+    {
+     "typeId": 40,
+     "name": "Sickle",
+     "max": 10
+    },
+    {
+     "typeId": 58,
+     "name": "Hatchet",
+     "max": 10
+    },
+    {
+     "typeId": 59,
+     "name": "Pickaxe",
+     "max": 10
+    },
+    {
+     "typeId": 126,
+     "name": "Scythe",
+     "max": 10
+    },
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "max": 10
+    },
+    {
+     "typeId": 10333,
+     "name": "Mortar and pestle",
+     "max": 10
+    },
+    {
+     "typeId": 10099,
+     "name": "Knife",
+     "max": 10
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "name": "Pastry",
+   "items": [
+    {
+     "typeId": 10079,
+     "name": "Wheat bread",
+     "max": 10
+    },
+    {
+     "typeId": 10083,
+     "name": "Fishy bread",
+     "max": 10
+    },
+    {
+     "typeId": 10080,
+     "name": "Yeast",
+     "max": 100,
+     "restock": 1
+    },
+    {
+     "typeId": 57,
+     "name": "Chef's hat"
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "name": "The Salty Wound Inn",
+   "items": [
+    {
+     "typeId": 10310,
+     "name": "Pint of beer"
+    },
+    {
+     "typeId": 10311,
+     "name": "Bottle of wine"
+    },
+    {
+     "typeId": 10288,
+     "name": "Whitefish"
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "name": "Magic equipment",
+   "items": [
+    {
+     "typeId": 199,
+     "name": "Spruce staff of Fire"
+    },
+    {
+     "typeId": 1,
+     "name": "Wool robe bottom"
+    },
+    {
+     "typeId": 3,
+     "name": "Wool pointy hat"
+    },
+    {
+     "typeId": 6,
+     "name": "Wool robe top"
+    },
+    {
+     "typeId": 9,
+     "name": "Cotton robe top"
+    },
+    {
+     "typeId": 16,
+     "name": "Cotton robe bottom"
+    },
+    {
+     "typeId": 262,
+     "name": "Amulet of wisdom"
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "name": "Rocks",
+   "items": [
+    {
+     "typeId": 10385,
+     "name": "Rock",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10015,
+     "name": "Bucket of clay",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 59,
+     "name": "Pickaxe"
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "name": "Healing instruments",
+   "items": [
+    {
+     "typeId": 80,
+     "name": "Spruce lute"
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "name": "PvP",
+   "items": [
+    {
+     "typeId": 264,
+     "name": "Amulet of great wisdom"
+    },
+    {
+     "typeId": 267,
+     "name": "Ring of great wisdom"
+    },
+    {
+     "typeId": 70,
+     "name": "Torch"
+    },
+    {
+     "typeId": 80,
+     "name": "Spruce lute"
+    },
+    {
+     "typeId": 346,
+     "name": "Flax robe top"
+    },
+    {
+     "typeId": 347,
+     "name": "Flax robe bottom"
+    },
+    {
+     "typeId": 348,
+     "name": "Flax pointy hat"
+    },
+    {
+     "typeId": 324,
+     "name": "Shadow dagger"
+    },
+    {
+     "typeId": 325,
+     "name": "Shadow halberd"
+    },
+    {
+     "typeId": 326,
+     "name": "Shadow greatsword"
+    },
+    {
+     "typeId": 327,
+     "name": "Shadow mace"
+    },
+    {
+     "typeId": 328,
+     "name": "Shadow broadsword"
+    },
+    {
+     "typeId": 335,
+     "name": "Deadwood bow"
+    },
+    {
+     "typeId": 338,
+     "name": "Deadwood crossbow"
+    },
+    {
+     "typeId": 341,
+     "name": "Deadwood staff of fire"
+    },
+    {
+     "typeId": 308,
+     "name": "Shadow plate helmet"
+    },
+    {
+     "typeId": 309,
+     "name": "Shadow chain helmet"
+    },
+    {
+     "typeId": 310,
+     "name": "Shadow platebody"
+    },
+    {
+     "typeId": 311,
+     "name": "Shadow platelegs"
+    },
+    {
+     "typeId": 312,
+     "name": "Shadow plate boots"
+    },
+    {
+     "typeId": 313,
+     "name": "Shadow plate gloves"
+    },
+    {
+     "typeId": 314,
+     "name": "Shadow heater shield"
+    },
+    {
+     "typeId": 315,
+     "name": "Shadow buckler shield"
+    },
+    {
+     "typeId": 276,
+     "name": "Troll leather body"
+    },
+    {
+     "typeId": 277,
+     "name": "Troll leather chaps"
+    },
+    {
+     "typeId": 278,
+     "name": "Troll leather hood"
+    },
+    {
+     "typeId": 279,
+     "name": "Troll leather boots"
+    },
+    {
+     "typeId": 280,
+     "name": "Troll leather bracelet"
+    },
+    {
+     "typeId": 281,
+     "name": "Troll leather quiver"
+    },
+    {
+     "typeId": 115,
+     "name": "Ring of the forest"
+    },
+    {
+     "typeId": 10443,
+     "name": "Flax bandage"
+    },
+    {
+     "typeId": 10067,
+     "name": "Weak health potion"
+    },
+    {
+     "typeId": 10068,
+     "name": "Health potion"
+    },
+    {
+     "typeId": 10069,
+     "name": "Strong health potion"
+    },
+    {
+     "typeId": 10093,
+     "name": "Weak mana potion"
+    },
+    {
+     "typeId": 10454,
+     "name": "Mana potion"
+    },
+    {
+     "typeId": 10297,
+     "name": "Crayfish"
+    },
+    {
+     "typeId": 10392,
+     "name": "PvP Crystal"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "name": "General store",
+   "items": [
+    {
+     "typeId": 70,
+     "name": "Torch"
+    },
+    {
+     "typeId": 163,
+     "name": "White peasant shirt"
+    },
+    {
+     "typeId": 243,
+     "name": "Brown peasant pants"
+    },
+    {
+     "typeId": 19,
+     "name": "Cow leather boots"
+    },
+    {
+     "typeId": 10079,
+     "name": "Wheat bread",
+     "max": 50,
+     "restock": 1
+    },
+    {
+     "typeId": 10067,
+     "name": "Weak health potion",
+     "max": 10
+    },
+    {
+     "typeId": 10395,
+     "name": "Home wayshrine teleport",
+     "max": 10
+    },
+    {
+     "typeId": 10367,
+     "name": "Wool bandage",
+     "max": 10
+    },
+    {
+     "typeId": 10472,
+     "name": "Auction house teleport",
+     "max": 10
+    },
+    {
+     "typeId": 10532,
+     "name": "Arena teleport",
+     "max": 50,
+     "restock": 1
+    },
+    {
+     "typeId": 40,
+     "name": "Sickle",
+     "max": 10
+    },
+    {
+     "typeId": 58,
+     "name": "Hatchet",
+     "max": 10
+    },
+    {
+     "typeId": 59,
+     "name": "Pickaxe",
+     "max": 10
+    },
+    {
+     "typeId": 126,
+     "name": "Scythe",
+     "max": 10
+    },
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "max": 10
+    },
+    {
+     "typeId": 10333,
+     "name": "Mortar and pestle",
+     "max": 10
+    },
+    {
+     "typeId": 10099,
+     "name": "Knife",
+     "max": 10
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "name": "Fisherman",
+   "items": [
+    {
+     "typeId": 90,
+     "name": "Fishing rod"
+    }
+   ]
+  },
+  {
+   "id": 12,
+   "name": "Farmer",
+   "items": [
+    {
+     "typeId": 126,
+     "name": "Scythe"
+    }
+   ]
+  },
+  {
+   "id": 13,
+   "name": "Alchemist",
+   "items": [
+    {
+     "typeId": 40,
+     "name": "Sickle"
+    },
+    {
+     "typeId": 10333,
+     "name": "Mortar and pestle"
+    }
+   ]
+  },
+  {
+   "id": 14,
+   "name": "Lumberjack",
+   "items": [
+    {
+     "typeId": 58,
+     "name": "Hatchet"
+    }
+   ]
+  },
+  {
+   "id": 15,
+   "name": "Gardener",
+   "items": [
+    {
+     "typeId": 10345,
+     "name": "Furniture: Fern",
+     "max": 10
+    },
+    {
+     "typeId": 10346,
+     "name": "Furniture: Fern 2",
+     "max": 10
+    },
+    {
+     "typeId": 10347,
+     "name": "Furniture: Grass",
+     "max": 10
+    },
+    {
+     "typeId": 10348,
+     "name": "Furniture: Grass 2",
+     "max": 10
+    },
+    {
+     "typeId": 10349,
+     "name": "Furniture: Mushroom",
+     "max": 10
+    },
+    {
+     "typeId": 10350,
+     "name": "Furniture: Mushroom 2",
+     "max": 10
+    },
+    {
+     "typeId": 10351,
+     "name": "Furniture: Shrub",
+     "max": 10
+    },
+    {
+     "typeId": 10352,
+     "name": "Furniture: Lamp post",
+     "max": 10
+    },
+    {
+     "typeId": 10353,
+     "name": "Furniture: Lamp post 2",
+     "max": 10
+    }
+   ]
+  },
+  {
+   "id": 16,
+   "name": "Food store",
+   "items": [
+    {
+     "typeId": 10318,
+     "name": "Cabbage",
+     "max": 10,
+     "restock": 3
+    },
+    {
+     "typeId": 10319,
+     "name": "Redberries",
+     "max": 5,
+     "restock": 3
+    },
+    {
+     "typeId": 10320,
+     "name": "Pumpkin",
+     "max": 5,
+     "restock": 3
+    },
+    {
+     "typeId": 10332,
+     "name": "Egg",
+     "max": 5,
+     "restock": 3
+    },
+    {
+     "typeId": 10336,
+     "name": "Tomato",
+     "max": 5,
+     "restock": 3
+    },
+    {
+     "typeId": 10337,
+     "name": "Carrot",
+     "max": 5,
+     "restock": 3
+    },
+    {
+     "typeId": 10340,
+     "name": "Honey",
+     "max": 5,
+     "restock": 3
+    }
+   ]
+  },
+  {
+   "id": 17,
+   "name": "Gem store",
+   "items": [
+    {
+     "typeId": 10251,
+     "name": "Garnet crystal",
+     "max": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 10264,
+     "name": "Zircon crystal",
+     "max": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 10243,
+     "name": "Amazonite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10244,
+     "name": "Apatite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10245,
+     "name": "Calcite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10246,
+     "name": "Cinnabar crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10247,
+     "name": "Diamond crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10248,
+     "name": "Emerald crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10249,
+     "name": "Aquamarine crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10250,
+     "name": "Fluorite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10252,
+     "name": "Halite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10253,
+     "name": "Hematite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10254,
+     "name": "Magnetite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10255,
+     "name": "Malachite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10256,
+     "name": "Pyrite crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10257,
+     "name": "Quartz crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10258,
+     "name": "Ruby crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10259,
+     "name": "Sapphire crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10260,
+     "name": "Sulphur crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10261,
+     "name": "Topaz crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10262,
+     "name": "Tourmaline crystal",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10263,
+     "name": "Turquoise crystal",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 18,
+   "name": "Fine blades",
+   "items": [
+    {
+     "typeId": 183,
+     "name": "Iron broadsword",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 83,
+     "name": "Iron greatsword",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 81,
+     "name": "Iron halberd",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 187,
+     "name": "Steel broadsword",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 71,
+     "name": "Steel greatsword",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 82,
+     "name": "Steel halberd",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 188,
+     "name": "Verum broadsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 97,
+     "name": "Verum greatsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 150,
+     "name": "Verum halberd",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 189,
+     "name": "Stranite broadsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 184,
+     "name": "Stranite greatsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 190,
+     "name": "Stranite halberd",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 328,
+     "name": "Shadow broadsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 326,
+     "name": "Shadow greatsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 325,
+     "name": "Shadow halberd",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 333,
+     "name": "Iridium broadsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 331,
+     "name": "Iridium greatsword",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 330,
+     "name": "Iridium halberd",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 19,
+   "name": "Fish store",
+   "items": [
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10084,
+     "name": "Raw whitefish",
+     "max": 20,
+     "restock": 5
+    },
+    {
+     "typeId": 10085,
+     "name": "Whitefish flakes",
+     "max": 10,
+     "restock": 5
+    },
+    {
+     "typeId": 10290,
+     "name": "Raw crayfish",
+     "max": 3,
+     "restock": 15
+    },
+    {
+     "typeId": 10291,
+     "name": "Oyster",
+     "max": 3,
+     "restock": 15
+    },
+    {
+     "typeId": 10292,
+     "name": "Raw poyfish",
+     "max": 20,
+     "restock": 5
+    },
+    {
+     "typeId": 10293,
+     "name": "Raw glassfish",
+     "max": 20,
+     "restock": 5
+    },
+    {
+     "typeId": 10294,
+     "name": "Silverback crayfish",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10296,
+     "name": "Raw oyster meat",
+     "max": 3,
+     "restock": 15
+    },
+    {
+     "typeId": 10300,
+     "name": "Oyster shell",
+     "max": 3,
+     "restock": 15
+    },
+    {
+     "typeId": 10331,
+     "name": "Bag of sea salt",
+     "max": 15,
+     "restock": 5
+    },
+    {
+     "typeId": 10343,
+     "name": "Raw stripefish",
+     "max": 2,
+     "restock": 5
+    },
+    {
+     "typeId": 10344,
+     "name": "Sarkas",
+     "max": 1,
+     "restock": 5
+    },
+    {
+     "typeId": 10400,
+     "name": "Coral key",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10422,
+     "name": "Sea serpent fang",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10515,
+     "name": "Raw trout",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 10643,
+     "name": "Smolderfish",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 20,
+   "name": "Yorkhill Jewellery",
+   "items": [
+    {
+     "typeId": 263,
+     "name": "Powerful amulet of wisdom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 265,
+     "name": "Ring of wisdom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 272,
+     "name": "Amulet of Frost",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 358,
+     "name": "Amulet of fire",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 359,
+     "name": "Amulet of ice",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 360,
+     "name": "Amulet of electricity",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 361,
+     "name": "Amulet of psychic",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 362,
+     "name": "Amulet of wind",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 363,
+     "name": "Amulet of earth",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 366,
+     "name": "Uplifting ring",
+     "max": 1,
+     "restock": 60
+    }
+   ]
+  },
+  {
+   "id": 21,
+   "name": "Signature stamps",
+   "items": [
+    {
+     "typeId": 10307,
+     "name": "Signature stamp",
+     "price": 10000,
+     "max": 5
+    }
+   ]
+  },
+  {
+   "id": 22,
+   "name": "Heavy armor",
+   "items": [
+    {
+     "typeId": 60,
+     "name": "Iron plate helmet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 61,
+     "name": "Iron plate body",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 62,
+     "name": "Iron plate legs",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 63,
+     "name": "Steel plate helmet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 64,
+     "name": "Steel plate body",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 65,
+     "name": "Steel plate legs",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 215,
+     "name": "Steel chain helmet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 191,
+     "name": "Iron heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 192,
+     "name": "Steel heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 273,
+     "name": "Iron kite shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 193,
+     "name": "Iron buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 206,
+     "name": "Steel buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 204,
+     "name": "Verum heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 207,
+     "name": "Verum buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 306,
+     "name": "Stranite heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 307,
+     "name": "Stranite buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 314,
+     "name": "Shadow heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 315,
+     "name": "Shadow buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 322,
+     "name": "Iridium heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 323,
+     "name": "Iridium buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 207,
+     "name": "Verum buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 216,
+     "name": "Verum chain helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 231,
+     "name": "Verum plate helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 252,
+     "name": "Verum platebody",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 259,
+     "name": "Verum platelegs",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 260,
+     "name": "Verum plate boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 261,
+     "name": "Verum plate gloves",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 300,
+     "name": "Stranite plate helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 301,
+     "name": "Stranite chain helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 302,
+     "name": "Stranite platebody",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 303,
+     "name": "Stranite platelegs",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 304,
+     "name": "Stranite plate boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 305,
+     "name": "Stranite plate gloves",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 308,
+     "name": "Shadow plate helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 309,
+     "name": "Shadow chain helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 310,
+     "name": "Shadow platebody",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 311,
+     "name": "Shadow platelegs",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 312,
+     "name": "Shadow plate boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 313,
+     "name": "Shadow plate gloves",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 316,
+     "name": "Iridium plate helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 317,
+     "name": "Iridium chain helmet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 318,
+     "name": "Iridium platebody",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 319,
+     "name": "Iridium platelegs",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 320,
+     "name": "Iridium plate boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 321,
+     "name": "Iridium plate gloves",
+     "stock": 0,
+     "restock": -1
+    }
+   ],
+   "comment": "yorkhill"
+  },
+  {
+   "id": 23,
+   "name": "Light armor",
+   "items": [
+    {
+     "typeId": 19,
+     "name": "Cow leather boots",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 167,
+     "name": "Cow leather chaps",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 168,
+     "name": "Cow leather body",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 294,
+     "name": "Cow leather hood",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 296,
+     "name": "Cow leather quiver",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 297,
+     "name": "Cow leather bracelet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 107,
+     "name": "Crawler leather body",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 108,
+     "name": "Crawler leather chaps",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 201,
+     "name": "Crawler leather boots",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 295,
+     "name": "Crawler leather hood",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 298,
+     "name": "Crawler leather bracelet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 299,
+     "name": "Crawler leather quiver",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 169,
+     "name": "Moose leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 170,
+     "name": "Moose leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 202,
+     "name": "Moose leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 285,
+     "name": "Moose leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 286,
+     "name": "Moose leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 287,
+     "name": "Moose leather quiver",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 109,
+     "name": "Bear leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 110,
+     "name": "Bear leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 203,
+     "name": "Bear leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 282,
+     "name": "Bear leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 283,
+     "name": "Bear leather quiver",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 284,
+     "name": "Bear leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 276,
+     "name": "Troll leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 277,
+     "name": "Troll leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 278,
+     "name": "Troll leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 279,
+     "name": "Troll leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 280,
+     "name": "Troll leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 288,
+     "name": "Dragon leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 289,
+     "name": "Dragon leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 290,
+     "name": "Dragon leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 291,
+     "name": "Dragon leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 292,
+     "name": "Dragon leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 293,
+     "name": "Dragon leather quiver",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 24,
+   "name": "Robes",
+   "items": [
+    {
+     "typeId": 1,
+     "name": "Wool robe bottom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 6,
+     "name": "Wool robe top",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 3,
+     "name": "Wool pointy hat",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 9,
+     "name": "Cotton robe top",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 16,
+     "name": "Cotton robe bottom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 218,
+     "name": "Cotton pointy hat",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 194,
+     "name": "Silk robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 195,
+     "name": "Silk robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 219,
+     "name": "Silk pointy hat",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 343,
+     "name": "Jute robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 344,
+     "name": "Jute robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 345,
+     "name": "Jute pointy hat",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 346,
+     "name": "Flax robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 347,
+     "name": "Flax robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 348,
+     "name": "Flax pointy hat",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 349,
+     "name": "Ramie robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 350,
+     "name": "Ramie robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 351,
+     "name": "Ramie pointy hat",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 25,
+   "name": "Bows",
+   "items": [
+    {
+     "typeId": 46,
+     "name": "Spruce bow",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 50,
+     "name": "Spruce crossbow",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 74,
+     "name": "Oak bow",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 75,
+     "name": "Oak crossbow",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 114,
+     "name": "Evark bow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 121,
+     "name": "Evark crossbow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 334,
+     "name": "Pertica bow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 335,
+     "name": "Deadwood bow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 336,
+     "name": "Archaeopteris bow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 337,
+     "name": "Pertica crossbow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 338,
+     "name": "Deadwood crossbow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 339,
+     "name": "Archaeopteris crossbow",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 80,
+     "name": "Spruce lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 370,
+     "name": "Oak lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 371,
+     "name": "Evark lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 372,
+     "name": "Pertica lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 373,
+     "name": "Deadwood lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 374,
+     "name": "Archaeopteris lute",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 199,
+     "name": "Spruce staff of Fire",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 268,
+     "name": "Oak staff of fire",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 271,
+     "name": "Evark staff of fire",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 340,
+     "name": "Pertica staff of fire",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 341,
+     "name": "Deadwood staff of fire",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 342,
+     "name": "Archaeopteris staff of fire",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 26,
+   "name": "Shields",
+   "items": [
+    {
+     "typeId": 191,
+     "name": "Iron heater shield",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 192,
+     "name": "Steel heater shield",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 204,
+     "name": "Verum heater shield",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 273,
+     "name": "Iron kite shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 193,
+     "name": "Iron buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 206,
+     "name": "Steel buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 207,
+     "name": "Verum buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 306,
+     "name": "Stranite heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 307,
+     "name": "Stranite buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 314,
+     "name": "Shadow heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 315,
+     "name": "Shadow buckler shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 322,
+     "name": "Iridium heater shield",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 323,
+     "name": "Iridium buckler shield",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 27,
+   "name": "Longboats",
+   "items": [
+    {
+     "typeId": 10432,
+     "name": "Longboat",
+     "max": 1,
+     "restock": 60
+    }
+   ]
+  },
+  {
+   "id": 28,
+   "name": "Clothes",
+   "items": [
+    {
+     "typeId": 228,
+     "name": "Black peasant shirt",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 229,
+     "name": "Red peasant shirt",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 230,
+     "name": "Gray peasant shirt",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 242,
+     "name": "Green peasant pants",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 243,
+     "name": "Brown peasant pants",
+     "max": 5,
+     "restock": 60
+    }
+   ]
+  },
+  {
+   "id": 29,
+   "name": "Boats",
+   "items": [
+    {
+     "typeId": 10489,
+     "name": "Fishing vessel",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 10549,
+     "name": "Small Bal Sardan boat",
+     "max": 5,
+     "restock": 60
+    },
+    {
+     "typeId": 10550,
+     "name": "Medium Bal Sardan boat",
+     "max": 5,
+     "restock": 60
+    }
+   ],
+   "comment": "bal sardan"
+  },
+  {
+   "id": 30,
+   "name": "Bal Sardan Tavern",
+   "items": [
+    {
+     "typeId": 10310,
+     "name": "Pint of beer"
+    },
+    {
+     "typeId": 10311,
+     "name": "Bottle of wine"
+    },
+    {
+     "typeId": 10288,
+     "name": "Whitefish"
+    }
+   ]
+  },
+  {
+   "id": 31,
+   "name": "Bal Sardan Vegetables",
+   "items": [
+    {
+     "typeId": 10336,
+     "name": "Tomato",
+     "max": 20
+    },
+    {
+     "typeId": 10337,
+     "name": "Carrot",
+     "max": 20
+    },
+    {
+     "typeId": 10318,
+     "name": "Cabbage",
+     "max": 20
+    }
+   ]
+  },
+  {
+   "id": 32,
+   "name": "Bal Sardan Oysters",
+   "items": [
+    {
+     "typeId": 10291,
+     "name": "Oyster",
+     "max": 3
+    },
+    {
+     "typeId": 10296,
+     "name": "Raw oyster meat",
+     "max": 3
+    },
+    {
+     "typeId": 10300,
+     "name": "Oyster shell",
+     "max": 3
+    }
+   ]
+  },
+  {
+   "id": 33,
+   "name": "Bal Sardan Food",
+   "items": [
+    {
+     "typeId": 10288,
+     "name": "Whitefish",
+     "max": 3
+    },
+    {
+     "typeId": 10332,
+     "name": "Egg",
+     "max": 3
+    },
+    {
+     "typeId": 10320,
+     "name": "Pumpkin",
+     "max": 3
+    },
+    {
+     "typeId": 10297,
+     "name": "Crayfish",
+     "max": 3
+    },
+    {
+     "typeId": 10298,
+     "name": "Poyfish",
+     "max": 3
+    },
+    {
+     "typeId": 10299,
+     "name": "Glassfish",
+     "max": 3
+    }
+   ]
+  },
+  {
+   "id": 34,
+   "name": "Furniture",
+   "items": [
+    {
+     "typeId": 10517,
+     "name": "Furniture: cabinet"
+    },
+    {
+     "typeId": 10518,
+     "name": "Furniture: cabinet"
+    },
+    {
+     "typeId": 10519,
+     "name": "Furniture: cabinet"
+    },
+    {
+     "typeId": 10520,
+     "name": "Furniture: cabinet"
+    },
+    {
+     "typeId": 10521,
+     "name": "Furniture: cabinet"
+    },
+    {
+     "typeId": 10522,
+     "name": "Furniture: large round table"
+    },
+    {
+     "typeId": 10523,
+     "name": "Furniture: bed"
+    },
+    {
+     "typeId": 10524,
+     "name": "Furniture: bed"
+    },
+    {
+     "typeId": 10525,
+     "name": "Furniture: chandelier"
+    },
+    {
+     "typeId": 10526,
+     "name": "Furniture: chair"
+    },
+    {
+     "typeId": 10527,
+     "name": "Furniture: Throne"
+    },
+    {
+     "typeId": 10528,
+     "name": "Furniture: Candleholder"
+    },
+    {
+     "typeId": 10529,
+     "name": "Furniture: Candleholder"
+    }
+   ]
+  },
+  {
+   "id": 35,
+   "name": "Tester shop",
+   "items": [
+    {
+     "typeId": 10326,
+     "name": "Tiny experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10327,
+     "name": "Small experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10328,
+     "name": "Medium experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10329,
+     "name": "Large experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10724,
+     "name": "Tester's experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10035,
+     "name": "Spruce log",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10087,
+     "name": "Oak logs",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10317,
+     "name": "Evark log",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10423,
+     "name": "Pertica logs",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10424,
+     "name": "Deadwood logs",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10425,
+     "name": "Archaeopteris logs",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10036,
+     "name": "Iron ore",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10091,
+     "name": "Verum ore",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10313,
+     "name": "Stranite ore",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10415,
+     "name": "Shadow ore",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10417,
+     "name": "Iridium ore",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10065,
+     "name": "Coal",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10394,
+     "name": "Copper",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10017,
+     "name": "Wool",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10020,
+     "name": "Cotton",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10426,
+     "name": "Flax",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10364,
+     "name": "Jute",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10429,
+     "name": "Ramie",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10388,
+     "name": "Yorkhill Monastery teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10389,
+     "name": "Bal Sardan teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10390,
+     "name": "Athagos lighthouse teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10395,
+     "name": "Home wayshrine teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10464,
+     "name": "Yorkhill teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10531,
+     "name": "South Athagos teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10532,
+     "name": "Arena teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10385,
+     "name": "Rock",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10066,
+     "name": "Small wooden boat",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10489,
+     "name": "Fishing vessel",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10468,
+     "name": "Small fishing boat",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10432,
+     "name": "Longboat",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 184,
+     "name": "Stranite greatsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 189,
+     "name": "Stranite broadsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 190,
+     "name": "Stranite halberd",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 300,
+     "name": "Stranite plate helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 301,
+     "name": "Stranite chain helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 302,
+     "name": "Stranite platebody",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 303,
+     "name": "Stranite platelegs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 304,
+     "name": "Stranite plate boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 305,
+     "name": "Stranite plate gloves",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 306,
+     "name": "Stranite heater shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 307,
+     "name": "Stranite buckler shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 308,
+     "name": "Shadow plate helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 309,
+     "name": "Shadow chain helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 310,
+     "name": "Shadow platebody",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 311,
+     "name": "Shadow platelegs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 312,
+     "name": "Shadow plate boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 313,
+     "name": "Shadow plate gloves",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 314,
+     "name": "Shadow heater shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 315,
+     "name": "Shadow buckler shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 316,
+     "name": "Iridium plate helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 317,
+     "name": "Iridium chain helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 318,
+     "name": "Iridium platebody",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 319,
+     "name": "Iridium platelegs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 320,
+     "name": "Iridium plate boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 321,
+     "name": "Iridium plate gloves",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 322,
+     "name": "Iridium heater shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 323,
+     "name": "Iridium buckler shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 325,
+     "name": "Shadow halberd",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 326,
+     "name": "Shadow greatsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 328,
+     "name": "Shadow broadsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 330,
+     "name": "Iridium halberd",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 331,
+     "name": "Iridium greatsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 333,
+     "name": "Iridium broadsword",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 334,
+     "name": "Pertica bow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 335,
+     "name": "Deadwood bow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 336,
+     "name": "Archaeopteris bow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 337,
+     "name": "Pertica crossbow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 338,
+     "name": "Deadwood crossbow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 339,
+     "name": "Archaeopteris crossbow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 340,
+     "name": "Pertica staff of fire",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 341,
+     "name": "Deadwood staff of fire",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 342,
+     "name": "Archaeopteris staff of fire",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 343,
+     "name": "Jute robe top",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 344,
+     "name": "Jute robe bottom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 345,
+     "name": "Jute pointy hat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 346,
+     "name": "Flax robe top",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 347,
+     "name": "Flax robe bottom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 348,
+     "name": "Flax pointy hat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 349,
+     "name": "Ramie robe top",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 350,
+     "name": "Ramie robe bottom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 351,
+     "name": "Ramie pointy hat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 370,
+     "name": "Oak lute",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 371,
+     "name": "Evark lute",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 372,
+     "name": "Pertica lute",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 373,
+     "name": "Deadwood lute",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 374,
+     "name": "Archaeopteris lute",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 375,
+     "name": "Lizard backpack",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10443,
+     "name": "Flax bandage",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10444,
+     "name": "Ramie bandage",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10514,
+     "name": "Ability: Stranglevine",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10295,
+     "name": "Oyster meat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 276,
+     "name": "Troll leather body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 277,
+     "name": "Troll leather chaps",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 278,
+     "name": "Troll leather hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 279,
+     "name": "Troll leather boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 280,
+     "name": "Troll leather bracelet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 281,
+     "name": "Troll leather quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 282,
+     "name": "Bear leather hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 283,
+     "name": "Bear leather quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 284,
+     "name": "Bear leather bracelet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 285,
+     "name": "Moose leather bracelet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 286,
+     "name": "Moose leather hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 287,
+     "name": "Moose leather quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 288,
+     "name": "Dragon leather body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 289,
+     "name": "Dragon leather chaps",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 290,
+     "name": "Dragon leather hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 291,
+     "name": "Dragon leather boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 292,
+     "name": "Dragon leather bracelet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 293,
+     "name": "Dragon leather quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10377,
+     "name": "Weak poison",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10491,
+     "name": "Ability: Ooze",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10535,
+     "name": "Palm plank",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10433,
+     "name": "Potion of poison resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10434,
+     "name": "Potion of fire resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10435,
+     "name": "Potion of earth resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10436,
+     "name": "Potion of wind resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10437,
+     "name": "Potion of electric resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10438,
+     "name": "Potion of psychic resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10439,
+     "name": "Potion of ice resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10440,
+     "name": "Potion of slash resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10441,
+     "name": "Potion of piercing resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10442,
+     "name": "Potion of blunt resistance",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10093,
+     "name": "Weak mana potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10454,
+     "name": "Mana potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 396,
+     "name": "Dragonbone shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 397,
+     "name": "Serpent Mask",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 274,
+     "name": "Roke's staff",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 70,
+     "name": "Torch",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10486,
+     "name": "House teleport",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 402,
+     "name": "Venomous bow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 404,
+     "name": "Venomous quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 405,
+     "name": "Venomous ring",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 406,
+     "name": "Venomous amulet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 246,
+     "name": "Pirate shirt",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 247,
+     "name": "Pirate pants",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 248,
+     "name": "Pirate hat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 382,
+     "name": "Shadow broadsword of poison",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 250,
+     "name": "Off-hand Iron Pistol",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 426,
+     "name": "Main-hand Iron Pistol",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 355,
+     "name": "Ulan's heirloom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 366,
+     "name": "Uplifting ring",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10483,
+     "name": "Movement speed potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10488,
+     "name": "Explosive potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10501,
+     "name": "Life potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10448,
+     "name": "Strong stamina potion",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 380,
+     "name": "Wand of Ke'yars Eketosh",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 383,
+     "name": "Ancient ring",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 403,
+     "name": "Spiderling",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 408,
+     "name": "Giant Rat Fang",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 413,
+     "name": "Dragon torch",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 414,
+     "name": "Dark Tamer body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 415,
+     "name": "Dark Tamer legs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 416,
+     "name": "Dark Tamer bracers",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 417,
+     "name": "Dark Tamer boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 418,
+     "name": "Dark Tamer hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 423,
+     "name": "Yin and Yang",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 424,
+     "name": "Yin",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 425,
+     "name": "Yang",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10639,
+     "name": "Potion of Salvation",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10640,
+     "name": "Small potion of Salvation",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10641,
+     "name": "Potion of Despair",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10642,
+     "name": "Furniture: Stone of Swiftness",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10643,
+     "name": "Smolderfish",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10564,
+     "name": "Brarrus meat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10644,
+     "name": "Furniture: Lava lamp",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10648,
+     "name": "Furniture: Golden chalice",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10649,
+     "name": "Emote: Hands-on-hips",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10628,
+     "name": "Furniture: Skull",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10629,
+     "name": "Furniture: Skulls",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10630,
+     "name": "Vault key 1",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10631,
+     "name": "Vault key 2",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10632,
+     "name": "Vault key 3",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10633,
+     "name": "Dynamite",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10638,
+     "name": "Poacher hideout teleport",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 419,
+     "name": "Bishop's mitre",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 420,
+     "name": "Mantle of St. Jakob",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 421,
+     "name": "Dark mitre",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 422,
+     "name": "Mantle of Olafsson, son of Olaf",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 435,
+     "name": "Golem's ring",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 434,
+     "name": "Ring of the Monastery",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 427,
+     "name": "Infernal Hound",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 428,
+     "name": "Pet Wraith",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 429,
+     "name": "Argi",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 433,
+     "name": "Crab",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 430,
+     "name": "Archbishop's Guard",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 431,
+     "name": "Archmagus's Guard",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 432,
+     "name": "Hunter's bow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10645,
+     "name": "Piece of ancient cloth",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10657,
+     "name": "Harpy meat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10661,
+     "name": "Furniture: Loom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10662,
+     "name": "Furniture: Alchemists' workbench",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10663,
+     "name": "Furniture: Saw",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10664,
+     "name": "Furniture: Carpenters' workbench",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10665,
+     "name": "Furniture: Stove",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10666,
+     "name": "Furniture: Bank chest",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10668,
+     "name": "Iron gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10669,
+     "name": "Steel gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10670,
+     "name": "Verum gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10671,
+     "name": "Stranite gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10672,
+     "name": "Shadow gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10701,
+     "name": "Sardanian weapon crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10673,
+     "name": "Iridium gear crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10723,
+     "name": "Christmas 2019 crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 437,
+     "name": "Small upgrade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 438,
+     "name": "Medium upgrade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 439,
+     "name": "Large upgrade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 440,
+     "name": "Small grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 441,
+     "name": "Medium grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 442,
+     "name": "Large grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 443,
+     "name": "Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 445,
+     "name": "Bat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 446,
+     "name": "Guard",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 447,
+     "name": "Reindeer",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 448,
+     "name": "Santa hat",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10717,
+     "name": "Candy cane",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10718,
+     "name": "Fruitcake",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10719,
+     "name": "Figgy pudding",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10720,
+     "name": "Gingerbread cookies",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10721,
+     "name": "Eggnog",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10722,
+     "name": "Golden candy cane",
+     "max": 5000,
+     "restock": 1
+    }
+   ]
+  },
+  {
+   "id": 36,
+   "name": "Light armor",
+   "items": [
+    {
+     "typeId": 107,
+     "name": "Crawler leather body",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 108,
+     "name": "Crawler leather chaps",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 201,
+     "name": "Crawler leather boots",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 295,
+     "name": "Crawler leather hood",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 298,
+     "name": "Crawler leather bracelet",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 299,
+     "name": "Crawler leather quiver",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 169,
+     "name": "Moose leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 170,
+     "name": "Moose leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 202,
+     "name": "Moose leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 285,
+     "name": "Moose leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 286,
+     "name": "Moose leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 287,
+     "name": "Moose leather quiver",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 109,
+     "name": "Bear leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 110,
+     "name": "Bear leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 203,
+     "name": "Bear leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 282,
+     "name": "Bear leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 283,
+     "name": "Bear leather quiver",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 284,
+     "name": "Bear leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 276,
+     "name": "Troll leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 277,
+     "name": "Troll leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 278,
+     "name": "Troll leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 279,
+     "name": "Troll leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 280,
+     "name": "Troll leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 281,
+     "name": "Troll leather quiver",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 37,
+   "name": "Guard armor",
+   "items": [
+    {
+     "typeId": 204,
+     "name": "Verum heater shield",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 207,
+     "name": "Verum buckler shield",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 216,
+     "name": "Verum chain helmet",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 231,
+     "name": "Verum plate helmet",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 252,
+     "name": "Verum platebody",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 259,
+     "name": "Verum platelegs",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 260,
+     "name": "Verum plate boots",
+     "stock": 1,
+     "restock": 120
+    },
+    {
+     "typeId": 261,
+     "name": "Verum plate gloves",
+     "stock": 1,
+     "restock": 120
+    }
+   ]
+  },
+  {
+   "id": 38,
+   "name": "Shady stuff",
+   "items": [
+    {
+     "typeId": 10488,
+     "name": "Explosive potion",
+     "stock": 1,
+     "restock": 7200
+    },
+    {
+     "typeId": 10487,
+     "name": "Gunpowder",
+     "stock": 1,
+     "restock": 7200
+    },
+    {
+     "typeId": 10330,
+     "name": "Human flesh",
+     "stock": 1,
+     "restock": 7200
+    },
+    {
+     "typeId": 10332,
+     "name": "Egg",
+     "stock": 1,
+     "restock": 7200
+    },
+    {
+     "typeId": 10561,
+     "name": "Brarrus tusk",
+     "stock": 1,
+     "restock": 7200
+    },
+    {
+     "typeId": 10331,
+     "name": "Bag of sea salt",
+     "max": 10,
+     "restock": 30
+    }
+   ]
+  },
+  {
+   "id": 39,
+   "name": "The Blue Sea Robes",
+   "items": [
+    {
+     "typeId": 1,
+     "name": "Wool robe bottom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 6,
+     "name": "Wool robe top",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 3,
+     "name": "Wool pointy hat",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 9,
+     "name": "Cotton robe top",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 16,
+     "name": "Cotton robe bottom",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 218,
+     "name": "Cotton pointy hat",
+     "max": 1,
+     "restock": 60
+    },
+    {
+     "typeId": 194,
+     "name": "Silk robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 195,
+     "name": "Silk robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 219,
+     "name": "Silk pointy hat",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 343,
+     "name": "Jute robe top",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 344,
+     "name": "Jute robe bottom",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 345,
+     "name": "Jute pointy hat",
+     "stock": 0,
+     "restock": -1
+    }
+   ]
+  },
+  {
+   "id": 40,
+   "name": "The Blue Sea Food",
+   "items": [
+    {
+     "typeId": 10288,
+     "name": "Whitefish",
+     "max": 3
+    },
+    {
+     "typeId": 10332,
+     "name": "Egg",
+     "max": 3
+    },
+    {
+     "typeId": 10320,
+     "name": "Pumpkin",
+     "max": 3
+    },
+    {
+     "typeId": 10297,
+     "name": "Crayfish",
+     "max": 3
+    },
+    {
+     "typeId": 10298,
+     "name": "Poyfish",
+     "max": 3
+    },
+    {
+     "typeId": 10299,
+     "name": "Glassfish",
+     "max": 3
+    },
+    {
+     "typeId": 10536,
+     "name": "Raw serpent meat",
+     "max": 1,
+     "restock": 300
+    }
+   ]
+  },
+  {
+   "id": 41,
+   "name": "Boats",
+   "items": [
+    {
+     "typeId": 10066,
+     "name": "Small wooden boat",
+     "max": 1,
+     "restock": 60
+    }
+   ]
+  },
+  {
+   "id": 42,
+   "name": "Gunar's spectacular souvenirs",
+   "items": [
+    {
+     "typeId": 10594,
+     "name": "Fibervine seed",
+     "max": 10,
+     "restock": 10
+    },
+    {
+     "typeId": 10596,
+     "name": "Furniture: Bal Sardan scrolls",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10597,
+     "name": "Furniture: Bal Sardan scrolls 2",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10598,
+     "name": "Furniture: Bal Sardan basket",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10599,
+     "name": "Furniture: Bal Sardan cup",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10600,
+     "name": "Furniture: Bal Sardan jug",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10601,
+     "name": "Furniture: Bal Sardan jug 2",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10602,
+     "name": "Furniture: Bal Sardan candle",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10603,
+     "name": "Furniture: Bal Sardan candles",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10604,
+     "name": "Furniture: Bal Sardan cooking pot",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10605,
+     "name": "Furniture: Bal Sardan bush",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10606,
+     "name": "Furniture: Bal Sardan bushes",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10607,
+     "name": "Furniture: Bal Sardan garden tree",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10608,
+     "name": "Furniture: Bal Sardan lantern",
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 10609,
+     "name": "Furniture: Bal Sardan lantern2",
+     "max": 10,
+     "restock": 60
+    }
+   ]
+  },
+  {
+   "id": 43,
+   "name": "Tavern",
+   "items": [
+    {
+     "typeId": 10310,
+     "name": "Pint of beer"
+    },
+    {
+     "typeId": 10311,
+     "name": "Bottle of wine"
+    },
+    {
+     "typeId": 10288,
+     "name": "Whitefish"
+    }
+   ]
+  }
+ ]
+}

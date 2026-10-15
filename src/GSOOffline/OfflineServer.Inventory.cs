@@ -48,7 +48,8 @@ namespace GSOOffline
             On(3, 4, c => Equip((int)c[2]));
             On(3, 5, c => Unequip((int)c[2]));
             On(4, 4, c => DestroyItem((int)c[1], (int)c[2], (int)c[3]));
-            On(4, 14, c => { if (!OnQuestItemUsed((int)c[3])) DestroyItem((int)c[2], (int)c[3], (int)c[4]); });   // no ground loot yet: dropping destroys
+            // No ground loot yet: dropping destroys (the sewers' pillar props up the bridge where it's dropped).
+            On(4, 14, c => { if (DropPillar((int)c[3]) || !OnQuestItemUsed((int)c[3])) DestroyItem((int)c[2], (int)c[3], (int)c[4]); });
             On(4, 1, OnChangeTab);
             On(198, 15, OnSwapItems);
             On(198, 17, OnInsertItem);
@@ -143,7 +144,8 @@ namespace GSOOffline
 
         private ItemSave NewItem(ItemTemplate t, int amount)
         {
-            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.baseGrade };
+            // Gear rolls its grade around the item's base grade (stacking resources keep theirs), as on the original server.
+            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.Stacks ? t.baseGrade : RollNewItemGrade(t.baseGrade) };
             foreach (var r in t.stats)
                 it.stats.Add(new ItemStat { key = r.key, value = Random.Range(Mathf.Min(r.min, r.max), Mathf.Max(r.min, r.max) + 1) });
             return it;

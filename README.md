@@ -122,12 +122,13 @@ Working:
 - Inventory, equipment and starter kits
 - NPC dialogue
 - Quest progress and rewards
-- Shops
+- Shops, with the original game's stock lists, limited stock and restocking
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Sailing: launching, boarding and steering boats, Sailing XP, boat teleports
 - Oyster fishing in Bal Sardan: harpoon guns and the fishing vessel's crane
 - Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
-- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm)
+- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
+- Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
@@ -140,18 +141,21 @@ Working:
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
-- Boss mechanics: poison clouds, fog fields, water and psychic explosions, stuns, ground slams and summoned minions (Nirish, the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Sepitus, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
+- Aellope, Goldon's flying world boss: patrols one of five routes over the island, dives when shot, fights on the ground, takes off again after 20 seconds without damage, feeds on a fallen player, and returns an hour after she's killed (the original server's behaviour)
+- Dungeon mechanics from the original server: Lakhmu's basement (lock puzzle, falling rocks), Ulan's dungeon (gate and key, lift, levers), the Poacher dungeon (vault, storage room and dynamite, lava room, traps, chests), the Yorkhill sewers' bridge, the Coral dungeon (water, tidal waves, explosions)
+- Boss mechanics from the original server: Nirish (webs, poison clouds, his healing spiderling), George (dynamite), Sytrax (flight and fire), Sepitus (bolts, plague, healing bird, lava hounds) and Phraustie (snowballs, Snow Apostles)
+- Reconstructed boss mechanics: fog fields, water and psychic explosions, stuns, ground slams and summoned minions (the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
 - Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)
 
 Partially working:
-- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman and Sightseeing. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Still to do: A Magical Journey, A Fishy Request, The Breaching Light, Lakhmu's Basement, Wand of Ke'yars Eketosh, Powder Monkey, Mantle of St. Jakob, Commander Grant's Gloves and Joining the Hunters Guild, plus the key puzzle in Ulan's dungeon.
+- Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman, Sightseeing, Lakhmu's basement, A Fishy Request, Powder Monkey, Mantle of St. Jakob, A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Left out: The Breaching Light and Wand of Ke'yars Eketosh, hidden in the game data and never finished by the original server.
 
 Not yet implemented:
 - Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 
-Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes. Boss uniques and pets the wiki misses come from the official patch notes on Steam.
+Loot comes from the original server's drop tables (`Loot.xml`, sent by the game's developer, from about update 136), turned into `src/GSOOffline/Data/droptables.json` by GSODevTools' `gen_droptables.py` and rolled as the original rolled them: each drop on its own, 1 in its rate. Every creature can also drop an upgrade or grade stone and a gear crate for its level, by the original's formulas. Creatures added after that snapshot (Bruno, Betsy, Lakhar, Lydia, Jotnar, Argus, the Elder Ent...) and the boss uniques and pets of updates 137-140 come from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA) and the official patch notes on Steam, in `src/GSOOffline/Data/loot.json` (`gen_loot.py`); the wiki names how rare drops were but not the rates, so those are reconstructed chances, and such a creature without a wiki entry drops silver by level.
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 

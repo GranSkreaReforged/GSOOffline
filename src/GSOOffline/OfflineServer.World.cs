@@ -39,6 +39,10 @@ namespace GSOOffline
             pendingSpawnNeedsClearing = false;
             pendingCrossing = null;
             ResetOysters();
+            ResetLakhmusBasement();
+            ResetUlansDungeon();
+            ResetPoacherDungeon();
+            ResetSewersAndCoral();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -116,11 +120,24 @@ namespace GSOOffline
         private void OnNewSceneLoaded(object[] c)
         {
             if (character == null) return;
-            var current = Script_sceneManager.instance.currentScene;
+            var manager = Script_sceneManager.instance;
+            // The client sends this from Script_sceneManager.OnNewSceneLoaded and clears its `async` only when that
+            // method returns. If anything after this message throws (Scr_UI_Minimap.UpdateMap does once the minimap's
+            // image has been destroyed), it runs again every frame: the black fade-in, the camera setup and this
+            // message, which rebuilt the world each frame (bosses reset, the player killed again on arrival). Clearing
+            // `async` here ends it after one pass, and a repeat for the zone we already have is ignored.
+            manager.async = null;
+            var current = manager.currentScene;
+            if (sceneReady && world != null && world.sceneId == current.id && character.scene == current.id)
+            {
+                Plugin.Log.LogWarning($"Scene {current.id} reported loaded again; ignored (the client's scene setup threw?)");
+                return;
+            }
             character.scene = current.id;
 
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
+            AddHarpyToWorld();
             LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
@@ -212,6 +229,23 @@ namespace GSOOffline
             }
         }
 
+        /// <summary>Dev: how far each of this scene's original-server spawns (Data/spawns.json) is from the ground (spawnground).</summary>
+        internal void LogSpawnGround()
+        {
+            if (world == null) return;
+            int ok = 0;
+            var rows = new List<SpawnRow>(SpawnData.Npcs(world.sceneId));
+            rows.AddRange(SpawnData.Harvestables(world.sceneId));
+            foreach (var r in rows)
+            {
+                Vector3 p = r.Position;
+                bool found = GroundAt(p, p.y + 3f, 40f, out var g);
+                if (found && Mathf.Abs(p.y - g.y) < 1.5f) { ok++; continue; }
+                Plugin.Log.LogInfo($"[dev] spawn type {r.type} at {SceneWorld.Vec(p)}: " + (found ? $"ground {p.y - g.y:0.00} m below" : "no ground within 40 m"));
+            }
+            Plugin.Log.LogInfo($"[dev] spawnground: {ok} of {rows.Count} original spawns in scene {world.sceneId} stand on the ground");
+        }
+
         private List<int> UnlockedWayshrines(CharacterSave ch)
         {
             if (!Plugin.UnlockAllWayshrines.Value) return new List<int>(ch.wayshrines);
@@ -261,6 +295,10 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandleSewerInteract(typeId)) return;     // the sewers' pillar
+            if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
+            if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
+            if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
             if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)

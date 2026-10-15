@@ -75,6 +75,7 @@ namespace GSOOffline
         private void UseItem(int typeId)
         {
             if (character == null || CountItem(typeId) == 0) return;
+            if (UseDynamite(typeId)) return;   // the Poacher dungeon's rock pile
             var t = ItemData.Get(typeId);
             if (t != null && t.food > 0)
             {

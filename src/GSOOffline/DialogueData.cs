@@ -226,14 +226,22 @@ namespace GSOOffline
             }
         }
 
+        private static bool SameItems(List<int[]> a, List<int[]> b)
+        {
+            if (a.Count != b.Count) return false;
+            for (int i = 0; i < a.Count; i++)
+                if (a[i][0] != b[i][0] || a[i][1] != b[i][1]) return false;
+            return true;
+        }
+
         public static void AddEntry(DialogueEntry e)
         {
             if (!EntriesByNpc.TryGetValue(e.npc, out var list))
                 EntriesByNpc[e.npc] = list = new List<DialogueEntry>();
             // A content.json entry replaces the derived one for its node; several content entries for one
-            // node can coexist (different NPC copies or phases).
+            // node can coexist (different NPC copies, phases, or items asked for: any one of several bandages).
             list.RemoveAll(x => x.node == e.node
-                && (x.condition == null || (x.npcType == e.npcType && x.quest == e.quest && x.phase == e.phase)));
+                && (x.condition == null || (x.npcType == e.npcType && x.quest == e.quest && x.phase == e.phase && SameItems(x.requiredItems, e.requiredItems))));
             list.Add(e);
         }
 

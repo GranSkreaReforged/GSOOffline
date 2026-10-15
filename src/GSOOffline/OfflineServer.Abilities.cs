@@ -49,7 +49,9 @@ namespace GSOOffline
         public int bonusHealthPercent;     // + max health while it lasts (Survivor, health boost)
         public bool payBackHealth;         // Survivor: the bonus is taken as damage when it ends
         public float manaPerSecond;
-        public float healPercentPerSecond; // of max health
+        public float healPercentPerSecond; // of max health (negative: damage over time)
+        public bool poisonDamage;          // that damage is poison (Nirish's venom): poison resistance applies
+        public bool plague;                // Sepitus's plague: heals hurt instead (Vitals.Heal)
         public bool manaFromDamage;        // Embrace the pain
         public bool peace;                 // NPCs up to the player's Healing level don't aggro
         public bool absorb;                // Energy blade: damage taken is stored and released around the player
@@ -229,6 +231,8 @@ namespace GSOOffline
         private readonly List<ActiveBuff> buffs = new List<ActiveBuff>();
         private float buffTick;
 
+        private bool HasBuff(int icon) => buffs.Exists(b => b.icon == icon);
+
         /// <summary>Starts (or refreshes) a buff from an ability or item, with its client icon.</summary>
         private void AddBuff(int source, int icon, float seconds, BuffEffect effect)
         {
@@ -381,6 +385,13 @@ namespace GSOOffline
             }
             if (heal > 0f && !PlayerDead && character.currentHealth < MaxHealth())
                 Heal(Mathf.Max(1, Mathf.RoundToInt(MaxHealth() * heal)));
+            else if (heal < 0f && !PlayerDead)
+            {
+                // Damage over time: Nirish's venom (the original's spider venom buff, a share of health each second).
+                float res = buffs.Exists(b => b.effect.poisonDamage) ? CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Poison))) : 0f;
+                PlayPlayerEffect(110);
+                HurtPlayer(Mathf.RoundToInt(MaxHealth() * -heal * (1f - res)), SplashPoisoned);
+            }
         }
 
         /// <summary>Dev: raise a skill to a level (bridge command setlevel).</summary>
@@ -561,6 +572,7 @@ namespace GSOOffline
             foreach (var t in targets)
             {
                 Aggro(t);
+                OnAbilityCastAt(t, a);   // quests that ask for a spell on something (A Magical Journey)
                 var target = t;
                 int hit = RollPlayerHit(weapon, t, power, a);
                 if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
