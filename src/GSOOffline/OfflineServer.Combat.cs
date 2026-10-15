@@ -545,6 +545,15 @@ namespace GSOOffline
             if (npc.health <= 0) KillNpc(npc, skill);
         }
 
+        /// <summary>Dev: a test character's base health, e.g. to stand in front of bosses (bridge command devhealth).</summary>
+        internal void DevSetHealth(int health)
+        {
+            character.health = Mathf.Max(1, health);
+            character.currentHealth = MaxHealth();
+            SendHealth();
+            Plugin.Log.LogInfo($"[dev] health {character.currentHealth}/{MaxHealth()}");
+        }
+
         /// <summary>Dev: kill a visible NPC as the player would (bridge command killnpc).</summary>
         internal void DevKill(int uid)
         {
@@ -911,10 +920,13 @@ namespace GSOOffline
             }
         }
 
+        internal static bool LogBlows;   // dev: blowlog on - every creature blow aimed at the player
+
         private void NpcSwingLands(NpcEntity npc, NpcInfo info, bool shoot)
         {
             var player = LocalPlayer;
             if (npc.dead || !npc.aggro || PlayerDead || player == null || Time.time < npc.stunnedUntil) return;
+            if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({npc.typeId}) {(shoot ? "shoots" : "swings")} from {Vector3.Distance(NpcPosition(npc), player.transform.position):0.0} m");
             if (shoot)
             {
                 NpcShoots(npc, info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
@@ -945,6 +957,7 @@ namespace GSOOffline
                 damage = ApplyDefensiveBuffs(damage, attacker);
                 damage = Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
             }
+            if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} (health {character.currentHealth - damage}/{MaxHealth()})");
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
             Send(8, 2, character.name, -damage, PlayerSplash(info));
             SendHealth();

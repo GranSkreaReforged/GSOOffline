@@ -477,6 +477,12 @@ namespace GSOOffline
             Plugin.Log.LogInfo("[dev] client stats: " + string.Join(" ", parts.ToArray()));
         }
 
+        // devhealth <n>: the test character's base health (only for throwaway characters: it's saved).
+        private static void DevHealth(string[] args) => OfflineServer.Instance.DevSetHealth(int.Parse(args[1]));
+
+        // blowlog on|off: log every creature blow aimed at the player ([blow] lines), to check who attacks.
+        private static void BlowLog(string[] args) => OfflineServer.LogBlows = args.Length < 2 || args[1] != "off";
+
         // combatstats: combat level, armor alignment and effective resistances, server against client.
         private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
 
