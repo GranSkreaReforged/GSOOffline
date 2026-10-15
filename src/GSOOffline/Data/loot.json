@@ -1,5 +1,5 @@
 {
- "source": "Gran Skrea Online wiki (gran-skrea-online.fandom.com), CC BY-SA",
+ "source": "Gran Skrea Online wiki (gran-skrea-online.fandom.com), CC BY-SA; boss drops from the official patch notes",
  "generator": "GSODevTools tools/datamining/gen_loot.py",
  "rarityChances": {
   "always": 1.0,
@@ -253,6 +253,25 @@
    ]
   },
   {
+   "name": "Argus",
+   "wikiPages": [
+    "Argus"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 496,
+     "name": "Argus",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 140"
+    }
+   ]
+  },
+  {
    "name": "Bear",
    "wikiPages": [
     "Bear"
@@ -307,6 +326,34 @@
      "chance": 0.5,
      "levels": [],
      "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Betsy",
+   "wikiPages": [
+    "Betsy"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 470,
+     "name": "Young Ghit",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 139"
+    },
+    {
+     "typeId": 10736,
+     "name": "Betsy's Horn",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "patch notes 139"
     }
    ]
   },
@@ -448,6 +495,15 @@
      "chance": 0.5,
      "levels": [],
      "from": "monster page"
+    },
+    {
+     "typeId": 450,
+     "name": "Bear",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 137"
     },
     {
      "typeId": 451,
@@ -912,6 +968,43 @@
    ]
   },
   {
+   "name": "Elder Ent",
+   "wikiPages": [
+    "Elder Ent"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 503,
+     "name": "Ent",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 140"
+    },
+    {
+     "typeId": 10750,
+     "name": "Nature mote",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "patch notes 140"
+    },
+    {
+     "typeId": 10756,
+     "name": "Elder Root",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "patch notes 140"
+    }
+   ]
+  },
+  {
    "name": "Ent",
    "wikiPages": [
     "Ent"
@@ -985,6 +1078,88 @@
      "chance": 0.5,
      "levels": [],
      "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "George",
+   "wikiPages": [
+    "George"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 453,
+     "name": "Storage guard's body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 454,
+     "name": "Storage guard's chaps",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 455,
+     "name": "Storage guard's hood",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 456,
+     "name": "Storage guard's boots",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 457,
+     "name": "Storage guard's bracelet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 458,
+     "name": "Storage guard's quiver",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 459,
+     "name": "Storage guard's crossbow",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
+    },
+    {
+     "typeId": 464,
+     "name": "Poacher",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 137"
     }
    ]
   },
@@ -1136,6 +1311,53 @@
    ]
   },
   {
+   "name": "Jotnar",
+   "wikiPages": [
+    "Jotnar"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 486,
+     "name": "Jotnar's body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139"
+    },
+    {
+     "typeId": 487,
+     "name": "Jotnar's chaps",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139"
+    }
+   ]
+  },
+  {
+   "name": "Lakhar",
+   "wikiPages": [
+    "Lakhar"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 480,
+     "name": "Lizard warrior",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 139"
+    }
+   ]
+  },
+  {
    "name": "Lizard warrior",
    "wikiPages": [
     "Lizard warrior"
@@ -1186,6 +1408,34 @@
    ]
   },
   {
+   "name": "Lydia",
+   "wikiPages": [
+    "Lydia"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 473,
+     "name": "Lydia's staff",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139"
+    },
+    {
+     "typeId": 474,
+     "name": "Lydia's earrings",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139"
+    }
+   ]
+  },
+  {
    "name": "Moose",
    "wikiPages": [
     "Moose"
@@ -1196,6 +1446,52 @@
     17
    ],
    "drops": []
+  },
+  {
+   "name": "Nirish",
+   "wikiPages": [
+    "Nirish"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 405,
+     "name": "Venomous ring",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 130"
+    },
+    {
+     "typeId": 406,
+     "name": "Venomous amulet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 130"
+    },
+    {
+     "typeId": 10614,
+     "name": "Nirish's poison fang",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "patch notes 130"
+    },
+    {
+     "typeId": 10622,
+     "name": "Nirish's skin",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5,
+     "levels": [],
+     "from": "patch notes 130"
+    }
+   ]
   },
   {
    "name": "Pirate",
@@ -1559,6 +1855,15 @@
      "chance": 0.5,
      "levels": [],
      "from": "monster page"
+    },
+    {
+     "typeId": 475,
+     "name": "Roke's ring",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139"
     }
    ]
   },
@@ -1614,6 +1919,70 @@
      "chance": 0.5,
      "levels": [],
      "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Sepitus",
+   "wikiPages": [
+    "Sepitus"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 414,
+     "name": "Dark Tamer body",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139/140"
+    },
+    {
+     "typeId": 415,
+     "name": "Dark Tamer legs",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139/140"
+    },
+    {
+     "typeId": 416,
+     "name": "Dark Tamer bracers",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139/140"
+    },
+    {
+     "typeId": 417,
+     "name": "Dark Tamer boots",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139/140"
+    },
+    {
+     "typeId": 418,
+     "name": "Dark Tamer hood",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 139/140"
+    },
+    {
+     "typeId": 427,
+     "name": "Infernal Hound",
+     "min": 1,
+     "max": 1,
+     "chance": 0.04,
+     "levels": [],
+     "from": "patch notes 135"
     }
    ]
   },
@@ -1825,6 +2194,15 @@
      "from": "item page"
     },
     {
+     "typeId": 468,
+     "name": "Serpent's Fang",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 138"
+    },
+    {
      "typeId": 10413,
      "name": "Sea serpent scale",
      "min": 1,
@@ -1850,6 +2228,25 @@
      "chance": 0.04,
      "levels": [],
      "from": "monster page"
+    }
+   ]
+  },
+  {
+   "name": "Tomb guardian",
+   "wikiPages": [
+    "Tomb guardian"
+   ],
+   "dropsSilver": true,
+   "silver": [],
+   "drops": [
+    {
+     "typeId": 465,
+     "name": "Tomb guardian's amulet",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
     }
    ]
   },
@@ -2193,6 +2590,15 @@
       90
      ],
      "from": "item page"
+    },
+    {
+     "typeId": 463,
+     "name": "Zalranaz's cleaver",
+     "min": 1,
+     "max": 1,
+     "chance": 0.15,
+     "levels": [],
+     "from": "patch notes 137"
     },
     {
      "typeId": 10250,

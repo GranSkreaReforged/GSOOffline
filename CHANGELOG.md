@@ -9,8 +9,10 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Armor alignment, from the game's update 135: wear enough light or heavy armor (chest 4 points, legs 3, head 2, back, gloves and boots 1 each; 7 needed) for its passive. Light armor deals 15% more damage, heavy armor takes 10% less. The game's "Light armor" / "Heavy armor" icon shows next to your health bar while it's active.
 - Your combat level shows in the character window (update 136: your three best combat skills, plus a twelfth of the others). It used to read 0, and so did every "Effective res" line, which now shows your resistance after the soft cap.
 - Bosses give double experience (update 137).
+- Bosses drop the uniques and pets the official patch notes name: the Storage Guard's armor set and crossbow and the Poacher pet (George), Zalranaz's cleaver, the Dark Tamer set and Infernal Hound (Sepitus), Nirish's venomous ring and amulet, the Tomb guardian's amulet, Serpent's Fang (Supreme Sea Serpent), Roke's ring, Lydia's staff and earrings, Jotnar's body and chaps, the Bear (Bruno), Young Ghit (Betsy), Lizard warrior (Lakhar), Argus and Ent (Elder Ent) pets, and the Elder Ent's crafting materials. Pets are rare (4%), uniques uncommon (15%); the rates are reconstructions.
 
 ### Changed
+- Bosses are tougher than ordinary creatures of their level, as the patch notes made them: 2.25 times the health and 1.35 times the damage (updates 136, 137 and 139 compounded). Zalranaz has 1642 health instead of 730.
 - Resistances follow the game's soft cap (update 136): full value up to 60%, then diminishing to a hard cap of 90%. They were cut off flat at 75%.
 - Broadswords and bows always deal at least half their maximum hit with basic attacks, greatswords 30% and halberds 65% (update 130). Brutal slash deals at least 75%, Cripple 50% and Fire ball 60%. Every hit used to roll from 1.
 - After a stun wears off, a creature can't be stunned again for 4 seconds (updates 117 and 131), so stuns can't chain forever.

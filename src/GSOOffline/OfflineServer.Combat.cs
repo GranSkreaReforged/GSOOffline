@@ -10,7 +10,15 @@ namespace GSOOffline
     internal static class CombatRules
     {
         public static int NpcHealth(int level) => 10 + 8 * Mathf.Max(1, level);
-        public static int NpcMaxHit(NpcInfo n) => n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
+        // Bosses: the patch notes' changes relative to ordinary creatures, compounded. Health: bosses +100% (136),
+        // +50% (137) against creatures +50% (137), -11.1% (139) = 2.25x. Damage: bosses +60% (136), +25% (137),
+        // -12.5% (139) against creatures +30% (136) = 1.35x. The game data gives bosses no health of their own,
+        // and its few damage values (Lakhar 1700) are on the old server's scale, so bosses use the level formula.
+        public const float BossHealthMultiplier = 2.25f, BossDamageMultiplier = 1.35f;
+        public static int BossHealth(int level) => Mathf.RoundToInt(NpcHealth(level) * BossHealthMultiplier);
+        public static int NpcMaxHit(NpcInfo n) =>
+            n.boss ? Mathf.RoundToInt((2 + 2 * Mathf.Max(1, n.level)) * BossDamageMultiplier)
+            : n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
         // Share of a creature's hit that Damage block on your gear absorbs: diminishing, and less against stronger
         // creatures (about a third for gear of the creature's level, ~200 block at 40). Never all of it.
         public static float BlockReduction(int block, int attackerLevel) =>

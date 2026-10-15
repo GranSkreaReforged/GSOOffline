@@ -149,7 +149,7 @@ Not yet implemented:
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 - Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 
-Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes.
+Loot comes from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA), whose players recorded what each monster dropped: 43 monsters have drop lists there, turned into `src/GSOOffline/Data/loot.json` by GSODevTools' `gen_loot.py`. The wiki names how rare drops were but not the rates, so "common", "uncommon" and "rare" map to reconstructed chances. Monsters it doesn't cover drop silver by level. Every monster can also drop upgrade and grade stones for its level band, as the wiki describes. Boss uniques and pets the wiki misses come from the official patch notes on Steam.
 
 Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
 
