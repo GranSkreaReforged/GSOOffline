@@ -104,6 +104,7 @@ namespace GSOOffline
             TickShopStock();
             TickDialogue();
             TickSightseeing();
+            TickLakhmusBasement();
             TickPet();
             TickRespawns();
             TickCombat();

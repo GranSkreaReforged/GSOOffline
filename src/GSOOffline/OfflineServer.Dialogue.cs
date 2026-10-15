@@ -26,6 +26,7 @@ namespace GSOOffline
             var npc = world?.GetNpc(uid);
             if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
             if (ResumeSightseeing(npc)) return;
+            if (LakhmuInteractNpc(npc)) return;
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 
