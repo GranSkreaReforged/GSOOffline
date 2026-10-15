@@ -19,8 +19,62 @@ namespace GSOOffline
         public static float HitChance = 0.85f;   // the player's blows
         // An NPC's blows land by its accuracy (1-100): 70% at 1, 82% at 50, 95% at 100 (it was 85% for all).
         public static float NpcHitChance(int accuracy) => 0.7f + 0.25f * Mathf.Clamp(accuracy, 0, 100) / 100f;
-        // Your gear's resistance to a blow's kind, in percent (a full set of one level gives about 40-60), up to 75%.
-        public static float PlayerResistance(int percent) => Mathf.Clamp(percent, -100, 75) / 100f;
+        // Your gear's resistance to a blow's kind, in percent (a full set of one level gives about 40-60), through the
+        // soft cap of update 136: full value to 60%, then half to 80 (70% effective), a quarter to 120 (80%),
+        // an eighth to 200 (90%), and never past 90%.
+        public static float PlayerResistance(int percent) => EffectiveResistance(percent) / 100f;
+
+        public static float EffectiveResistance(int percent)
+        {
+            float p = Mathf.Max(-100, percent);
+            if (p <= 60f) return p;
+            if (p <= 80f) return 60f + (p - 60f) * 0.5f;
+            if (p <= 120f) return 70f + (p - 80f) * 0.25f;
+            return Mathf.Min(90f, 80f + (p - 120f) * 0.125f);
+        }
+
+        // No single blow takes more than this share of your maximum health (update 140).
+        public const float MaxHitShare = 0.48f;
+        // After a stun wears off, the target can't be stunned again for this long (updates 117 and 131; NPCs too, 126).
+        public const float StunImmunity = 4f;
+        // Bosses give double experience (update 137).
+        public const int BossXpMultiplier = 2;
+
+        // Abilities with their own lowest roll: Brutal slash and Cripple (update 130), Fire ball (update 134).
+        public static readonly Dictionary<int, float> AbilityMinDamageShare = new Dictionary<int, float>
+        {
+            { 86, 0.75f }, { 88, 0.5f }, { 1, 0.6f },
+        };
+
+        // A weapon's lowest basic-attack roll as a share of its highest (update 130); unlisted weapons roll from 1.
+        public static float MinDamageShare(ItemTemplate w)
+        {
+            if (w == null) return 0f;
+            if (w.flags.Contains("isHalberd")) return 0.65f;
+            if (w.flags.Contains("isBroadsword") || w.flags.Contains("isBow")) return 0.5f;
+            if (w.flags.Contains("isGreatsword")) return 0.3f;
+            return 0f;
+        }
+
+        // Armor alignment (update 135): worn light or heavy armor scores chest 4, legs 3, head 2, back, gloves and
+        // boots 1 each (shields don't count). 7 points in one type give its passive.
+        public const int AlignmentNeeded = 7;
+        public static int AlignmentWeight(string slot)
+        {
+            switch (slot)
+            {
+                case "Body": return 4;
+                case "Legs": return 3;
+                case "Head": return 2;
+                case "Back": case "Bracelet": case "Feet": return 1;
+                default: return 0;
+            }
+        }
+        public const float LightAlignmentDamage = 1.15f, HeavyAlignmentTaken = 0.9f;
+        public const int BuffLightArmor = 94, BuffHeavyArmor = 95;   // client buff icons (XMLs/Buffs)
+
+        // Combat level (update 136): the three best combat skills count in full (/3), every other one a twelfth.
+        public static readonly int[] CombatSkills = { 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26 };
         // Block also takes a flat bite out of every blow, so well-armoured players shrug off weak creatures (a crab's
         // few points against ~200 block at level 40) while creatures of their own level still hurt.
         public static float FlatBlock(int block) => Mathf.Max(0, block) / 20f;
@@ -399,7 +453,10 @@ namespace GSOOffline
             npc.hitSplash = SplashPlain;
             if (Random.value >= CombatRules.HitChance) return 0;
             int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
-            float damage = Random.Range(1, max + 1) * power * DamageDealtMultiplier();
+            float minShare = ability == null ? CombatRules.MinDamageShare(weapon != null ? ItemData.Get(weapon.typeId) : null)
+                : CombatRules.AbilityMinDamageShare.TryGetValue(ability.id, out float s) ? s : 0f;
+            int min = Mathf.Clamp(Mathf.RoundToInt(max * minShare), 1, max);
+            float damage = Random.Range(min, max + 1) * power * DamageDealtMultiplier();
             if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) return Mathf.RoundToInt(damage);
             if (ability == null || ability.id != AggressiveSnowball)
             {
@@ -506,7 +563,7 @@ namespace GSOOffline
             if (info != null) NpcSound(npc, info.sfxDeath);
 
             int level = info?.level ?? 1;
-            AwardKillXp(skill, CombatRules.KillXp(level));
+            AwardKillXp(skill, CombatRules.KillXp(level) * (info != null && info.boss ? CombatRules.BossXpMultiplier : 1));
             DropLoot(npc, info);
             OnNpcKilled(npc.typeId);
         }
@@ -878,6 +935,7 @@ namespace GSOOffline
                 damage = Mathf.Max(0, Mathf.RoundToInt(roll - CombatRules.FlatBlock(block)));
                 lastHitTaken = Time.time;
                 damage = ApplyDefensiveBuffs(damage, attacker);
+                damage = Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
             }
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
             Send(8, 2, character.name, -damage, PlayerSplash(info));
@@ -897,7 +955,7 @@ namespace GSOOffline
             npc.pos = npc.spawnPos;
             npc.hasDest = false;
             npc.attackAnimUntil = 0f;
-            npc.stunnedUntil = npc.rootedUntil = 0f;
+            npc.stunnedUntil = npc.rootedUntil = npc.stunImmuneUntil = 0f;
             npc.dotTicks = 0;
             Send(13, 0, npc.uid, false);
             Send(9, 1, npc.uid, npc.spawnPos);
@@ -924,6 +982,7 @@ namespace GSOOffline
             respawnPlayerAt = -1f;
             aggroImmuneUntil = Time.time + CombatRules.RespawnProtection;
             character.currentHealth = MaxHealth();
+            RefreshAlignment(true);
             Send(1, 2, character.name, false);
             Send(1, 4, character.name, true);
             SendHealth();

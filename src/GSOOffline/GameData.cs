@@ -29,6 +29,7 @@ namespace GSOOffline
         public float attackDelay;      // seconds into a swing before the blow lands
         public float attackMissDistance;   // a melee blow misses if the player got this much beyond reach
         public int damage;             // explicit damage (rare); 0 = derive from level
+        public bool boss;              // boss="1": double experience
         public int defence;
         public int damageBlock;
         public int damageType;         // DamageKinds index of its blows (9 slash, 10 blunt, 11 piercing...)
@@ -159,6 +160,7 @@ namespace GSOOffline
                     attackDelay = IntAttr(n, "attackdelay", 600) / 1000f,
                     attackMissDistance = IntAttr(n, "attackmissdistance", 1),
                     damage = IntAttr(n, "damage"),
+                    boss = IntAttr(n, "boss") == 1,
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),

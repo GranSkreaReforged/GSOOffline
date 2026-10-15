@@ -477,6 +477,9 @@ namespace GSOOffline
             Plugin.Log.LogInfo("[dev] client stats: " + string.Join(" ", parts.ToArray()));
         }
 
+        // combatstats: combat level, armor alignment and effective resistances, server against client.
+        private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
+
         private static void PlayerState(string[] args)
         {
             var pl = Scr_PlayerHandler.instance.player;

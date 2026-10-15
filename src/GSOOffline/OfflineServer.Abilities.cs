@@ -259,7 +259,7 @@ namespace GSOOffline
             return m;
         }
 
-        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt);
+        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt) * AlignmentDamageDealt();
         private float AttackSpeedMultiplier() => BuffProduct(e => e.attackSpeed);
         internal float CraftTimeMultiplier() => BuffProduct(e => e.craftTime);
         internal float GatherTimeMultiplier() => BuffProduct(e => e.gatherTime);
@@ -279,7 +279,9 @@ namespace GSOOffline
         /// </summary>
         private int ApplyDefensiveBuffs(int damage, NpcEntity attacker)
         {
-            if (damage <= 0 || buffs.Count == 0) return damage;
+            if (damage <= 0) return damage;
+            damage = Mathf.RoundToInt(damage * AlignmentDamageTaken());
+            if (buffs.Count == 0) return damage;
             int raw = damage;
             foreach (var b in buffs)
                 if (b.effect.absorb)
@@ -522,7 +524,11 @@ namespace GSOOffline
                 var target = t;
                 int hit = RollPlayerHit(weapon, t, power, a);
                 if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
-                if (execution && t.health * 4 <= t.maxHealth) hit *= 2;   // double damage on a badly hurt target
+                if (execution && Time.time < t.stunnedUntil)
+                {
+                    hit *= 2;   // "Double damage for stunned targets"
+                    Plugin.Log.LogInfo($"[ability] Execution doubled on stunned {t.uid}: {hit}");
+                }
                 // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
                 int upFront = rule.dot > 0f ? hit / 2 : hit;
                 System.Action<int, int> land = (strike, strikes) =>
@@ -601,11 +607,13 @@ namespace GSOOffline
 
         private void ApplyNpcEffects(NpcEntity npc, AbilityRule rule, int hit, int skill)
         {
-            if (rule.stun > 0f)
+            if (rule.stun > 0f && Time.time >= npc.stunImmuneUntil)
             {
-                npc.stunnedUntil = Mathf.Max(npc.stunnedUntil, Time.time + rule.stun);
+                npc.stunnedUntil = Time.time + rule.stun;
+                npc.stunImmuneUntil = npc.stunnedUntil + CombatRules.StunImmunity;
                 PlayNpcEffect(npc, 21);
             }
+            else if (rule.stun > 0f) Plugin.Log.LogInfo($"[ability] {npc.uid} is immune to stuns for {npc.stunImmuneUntil - Time.time:0.0}s");
             if (rule.root > 0f) npc.rootedUntil = Mathf.Max(npc.rootedUntil, Time.time + rule.root);
             if (rule.stun > 0f || rule.root > 0f) HoldNpc(npc);
             if (rule.dot > 0f)
