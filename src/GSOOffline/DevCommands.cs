@@ -613,6 +613,18 @@ namespace GSOOffline
         // setgrade <itemId> <grade>: sets an item's grade (1 damaged - 8 mythic), for testing upgrades.
         private static void SetGrade(string[] args) => OfflineServer.Instance.DevSetGrade(int.Parse(args[1]), int.Parse(args[2]));
 
+        // where <name>: every loaded object whose name contains the word, with its position and renderer bounds.
+        private static void Where(string[] args)
+        {
+            foreach (var t in UnityEngine.Object.FindObjectsOfType<UnityEngine.Transform>())
+            {
+                if (t.name.IndexOf(args[1], System.StringComparison.OrdinalIgnoreCase) < 0) continue;
+                var r = t.GetComponent<UnityEngine.Renderer>();
+                Plugin.Log.LogInfo($"[dev] where '{t.name}' at {t.position}" + (r != null ? $" bounds {r.bounds.min} - {r.bounds.max}" : ""));
+            }
+            Plugin.Log.LogInfo("[dev] where done");
+        }
+
         // objs: the spawned objects the client shows (gates, lifts, oysters...), with their positions.
         private static void Objs(string[] args)
         {
