@@ -218,7 +218,6 @@
     { "on": "interact", "quest": 7, "phase": 1, "objectType": 19, "scene": 1, "pos": "503.0,3.0,1311.8", "radius": 8, "setPhase": 2, "action": 1005, "note": "the scroll by the pond" },
     { "on": "kill", "quest": 7, "phase": 2, "npc": 41, "setPhase": 3, "note": "the Pond Specter is banished" },
 
-    { "on": "enter", "quest": 17, "phase": 2, "scene": 25, "pos": "112.0,15.1,-198.0", "radius": 20, "setPhase": 3, "note": "the end of Ulan's dungeon" },
 
     { "on": "kill", "quest": 18, "phase": 1, "npc": 173, "scene": 13, "chance": 35, "action": 1006, "note": "Tesco's remains from a peninsula crab" },
     { "on": "use", "quest": 18, "phase": 1, "item": 10466, "scene": 13, "consume": true, "setPhase": 2, "action": 1007 },

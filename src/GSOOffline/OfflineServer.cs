@@ -61,6 +61,7 @@ namespace GSOOffline
             RegisterLootHandlers();
             RegisterBoatHandlers();
             RegisterOysterHandlers();
+            RegisterItemCombos();
         }
 
         public void Receive(byte ev, object[] c)
@@ -105,6 +106,7 @@ namespace GSOOffline
             TickDialogue();
             TickSightseeing();
             TickLakhmusBasement();
+            TickUlansDungeon();
             TickPet();
             TickRespawns();
             TickCombat();

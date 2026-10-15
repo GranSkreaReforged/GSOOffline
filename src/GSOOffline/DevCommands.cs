@@ -607,6 +607,14 @@ namespace GSOOffline
         // spawnground: checks the original server's spawns in this scene (Data/spawns.json) against the ground.
         private static void SpawnGround(string[] args) => OfflineServer.Instance.LogSpawnGround();
 
+        // objs: the spawned objects the client shows (gates, lifts, oysters...), with their positions.
+        private static void Objs(string[] args)
+        {
+            foreach (var so in Scr_SpawnedObjectHandler.instance.objectList)
+                if (so != null) Plugin.Log.LogInfo($"[dev] object {so.uniqueId} type {so.typeId} at {so.transform.position} rot {so.transform.eulerAngles.y:0}");
+            Plugin.Log.LogInfo("[dev] objs done");
+        }
+
         // silver <amount>: sets the test character's silver (boat rides, shops).
         private static void Silver(string[] args) => OfflineServer.Instance.SetSilver(int.Parse(args[1]));
 
