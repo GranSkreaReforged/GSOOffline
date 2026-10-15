@@ -16,6 +16,10 @@ namespace GSOOffline
     /// - Sepitus: a 3 s charge at you, then a bolt that takes 30% of your health; 10 s of fighting; a second charge
     ///   whose bolt also plagues you for 10 s (heals hurt instead); then, if he and Sytrax are far apart in health, a
     ///   healing bird from the healthier one evens them up. Below half health he calls three lava hounds every 30 s.
+    /// - Phraustie (Scr_Snowman): he never walks or swings. Every 3 s a big snowball at you (40-50% of your health,
+    ///   6.5 m), and a storm of snowballs around him that grows as he's hurt (up to 15 every half second near death,
+    ///   20-25% each, 3.3 m). From 60% health down, every 45 s, Snow Apostles appear around him and lob friendly
+    ///   snowballs that heal him 1000 every 3 s for 90 s. With no one near he regains 5% every half second.
     /// Blows given in the original's numbers are taken as the same share of the player's health (HurtByOriginal).
     /// </summary>
     public partial class OfflineServer
@@ -36,6 +40,7 @@ namespace GSOOffline
             if (player == null) return;
             Vector3 me = player.transform.position;
             if (world.sceneId == SceneSewers) TickNirish(me);
+            if (world.sceneId == ScenePhraustie) TickPhraustie(me);
             if (world.sceneId == ScenePoacher)
             {
                 TickGeorge(me);
@@ -95,6 +100,93 @@ namespace GSOOffline
             else minion.flying = true;   // scripted: walks where the script sends it
             visibilityTimer = 0f;
             return minion;
+        }
+
+        // ---- Phraustie, the False God of Christmas -------------------------------------------------
+
+        private const int ScenePhraustie = 34, PhraustieType = 323, SnowApostle = 324;
+        private float phraustieBigAt, phraustieStormAt, phraustieApostlesAt, phraustieHealAt;
+
+        private void TickPhraustie(Vector3 me)
+        {
+            var boss = Boss(PhraustieType);
+            if (boss == null) return;
+            if (boss.dead)
+            {
+                DismissMinions(boss);
+                return;
+            }
+            boss.flying = true;   // he stands his ground: no walking, no swings
+            Vector3 at = NpcPosition(boss);
+            bool near = !PlayerDead && Vector3.Distance(at, me) < 40f;
+            if (!near)
+            {
+                if (boss.health < boss.maxHealth && Vector3.Distance(at, me) >= 60f && Time.time >= phraustieBigAt)
+                {
+                    phraustieBigAt = Time.time + 0.5f;
+                    HealNpc(boss, Mathf.RoundToInt(boss.maxHealth * 0.05f));
+                }
+                return;
+            }
+            float hurt = 1f - HealthShare(boss);
+            Vector3 hand = at + Vector3.up * 4.5f;
+            if (Time.time >= phraustieBigAt)
+            {
+                phraustieBigAt = Time.time + 3f;
+                Vector3 spot = me;
+                SetAnim(boss, 147, true);
+                Send(198, 28, boss.uid, me);
+                Later(2f, () => { if (!boss.dead) SetAnim(boss, 149); });
+                Snowball(57, hand, spot, 8f, 6.5f, Random.Range(40, 51));
+            }
+            if (Time.time >= phraustieStormAt)
+            {
+                phraustieStormAt = Time.time + 0.5f;
+                int count = (int)(hurt * 15f);
+                for (int i = 0; i < count; i++)
+                    Snowball(42, hand, new Vector3(at.x + Random.Range(-40, 40), at.y, at.z + Random.Range(-40, 40)), 4f, 3.3f, Random.Range(20, 26));
+            }
+            if (Time.time >= phraustieApostlesAt)
+            {
+                int apostles = (int)(hurt * 5f - 1f);
+                if (apostles >= 1)
+                {
+                    phraustieApostlesAt = Time.time + 45f;
+                    Plugin.Log.LogInfo($"[boss] Phraustie raises {apostles} Snow Apostles");
+                    for (int i = 0; i < apostles; i++)
+                    {
+                        int x, z;
+                        do { x = Random.Range(-20, 20); z = Random.Range(-20, 20); } while (x < 4 && x > -4 || z < 4 && z > -4);
+                        var apostle = SpawnBossMinion(boss, SnowApostle, at + new Vector3(x, 0f, z), false);
+                        Later(90f, () => { if (world != null && world.npcs.Remove(apostle)) visibilityTimer = 0f; });
+                    }
+                }
+            }
+            if (Time.time >= phraustieHealAt)
+            {
+                phraustieHealAt = Time.time + 3f;
+                foreach (var a in world.npcs.FindAll(n => n.typeId == SnowApostle && n.master == boss && !n.dead))
+                {
+                    Send(198, 3, 42, a.uid, boss.uid);   // a friendly snowball
+                    SetAnim(a, 147, true);
+                    Later(FlightTime(42, NpcPosition(a), at), () => { if (!boss.dead) HealNpc(boss, 1000); });
+                }
+            }
+        }
+
+        /// <summary>A snowball thrown at a spot (marked), bursting there: a share of the player's health if they're within reach.</summary>
+        private void Snowball(int projectile, Vector3 from, Vector3 spot, float marker, float reach, int percent)
+        {
+            Send(21, 0, projectile, from, spot);
+            Send(198, 1, spot, marker, 2f, (byte)0);
+            Later(FlightTime(projectile, from, spot), () =>
+            {
+                if (world == null || world.sceneId != ScenePhraustie) return;
+                PlayEffect(165, spot);
+                if (PlayerDead || !PlayerWithin(spot, reach)) return;
+                HurtPlayer(Mathf.RoundToInt(MaxHealth() * percent / 100f), SplashPlain);
+                Plugin.Log.LogInfo($"[boss] a {(projectile == 57 ? "big snowball" : "snowball")} hits the player ({percent}%)");
+            });
         }
 
         // ---- Nirish ------------------------------------------------------------------------------
