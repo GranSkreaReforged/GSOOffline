@@ -10,6 +10,7 @@ namespace GSOOffline
         Lingering,   // a field under the player that hurts each second while they stand in it
         Nova,        // a blast around the boss after a wind-up
         Stun,        // the player can't move for a moment
+        Absorb,      // warning, then a short window in which the player's hits come back at them
     }
 
     /// <summary>One timed move of a boss fight. Numbers are reconstructions: the patch notes name the moves but
@@ -54,6 +55,7 @@ namespace GSOOffline
                 new BossMove { kind = BossMoveKind.Nova, every = 20f, delay = 2.5f, radius = 8f, share = 1.5f, warnGfx = 169, hitGfx = 170,
                     damageKind = DamageKinds.Psychic, note = "psychic explosion" },
                 new BossMove { kind = BossMoveKind.Stun, every = 25f, radius = 8f, duration = 2f, note = "stun" },
+                Absorb(),
             } },
             // Tomb guardians: psychic explosions on a 30 second cycle (update 139).
             { 227, TombGuardian() }, { 228, TombGuardian() }, { 229, TombGuardian() },
@@ -75,7 +77,16 @@ namespace GSOOffline
         {
             new BossMove { kind = BossMoveKind.Nova, every = 30f, delay = 2f, radius = 6f, share = 1.2f, hitGfx = 170,
                 damageKind = DamageKinds.Psychic, note = "psychic explosion" },
+            Absorb(),
         };
+
+        // Absorb (updates 138-139 name it for Zalranaz and the Tomb guardians but never say what it did; this is
+        // made up): the boss warns, 2 seconds later its shield is up for 4 seconds and every blow or spell the player
+        // lands on it comes back at them in full, then it says the shield is down. Speech bubbles carry the timing.
+        private const float AbsorbWarning = 2f, AbsorbWindow = 4f;
+        private const int GfxAbsorb = 100;   // "black hole into healing"
+
+        private static BossMove Absorb() => new BossMove { kind = BossMoveKind.Absorb, every = 35f, note = "absorb" };
 
         private const int NirishSpiderling = 276;
         private const float SpiderlingHealPerSecond = 0.01f;   // of Nirish's health (reconstruction)
@@ -116,6 +127,9 @@ namespace GSOOffline
                 }
                 if (boss.typeId == 275) MendNirish(boss);
             }
+            foreach (var n in world.npcs)
+                if (BossMoves.TryGetValue(n.typeId, out var m) && System.Array.Exists(m, x => x.kind == BossMoveKind.Absorb))
+                    ShowAbsorbAura(n, !n.dead && Time.time < n.absorbUntil);
             world.npcs.RemoveAll(n => n.master != null && n.dead && Time.time > n.respawnAt);   // fallen minions fade away
         }
 
@@ -166,6 +180,25 @@ namespace GSOOffline
                         if (PlayerWithin(at, m.radius)) HazardHit(info, m, m.note);
                     });
                     break;
+                case BossMoveKind.Absorb:
+                    NpcSay(boss, "I will drink your strength...");
+                    boss.absorbUntil = Time.time + AbsorbWarning + AbsorbWindow;   // the aura shows from the warning on
+                    boss.reflectFrom = Time.time + AbsorbWarning;
+                    Notice($"{info.name} begins to absorb. Stop attacking!", "orange");
+                    PlayNpcEffect(boss, GfxAbsorb);
+                    Later(AbsorbWarning, () =>
+                    {
+                        if (boss.dead || !boss.aggro) return;
+                        NpcSay(boss, "Strike me, and suffer!");
+                        PlayNpcEffect(boss, GfxAbsorb);
+                        Later(AbsorbWindow, () =>
+                        {
+                            if (boss.dead) return;
+                            NpcSay(boss, "The dark shield fades.");
+                            Notice($"{info.name}'s shield is down. Attack!", "green");
+                        });
+                    });
+                    break;
                 case BossMoveKind.Stun:
                     if (!PlayerWithin(bossPos, m.radius)) break;
                     PlayPlayerEffect(21);
@@ -173,6 +206,29 @@ namespace GSOOffline
                     Later(m.duration, () => { if (!PlayerDead && character != null) Send(1, 4, character.name, true); });
                     break;
             }
+        }
+
+        /// <summary>
+        /// Zalranaz's red orbs (OrbSmallRed in his model) shimmer only while he absorbs, so the aura itself warns.
+        /// Set every tick, so a model streamed in again picks it up.
+        /// </summary>
+        private static void ShowAbsorbAura(NpcEntity boss, bool on)
+        {
+            var c = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(boss.uid) : null;
+            if (c == null) return;
+            foreach (var t in c.GetComponentsInChildren<Transform>(true))
+                if (t.name.StartsWith("OrbSmallRed") && t.gameObject.activeSelf != on) t.gameObject.SetActive(on);
+        }
+
+        /// <summary>3/30: a speech bubble over an NPC.</summary>
+        private void NpcSay(NpcEntity npc, string text) => Send(3, 30, text, npc.uid);
+
+        /// <summary>A blow landed on an absorbing boss: it hurts the player instead, through the usual caps.</summary>
+        private void ReflectAbsorbed(NpcEntity boss, int damage)
+        {
+            int hit = Mathf.Min(ApplyDefensiveBuffs(damage, null), Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
+            Plugin.Log.LogInfo($"[boss] {boss.uid} absorbs {damage} and reflects {hit}");
+            HurtPlayer(hit, SplashPlain);
         }
 
         private bool PlayerWithin(Vector3 spot, float radius)
