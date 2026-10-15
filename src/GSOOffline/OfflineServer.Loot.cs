@@ -69,7 +69,23 @@ namespace GSOOffline
             int level = info?.level ?? 1;
             var bag = new LootBag();
             var table = LootData.For(info?.name);
-            if (table != null)
+            if (info != null && LootData.KnownToOriginal(info.id))
+            {
+                // The original server's tables, rolled as it rolled them: each drop on its own, 1 in its rate.
+                var original = LootData.OriginalDrops(info.id);
+                foreach (var d in original)
+                {
+                    if (!OneIn(d.rate)) continue;
+                    if (d.typeId == 0) bag.silver = Random.Range(d.min, d.max + 1);
+                    else AddToBag(bag, d.typeId, Random.Range(d.min, d.max + 1));
+                }
+                // The uniques and pets patch notes added after that snapshot (updates 137-140).
+                if (table != null)
+                    foreach (var d in table.drops)
+                        if (LaterPatch(d) && !original.Exists(o => o.typeId == d.typeId) && Random.value < d.chance)
+                            AddToBag(bag, d.typeId, Random.Range(d.min, d.max + 1));
+            }
+            else if (table != null)
             {
                 foreach (var d in table.drops)
                 {
@@ -84,10 +100,44 @@ namespace GSOOffline
             {
                 bag.silver = CombatRules.SilverDrop(level);   // no wiki entry: the old level formula
             }
-            foreach (var g in LootData.File.global)
-                if (level >= g.minLevel && level <= g.maxLevel && Random.value < g.chance) AddToBag(bag, g.typeId, 1);
+            LevelDrops(bag, level);
             return bag;
         }
+
+        // Unity's Random.Range(0, n) is 0 for any n <= 1, as on the original server.
+        private static bool OneIn(int n) => Random.Range(0, n) == 0;
+
+        // Snapshot of the original server's Loot.xml: about update 136.
+        private const int OriginalLootUpdate = 136;
+
+        private static bool LaterPatch(LootDrop d)
+        {
+            if (d.from == null || !d.from.StartsWith("patch notes")) return false;
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(d.from, @"\d+"))
+                if (int.Parse(m.Value) > OriginalLootUpdate) return true;
+            return false;
+        }
+
+        /// <summary>
+        /// What every creature could drop by level on the original server (Scr_NpcHandler.dropLoot): an upgrade stone,
+        /// 1 in 15 of them a grade stone instead, and a gear crate of the level's metal, 1 in 15 of them the next one.
+        /// </summary>
+        private static void LevelDrops(LootBag bag, int level)
+        {
+            if (level >= 1 && level < 25 && OneIn(50 - level)) AddToBag(bag, OneIn(15) ? 440 : 437, 1);
+            else if (level >= 25 && level < 50 && OneIn(75 - level)) AddToBag(bag, OneIn(15) ? 441 : 438, 1);
+            else if (level >= 50 && OneIn(100 - level)) AddToBag(bag, OneIn(15) ? 442 : 439, 1);
+
+            if (level >= 1 && level < 10 && OneIn(50 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 1 : IronCrate, 1);
+            else if (level >= 10 && level < 20 && OneIn(60 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 2 : IronCrate + 1, 1);
+            else if (level >= 20 && level < 30 && OneIn(2 * (70 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 3 : IronCrate + 2, 1);
+            else if (level >= 30 && level < 40 && OneIn(2 * (80 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 4 : IronCrate + 3, 1);
+            else if (level >= 40 && level < 50 && OneIn(3 * (90 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 5 : IronCrate + 4, 1);
+            else if (level >= 50 && OneIn(3 * (100 - level))) AddToBag(bag, IronCrate + 5, 1);
+        }
+
+        // Gear crates: iron, steel, verum, stranite, shadow, iridium (10668-10673).
+        private const int IronCrate = 10668;
 
         // The wiki gives one observed amount (e.g. "Crab lvl 2: 7"); vary it a little around that.
         private static int WikiSilver(int min, int max)
