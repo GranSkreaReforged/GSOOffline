@@ -122,12 +122,12 @@ Working:
 - Inventory, equipment and starter kits
 - NPC dialogue
 - Quest progress and rewards
-- Shops
+- Shops, with the original game's stock lists, limited stock and restocking
 - Harvesting (mining, woodcutting, fishing, gathering)
 - Sailing: launching, boarding and steering boats, Sailing XP, boat teleports
 - Oyster fishing in Bal Sardan: harpoon guns and the fishing vessel's crane
 - Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
-- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm)
+- Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank

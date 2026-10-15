@@ -101,6 +101,7 @@ namespace GSOOffline
             TickSkills();
             TickSitting();
             TickWindows();
+            TickShopStock();
             TickDialogue();
             TickSightseeing();
             TickPet();

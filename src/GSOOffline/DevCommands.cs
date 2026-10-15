@@ -604,6 +604,9 @@ namespace GSOOffline
         // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
         private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
 
+        // silver <amount>: sets the test character's silver (boat rides, shops).
+        private static void Silver(string[] args) => OfflineServer.Instance.SetSilver(int.Parse(args[1]));
+
         // harpy [spawn [route 0-4] | hit [damage] | takeoff | back]: where Aellope is and what she's doing; spawn puts her on a
         // route now, hit deals her damage (default 1) as the player (in the air: she dives at you).
         private static void Harpy(string[] args) => OfflineServer.Instance.DevHarpy(args);

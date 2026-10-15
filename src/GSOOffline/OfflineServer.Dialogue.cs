@@ -113,8 +113,15 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dialogue] node {n.id} options [{string.Join(",", visible.ToArray())}]");
             var player = LocalPlayer;
             dialogueAt = player != null ? player.transform.position : Vector3.zero;
-            // nodeId>opt|opt>var1|var2  ($1 in node text = player name)
-            Send(2, 3, character.name, n.id + ">" + string.Join("|", visible.ToArray()) + ">" + character.name + "|-");
+            // nodeId>opt|opt>var1|var2  ($1 in node text = var1: the player's name, or a node's own text)
+            Send(2, 3, character.name, n.id + ">" + string.Join("|", visible.ToArray()) + ">" + NodeVar(n.id) + "|-");
+        }
+
+        /// <summary>What $1 stands for in a node's text: the player's name, except where the original server filled it in.</summary>
+        private string NodeVar(int nodeId)
+        {
+            if (nodeId == HarpyGossipNode) return HarpyGossip();
+            return character.name;
         }
 
         private void ChooseOption(int optionId)
@@ -281,9 +288,7 @@ namespace GSOOffline
         private void OpenShop(int shopId)
         {
             openShop = ShopData.Get(shopId);
-            var parts = new List<string>();
-            foreach (var i in openShop.items) parts.Add(i[0] + "-" + i[1] + "-99");
-            string list = string.Join(",", parts.ToArray());
+            string list = ShopList();
             // currency type 0 = silver; the refresh that follows carries the merchant's own silver,
             // which caps what the client will let you sell.
             Send(0, 2, character.name, openShop.name, "0>" + list);
@@ -294,23 +299,57 @@ namespace GSOOffline
         private void RefreshShop()
         {
             if (openShop == null) return;
-            var parts = new List<string>();
-            foreach (var i in openShop.items) parts.Add(i[0] + "-" + i[1] + "-99");
-            Send(2, 37, openShop.name, openShop.merchantSilver + ">" + string.Join(",", parts.ToArray()));
+            Send(2, 37, openShop.name, openShop.merchantSilver + ">" + ShopList());
         }
 
-        private int ShopPrice(int typeId)
+        // type-price-stock for each item; the client shows the stock on the icon, in red at 0.
+        private string ShopList()
         {
-            if (openShop == null) return -1;
-            foreach (var i in openShop.items)
-                if (i[0] == typeId) return i[1];
-            return -1;
+            var parts = new List<string>();
+            foreach (var e in openShop.items) parts.Add(e.typeId + "-" + e.price + "-" + e.Shown);
+            return string.Join(",", parts.ToArray());
+        }
+
+        private ShopEntry ShopItem(int typeId)
+        {
+            if (openShop == null) return null;
+            foreach (var e in openShop.items)
+                if (e.typeId == typeId) return e;
+            return null;
+        }
+
+        private int ShopPrice(int typeId) => ShopItem(typeId)?.price ?? -1;
+
+        /// <summary>Restocking, once a second; an open shop window shows it as it happens.</summary>
+        private float shopRestockTimer;
+
+        private void TickShopStock()
+        {
+            shopRestockTimer -= Time.deltaTime;
+            if (shopRestockTimer > 0f) return;
+            shopRestockTimer = 1f;
+            if (ShopData.Restock(openShop)) RefreshShop();
         }
 
         private void BuyFromShop(int typeId, int amount)
         {
-            int price = ShopPrice(typeId);
-            if (character == null || price < 0 || amount <= 0) return;
+            var entry = ShopItem(typeId);
+            if (character == null || entry == null || amount <= 0) return;
+            if (entry.Limited)
+            {
+                if (entry.stock <= 0)
+                {
+                    Send(2, 41, "The shop has run out of stock.");
+                    RefreshShop();
+                    return;
+                }
+                if (amount > entry.stock)
+                {
+                    amount = entry.stock;
+                    Send(2, 41, "The shop has run out of stock.");
+                }
+            }
+            int price = entry.price;
             int cost = price * amount;
             if (character.silver < cost)
             {
@@ -318,6 +357,7 @@ namespace GSOOffline
                 return;
             }
             SetSilver(character.silver - cost);
+            if (entry.Limited) entry.stock -= amount;
             GiveItem(typeId, amount);
             openShop.merchantSilver += cost;
             RefreshShop();
@@ -342,6 +382,9 @@ namespace GSOOffline
             }
             RemoveFromStack(it, amount);
             SetSilver(character.silver + payout);
+            // Resources (ids above 10000) go back on the shelf of a shop that sells them, as on the original server.
+            var shelf = ShopItem(typeId);
+            if (typeId > 10000 && shelf != null && shelf.Limited) shelf.stock += amount;
             openShop.merchantSilver -= payout;
             RefreshShop();
         }
