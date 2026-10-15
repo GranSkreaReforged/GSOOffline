@@ -253,6 +253,27 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[harpy] Aellope killed at {SceneWorld.Vec(npc.pos)}; back in {HarpyRespawn / 60f:0} minutes");
         }
 
+        // "Have you sighted any harpies yet?": the Mantle of St. Jakob navigator's answer (dialogue node 2292).
+        private const int HarpyGossipNode = 2292;
+
+        /// <summary>Where the navigator says Aellope is, word for word as the original server's GetHarpyLocationString.</summary>
+        private string HarpyGossip()
+        {
+            if (harpyState != HarpyState.Away)
+                switch (harpyRoute)
+                {
+                    case 0: return "Yes. There is one flying over West Goldon. We are headed there momentarily.";
+                    case 1: return "Yes. Look up.";
+                    case 2: return "Yes. There is one flying over North Goldon. We are headed there momentarily.";
+                    case 3: return "Yes. There is one flying over North-East Goldon. We are headed there momentarily.";
+                    case 4: return "Yes. There is one flying over South Goldon. We are headed there momentarily.";
+                }
+            float left = harpyBackAt - Time.time;
+            if (left > 2700f) return "A harpy was just hunted down. It might take a while for them to appear again.";
+            if (left > 1800f) return "No sightings in a while.";
+            return "It has been a long time since we saw one. We should be able to spot one any moment now...";
+        }
+
         /// <summary>Dev: harpy [spawn [route] | hit [damage] | takeoff | back]</summary>
         internal void DevHarpy(string[] args)
         {
@@ -266,7 +287,8 @@ namespace GSOOffline
             string ground = harpyState != HarpyState.Away && HarpyInWorld && GroundAt(harpyPos, harpyPos.y + 3f, 200f, out var g) ? $", {harpyPos.y - g.y:0.0} m up" : string.Empty;
             var c = HarpyInWorld && Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(harpyNpc.uid) : null;
             Plugin.Log.LogInfo($"[dev] harpy: {where}{ground}; client speed {(c != null ? c.movementSpeed.ToString() : "-")}; uid {harpyNpc?.uid}, health {harpyNpc?.health}/{harpyNpc?.maxHealth}, in world {HarpyInWorld}" +
-                (harpyState == HarpyState.Landed || harpyState == HarpyState.Feeding ? $", takes off in {harpyResetAt - Time.time:0.0} s" : string.Empty));
+                (harpyState == HarpyState.Landed || harpyState == HarpyState.Feeding ? $", takes off in {harpyResetAt - Time.time:0.0} s" : string.Empty) +
+                $"; the navigator says \"{HarpyGossip()}\"");
         }
     }
 }
