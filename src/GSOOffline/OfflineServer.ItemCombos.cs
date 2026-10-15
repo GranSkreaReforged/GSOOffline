@@ -19,6 +19,7 @@ namespace GSOOffline
             if (character == null || PlayerDead) return;
             int targetType = (int)c[4], usedType = (int)c[5];
             if (CountItem(targetType) == 0 || CountItem(usedType) == 0) return;
+            if (GrantsGlovesCombo(targetType, usedType)) return;
             if (Pair(targetType, usedType, ItemKeyHalfA, ItemKeyHalfB))
             {
                 TakeItems(ItemKeyHalfA, 1);
@@ -36,6 +37,30 @@ namespace GSOOffline
             }
             if (UpgradeWith((int)c[2], (int)c[3])) return;
             Notice($"You try to use {ItemData.Get(usedType)?.name} with {ItemData.Get(targetType)?.name}. Nothing interesting happens.");
+        }
+
+        // Commander Grant's gloves (quest 34, a reconstruction): the upgrade tutorial. His two gloves combine into the
+        // upgraded pair; his upgrade stone is the one he later docks your pay for.
+        private const int GrantStone = 10726, GrantGloveA = 10727, GrantGloveB = 10728, GrantGloves = 10729;
+
+        private bool GrantsGlovesCombo(int targetType, int usedType)
+        {
+            if (Pair(targetType, usedType, GrantGloveA, GrantGloveB))
+            {
+                TakeItems(GrantGloveA, 1);
+                TakeItems(GrantGloveB, 1);
+                GiveItem(GrantGloves);
+                Notice("Upgrade successfull! Your item's grade has increased!", "green");
+                if (character.GetQuestPhase(QuestGrantsGloves) == 1) SetQuestPhase(QuestGrantsGloves, 2);
+                return true;
+            }
+            if (usedType == GrantStone && (targetType == GrantGloveA || targetType == GrantGloveB || targetType == GrantGloves))
+            {
+                TakeItems(GrantStone, 1);
+                Notice("Upgrade failed, your material was destroyed.", "red");
+                return true;
+            }
+            return false;
         }
 
         // Either way round (the original only took the halves and the key one way).
