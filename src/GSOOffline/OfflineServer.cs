@@ -110,6 +110,7 @@ namespace GSOOffline
             TickPoacherDungeon();
             TickSewers();
             TickCoral();
+            TickOriginalBosses();
             TickPet();
             TickRespawns();
             TickCombat();

@@ -575,6 +575,9 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] actionId {p.anim.actionId}");
         }
 
+        // npcpercent <uid> <percent>: sets an NPC's current health to that share of its maximum (boss health thresholds).
+        private static void NpcPercent(string[] args) => OfflineServer.Instance.DevNpcPercent(int.Parse(args[1]), int.Parse(args[2]));
+
         // npchp <uid> <hp>: sets an NPC's health and max health (a training dummy for combat tests).
         private static void NpcHp(string[] args) => OfflineServer.Instance.DevSetNpcHealth(int.Parse(args[1]), int.Parse(args[2]));
 

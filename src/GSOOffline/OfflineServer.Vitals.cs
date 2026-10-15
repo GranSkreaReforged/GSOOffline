@@ -122,6 +122,14 @@ namespace GSOOffline
         public void Heal(int amount)
         {
             if (character == null) return;
+            // Sepitus's plague, in his dungeon: a real heal (over 2% of your health) burns you for 2-3 times as much.
+            if (character.scene == ScenePoacher && amount > MaxHealth() * 0.02f && buffs.Exists(b => b.effect.plague))
+            {
+                PlayPlayerEffect(7);
+                float res = CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Fire)));
+                HurtPlayer(Mathf.RoundToInt(amount * Random.Range(2f, 3f) * (1f - res)), SplashPlain);
+                return;
+            }
             character.currentHealth = Mathf.Min(MaxHealth(), character.currentHealth + amount);
             SendHealth();
         }
