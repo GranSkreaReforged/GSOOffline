@@ -225,6 +225,23 @@ namespace GSOOffline
             }
         }
 
+        /// <summary>Dev: how far each of this scene's original-server spawns (Data/spawns.json) is from the ground (spawnground).</summary>
+        internal void LogSpawnGround()
+        {
+            if (world == null) return;
+            int ok = 0;
+            var rows = new List<SpawnRow>(SpawnData.Npcs(world.sceneId));
+            rows.AddRange(SpawnData.Harvestables(world.sceneId));
+            foreach (var r in rows)
+            {
+                Vector3 p = r.Position;
+                bool found = GroundAt(p, p.y + 3f, 40f, out var g);
+                if (found && Mathf.Abs(p.y - g.y) < 1.5f) { ok++; continue; }
+                Plugin.Log.LogInfo($"[dev] spawn type {r.type} at {SceneWorld.Vec(p)}: " + (found ? $"ground {p.y - g.y:0.00} m below" : "no ground within 40 m"));
+            }
+            Plugin.Log.LogInfo($"[dev] spawnground: {ok} of {rows.Count} original spawns in scene {world.sceneId} stand on the ground");
+        }
+
         private List<int> UnlockedWayshrines(CharacterSave ch)
         {
             if (!Plugin.UnlockAllWayshrines.Value) return new List<int>(ch.wayshrines);

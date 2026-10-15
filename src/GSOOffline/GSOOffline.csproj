@@ -45,6 +45,7 @@
     <EmbeddedResource Include="Data\droptables.json" LogicalName="GSOOffline.droptables.json" />
     <EmbeddedResource Include="Data\loot.json" LogicalName="GSOOffline.loot.json" />
     <EmbeddedResource Include="Data\shops.json" LogicalName="GSOOffline.shops.json" />
+    <EmbeddedResource Include="Data\spawns.json" LogicalName="GSOOffline.spawns.json" />
   </ItemGroup>
 
   <Target Name="CheckGameDir" BeforeTargets="ResolveAssemblyReferences">

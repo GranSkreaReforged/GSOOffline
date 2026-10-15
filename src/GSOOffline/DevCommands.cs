@@ -604,6 +604,9 @@ namespace GSOOffline
         // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
         private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
 
+        // spawnground: checks the original server's spawns in this scene (Data/spawns.json) against the ground.
+        private static void SpawnGround(string[] args) => OfflineServer.Instance.LogSpawnGround();
+
         // silver <amount>: sets the test character's silver (boat rides, shops).
         private static void Silver(string[] args) => OfflineServer.Instance.SetSilver(int.Parse(args[1]));
 
