@@ -32,6 +32,10 @@ namespace GSOOffline
         public float reflectFrom;       // ...and from then the player's hits come back at them        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
         public int dotDamage, dotTicks, dotSkill;
         public float nextDot;
+
+        // scripted NPCs (Aellope, OfflineServer.Harpy.cs)
+        public bool flying;       // in the air: its script moves and animates it, the ground AI leaves it alone
+        public bool ownRespawn;   // its script brings it back, not the respawn timer
     }
 
     public class HarvestableEntity

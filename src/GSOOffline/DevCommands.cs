@@ -604,6 +604,10 @@ namespace GSOOffline
         // killnpc <uid>: kills a visible NPC as if the player had (xp, loot bag, quest triggers).
         private static void KillNpc(string[] args) => OfflineServer.Instance.DevKill(int.Parse(args[1]));
 
+        // harpy [spawn [route 0-4] | hit [damage] | takeoff | back]: where Aellope is and what she's doing; spawn puts her on a
+        // route now, hit deals her damage (default 1) as the player (in the air: she dives at you).
+        private static void Harpy(string[] args) => OfflineServer.Instance.DevHarpy(args);
+
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
 

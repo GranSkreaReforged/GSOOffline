@@ -547,6 +547,7 @@ namespace GSOOffline
         /// <param name="dev">Dev kills ignore Absorb.</param>
         private void DealDamage(NpcEntity npc, int damage, int skill, bool reflectable = false, bool dev = false)
         {
+            HarpyHurt(npc, damage);
             if (!dev && damage > 0 && Time.time >= npc.reflectFrom && Time.time < npc.absorbUntil)
             {
                 Send(12, 0, npc.uid, npc.health, npc.maxHealth, SplashBlocked);
@@ -591,6 +592,7 @@ namespace GSOOffline
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
             // A summoned minion's body fades a few seconds after it falls (TickBossMechanics removes it).
             npc.respawnAt = Time.time + (npc.master != null ? 5f : info?.respawnTime ?? CombatRules.NpcRespawn);
+            HarpyDied(npc);   // shot down in the air: on the ground before the loot drops
             Send(11, 0, npc.uid, false, string.Empty);
             Send(13, 2, npc.uid, false);
             Send(13, 0, npc.uid, true);
@@ -787,8 +789,9 @@ namespace GSOOffline
         private void FinishReturn(NpcEntity npc)
         {
             npc.returning = false;
-            npc.health = npc.maxHealth;
             Send(13, 2, npc.uid, false);
+            if (npc.ownRespawn) return;   // Aellope heals by feeding on the dead and when she takes off (OfflineServer.Harpy.cs)
+            npc.health = npc.maxHealth;
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
         }
 
@@ -864,9 +867,10 @@ namespace GSOOffline
             {
                 if (npc.dead)
                 {
-                    if (npc.master == null && Time.time >= npc.respawnAt) RespawnNpc(npc);
+                    if (npc.master == null && !npc.ownRespawn && Time.time >= npc.respawnAt) RespawnNpc(npc);
                     continue;
                 }
+                if (npc.flying) continue;
                 if (!NpcShown(npc))
                 {
                     npc.aggro = npc.attackingSent = npc.returning = false;

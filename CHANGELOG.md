@@ -4,6 +4,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Added
+- Aellope flies again, as she did in the original game. She patrols one of five routes 30-40 metres above Goldon (west, the centre, north, north-east or south), back and forth. Hit her and she dives at the spot you stood on, lands and fights. If 20 seconds pass without her taking damage, she takes off healed and goes back to her route. If you die while she's down, she flies to your body and feeds on it, healing 30% (at most every 45 seconds). Shot down in the air, she falls to the ground with her loot. Killed, she returns an hour later on a new route. This is how the original server ran her; the routes and timings come from its code. She used to stand still in the middle of the island.
+
 ### Changed
 - Every shop sells what it sold in the original game: 43 shops, 650 items, from the original server's stock lists (the game's developer sent us the server). Shopkeepers used to sell items picked by theme. The Grimwall Tool vendor now sells the original Tools stock, which includes the knife and the mortar and pestle.
 

@@ -133,6 +133,7 @@ namespace GSOOffline
 
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
+            AddHarpyToWorld();
             LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.

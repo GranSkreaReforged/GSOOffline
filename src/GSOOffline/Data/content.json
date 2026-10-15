@@ -299,7 +299,6 @@
     { "type": 372, "note": "boss: Jotnar, the Crusher of Bones: 'a cave near Trout' (update 139), among the trolls south of Trout", "scene": 13, "spawn": [ "1431.5,14.7,751.1" ] },
     { "type": 356, "note": "boss: Betsy, the Ghit Mother: 'grazing near the crossing in the north-west of Bal Sardan' (update 139), among the north-west ghits", "scene": 7, "spawn": [ "414.2,5.9,467.1" ] },
     { "type": 368, "note": "boss: Lakhar, the Lizard Captain: 'Aldrumz in the east of Bal Sardan' (update 139), among the eastern lizard warriors", "scene": 7, "spawn": [ "774.4,16.1,-40.8" ] },
-    { "type": 307, "note": "boss: Aellope: world boss 'flying around the island of Goldon' (update 135, wiki); open ground mid-island", "scene": 18, "spawn": [ "1065.0,15.6,669.0" ] },
     { "type": 323, "note": "boss: Phraustie the Snowman on Ruteran (the original server's spawn point)", "scene": 34, "spawn": [ "-432.0,11.7,-256.0" ] },
     { "type": 293, "note": "boss: Sytrax, Sepitus's dragon ('darkTamerDragon' in the original server), beside him", "scene": 38, "spawn": [ "905.0,25.7,-629.6" ] },
     { "type": 263, "note": "boss: Viper: nothing records where; a level-90 venom spitter (Nirish's projectile), so deep in the Yorkhill sewers, in the low channel among the dark warriors, far from both the entrance (where the rats are) and Nirish", "scene": 4, "spawn": [ "152.3,61.8,14.6" ] }
