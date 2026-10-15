@@ -995,6 +995,19 @@ namespace GSOOffline
             if (character.currentHealth <= 0) PlayerDies();
         }
 
+        /// <summary>
+        /// Damage the original server dealt in its own numbers (100 health per combat level), taken as the same share
+        /// of this player's health, less their resistance to its kind: the dungeons' scripted hazards.
+        /// </summary>
+        private int HurtByOriginal(int originalDamage, int damageKind, int splash = SplashPlain)
+        {
+            float share = Mathf.Min(1f, originalDamage / (Mathf.Max(1, CombatLevel()) * 100f));
+            float res = damageKind > 0 && damageKind < DamageKinds.Count ? CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(damageKind))) : 0f;
+            int damage = Mathf.RoundToInt(MaxHealth() * share * (1f - res));
+            HurtPlayer(damage, splash);
+            return damage;
+        }
+
         // The splash style for a blow on you. damagetype used to go straight through, but splash styles aren't damage
         // kinds: spiders' poison (1) showed as "blocked", hounds' fire (3) as "weakened", Ents' earth (4) as "poisoned".
         private static int PlayerSplash(NpcInfo info) => info.damageType == DamageKinds.Poison ? SplashPoisoned : SplashPlain;
