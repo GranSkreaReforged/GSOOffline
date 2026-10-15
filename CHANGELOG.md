@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.6.0] - 2026-10-16
 ### Added
 - The last three quests can be played, rebuilt from their dialogue (they came in 2020, after the original server code we have). A Magical Journey: buy Arthos a beer, find Kromwell at the Mages Guild, cast Flame Lance at a training dummy and join the guild. Commander Grant's Gloves: the Commander at the Grimwall smithy takes you for the smith; combine his gloves for a lesson in upgrading. Joining the Hunters Guild: finishing The Lone Hunter sends you to the guild in Trout, where the Porter wants Bruno dead; your member insignia then gets you into the guild hall.
 - Three more quests can be played, as the original server ran them. A Fishy Request: Talvin in Trout sends you fishing north of the village for a soloman fish to hang on the rack, which turns out to draw a troll to the village; kill it for 8000 Fishing XP, and Trout's merchants will trade with you. Powder Monkey: staunch G'Ertagnon's wound on his island off West Athagos with a bandage and bring him 7 saltpeter, 2 charcoal and 1 sulfur powder; he teaches you gunpowder, and his chest holds the recipe. Mantle of St. Jakob: hear Nimuel Reyes's story in the Yorkhill Monastery (Archery 40), find the expedition camped by the Dead Lake in Goldon, take a torn piece of the mantle from Aellope, have the Yorkhill artisans' master tailor sew the mantle, and bring it back for the Ring of the Monastery.
