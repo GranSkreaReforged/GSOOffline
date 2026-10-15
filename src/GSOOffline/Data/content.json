@@ -300,7 +300,9 @@
     { "type": 356, "note": "boss: Betsy, the Ghit Mother: 'grazing near the crossing in the north-west of Bal Sardan' (update 139), among the north-west ghits", "scene": 7, "spawn": [ "414.2,5.9,467.1" ] },
     { "type": 368, "note": "boss: Lakhar, the Lizard Captain: 'Aldrumz in the east of Bal Sardan' (update 139), among the eastern lizard warriors", "scene": 7, "spawn": [ "774.4,16.1,-40.8" ] },
     { "type": 307, "note": "boss: Aellope: world boss 'flying around the island of Goldon' (update 135, wiki); open ground mid-island", "scene": 18, "spawn": [ "1065.0,15.6,669.0" ] },
-    { "type": 323, "note": "boss: Phraustie the Snowman: 'on Ruteran' (Christmas 2020), among the snowmen", "scene": 34, "spawn": [ "-382.0,10.7,-227.6" ] }
+    { "type": 323, "note": "boss: Phraustie the Snowman: 'on Ruteran' (Christmas 2020), among the snowmen", "scene": 34, "spawn": [ "-382.0,10.7,-227.6" ] },
+    { "type": 293, "note": "boss: Sytrax: nothing records where; his NPC id and emblem sit with the poacher dungeon bosses (Sepitus 292, George 294), so in its graveyard among the ghosts", "scene": 38, "spawn": [ "33.5,56.3,-38.4" ] },
+    { "type": 263, "note": "boss: Viper: nothing records where; a level-90 venom spitter (Nirish's projectile), so deep in the Yorkhill sewers, in the low channel among the dark warriors, far from both the entrance (where the rats are) and Nirish", "scene": 4, "spawn": [ "152.3,61.8,14.6" ] }
   ],
 
   "questObjects": [

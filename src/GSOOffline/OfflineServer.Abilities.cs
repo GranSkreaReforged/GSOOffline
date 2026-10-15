@@ -578,7 +578,7 @@ namespace GSOOffline
                     PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : weaponHitSfx, NpcPosition(target));
                     if (strike == 0 && hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
                     int share = upFront / strikes + (strike == strikes - 1 ? upFront % strikes : 0);
-                    DealDamage(target, share, xpSkill);
+                    DealDamage(target, share, xpSkill, reflectable: true);
                     if (vampiric && share > 0) Heal(share / 2);
                 };
                 releases.Add((strike, strikes) =>

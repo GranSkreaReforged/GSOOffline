@@ -324,7 +324,7 @@ namespace GSOOffline
             {
                 if (npc.dead) return;
                 if (hit > 0) PlaySound(hitSfx, NpcPosition(npc));
-                DealDamage(npc, hit, skill);
+                DealDamage(npc, hit, skill, reflectable: true);
             };
             pendingBlow = (strike, strikes) =>
             {
@@ -542,8 +542,17 @@ namespace GSOOffline
             return best;
         }
 
-        private void DealDamage(NpcEntity npc, int damage, int skill)
+        /// <param name="reflectable">The player's own blow or ability: while the target absorbs, it comes back at
+        /// them. Other damage (pets, damage over time, reflections) is just soaked up.</param>
+        /// <param name="dev">Dev kills ignore Absorb.</param>
+        private void DealDamage(NpcEntity npc, int damage, int skill, bool reflectable = false, bool dev = false)
         {
+            if (!dev && damage > 0 && Time.time >= npc.reflectFrom && Time.time < npc.absorbUntil)
+            {
+                Send(12, 0, npc.uid, npc.health, npc.maxHealth, SplashBlocked);
+                if (reflectable) ReflectAbsorbed(npc, damage);
+                return;
+            }
             if (damage > 0 && damage < npc.health && GameData.Npcs.TryGetValue(npc.typeId, out var hurt))
                 NpcSound(npc, hurt.sfxTakeHit);
             ProfileEvent("hit");
@@ -571,7 +580,7 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev] killnpc: no live NPC {uid}");
                 return;
             }
-            DealDamage(npc, npc.health, WeaponSkill(EquippedWeapon()));
+            DealDamage(npc, npc.health, WeaponSkill(EquippedWeapon()), dev: true);
         }
 
         private void KillNpc(NpcEntity npc, int skill)

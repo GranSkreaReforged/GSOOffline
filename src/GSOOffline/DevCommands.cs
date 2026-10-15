@@ -520,6 +520,27 @@ namespace GSOOffline
             }
         }
 
+        // npcparts <uid>: a client NPC's child objects with renderers: type, material, active and enabled, to find
+        // an aura or effect that's part of its model.
+        private static void NpcParts(string[] args)
+        {
+            var npc = Scr_NpcHandler.instance.getNpc(int.Parse(args[1]));
+            if (npc == null) { Plugin.Log.LogInfo("[dev] npcparts: no such NPC"); return; }
+            foreach (var r in npc.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                Plugin.Log.LogInfo($"[dev]   {r.transform.parent?.name}/{r.name} {r.GetType().Name} mat={(r.sharedMaterial != null ? r.sharedMaterial.name : "-")} active={r.gameObject.activeInHierarchy} enabled={r.enabled}");
+            foreach (var l in npc.GetComponentsInChildren<UnityEngine.Light>(true))
+                Plugin.Log.LogInfo($"[dev]   light {l.transform.parent?.name}/{l.name} {l.type} color={l.color} range={l.range:F1} intensity={l.intensity:F1} active={l.gameObject.activeInHierarchy} enabled={l.enabled}");
+        }
+
+        // npcpart <uid> <child name> on|off: shows or hides a named part of a client NPC's model (an aura, an orb).
+        private static void NpcPart(string[] args)
+        {
+            var npc = Scr_NpcHandler.instance.getNpc(int.Parse(args[1]));
+            string name = args[2].Replace('_', ' ');
+            foreach (var t in npc.GetComponentsInChildren<UnityEngine.Transform>(true))
+                if (t.name == name) { t.gameObject.SetActive(args[3] == "on"); Plugin.Log.LogInfo($"[dev] {name} {args[3]}"); }
+        }
+
         // combatstats: combat level, armor alignment and effective resistances, server against client.
         private static void CombatStats(string[] args) => OfflineServer.Instance.DevCombatStats();
 

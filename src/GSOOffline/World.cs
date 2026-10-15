@@ -27,7 +27,9 @@ namespace GSOOffline
         // ability effects
         public float stunnedUntil, rootedUntil;
         public float stunImmuneUntil;
-        public NpcEntity master;        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
+        public NpcEntity master;
+        public float absorbUntil;       // a boss's Absorb (aura on) until then
+        public float reflectFrom;       // ...and from then the player's hits come back at them        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
         public int dotDamage, dotTicks, dotSkill;
         public float nextDot;
     }
