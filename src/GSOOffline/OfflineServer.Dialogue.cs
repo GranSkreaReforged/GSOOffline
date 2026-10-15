@@ -137,8 +137,9 @@ namespace GSOOffline
             if (o.questUpdate != null) SetQuestPhase(o.questUpdate.quest, o.questUpdate.phase);
             var shown = dialogueNode;
             if (o.otherAction > 0) RunAction(o.otherAction, dialogueNode.id);
-            if (o.next > 0)
-                EnterNode(o.next);
+            int next = o.next >= 0 ? o.next : ScriptedNextNode(shown.id);   // -1: the original chose it in code
+            if (next > 0)
+                EnterNode(next);
             else if (dialogueNode == shown)
                 CloseDialogue();   // unless the action opened another conversation
         }
@@ -223,7 +224,7 @@ namespace GSOOffline
             OnQuestPhaseReached(quest);
         }
 
-        private static readonly Regex XpReward = new Regex(@"gained (\d+) XP in (.+?)\.", RegexOptions.IgnoreCase);
+        private static readonly Regex XpReward = new Regex(@"gained (\d+) (?:XP|experience) in (.+?)\.", RegexOptions.IgnoreCase);
 
         private void CompleteQuest(int quest)
         {
