@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Creatures drop what they dropped in the original game, at the original rates, from the original server's drop tables. Most drops are much rarer than before (a wolf's tooth is 1 in 15, a cow's scythe 1 in 30), and a few creatures drop things the wiki never recorded. Every creature can also drop an upgrade or grade stone and now a gear crate for its level, as in the original. Creatures from 2020 updates (Bruno, Betsy, Lakhar, Lydia, Jotnar, Argus, the Elder Ent) and the boss uniques and pets added in updates 137-140 keep their wiki and patch-note drops.
 - Aellope flies again, as she did in the original game. She patrols one of five routes 30-40 metres above Goldon (west, the centre, north, north-east or south), back and forth. Hit her and she dives at the spot you stood on, lands and fights. If 20 seconds pass without her taking damage, she takes off healed and goes back to her route. If you die while she's down, she flies to your body and feeds on it, healing 30% (at most every 45 seconds). Shot down in the air, she falls to the ground with her loot. Killed, she returns an hour later on a new route. This is how the original server ran her; the routes and timings come from its code. She used to stand still in the middle of the island.
 
 ### Changed

@@ -10,50 +10,6 @@
   "very rare": 0.005
  },
  "defaultChance": 0.5,
- "global": [
-  {
-   "typeId": 437,
-   "name": "Small upgrade stone",
-   "minLevel": 1,
-   "maxLevel": 24,
-   "chance": 0.02
-  },
-  {
-   "typeId": 438,
-   "name": "Medium upgrade stone",
-   "minLevel": 25,
-   "maxLevel": 49,
-   "chance": 0.02
-  },
-  {
-   "typeId": 439,
-   "name": "Large upgrade stone",
-   "minLevel": 50,
-   "maxLevel": 999,
-   "chance": 0.02
-  },
-  {
-   "typeId": 440,
-   "name": "Small grade stone",
-   "minLevel": 1,
-   "maxLevel": 24,
-   "chance": 0.005
-  },
-  {
-   "typeId": 441,
-   "name": "Medium grade stone",
-   "minLevel": 25,
-   "maxLevel": 49,
-   "chance": 0.005
-  },
-  {
-   "typeId": 442,
-   "name": "Large grade stone",
-   "minLevel": 50,
-   "maxLevel": 999,
-   "chance": 0.005
-  }
- ],
  "monsters": [
   {
    "name": "Aellope",
