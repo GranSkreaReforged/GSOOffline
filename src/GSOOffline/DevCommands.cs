@@ -607,6 +607,9 @@ namespace GSOOffline
         // spawnground: checks the original server's spawns in this scene (Data/spawns.json) against the ground.
         private static void SpawnGround(string[] args) => OfflineServer.Instance.LogSpawnGround();
 
+        // setgrade <itemId> <grade>: sets an item's grade (1 damaged - 8 mythic), for testing upgrades.
+        private static void SetGrade(string[] args) => OfflineServer.Instance.DevSetGrade(int.Parse(args[1]), int.Parse(args[2]));
+
         // objs: the spawned objects the client shows (gates, lifts, oysters...), with their positions.
         private static void Objs(string[] args)
         {

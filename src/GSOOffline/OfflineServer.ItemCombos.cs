@@ -2,7 +2,8 @@ namespace GSOOffline
 {
     /// <summary>
     /// Using one item on another (198/11: the client sends the target's and the used item's ids and types), as the
-    /// original server's Scr_PlayerInventory.UseItemOnItem. For now: the key from Ulan's dungeon.
+    /// original server's Scr_PlayerInventory.UseItemOnItem: the key from Ulan's dungeon, and upgrading gear
+    /// (OfflineServer.Grades.cs).
     /// </summary>
     public partial class OfflineServer
     {
@@ -33,6 +34,7 @@ namespace GSOOffline
                 Notice("You press the key in the clay and make a key mould.");
                 return;
             }
+            if (UpgradeWith((int)c[2], (int)c[3])) return;
             Notice($"You try to use {ItemData.Get(usedType)?.name} with {ItemData.Get(targetType)?.name}. Nothing interesting happens.");
         }
 

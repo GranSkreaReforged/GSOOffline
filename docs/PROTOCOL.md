@@ -66,7 +66,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
   - 4/4 remove (itemId, typeId, amount, name)
   - 4/14 drop
   - 198/15 swap and 198/17 insert (index1, index2)
-  - 198/11 use an item on another: name, target item id, used item id, target type, used type (OfflineServer.ItemCombos.cs)
+  - 198/11 use an item on another: name, target item id, used item id, target type, used type (OfflineServer.ItemCombos.cs); S→C 198/16 sets an item's grade (item id, grade)
   - 198/16 sort (type, ascending). The client has already sorted its own list when it sends this; the server adopts that order.
   - 3/17 collect loot (name, lootId): the server gives the bag's contents and removes it (198/35)
 - **Shops:** 8/8 buy (name, typeId, amount); 4/5 sell (name, typeId, uniqueId, amount).

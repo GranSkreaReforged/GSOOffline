@@ -456,7 +456,7 @@ namespace GSOOffline
             foreach (var it in character.items)
                 if (it.equipped)
                     foreach (var s in it.stats)
-                        if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += s.value;
+                        if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += Graded(it, s.value);
             return sum;
         }
 
@@ -473,6 +473,7 @@ namespace GSOOffline
                 : CombatRules.AbilityMinDamageShare.TryGetValue(ability.id, out float s) ? s : 0f;
             int min = Mathf.Clamp(Mathf.RoundToInt(max * minShare), 1, max);
             float damage = Random.Range(min, max + 1) * power * DamageDealtMultiplier();
+            if (weapon != null) damage *= WeaponGradeMultiplier(weapon.grade);
             if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) return Mathf.RoundToInt(damage);
             if (ability == null || ability.id != AggressiveSnowball)
             {

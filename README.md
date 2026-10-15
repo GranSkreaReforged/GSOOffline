@@ -128,6 +128,7 @@ Working:
 - Oyster fishing in Bal Sardan: harpoon guns and the fishing vessel's crane
 - Ferries: the lighthouse-Yorkhill ship and the lighthouse-Bal Sardan crossing
 - Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
+- Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
