@@ -43,6 +43,9 @@ namespace GSOOffline
 
         // No single blow takes more than this share of your maximum health (update 140).
         public const float MaxHitShare = 0.48f;
+        // The explosive potion and black candy: the fuse and reach are the original's; the blow (times the hit of
+        // your alchemy level and gear) and the share of your own health if you stay too close are reconstructions.
+        public const float ExplosiveFuse = 3f, ExplosionRadius = 6f, ExplosionHitPower = 3f, ExplosionSelfShare = 0.3f;
         // After a stun wears off, the target can't be stunned again for this long (updates 117 and 131; NPCs too, 126).
         public const float StunImmunity = 4f;
         // Pets (update 132): a pet's blow is this share of its owner's basic hit (reconstruction; the notes only
