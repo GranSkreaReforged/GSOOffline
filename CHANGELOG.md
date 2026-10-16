@@ -4,13 +4,16 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Gear crates hold what they held in the original game: their tier's plate armor, broadsword, greatsword, halberd and heater shield, its leather and robes, and its bow, crossbow, lute and fire staff. One crate in four holds another piece, and so on. The Guard pet hides in one crate in 30,000 (iron) to one in 5,000 (iridium). They used to hold daggers, maces and chain helmets the original game never gave out, and never a bow, lute or staff.
+- Gear asks for its level again, as in the original game: a weapon needs that level in its fighting skill (swordsmanship, archery, fencing, mace fighting, the grims, healing), armor that level in light or heavy armor, and a few items that combat level. Without it the item stays in your bag with "You don't have the level required to equip this item." It's the requirement the item's tooltip already shows. Gear you're wearing stays on (#63).
+- Creature camps are easier to take on alone. Ordinary creatures notice you from 15 m instead of up to 30 m, so you can pull one or two from a camp instead of all of it. They come back after 5 minutes instead of 2, and only once you're 40 m from where they stand, so they never reappear next to you mid-fight. Bosses and quest creatures keep their own timers (#64).
 ### Fixed
+- Sardanian weapon crates (lizard warriors) open: a Sardanian spear, axe or buckler shield, sometimes more. Opening one did nothing before.
+- Christmas 2019 crates (Phraustie drops 10-20) open, as in the original game: Christmas food (sometimes more than one), and a chance at the Santa hat, each piece of Christmas furniture and the Reindeer. The untradeable Reindeer comes once, a little more likely with every crate opened until it does. Opening one did nothing before.
 - The sailor in Yorkhill who'll part with his raft for a pint of beer now takes the pint and gives you the Old raft. He used to say "Cheers!" and give nothing (#62).
 - Entering Ulan's dungeon puts you inside it, where the original game did. You used to land outside the dungeon. Leaving it and coming back up from the Cave Dragons also use the original game's arrival points (#61).
 - Equipping a weapon while a gathering tool is in your hand puts the tool back in your bag and keeps the weapon on your back where it is. It used to put the tool on your back and the weapon that was there into your bag. Taking a different tool in hand for the next resource does the same (#60).
-### Changed
-- Gear asks for its level again, as in the original game: a weapon needs that level in its fighting skill (swordsmanship, archery, fencing, mace fighting, the grims, healing), armor that level in light or heavy armor, and a few items that combat level. Without it the item stays in your bag with "You don't have the level required to equip this item." It's the requirement the item's tooltip already shows. Gear you're wearing stays on (#63).
-- Creature camps are easier to take on alone. Ordinary creatures notice you from 15 m instead of up to 30 m, so you can pull one or two from a camp instead of all of it. They come back after 5 minutes instead of 2, and only once you're 40 m from where they stand, so they never reappear next to you mid-fight. Bosses and quest creatures keep their own timers (#64).
 
 ## [1.6.0] - 2026-10-16
 ### Added

@@ -4,9 +4,9 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// Items used from the inventory (3/18): food, potions, teleport scrolls, experience scrolls and gear
-    /// crates. The item data only marks them usable; what each did was server code. Experience scroll
-    /// amounts come from the community wiki, the rest are reconstructions.
+    /// Items used from the inventory (3/18): food, potions, teleport scrolls and experience scrolls (crates are in
+    /// OfflineServer.Crates.cs). The item data only marks them usable; what each did was server code. Experience
+    /// scroll amounts come from the community wiki, the rest are reconstructions.
     /// </summary>
     public partial class OfflineServer
     {
@@ -61,17 +61,6 @@ namespace GSOOffline
             { 10326, 100 }, { 10327, 300 }, { 10328, 1000 }, { 10329, 5000 }, { 10724, 50000 },
         };
 
-        // Gear crates -> name prefixes of the equipment they can hold (wiki: steel crates give crawler leather and steel armor).
-        private static readonly Dictionary<int, string[]> GearCrates = new Dictionary<int, string[]>
-        {
-            { 10668, new[] { "Iron ", "Cow leather", "Wool " } },
-            { 10669, new[] { "Steel ", "Crawler leather", "Cotton " } },
-            { 10670, new[] { "Verum ", "Moose leather", "Silk " } },
-            { 10671, new[] { "Stranite ", "Bear leather", "Jute " } },
-            { 10672, new[] { "Shadow ", "Troll leather" } },
-            { 10673, new[] { "Iridium ", "Dragon leather" } },
-        };
-
         private void UseItem(int typeId)
         {
             if (character == null || CountItem(typeId) == 0) return;
@@ -84,8 +73,7 @@ namespace GSOOffline
             }
             else if (Potions.TryGetValue(typeId, out var p)) DrinkPotion(typeId, p);
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
-            else if (GearCrates.TryGetValue(typeId, out var tiers)) OpenGearCrate(typeId, tiers);
-            else if (TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
+            else if (TryOpenCrate(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 
@@ -118,22 +106,6 @@ namespace GSOOffline
             if (player != null) PlayEffect(GfxTeleport, player.transform.position);
             arrivalGfx = GfxTeleportLand;
             Teleport(w.scene, w.pos);
-        }
-
-        private void OpenGearCrate(int typeId, string[] prefixes)
-        {
-            var pool = new List<int>();
-            foreach (var t in ItemData.Templates.Values)
-            {
-                if (t.slot == null || IsAnyTool(t.typeId)) continue;
-                foreach (string pre in prefixes)
-                    if (t.name != null && t.name.StartsWith(pre)) pool.Add(t.typeId);
-            }
-            if (pool.Count == 0) return;
-            TakeItems(typeId, 1);
-            int got = pool[Random.Range(0, pool.Count)];
-            GiveItem(got);
-            Notice($"The crate held {ItemData.Get(got)?.name}.", "green");
         }
 
         /// <summary>16/3 from the experience scroll window: skill id, scroll type id.</summary>
