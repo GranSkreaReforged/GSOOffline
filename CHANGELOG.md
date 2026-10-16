@@ -6,6 +6,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 ### Fixed
 - The sailor in Yorkhill who'll part with his raft for a pint of beer now takes the pint and gives you the Old raft. He used to say "Cheers!" and give nothing (#62).
+- Entering Ulan's dungeon puts you inside it, where the original game did. You used to land outside the dungeon. Leaving it and coming back up from the Cave Dragons also use the original game's arrival points (#61).
 
 ## [1.6.0] - 2026-10-16
 ### Added
