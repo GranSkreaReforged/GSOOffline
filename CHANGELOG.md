@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Gear asks for its level again, as in the original game: a weapon needs that level in its fighting skill (swordsmanship, archery, fencing, mace fighting, the grims, healing), armor that level in light or heavy armor, and a few items that combat level. Without it the item stays in your bag with "You don't have the level required to equip this item." It's the requirement the item's tooltip already shows. Gear you're wearing stays on (#63).
 
 ## [1.6.0] - 2026-10-16
 ### Added
