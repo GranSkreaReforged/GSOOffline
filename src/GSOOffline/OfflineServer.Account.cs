@@ -168,6 +168,7 @@ namespace GSOOffline
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it
             ResetWorldState();
             startTimeSent = false;   // zone changes reset the world state too, but keep the clock
+            eventsAnnounced = false;
             Plugin.Log.LogInfo($"'{ch.name}' entering world: scene {ch.scene} at {ch.Position}.");
 
             Send(2, 42, ch.name, BuildPlayerData(ch));
