@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Equipping a weapon while a gathering tool is in your hand puts the tool back in your bag and keeps the weapon on your back where it is. It used to put the tool on your back and the weapon that was there into your bag. Taking a different tool in hand for the next resource does the same (#60).
 
 ## [1.6.0] - 2026-10-16
 ### Added
