@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Entering Ulan's dungeon puts you inside it, where the original game did. You used to land outside the dungeon. Leaving it and coming back up from the Cave Dragons also use the original game's arrival points (#61).
 
 ## [1.6.0] - 2026-10-16
 ### Added

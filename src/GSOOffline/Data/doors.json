@@ -218,9 +218,9 @@
    ],
    "toScene": 25,
    "toPos": [
-    74.36,
-    71.43,
-    30.26
+    76.4,
+    70.3,
+    33.6
    ],
    "note": "Prefab_Object_Interactable_34ExitFromUlansDungeon"
   },
@@ -234,9 +234,9 @@
    ],
    "toScene": 8,
    "toPos": [
-    883.41,
-    11.2,
-    1445.94
+    880.9,
+    12.6,
+    1439.8
    ],
    "note": "Prefab_Object_Interactable_33EntranceToUlansDungeon"
   },
@@ -266,9 +266,9 @@
    ],
    "toScene": 25,
    "toPos": [
-    82.49,
-    16.86,
-    -182.98
+    85.0,
+    16.6,
+    -185.9
    ],
    "note": "Prefab_Object_Interactable_35EntranceToUlan2ndFloor"
   },
