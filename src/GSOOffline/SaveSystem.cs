@@ -103,6 +103,7 @@ namespace GSOOffline
         public List<ItemSave> bank = new List<ItemSave>();
         public List<ReturnPoint> returnPoints = new List<ReturnPoint>();   // where interior exits lead back to
         public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
+        public int christmasPetCounter;   // Christmas 2019 crates opened without the untradeable Reindeer; -1 = got it
 
         public int GetAbilitySlot(int slot)
         {
