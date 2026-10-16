@@ -84,6 +84,14 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class DeathBagSave
+    {
+        public int scene;
+        public float x, y, z;
+        public List<ItemSave> items = new List<ItemSave>();   // the very items, grades and stats intact
+    }
+
+    [Serializable]
     public class KillCount
     {
         public int npc;
@@ -136,6 +144,9 @@ namespace GSOOffline
         public int halloweenPetCounter;   // Halloween 2019 crates opened without the untradeable Bat; -1 = got it
         public HouseSave house;           // null = no house
         public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
+        public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)
+        public float deathTollSeconds;          // playing time left on it
+        public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // gear dropped on death, until fetched
 
         public int GetKills(int npc)
         {
