@@ -214,6 +214,7 @@
     { "id": 35, "note": "Bal Sardan sailor (north, dialogue 535): boat to the southern marshes for 50 silver (original server action 35)", "silver": -50, "scene": 7, "pos": "560,5.05,-130.7" },
     { "id": 38, "note": "Bal Sardan sailor (south marshes, dialogue 539): boat back to the northern side for 50 silver (original server action 38)", "silver": -50, "scene": 7, "pos": "150.4,4,724.4" },
     { "id": 42, "note": "Monastery fisherman (dialogue 650): free boat to the beach south of the monastery, by the Coral Cave (original server action 42)", "scene": 1, "pos": "601,3.73,1622.7" },
+    { "id": 67, "note": "Yorkhill raft sailor (dialogue 2073, 'Cheers!'): takes a pint of beer and gives an Old raft (original server action 67)", "take": [{ "type": 10310, "amount": 1 }], "give": [{ "type": 10625, "amount": 1 }], "notice": "You have received an Old raft." },
 
     { "id": 20, "note": "Q5 dinner cut-scene (no effect)" },
     { "id": 24, "note": "Q5 dinner cut-scene (no effect)" },
