@@ -20,6 +20,7 @@ namespace GSOOffline
             public int silver;
             public readonly List<ItemAmount> items = new List<ItemAmount>();
             public float despawnAt;
+            public DeathBagSave death;   // gear dropped on death: saved, never despawns, gives back the same items
         }
 
         // Reconstructions: the old server's numbers are lost.
@@ -233,6 +234,11 @@ namespace GSOOffline
             {
                 Plugin.Log.LogInfo($"[loot] bag {id} too far ({dist:F1}m)");
                 Notice("That's too far away.", "red");
+                return;
+            }
+            if (bag.death != null)
+            {
+                CollectDeathBag(bag);
                 return;
             }
             foreach (var it in bag.items) GiveItem(it.type, it.amount);

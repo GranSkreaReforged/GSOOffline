@@ -178,6 +178,7 @@ namespace GSOOffline
             SendHealth();
             SendMana();
             SendGearStats();
+            SendDeathToll();
             RefreshAlignment(true);
             SendSceneLoot();
             SendBoats();

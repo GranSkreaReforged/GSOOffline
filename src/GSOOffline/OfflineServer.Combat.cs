@@ -43,6 +43,14 @@ namespace GSOOffline
 
         // No single blow takes more than this share of your maximum health (update 140).
         public const float MaxHitShare = 0.48f;
+        // Death's toll (issue #69): each death in a row takes 5% more experience for 5 more minutes of play, up to
+        // 5 deaths (25%, 25 minutes). From the 4th, half the deaths drop equipped gear into a bag where you fell:
+        // one piece 60%, two 30%, else three to all of it. John Brech's fee per level of the toll, times
+        // 1 + combat level / 10.
+        public const float DeathTollXpLoss = 0.05f, DeathTollMinutesPerStack = 5f;
+        public const int DeathTollMaxStacks = 5, DeathTollDropFromStack = 4;
+        public const float DeathDropChance = 0.5f, DeathDropOne = 0.6f, DeathDropTwo = 0.3f;
+        public static readonly int[] DeathCleanseFee = { 100, 300, 500, 800, 1000 };
         // The explosive potion and black candy: the fuse and reach are the original's; the blow (times the hit of
         // your alchemy level and gear) and the share of your own health if you stay too close are reconstructions.
         public const float ExplosiveFuse = 3f, ExplosionRadius = 6f, ExplosionHitPower = 3f, ExplosionSelfShare = 0.3f;
@@ -1053,6 +1061,7 @@ namespace GSOOffline
 
         private void PlayerDies()
         {
+            ApplyDeathToll(LocalPlayer != null ? LocalPlayer.transform.position : character.Position);
             StopAttacking();
             ClearBuffs();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
@@ -1076,6 +1085,7 @@ namespace GSOOffline
                 Teleport(w.scene, w.pos);
             else
                 Teleport(StartScene, StartPos);
+            SendDeathToll();   // a respawn in the same scene doesn't reload it
         }
 
         private void TickCombat()

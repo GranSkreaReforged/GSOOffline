@@ -124,6 +124,7 @@ namespace GSOOffline
             TickFerries();
             TickOysters();
             TickHousing();
+            TickDeathToll();
             TickHarpoons();
             TickAutoLogin();
         }

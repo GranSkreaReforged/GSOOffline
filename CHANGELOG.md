@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Dying costs something again, in a way that suits playing alone (#69). Each death puts "Death's toll" on you: 5% less experience from everything for 5 minutes. Dying again while it lasts makes it 10% for 10 minutes, and so on up to 25% for 25 minutes. From the 4th death in a row, half the time some of your equipped gear falls: usually one piece, sometimes two, rarely more, very rarely all of it. It lies in a bag where you fell and stays there, through logging out, until you pick it up; the pieces keep their grade and upgrades. The toll wears off only while you play. John Brech in Yorkhill, near the wayshrine, lifts it for silver: 100 to 1,000 depending on the toll, more the higher your combat level. Talk to him once for the price and again to pay. The buff's tooltip shows the current price.
 - Houses, as in the original game, for one player:
   - **Building:** the original game's 116 plots stand as ruins across Gran Skrea. Click a ruin's door to choose a house that fits the plot, for silver and materials (a Small house is 50,000 silver, 25 rock and 80 spruce planks). One house per character.
   - **Furniture:** use a furniture item inside your house to place it, and click a piece in building mode to pick it up. Many pieces are Carpentry crafts. A house holds 5 pieces per metre of plot; buy more in the House window.
