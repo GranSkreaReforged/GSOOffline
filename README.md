@@ -119,7 +119,7 @@ Working:
 - Entering the world and zone loading
 - Saving
 - Wayshrine travel
-- Inventory, equipment and starter kits
+- Inventory, equipment (with the original game's level requirements) and starter kits
 - NPC dialogue
 - Quest progress and rewards
 - Shops, with the original game's stock lists, limited stock and restocking
