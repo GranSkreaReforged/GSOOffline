@@ -62,6 +62,35 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class FurnitureSave
+    {
+        public int type;
+        public int rot;
+        public float x, y, z;
+    }
+
+    [Serializable]
+    public class HouseSave
+    {
+        public int scene;
+        public int plot;               // plot id within the scene (Data/houseplots.json)
+        public int type;               // the client's HouseTypes.xml typeid
+        public int rotation;
+        public string name;
+        public bool locked;
+        public int extraSpace;         // furniture space bought on top of 5 per metre of plot
+        public long builtAt;           // unix seconds: demolishing within the hour gives everything back
+        public List<FurnitureSave> furniture = new List<FurnitureSave>();
+    }
+
+    [Serializable]
+    public class KillCount
+    {
+        public int npc;
+        public int count;
+    }
+
+    [Serializable]
     public class CharacterSave
     {
         public string name;
@@ -105,6 +134,22 @@ namespace GSOOffline
         public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
         public int christmasPetCounter;   // Christmas 2019 crates opened without the untradeable Reindeer; -1 = got it
         public int halloweenPetCounter;   // Halloween 2019 crates opened without the untradeable Bat; -1 = got it
+        public HouseSave house;           // null = no house
+        public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
+
+        public int GetKills(int npc)
+        {
+            foreach (var k in kills)
+                if (k.npc == npc) return k.count;
+            return 0;
+        }
+
+        public void AddKill(int npc)
+        {
+            foreach (var k in kills)
+                if (k.npc == npc) { k.count++; return; }
+            kills.Add(new KillCount { npc = npc, count = 1 });
+        }
 
         public int GetAbilitySlot(int slot)
         {

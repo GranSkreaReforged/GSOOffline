@@ -138,6 +138,18 @@ namespace GSOOffline
 
         private static void DespawnObj(string[] args) => Scr_SpawnedObjectHandler.instance.RemoveSpawnedObject(int.Parse(args[1]));
 
+        // houses: the house objects the client holds (Scr_HouseHandler.houses), with their doors.
+        private static void Houses(string[] args)
+        {
+            foreach (var h in Scr_HouseHandler.instance.houses)
+            {
+                if (h == null) continue;
+                Plugin.Log.LogInfo($"[dev] house {h.id} type {h.typeid} size {h.size} '{h.houseName}' at {SceneWorld.Vec(h.transform.position)}"
+                    + $" door {(h.door != null ? SceneWorld.Vec(h.door.transform.position) : "none")} furniture {h.furniture.Count}");
+            }
+            Plugin.Log.LogInfo($"[dev] {Scr_HouseHandler.instance.houses.Count} house objects");
+        }
+
         // interactablesnear [radius]: every scene interactable within radius of the player (default 150 m), active or not.
         private static void InteractablesNear(string[] args)
         {

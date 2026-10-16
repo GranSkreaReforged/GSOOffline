@@ -61,6 +61,7 @@ namespace GSOOffline
             RegisterLootHandlers();
             RegisterBoatHandlers();
             RegisterOysterHandlers();
+            RegisterHousingHandlers();
             RegisterItemCombos();
         }
 
@@ -122,6 +123,7 @@ namespace GSOOffline
             TickImpacts();
             TickFerries();
             TickOysters();
+            TickHousing();
             TickHarpoons();
             TickAutoLogin();
         }

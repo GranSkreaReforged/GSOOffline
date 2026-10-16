@@ -74,6 +74,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 - **Skills:** 8/4 start action (name, actionType, targetId), used for harvesting and crafting.
 - **Travel:** 3/39 wayshrine teleport (name, id); 7/11 set home wayshrine.
 - **Boats:** a boat item is launched with 3/18 use item. 2/29 board (name, owner); 5/6 boat position (name, int rot, Vector3), every 0.5 s while the owner is aboard; chat `/enterboat owner`, `/leaveboat owner`, `/removeboat owner` (the boat menu, the F key, and the client's shore check, which sends `/removeboat` whenever the boat's height leaves 3..3.25). Oyster fishing: 3/11 interactable 46 (a harpoon gun) -> the server sends 24/3 (bool) to turn harpoon mode on or off (a crosshair; the client never turns it off itself); 28/0 harpoon shot (Vector3: the point under the crosshair); interactable 47 is the fishing vessel's crane, which the client only uses from a ship with typeId 4 and answers with 28/1 (Vector3: the net, 4 m off the vessel's side) after the 3/12 confirm; 7/30 (name) plays the crane.
+- **Housing:** 3/11 interactable 20 (a house door: yours opens with 20/1 (houseId, scene, bool) and shuts after 10 s; a ruin's opens the Building window, 3/33 type 13) -> 3/34 build (name, houseType). 17/2 place furniture (name, itemType, int rot, Vector3), 5/4 pick up furniture (name, itemType, Vector3), 6/22 rotate the house (reply 16/6 houseId, rotation), 7/8 House window data (reply 2/13 `name_locked_owners_whitelist_blacklist_guildId`), 198/7 buy furniture space, 198/8, 198/9 and 198/10 ask its cost, total and used (replies 198/11, 198/12, 198/14, each one int). Chat `/demolishhouse`, `/lockhousedoor`. Guest lists (18/1), visitors (7/9), selling and guild houses (3/52, 6/18) were multiplayer only. S->C 2/12 (name, list): the houses near the player, `id_type_x,y,z_furniture_forceUpdate_name_owners_size_rotation` joined by `>`, where furniture is `type,rot,x,y,z` joined by `|` (or `0`), the position is the plot's centre, type 0 is a ruin (`ab_poh_0`, `ab_poh_0small` up to size 6), and forceUpdate 1 rebuilds a house the client already has. The client drops houses missing from a list.
 - **Appearance:** 3/22 gender, 3/23 hair, 3/24 body type, 3/25 eyebrows, 3/26 body size, 4/6 hair colour (r, g, b); 8/9 fighting style and profession.
 - **Ignored offline** (heartbeats and telemetry): 7/0, 3/47, 6/27, 7/18, 7/21, 27/0, 198/2, 198/3.
 
@@ -152,6 +153,8 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 | 9–16, 20, 22–25, 28, 29, 33–38, 42, 45 | Doors, gates, hatches and portals. The server mapped each to a destination; this has to be rebuilt by pairing doors across scenes (`GSODevTools/extracted/markers.json`). |
 | 37 | Generic doors (158 of them, mostly house and interior doors) |
 | 54 | Chairs |
+| 20 | House doors (the client remembers which house for the Building window) |
+| 49-53, 56, 62, 67, 70, 72, 73 | House furniture: trophies, gallows, activity book, teleporter, Stone of Swiftness, PvP trophy, organ, bank chest |
 
 ## Data sources
 
@@ -165,5 +168,7 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 | Items, crafting recipes | `Resources/Data/items` |
 | Abilities, buffs, projectiles | `Resources/XMLs/Abilities`, `Buffs`, `Projectiles` |
 | Wayshrines | `Resources/XMLs/Wayshrines` |
+| House types (cost, materials, plot size) | `Resources/XMLs/HouseTypes` |
+| House plots | Not in the client. `Data/houseplots.json`, the original server's `HousePlots_<scene>`, by GSODevTools `gen_houseplots.py` |
 | NPC and harvestable spawn points | `Scr_NPCDummy` / `Scr_HarvestableDummy` in each scene |
 | **Lost** | NPC loot tables, shop stock, door destinations, server-side formulas (HP, damage, XP) |

@@ -606,6 +606,7 @@ namespace GSOOffline
             npc.aggro = false;
             if (npc.uid == targetUid) StopAttacking();
             GameData.Npcs.TryGetValue(npc.typeId, out var info);
+            character.AddKill(npc.typeId);
             // A summoned minion's body fades a few seconds after it falls (TickBossMechanics removes it).
             npc.respawnAt = Time.time + (npc.master != null ? 5f : info?.respawnTime ?? CombatRules.NpcRespawn);
             HarpyDied(npc);   // shot down in the air: on the ground before the loot drops
