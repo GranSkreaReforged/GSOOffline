@@ -7,6 +7,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Fixed
 - The sailor in Yorkhill who'll part with his raft for a pint of beer now takes the pint and gives you the Old raft. He used to say "Cheers!" and give nothing (#62).
 - Entering Ulan's dungeon puts you inside it, where the original game did. You used to land outside the dungeon. Leaving it and coming back up from the Cave Dragons also use the original game's arrival points (#61).
+- Equipping a weapon while a gathering tool is in your hand puts the tool back in your bag and keeps the weapon on your back where it is. It used to put the tool on your back and the weapon that was there into your bag. Taking a different tool in hand for the next resource does the same (#60).
 
 ## [1.6.0] - 2026-10-16
 ### Added

@@ -250,6 +250,14 @@ namespace GSOOffline
             // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the
             // "Switch weapon" key). The client has no other way to fill that slot, so the old server did this.
             if (t.slot != "Weapon") return;
+            // A gathering tool taken out of the hand goes back in the bag instead, while a real weapon is on the
+            // back: equipping a weapon (or another tool) after harvesting must not push the fighting weapon off.
+            var back = SecondaryWeapon();
+            if (replaced != null && IsAnyTool(replaced.typeId) && back != null && !IsAnyTool(back.typeId))
+            {
+                Plugin.Log.LogInfo($"[inventory] {ItemData.Get(replaced.typeId)?.name} back in the bag; {ItemData.Get(back.typeId)?.name} stays on the back");
+                return;
+            }
             if (replaced != null) SetSecondaryWeapon(replaced);
             else if (it.id == character.secondaryWeaponId) SetSecondaryWeapon(null);
         }
