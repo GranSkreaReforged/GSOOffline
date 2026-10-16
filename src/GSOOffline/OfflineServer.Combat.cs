@@ -101,7 +101,19 @@ namespace GSOOffline
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
-        public const int NpcRespawn = 120;   // seconds; the community wiki's "2 minutes" for ordinary creatures
+        // Ordinary creatures, tuned for one player. The original server spawned them in camps for a shared world:
+        // 30 m aggro reach (most creatures' data) pulled a whole camp at once, and they were back 2 minutes after
+        // dying (the community wiki and the original's default), often while the player was still clearing the
+        // camp. Bosses and creatures with their own respawntime keep theirs.
+        public const int NpcRespawn = 300;   // seconds
+        public const float MaxAggroDistance = 15f;
+        // A dead creature waits for the player to be this far from where it spawns, so it never pops back in mid-fight.
+        public const float RespawnClearance = 40f;
+
+        public static float AggroDistance(NpcInfo n) => n.ordinary ? Mathf.Min(n.aggroDistance, MaxAggroDistance) : n.aggroDistance;
+
+        public static bool RespawnClear(NpcInfo n, Vector3 spawn, Vector3 player) =>
+            n == null || !n.ordinary || new Vector2(spawn.x - player.x, spawn.z - player.z).magnitude >= RespawnClearance;
         public const float RespawnDelay = 5f;   // seconds dead before waking at the home wayshrine
         public const float RespawnProtection = 10f;
 
@@ -868,7 +880,9 @@ namespace GSOOffline
             {
                 if (npc.dead)
                 {
-                    if (npc.master == null && !npc.ownRespawn && Time.time >= npc.respawnAt) RespawnNpc(npc);
+                    if (npc.master == null && !npc.ownRespawn && Time.time >= npc.respawnAt
+                        && CombatRules.RespawnClear(GameData.Npcs.TryGetValue(npc.typeId, out var dead) ? dead : null, npc.spawnPos, playerPos))
+                        RespawnNpc(npc);
                     continue;
                 }
                 if (npc.flying) continue;
@@ -897,8 +911,11 @@ namespace GSOOffline
                 }
 
                 if (!npc.aggro && info.aggressive && !CombatRules.IsGuard(info) && !PlayerDead
-                    && Time.time >= aggroImmuneUntil && dist <= info.aggroDistance && !CalmedBy(info))
+                    && Time.time >= aggroImmuneUntil && dist <= CombatRules.AggroDistance(info) && !CalmedBy(info))
+                {
+                    Plugin.Log.LogInfo($"[combat] {info.name} ({npc.uid}) notices you at {dist:F1} m");
                     Aggro(npc);
+                }
                 if (!npc.aggro) continue;
                 if (Time.time < npc.stunnedUntil) continue;   // stunned: no moving, no swinging
 
