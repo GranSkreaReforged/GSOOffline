@@ -22,6 +22,7 @@ namespace GSOOffline
         public int health;
         public bool canFight;
         public int respawnTime;
+        public bool ordinary;          // no respawntime in the data and not a boss: a plain creature (CombatRules tunes these)
         public bool aggressive;
         public float aggroDistance;
         public float attackDistance;
@@ -168,6 +169,7 @@ namespace GSOOffline
                     attackMissDistance = IntAttr(n, "attackmissdistance", 1),
                     damage = IntAttr(n, "damage"),
                     boss = IsBoss(n),
+                    ordinary = Attr(n, "respawntime") == null && !IsBoss(n),
                     defence = IntAttr(n, "defence"),
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),

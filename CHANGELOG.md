@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Creature camps are easier to take on alone. Ordinary creatures notice you from 15 m instead of up to 30 m, so you can pull one or two from a camp instead of all of it. They come back after 5 minutes instead of 2, and only once you're 40 m from where they stand, so they never reappear next to you mid-fight. Bosses and quest creatures keep their own timers (#64).
 
 ## [1.6.0] - 2026-10-16
 ### Added
