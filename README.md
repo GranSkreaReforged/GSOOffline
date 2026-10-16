@@ -106,6 +106,7 @@ src/GSOOffline/
   OfflineServer.Boats.cs       boats and sailing
   OfflineServer.Ferries.cs     ferries (transports) and zone crossings
   OfflineServer.Oysters.cs     Bal Sardan oyster fishing
+  OfflineServer.Housing.cs     houses on plots, furniture
   FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
@@ -132,6 +133,7 @@ Working:
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors
 - Bank
+- Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
 - Light and heavy armor XP, shared from kills made shortly after being hit

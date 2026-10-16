@@ -5,6 +5,12 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Houses, as in the original game, for one player:
+  - **Building:** the original game's 116 plots stand as ruins across Gran Skrea. Click a ruin's door to choose a house that fits the plot, for silver and materials (a Small house is 50,000 silver, 25 rock and 80 spruce planks). One house per character.
+  - **Furniture:** use a furniture item inside your house to place it, and click a piece in building mode to pick it up. Many pieces are Carpentry crafts. A house holds 5 pieces per metre of plot; buy more in the House window.
+  - **The House window** also rotates the empty house and demolishes it. Demolishing gives back 70% of the silver and materials, or all of it within an hour of building, as its confirmation always promised.
+  - **Furniture with a use:** bank chests open your bank, two teleporters link up, the Stone of Swiftness speeds you up, the organ plays and trophies show your kill counts. The house teleport scroll takes you home.
+  - Guests, locks against other players, selling and guild houses were for the shared world and say so. Houses never decay.
 - The Halloween and Christmas events come back each year, as the original game ran them. From 15 October to 7 November every creature can drop a Halloween 2019 crate, and from 1 December to 6 January a Christmas 2019 crate. Odds run from about 1 in 29 kills at level 1 to 1 in 10 at level 50, and higher above that. During Halloween one group of creatures (crabs, wolves, skeletons, wraiths...) drops crates twice as often, a different group every hour. The talking pumpkin tells you which. A message on entering the world says when an event is on. `SeasonalEvents` in the config (Auto, Off, Halloween, Christmas, Both) overrides the dates.
 - Halloween 2019 crates open: candy (sometimes more than one), and a chance at the talking pumpkin, each piece of Halloween furniture and the Bat. The untradeable Bat comes once, a little more likely with every crate opened until it does.
 - Halloween candy and Christmas treats work as in the original game. Red candy and fruitcake restore health; blue candy and figgy pudding restore mana. White candy gives stamina, and golden candy and candy canes give speed. Eggnog warms you and regenerates mana. The golden candy cane speeds up gathering and crafting for 20 minutes.

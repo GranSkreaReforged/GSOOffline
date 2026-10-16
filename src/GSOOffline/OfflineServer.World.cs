@@ -43,6 +43,7 @@ namespace GSOOffline
             ResetUlansDungeon();
             ResetPoacherDungeon();
             ResetSewersAndCoral();
+            ResetHousing();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -216,6 +217,7 @@ namespace GSOOffline
             Vector3 p = player.transform.position;
 
             SendQuestObjects();
+            SendVisibleHouses();
             string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
             if (npcs != lastNpcList)
             {
@@ -306,6 +308,7 @@ namespace GSOOffline
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
             if (HandleItemObjectInteract(typeId)) return;   // Kombra's book, the Argi blueprint chest
+            if (HandleFurnitureInteract(typeId)) return;    // house doors and furniture
             if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
             OnObjectClicked(typeId);
