@@ -912,7 +912,10 @@ namespace GSOOffline
 
                 if (!npc.aggro && info.aggressive && !CombatRules.IsGuard(info) && !PlayerDead
                     && Time.time >= aggroImmuneUntil && dist <= CombatRules.AggroDistance(info) && !CalmedBy(info))
+                {
+                    Plugin.Log.LogInfo($"[combat] {info.name} ({npc.uid}) notices you at {dist:F1} m");
                     Aggro(npc);
+                }
                 if (!npc.aggro) continue;
                 if (Time.time < npc.stunnedUntil) continue;   // stunned: no moving, no swinging
 
