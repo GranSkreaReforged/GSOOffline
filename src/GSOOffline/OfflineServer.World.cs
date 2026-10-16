@@ -300,6 +300,7 @@ namespace GSOOffline
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
+            if (HandleItemObjectInteract(typeId)) return;   // Kombra's book, the Argi blueprint chest
             if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
             OnObjectClicked(typeId);

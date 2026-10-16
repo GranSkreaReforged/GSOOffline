@@ -5,7 +5,7 @@ namespace GSOOffline
 {
     /// <summary>
     /// Items used from the inventory (3/18): food, potions, teleport scrolls and experience scrolls (crates are in
-    /// OfflineServer.Crates.cs). The item data only marks them usable; what each did was server code. Experience
+    /// OfflineServer.Crates.cs, books, recipe scrolls and other oddities in OfflineServer.ItemUses.cs). The item data only marks them usable; what each did was server code. Experience
     /// scroll amounts come from the community wiki, the rest are reconstructions.
     /// </summary>
     public partial class OfflineServer
@@ -73,7 +73,7 @@ namespace GSOOffline
             }
             else if (Potions.TryGetValue(typeId, out var p)) DrinkPotion(typeId, p);
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
-            else if (TryOpenCrate(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
+            else if (TryOpenCrate(typeId) || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 
