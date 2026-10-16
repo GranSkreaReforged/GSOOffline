@@ -112,8 +112,8 @@ namespace GSOOffline
                     PlaceExplosive(me);
                     Notice("You quickly spit out the candy after it starts fizzling in your mouth.", "white");
                     return true;
-                case 10700:   // Talking pumpkin: there is no Halloween event offline
-                    Notice("Pumpkin says: Huh? Is it Halloween yet? zzz... ");
+                case 10700:   // Talking pumpkin
+                    TalkingPumpkin();
                     return true;
                 case 10501:   // Life potion: for other players
                     Notice("There is nobody nearby to resurrect.", "white");

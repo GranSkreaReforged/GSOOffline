@@ -76,7 +76,7 @@ namespace GSOOffline
 
         // The start time goes out once per login: resending it on every zone change would turn the clock back
         // (the client's day/night cycle runs on its own, and GSO HD Textures' weather keeps it going across zones).
-        private bool startTimeSent;
+        private bool startTimeSent, eventsAnnounced;
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
@@ -165,6 +165,11 @@ namespace GSOOffline
             {
                 Send(16, 1, (int)Plugin.TimeOfDay.Value, 20);
                 startTimeSent = true;
+            }
+            if (!eventsAnnounced)
+            {
+                eventsAnnounced = true;
+                AnnounceSeasonalEvents();
             }
             SendWayshrines();
             SendPendingEquips();

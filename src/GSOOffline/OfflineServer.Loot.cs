@@ -50,6 +50,7 @@ namespace GSOOffline
         {
             int level = info?.level ?? 1;
             var bag = RollLoot(info);
+            SeasonalDrops(bag, info);
             if (bag.items.Count == 0 && bag.silver <= 0)
             {
                 Plugin.Log.LogInfo($"[loot] {info?.name} (level {level}) dropped nothing");

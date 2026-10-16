@@ -24,6 +24,7 @@ namespace GSOOffline
         internal static ConfigEntry<bool> UnlockAllWayshrines;
         internal static ConfigEntry<bool> LogUnhandledEvents;
         internal static ConfigEntry<float> TimeOfDay;
+        internal static ConfigEntry<string> SeasonalEvents;
         internal static ConfigEntry<string> AutoLogin;
         internal static ConfigEntry<string> AutoCharacter;
         internal static ConfigEntry<bool> ShowVersion;
@@ -42,6 +43,9 @@ namespace GSOOffline
             HarvestableViewDistance = Config.Bind("World", "HarvestableViewDistance", 90f, "Distance (m) at which harvestable nodes are streamed to the client.");
             UnlockAllWayshrines = Config.Bind("World", "UnlockAllWayshrines", true, "Give every character all wayshrines so the whole world is reachable.");
             TimeOfDay = Config.Bind("World", "StartTimeOfDay", 1000f, "Time of day when you enter the world (0-2400); the day/night cycle runs on from there. Negative = leave client default.");
+            SeasonalEvents = Config.Bind("World", "SeasonalEvents", "Auto", new ConfigDescription(
+                "Holiday events (creatures drop Halloween or Christmas crates). Auto: Halloween from 15 October to 7 November, Christmas from 1 December to 6 January, by this computer's date.",
+                new AcceptableValueList<string>("Auto", "Off", "Halloween", "Christmas", "Both")));
             LogUnhandledEvents = Config.Bind("Debug", "LogUnhandledEvents", true, "Log client->server events the offline server does not implement yet.");
             AutoLogin = Config.Bind("Convenience", "AutoLogin", "", "If set, log in automatically with this account name (skips the login screen).");
             AutoCharacter = Config.Bind("Convenience", "AutoCharacter", "", "If set together with AutoLogin, enter the world with this character (created if missing).");

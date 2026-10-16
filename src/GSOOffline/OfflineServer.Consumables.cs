@@ -16,6 +16,10 @@ namespace GSOOffline
             public int buff;          // client buff icon
             public float seconds;
             public BuffEffect effect;
+            public Potion also;       // a second buff from the same item
+            public string line;       // seasonal treats: "You eat the X." and this line
+            public bool drink;
+            public int gfx, gfx2, sfx;   // effects on the player and a sound
         }
 
         private static readonly Dictionary<int, Potion> Potions = new Dictionary<int, Potion>
@@ -37,6 +41,21 @@ namespace GSOOffline
             { 10446, IconOnly(30, 20f) }, { 10447, IconOnly(30, 40f) }, { 10448, IconOnly(30, 60f) },   // stamina (wiki: strong = 60 s)
             { 10483, IconOnly(33, 15f) },   // Movement speed potion (wiki: 15 s)
             { 10310, IconOnly(13, 60f) }, { 10311, IconOnly(13, 60f) },   // beer, wine: drunk
+            // Halloween candy and Christmas treats (the original's usePotion; the amounts of its potions of the same
+            // strength). Brown candy and gingerbread cookies are plain food.
+            { 10681, new Potion { health = 300, line = "... it restores some health." } },   // Red candy
+            { 10718, new Potion { health = 300, line = "... it restores some health." } },   // Fruitcake
+            { 10683, new Potion { mana = 120, line = "... it restores some mana." } },       // Blue candy
+            { 10719, new Potion { mana = 120, line = "... it restores some mana." } },       // Figgy pudding
+            { 10685, new Potion { buff = 30, seconds = 30f, effect = new BuffEffect(), line = "... you feel much lighter now!" } },   // White candy: stamina
+            { 10682, new Potion { buff = 33, seconds = 15f, effect = new BuffEffect(), gfx = 82, sfx = 66, line = "" } },           // Golden candy: speed
+            { 10717, new Potion { buff = 33, seconds = 5f, effect = new BuffEffect(), gfx = 82, sfx = 66, line = "... wheee." } },  // Candy cane
+            { 10721, new Potion { buff = 23, seconds = 120f, effect = new BuffEffect(), drink = true,                               // Eggnog
+                also = new Potion { buff = 31, seconds = 120f, effect = new BuffEffect { manaPerSecond = 3f } },
+                line = "... you feel much warmer and a little bit dizzy" } },
+            { 10722, new Potion { buff = 46, seconds = 1200f, effect = new BuffEffect { gatherTime = 0.75f }, gfx = 83, gfx2 = 84, sfx = 65,   // Golden candy cane
+                also = new Potion { buff = 45, seconds = 1200f, effect = new BuffEffect { craftTime = 0.75f } },
+                line = "... you get the sugar rush of your lifetime!." } },
         };
 
         private static Potion IconOnly(int buff, float seconds) => new Potion { buff = buff, seconds = seconds, effect = new BuffEffect() };
@@ -66,14 +85,14 @@ namespace GSOOffline
             if (character == null || CountItem(typeId) == 0) return;
             if (UseDynamite(typeId)) return;   // the Poacher dungeon's rock pile
             var t = ItemData.Get(typeId);
-            if (t != null && t.food > 0)
+            if (Potions.TryGetValue(typeId, out var p)) DrinkPotion(typeId, p);   // before food: fruitcake and figgy pudding are both
+            else if (t != null && t.food > 0)
             {
                 TakeItems(typeId, 1);
                 Heal(t.food);
             }
-            else if (Potions.TryGetValue(typeId, out var p)) DrinkPotion(typeId, p);
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
-            else if (TryOpenCrate(typeId) || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
+            else if (TryOpenCrate(typeId) || TryOpenHalloweenCrate(typeId) || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 
@@ -88,6 +107,17 @@ namespace GSOOffline
                 SendMana();
             }
             if (p.effect != null) AddBuff(-typeId, p.buff, p.seconds, p.effect);   // negative: item sources never clash with abilities
+            if (p.also != null) AddBuff(-typeId - 100000, p.also.buff, p.also.seconds, p.also.effect);
+            if (p.line != null)
+            {
+                Notice($"You {(p.drink ? "drink" : "eat")} the {ItemData.Get(typeId)?.name}.", "white");
+                if (p.line.Length > 0) Notice(p.line, "white");
+                var player = LocalPlayer;
+                if (player != null) PlaySound(p.drink ? 299 : 300, player.transform.position, 30);
+                if (player != null && p.sfx > 0) PlaySound(p.sfx, player.transform.position, 40);
+                PlayPlayerEffect(p.gfx);
+                PlayPlayerEffect(p.gfx2);
+            }
             Plugin.Log.LogInfo($"[item] used {ItemData.Get(typeId)?.name}");
         }
 
