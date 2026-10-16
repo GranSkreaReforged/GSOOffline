@@ -117,7 +117,7 @@ namespace GSOOffline
                 if (level > bestLevel) { best = it; bestLevel = level; }
             }
             if (best == null) return;
-            Plugin.Log.LogInfo($"[skill] taking {ItemData.Get(best.typeId)?.name} ({best.id}) in hand for {tool}; {(inHand != null ? ItemData.Get(inHand.typeId)?.name + " goes on the back" : "hand was empty")}");
+            Plugin.Log.LogInfo($"[skill] taking {ItemData.Get(best.typeId)?.name} ({best.id}) in hand for {tool}; {(inHand != null ? "replacing " + ItemData.Get(inHand.typeId)?.name : "hand was empty")}");
             Equip(best.id);
         }
 
