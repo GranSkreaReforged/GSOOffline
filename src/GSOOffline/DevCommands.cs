@@ -208,6 +208,11 @@ namespace GSOOffline
         // 1 two-hander, 2 archer, 3 crossbowman, 4 fire mage).
         private static void BountyReset(string[] args) => OfflineServer.Instance.DevBountyReset();
         private static void Outlaws(string[] args) => OfflineServer.Instance.DevOutlaws();
+
+        // riskinfo: what the risk-zone "?" button does (Menucontroller): the scroll notification with the risk zones
+        // text, which RiskZoneInfoPatch turns into the active bounties.
+        private static void RiskInfo(string[] args) =>
+            Script_WindowController.instance.createScrollNotification("Information", "Risk zones:\n\nBlue\n- No PvP", 600);
         private static void BountyHere(string[] args) => OfflineServer.Instance.DevBountyHere(int.Parse(args[1]), int.Parse(args[2]));
 
         // interactablesnear [radius]: every scene interactable within radius of the player (default 150 m), active or not.

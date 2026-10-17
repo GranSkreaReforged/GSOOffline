@@ -173,6 +173,7 @@ namespace GSOOffline
             {
                 eventsAnnounced = true;
                 AnnounceSeasonalEvents();
+                AnnounceActiveBounties();
             }
             SendWayshrines();
             SendPendingEquips();

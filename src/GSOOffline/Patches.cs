@@ -15,6 +15,18 @@ namespace GSOOffline
         }
     }
 
+    // The risk-zone button (the "?" by the chat) explained PvP risk zones, which don't exist offline: it lists
+    // your active bounties instead (OfflineServer.Bounties.cs).
+    [HarmonyPatch(typeof(Script_WindowController), nameof(Script_WindowController.createScrollNotification))]
+    internal static class RiskZoneInfoPatch
+    {
+        private static void Prefix(ref string title, ref string text, ref int length)
+        {
+            if (text == null || !text.StartsWith("Risk zones:") || OfflineServer.Instance == null) return;
+            OfflineServer.Instance.ActiveBountiesWindow(out title, out text, out length);
+        }
+    }
+
     // Replaces the Photon connect loop and the server-heartbeat timeout.
     [HarmonyPatch(typeof(Scr_ConnectionHandler), "Update")]
     internal static class ConnectionUpdatePatch

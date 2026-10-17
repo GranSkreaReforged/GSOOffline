@@ -101,6 +101,7 @@ namespace GSOOffline
             public float nextKiteAt;      // backing off has a cooldown: in between it stands and fights
             public Vector3 lastClear;     // where it last stood with nothing through its body
             public int lastAbility = -1;
+            public int unstickTries;      // moves back in a row that left it still inside something
             public float removeAt = -1f;  // dead: the body goes after a while
         }
 
@@ -175,6 +176,70 @@ namespace GSOOffline
                     if (list[i].playerName.StartsWith(b.name + ",")) list[i] = BoardEntry(b);
             if (world != null) SyncBountyActors();
             SaveCurrentCharacter();
+            ShowActiveBounties();
+        }
+
+        // ---- the active bounties window ------------------------------------------------------
+
+        /// <summary>
+        /// The "Active bounties" window (the client's scroll notification, type 38): what you're hunting, or where to
+        /// pick a bounty up. The risk-zone "?" button opens it (RiskZoneInfoPatch), and so do /bounties, taking a
+        /// bounty and entering the world with one.
+        /// </summary>
+        internal void ActiveBountiesWindow(out string title, out string text, out int length)
+        {
+            title = "Active bounties";
+            var active = character != null ? character.bounties.FindAll(b => b.started) : new List<BountySave>();
+            var sb = new StringBuilder();
+            if (active.Count == 0)
+            {
+                sb.Append("You have no active bounties.\n\nVisit a wanted board (in Grimwall, Yorkhill, Goldon, the Blue Sea or Bal Sardan town) ")
+                  .Append("and press \"Add bounty\" on an outlaw to take the bounty on.");
+                length = 200;
+            }
+            else
+            {
+                foreach (var b in active)
+                    sb.Append(b.name).Append(", level ").Append(b.level).Append(' ').Append(StyleNames[b.style]).Append("\n")
+                      .Append("Bounty: ").Append(b.silver).Append(" silver\n")
+                      .Append("Last seen: ").Append(b.lastSeen).Append("\n")
+                      .Append("Wears ").Append(GearSummary(b)).Append("\n\n");
+                sb.Append("Defeat them to collect the bounty. More are posted on the wanted boards.");
+                length = 120 + 130 * active.Count;
+            }
+            text = sb.ToString();
+        }
+
+        private void ShowActiveBounties()
+        {
+            var wc = Script_WindowController.instance;
+            if (wc == null || character == null) return;
+            ActiveBountiesWindow(out string title, out string text, out int length);
+            wc.createScrollNotification(title, text, length);
+        }
+
+        /// <summary>The active bounties window is open: show it again with the current list (a kill takes one off).</summary>
+        private void RefreshActiveBountiesWindow()
+        {
+            var wc = Script_WindowController.instance;
+            if (wc == null) return;
+            var windows = HarmonyLib.Traverse.Create(wc).Field("windows").GetValue<List<Script_Window>>();
+            if (windows != null && windows.Exists(w => w.windowType == 38 && w.windowActive && w.windowTitle == "Active bounties"))
+                ShowActiveBounties();
+        }
+
+        /// <summary>Chat: /bounties opens the active bounties window. True if it was that.</summary>
+        private bool RunBountyCommand(string cmd)
+        {
+            if (cmd != "bounties") return false;
+            ShowActiveBounties();
+            return true;
+        }
+
+        /// <summary>Entering the world with bounties on: the window comes up once per login.</summary>
+        private void AnnounceActiveBounties()
+        {
+            if (character != null && character.bounties.Exists(b => b.started)) Later(1f, ShowActiveBounties);
         }
 
         /// <summary>
@@ -662,8 +727,9 @@ namespace GSOOffline
             {
                 if (a.npc.dead) continue;
                 Vector3 p = NpcPosition(a.npc);
-                if (!OutlawInside(p, r, h, stepUp)) { a.lastClear = p; continue; }
-                if (a.lastClear == Vector3.zero) continue;
+                if (!OutlawInside(p, r, h, stepUp)) { a.lastClear = p; a.unstickTries = 0; continue; }
+                if (a.lastClear == Vector3.zero || a.unstickTries >= 3) continue;   // moving it back didn't help: leave it
+                a.unstickTries++;
                 Plugin.Log.LogInfo($"[bounty] {a.save.name} stuck at {SceneWorld.Vec(p)}: back to {SceneWorld.Vec(a.lastClear)}");
                 a.npc.hasDest = false;
                 a.npc.pos = a.lastClear;
@@ -818,6 +884,7 @@ namespace GSOOffline
             Notice($"Bounty complete: {b.name}. +{b.silver} silver", "green");
             Plugin.Log.LogInfo($"[bounty] {b.name} killed: {b.silver} silver, dropped {LootLabel(bag)}");
             SaveCurrentCharacter();
+            RefreshActiveBountiesWindow();
             return true;
         }
 
