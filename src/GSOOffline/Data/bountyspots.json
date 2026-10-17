@@ -1,0 +1,2553 @@
+{
+ "source": "the client's scene markers and the original server's spawns (GSOOffline Data/spawns.json), with NPCInfo levels",
+ "generator": "GSODevTools tools/datamining/gen_bountyspots.py",
+ "spots": [
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    152.6,
+    17.4,
+    1262.4
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 370,
+   "direction": "west"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    485.4,
+    3.6,
+    1168.1
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 20,
+   "direction": "west"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    490.2,
+    3.6,
+    1133.3
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 40,
+   "direction": "south-west"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    523.8,
+    14.5,
+    1123.7
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 10,
+   "creatures": [
+    "Wolf",
+    "Skeleton"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 50,
+   "direction": "south"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    544.7,
+    23.9,
+    1160.1
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 40,
+   "direction": "east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    573.8,
+    26.2,
+    1188.3
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 20,
+   "direction": "south-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    601.3,
+    6.1,
+    1249.0
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 60,
+   "direction": "north-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    640.3,
+    4.4,
+    855.7
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 340,
+   "direction": "south-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    688.9,
+    10.8,
+    890.6
+   ],
+   "level": 5,
+   "minLevel": 2,
+   "maxLevel": 18,
+   "creatures": [
+    "Skeleton",
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 330,
+   "direction": "south-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    713.7,
+    12.6,
+    933.8
+   ],
+   "level": 5,
+   "minLevel": 2,
+   "maxLevel": 18,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 310,
+   "direction": "south-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    721.6,
+    9.3,
+    991.7
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 270,
+   "direction": "south-east"
+  },
+  {
+   "scene": 1,
+   "zone": "West Athagos",
+   "pos": [
+    752.9,
+    13.1,
+    958.0
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Evil monk's dungeon",
+   "distance": 320,
+   "direction": "south-east"
+  },
+  {
+   "scene": 7,
+   "zone": "Bal Sardan",
+   "pos": [
+    261.6,
+    13.2,
+    473.7
+   ],
+   "level": 50,
+   "minLevel": 50,
+   "maxLevel": 50,
+   "creatures": [
+    "Lizard warrior"
+   ],
+   "landmark": "the Bal Sardan wayshrine",
+   "distance": 450,
+   "direction": "west"
+  },
+  {
+   "scene": 7,
+   "zone": "Bal Sardan",
+   "pos": [
+    288.6,
+    13.9,
+    438.7
+   ],
+   "level": 50,
+   "minLevel": 50,
+   "maxLevel": 50,
+   "creatures": [
+    "Lizard warrior"
+   ],
+   "landmark": "the Bal Sardan wayshrine",
+   "distance": 420,
+   "direction": "west"
+  },
+  {
+   "scene": 7,
+   "zone": "Bal Sardan",
+   "pos": [
+    292.9,
+    7.2,
+    490.8
+   ],
+   "level": 50,
+   "minLevel": 50,
+   "maxLevel": 50,
+   "creatures": [
+    "Lizard warrior"
+   ],
+   "landmark": "the Bal Sardan wayshrine",
+   "distance": 430,
+   "direction": "west"
+  },
+  {
+   "scene": 7,
+   "zone": "Bal Sardan",
+   "pos": [
+    661.9,
+    6.4,
+    -246.6
+   ],
+   "level": 50,
+   "minLevel": 50,
+   "maxLevel": 50,
+   "creatures": [
+    "Lizard warrior"
+   ],
+   "landmark": "the Bal Sardan South wayshrine",
+   "distance": 140,
+   "direction": "west"
+  },
+  {
+   "scene": 7,
+   "zone": "Bal Sardan",
+   "pos": [
+    692.3,
+    5.2,
+    -212.9
+   ],
+   "level": 50,
+   "minLevel": 50,
+   "maxLevel": 50,
+   "creatures": [
+    "Lizard warrior"
+   ],
+   "landmark": "the Bal Sardan South wayshrine",
+   "distance": 130,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    671.3,
+    7.2,
+    716.6
+   ],
+   "level": 24,
+   "minLevel": 10,
+   "maxLevel": 38,
+   "creatures": [
+    "Skeleton",
+    "Troll"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 610,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    671.7,
+    4.7,
+    765.5
+   ],
+   "level": 38,
+   "minLevel": 13,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll",
+    "Sorceress"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 620,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    698.8,
+    4.5,
+    793.5
+   ],
+   "level": 38,
+   "minLevel": 10,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll",
+    "Skeleton"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 600,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    898.9,
+    20.9,
+    1005.7
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 390,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    913.8,
+    25.4,
+    919.0
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 370,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    936.3,
+    34.0,
+    662.6
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 340,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    946.1,
+    29.7,
+    947.3
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 340,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    958.7,
+    10.6,
+    868.5
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 330,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    983.5,
+    27.0,
+    943.5
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 300,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    998.8,
+    51.2,
+    634.4
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 270,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1016.5,
+    17.7,
+    923.4
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 270,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1038.3,
+    57.5,
+    638.6
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 240,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1054.8,
+    36.1,
+    775.9
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 280,
+   "direction": "south-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1102.5,
+    62.9,
+    699.4
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 240,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1144.9,
+    61.9,
+    702.9
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 220,
+   "direction": "north-west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1153.8,
+    11.8,
+    514.0
+   ],
+   "level": 65,
+   "minLevel": 65,
+   "maxLevel": 65,
+   "creatures": [
+    "Poacher"
+   ],
+   "landmark": "the Poacher dungeon",
+   "distance": 90,
+   "direction": "west"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1347.5,
+    20.0,
+    857.0
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 100,
+   "direction": "south-east"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1398.0,
+    8.5,
+    942.7
+   ],
+   "level": 20,
+   "minLevel": 20,
+   "maxLevel": 20,
+   "creatures": [
+    "Attracted troll"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 120,
+   "direction": "east"
+  },
+  {
+   "scene": 13,
+   "zone": "East Athagos",
+   "pos": [
+    1885.0,
+    36.5,
+    730.7
+   ],
+   "level": 55,
+   "minLevel": 55,
+   "maxLevel": 55,
+   "creatures": [
+    "Dragon"
+   ],
+   "landmark": "the East Athagos wayshrine",
+   "distance": 640,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    237.2,
+    24.3,
+    685.8
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 510,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    263.9,
+    25.9,
+    626.7
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 470,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    277.9,
+    26.1,
+    747.7
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 490,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    285.5,
+    19.5,
+    480.1
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 450,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    310.8,
+    18.6,
+    855.6
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 510,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    322.9,
+    22.9,
+    443.1
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 430,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    362.1,
+    28.5,
+    724.0
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 400,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    369.8,
+    37.2,
+    796.9
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 430,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    379.1,
+    23.9,
+    580.3
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 350,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    440.8,
+    24.1,
+    698.1
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 320,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    449.0,
+    26.5,
+    831.7
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 390,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    480.7,
+    27.5,
+    637.8
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 260,
+   "direction": "west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    532.8,
+    11.2,
+    830.5
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 330,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    533.1,
+    34.4,
+    650.1
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 220,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    552.7,
+    62.9,
+    953.8
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 430,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    557.1,
+    15.2,
+    716.0
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 230,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    560.8,
+    22.1,
+    865.4
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 350,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    575.1,
+    53.3,
+    920.9
+   ],
+   "level": 40,
+   "minLevel": 13,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 390,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    594.5,
+    28.4,
+    875.8
+   ],
+   "level": 40,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem",
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 340,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    599.4,
+    15.1,
+    836.6
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 300,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    614.2,
+    20.2,
+    642.9
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 140,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    623.7,
+    8.6,
+    808.7
+   ],
+   "level": 13,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Sorceress",
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 270,
+   "direction": "north-west"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    638.9,
+    12.9,
+    848.0
+   ],
+   "level": 26,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 300,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    740.8,
+    15.2,
+    868.5
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 300,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    741.8,
+    17.7,
+    760.8
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 200,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    749.5,
+    41.7,
+    968.6
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 400,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    753.1,
+    16.1,
+    811.4
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 13,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 250,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    754.4,
+    44.2,
+    1015.6
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 450,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    776.5,
+    5.5,
+    679.7
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 120,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    781.8,
+    15.2,
+    758.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 200,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    809.5,
+    10.3,
+    464.9
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 130,
+   "direction": "south-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    822.7,
+    15.0,
+    776.3
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 230,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    827.3,
+    11.5,
+    512.3
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 110,
+   "direction": "south-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    835.6,
+    25.9,
+    1002.2
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 450,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    842.3,
+    17.7,
+    607.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 120,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    857.5,
+    9.7,
+    365.0
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 240,
+   "direction": "south-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    865.4,
+    8.1,
+    432.2
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 38,
+   "creatures": [
+    "Skeleton",
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 190,
+   "direction": "south-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    872.7,
+    18.4,
+    987.8
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 450,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    878.3,
+    17.8,
+    564.1
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 150,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    889.5,
+    13.6,
+    1040.0
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 500,
+   "direction": "north"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    918.4,
+    9.4,
+    469.1
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 13,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 210,
+   "direction": "south-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    933.9,
+    25.4,
+    536.3
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 200,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    963.1,
+    21.9,
+    650.2
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 250,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    973.3,
+    25.4,
+    545.6
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 240,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1006.9,
+    9.7,
+    521.3
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 13,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 280,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1007.1,
+    19.8,
+    610.4
+   ],
+   "level": 13,
+   "minLevel": 13,
+   "maxLevel": 38,
+   "creatures": [
+    "Sorceress",
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 280,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1010.4,
+    14.0,
+    680.4
+   ],
+   "level": 39,
+   "minLevel": 38,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem",
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 300,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1039.7,
+    11.3,
+    561.2
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 310,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1044.7,
+    7.2,
+    510.5
+   ],
+   "level": 11,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 320,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1045.2,
+    13.7,
+    637.9
+   ],
+   "level": 13,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Skeleton",
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 320,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1062.0,
+    15.6,
+    669.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 40,
+   "creatures": [
+    "Skeleton",
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 350,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1119.0,
+    16.8,
+    664.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 400,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1152.1,
+    6.5,
+    597.9
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 420,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1166.8,
+    18.7,
+    640.4
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 440,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1167.4,
+    11.7,
+    676.2
+   ],
+   "level": 40,
+   "minLevel": 40,
+   "maxLevel": 40,
+   "creatures": [
+    "Golem"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 450,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1187.7,
+    8.9,
+    1056.1
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 670,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1196.8,
+    9.7,
+    702.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 10,
+   "creatures": [
+    "Skeleton"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 480,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1201.8,
+    27.0,
+    903.0
+   ],
+   "level": 45,
+   "minLevel": 35,
+   "maxLevel": 55,
+   "creatures": [
+    "Young dragon",
+    "Dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 580,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1202.3,
+    27.0,
+    938.1
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 600,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1207.2,
+    14.3,
+    999.9
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 640,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1234.4,
+    27.0,
+    872.1
+   ],
+   "level": 45,
+   "minLevel": 35,
+   "maxLevel": 55,
+   "creatures": [
+    "Young dragon",
+    "Dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 590,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1242.0,
+    32.3,
+    597.0
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 510,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1247.7,
+    27.0,
+    909.1
+   ],
+   "level": 45,
+   "minLevel": 35,
+   "maxLevel": 55,
+   "creatures": [
+    "Dragon",
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 620,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1258.0,
+    15.8,
+    1019.8
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 700,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1278.5,
+    11.3,
+    963.1
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 680,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1316.5,
+    10.8,
+    643.0
+   ],
+   "level": 10,
+   "minLevel": 10,
+   "maxLevel": 38,
+   "creatures": [
+    "Skeleton",
+    "Sorceress"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 590,
+   "direction": "east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1319.6,
+    8.9,
+    832.8
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 650,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1335.7,
+    13.2,
+    879.7
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 680,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1348.7,
+    27.0,
+    973.6
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Young dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 740,
+   "direction": "north-east"
+  },
+  {
+   "scene": 18,
+   "zone": "Goldon",
+   "pos": [
+    1374.5,
+    27.0,
+    1030.3
+   ],
+   "level": 45,
+   "minLevel": 35,
+   "maxLevel": 55,
+   "creatures": [
+    "Young dragon",
+    "Dragon"
+   ],
+   "landmark": "the Goldon wayshrine",
+   "distance": 790,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    474.1,
+    3.1,
+    426.2
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 190,
+   "direction": "north"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    476.1,
+    3.1,
+    1037.1
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 800,
+   "direction": "north"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    509.8,
+    3.1,
+    766.1
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 530,
+   "direction": "north"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    521.1,
+    3.1,
+    731.8
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 500,
+   "direction": "north"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    605.3,
+    3.1,
+    969.6
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 750,
+   "direction": "north"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    641.7,
+    3.1,
+    658.7
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 470,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    671.7,
+    3.1,
+    507.8
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 370,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    709.7,
+    3.1,
+    352.6
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 310,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    711.6,
+    3.1,
+    267.1
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 300,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    789.5,
+    3.1,
+    143.9
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 390,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    790.2,
+    3.1,
+    643.4
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 550,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    790.7,
+    3.1,
+    361.0
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 390,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    875.7,
+    3.1,
+    389.8
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 480,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    901.0,
+    3.5,
+    826.0
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 760,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    919.5,
+    3.1,
+    655.9
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 650,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    949.9,
+    3.1,
+    764.3
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 740,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    957.8,
+    3.1,
+    569.2
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 630,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    967.8,
+    3.1,
+    1244.6
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 1140,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    971.5,
+    3.1,
+    509.6
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 610,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    973.2,
+    3.1,
+    175.2
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 560,
+   "direction": "east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    1042.7,
+    3.1,
+    658.2
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 750,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    1060.0,
+    3.1,
+    1203.6
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 1160,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    1145.2,
+    3.1,
+    1147.4
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 1160,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    1182.2,
+    3.1,
+    1182.0
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 1210,
+   "direction": "north-east"
+  },
+  {
+   "scene": 19,
+   "zone": "The Blue Sea",
+   "pos": [
+    1287.0,
+    3.1,
+    1026.0
+   ],
+   "level": 45,
+   "minLevel": 45,
+   "maxLevel": 45,
+   "creatures": [
+    "Sea serpent"
+   ],
+   "landmark": "the The Blue Sea wayshrine",
+   "distance": 1170,
+   "direction": "north-east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    -66.4,
+    103.6,
+    -69.5
+   ],
+   "level": 35,
+   "minLevel": 35,
+   "maxLevel": 35,
+   "creatures": [
+    "Wild snow wolf"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 600,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    -11.4,
+    84.3,
+    -217.8
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 5,
+   "creatures": [
+    "Wolf"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 670,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    80.0,
+    98.6,
+    -52.3
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 35,
+   "creatures": [
+    "Wolf",
+    "Wild snow wolf"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 750,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    97.4,
+    18.1,
+    -425.8
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 830,
+   "direction": "south-east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    115.7,
+    94.1,
+    -45.6
+   ],
+   "level": 5,
+   "minLevel": 5,
+   "maxLevel": 35,
+   "creatures": [
+    "Wolf",
+    "Wild snow wolf"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 780,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    169.3,
+    71.0,
+    -163.6
+   ],
+   "level": 47,
+   "minLevel": 47,
+   "maxLevel": 47,
+   "creatures": [
+    "Aggressive Crawler"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 840,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    347.2,
+    80.0,
+    16.5
+   ],
+   "level": 30,
+   "minLevel": 30,
+   "maxLevel": 30,
+   "creatures": [
+    "Fire elemental"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 1020,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    354.5,
+    76.1,
+    -19.7
+   ],
+   "level": 30,
+   "minLevel": 30,
+   "maxLevel": 30,
+   "creatures": [
+    "Fire elemental"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 1020,
+   "direction": "east"
+  },
+  {
+   "scene": 35,
+   "zone": "Deepheart",
+   "pos": [
+    372.0,
+    61.2,
+    208.8
+   ],
+   "level": 38,
+   "minLevel": 38,
+   "maxLevel": 38,
+   "creatures": [
+    "Troll"
+   ],
+   "landmark": "the Deepheart wayshrine",
+   "distance": 1080,
+   "direction": "east"
+  }
+ ]
+}

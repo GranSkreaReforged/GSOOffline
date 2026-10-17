@@ -204,6 +204,12 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] fakeplayer {args[1]}: {(f != null ? SceneWorld.Vec(f.transform.position) + " hp " + f.currentHealth + "/" + f.maxHealth + " dead " + f.dead : "none")}");
         }
 
+        // bountyreset: a fresh bounty board. bountyhere <style 0-4> <level>: an outlaw 8 m away (0 swordsman,
+        // 1 two-hander, 2 archer, 3 crossbowman, 4 fire mage).
+        private static void BountyReset(string[] args) => OfflineServer.Instance.DevBountyReset();
+        private static void Outlaws(string[] args) => OfflineServer.Instance.DevOutlaws();
+        private static void BountyHere(string[] args) => OfflineServer.Instance.DevBountyHere(int.Parse(args[1]), int.Parse(args[2]));
+
         // interactablesnear [radius]: every scene interactable within radius of the player (default 150 m), active or not.
         private static void InteractablesNear(string[] args)
         {

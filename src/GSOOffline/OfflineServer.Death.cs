@@ -160,7 +160,7 @@ namespace GSOOffline
 
         private LootBag AddDeathBagLoot(DeathBagSave save)
         {
-            var bag = new LootBag { id = nextLootId++, scene = save.scene, pos = new Vector3(save.x, save.y, save.z), despawnAt = float.MaxValue, death = save };
+            var bag = new LootBag { id = nextLootId++, scene = save.scene, pos = new Vector3(save.x, save.y, save.z), despawnAt = float.MaxValue, death = save, kept = save.items };
             foreach (var it in save.items) bag.items.Add(new ItemAmount { type = it.typeId, amount = it.amount });
             SceneLoot(save.scene).Add(bag);
             return bag;
@@ -173,10 +173,10 @@ namespace GSOOffline
             foreach (var save in character.deathBags) AddDeathBagLoot(save);
         }
 
-        /// <summary>Picking up a death bag: the very same items back in the bag.</summary>
-        private void CollectDeathBag(LootBag bag)
+        /// <summary>Picking up a bag of kept items (a death bag, a bounty's gear): the very same items back in the bag.</summary>
+        private void CollectKeptBag(LootBag bag)
         {
-            foreach (var it in bag.death.items)
+            foreach (var it in bag.kept)
             {
                 it.equipped = false;
                 if (ItemData.Get(it.typeId)?.Stacks == true)
@@ -187,9 +187,9 @@ namespace GSOOffline
                 character.items.Add(it);
                 SendItemAdded(it, it.amount);
             }
-            character.deathBags.Remove(bag.death);
+            if (bag.death != null) character.deathBags.Remove(bag.death);
             CheckItemTriggers();
-            Notice("You recover " + LootLabel(bag) + ".");
+            Notice((bag.death != null ? "You recover " : "You loot ") + LootLabel(bag) + ".");
             RemoveLoot(bag);
             SaveCurrentCharacter();
         }
