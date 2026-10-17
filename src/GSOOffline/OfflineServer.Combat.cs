@@ -52,7 +52,7 @@ namespace GSOOffline
         public const float DeathDropChance = 0.5f, DeathDropOne = 0.6f, DeathDropTwo = 0.3f;
         public static readonly int[] DeathCleanseFee = { 100, 300, 500, 800, 1000 };
         // Bounty board (issue #67): 3 to 5 outlaws within 5 levels of your combat level, the board topped up
-        // every 15 minutes and an outlaw gone after an hour. They are tougher than a creature of their level (they
+        // every 15 minutes and an outlaw not taken on gone after an hour. They are tougher than a creature of their level (they
         // stand in for a player); their hits and defences come from their gear. Each ability every 4th swing.
         public const int BountyMin = 3, BountyMax = 5, BountyLevelRange = 5;
         public const long BountyLifetimeSeconds = 3600, BountyRefreshSeconds = 900;

@@ -104,7 +104,8 @@ namespace GSOOffline
         public string lastSeen;
         public int silver;
         public int murders;
-        public long createdAt;         // unix seconds: an hour later it leaves the board
+        public long createdAt;         // unix seconds: an hour later it leaves the board, unless started
+        public bool started;           // you took the bounty on: only then does the outlaw wait in the world
         public int abilityChance;      // percent per swing it uses an ability (its temperament)
         public float kiteDistance;     // shooters back off when you come closer than this
         public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death

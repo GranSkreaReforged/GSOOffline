@@ -111,6 +111,7 @@ namespace GSOOffline
         private void RegisterBountyHandlers()
         {
             On(2, 9, c => SelectBountyTarget(c.Length > 2 ? c[2] as string : null));   // selectPlayerTarget (name, target)
+            On(7, 32, c => StartBounty(c.Length > 1 ? c[1] as string : null));          // the board's "Add bounty" button
         }
 
         private static long UnixNow => DateTime.UtcNow.Ticks / TimeSpan.TicksPerSecond;
@@ -130,20 +131,50 @@ namespace GSOOffline
             Send(3, 33, character.name, WindowWantedBoard);
             foreach (var b in character.bounties)
             {
-                string json = JsonUtility.ToJson(new Scr_WantedBoard.WantedCriminal
-                {
-                    playerName = $"{b.name}, level {b.level} {StyleNames[b.style]}",
-                    lastArea = $"{b.lastSeen}. Wears {GearSummary(b)}",
-                    criminalTimer = 0,   // over 1800 shows "Outlaw" in red with an "Add bounty" button for other players
-                    murderCount = b.murders,
-                    bounty = b.silver,
-                });
-                Send(7, 31, json);
+                Send(7, 31, JsonUtility.ToJson(BoardEntry(b)));
             }
             if (character.bounties.Count == 0) Notice("The board is empty. Come back later.", "white");
             Later(0.2f, WidenWantedBoard);
             Plugin.Log.LogInfo($"[bounty] board: {character.bounties.Count} outlaws");
             return true;
+        }
+
+        /// <summary>
+        /// One board line. A bounty not yet started shows as an "Outlaw" in red, which is the client's only entry with
+        /// a button ("Add bounty", 7/32): pressing it starts the hunt. A started one shows plain, marked "hunting".
+        /// </summary>
+        private static Scr_WantedBoard.WantedCriminal BoardEntry(BountySave b) => new Scr_WantedBoard.WantedCriminal
+        {
+            playerName = $"{b.name}, level {b.level} {StyleNames[b.style]}" + (b.started ? " (hunting)" : string.Empty),
+            lastArea = $"{b.lastSeen}. Wears {GearSummary(b)}",
+            criminalTimer = b.started ? 0 : 1801,
+            murderCount = b.murders,
+            bounty = b.silver,
+        };
+
+        /// <summary>
+        /// 7/32, the board's "Add bounty" button (it sends the entry's name line): the bounty starts, and the outlaw
+        /// takes its place in the world. The open board's line is updated in place.
+        /// </summary>
+        private void StartBounty(string line)
+        {
+            if (character == null || string.IsNullOrEmpty(line)) return;
+            var b = character.bounties.Find(o => line.StartsWith(o.name + ","));
+            if (b == null) return;
+            if (b.started)
+            {
+                Notice($"You're already hunting {b.name}.", "gray");
+                return;
+            }
+            b.started = true;
+            Notice($"You take the bounty on {b.name}: {b.silver} silver. Last seen: {b.lastSeen}.", "green");
+            Plugin.Log.LogInfo($"[bounty] started: {b.name}");
+            var list = Script_WindowController.instance?.window_wantedCriminals?.criminalsList;
+            if (list != null)
+                for (int i = 0; i < list.Count; i++)
+                    if (list[i].playerName.StartsWith(b.name + ",")) list[i] = BoardEntry(b);
+            if (world != null) SyncBountyActors();
+            SaveCurrentCharacter();
         }
 
         /// <summary>
@@ -185,7 +216,7 @@ namespace GSOOffline
             if (character == null) return;
             long now = UnixNow;
             int before = character.bounties.Count;
-            character.bounties.RemoveAll(b => now - b.createdAt > CombatRules.BountyLifetimeSeconds && !BountyEngaged(b));
+            character.bounties.RemoveAll(b => !b.started && now - b.createdAt > CombatRules.BountyLifetimeSeconds && !BountyEngaged(b));
             bool changed = character.bounties.Count != before;
             if (now >= character.bountyRefreshAt)
             {
@@ -368,7 +399,7 @@ namespace GSOOffline
                     RemoveBountyActor(kv.Value);
             foreach (var b in character.bounties)
             {
-                if (b.scene != world.sceneId) continue;
+                if (b.scene != world.sceneId || !b.started) continue;   // nobody waits until the bounty is taken
                 int uid = BountyUidBase + b.id;
                 if (bountyByUid.ContainsKey(uid)) continue;
                 var info = BountyInfo(b);
@@ -837,7 +868,7 @@ namespace GSOOffline
             {
                 id = ++character.nextBountyId, name = FirstNames[Random.Range(0, FirstNames.Length)] + " " + Epithets[Random.Range(0, Epithets.Length)],
                 level = level, style = style, gender = Random.Range(0, 2), hair = Random.Range(0, 16), hairR = 120, hairG = 80, hairB = 40,
-                scene = character.scene, x = me.x + 8f, y = me.y, z = me.z, murders = 1, createdAt = UnixNow, lastSeen = "right here",
+                scene = character.scene, x = me.x + 8f, y = me.y, z = me.z, murders = 1, createdAt = UnixNow, lastSeen = "right here", started = true,
             };
             RollTemperament(b);
             b.gear = RollBountyGear((BountyStyle)style, level);
