@@ -62,6 +62,63 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class FurnitureSave
+    {
+        public int type;
+        public int rot;
+        public float x, y, z;
+    }
+
+    [Serializable]
+    public class HouseSave
+    {
+        public int scene;
+        public int plot;               // plot id within the scene (Data/houseplots.json)
+        public int type;               // the client's HouseTypes.xml typeid
+        public int rotation;
+        public string name;
+        public bool locked;
+        public int extraSpace;         // furniture space bought on top of 5 per metre of plot
+        public long builtAt;           // unix seconds: demolishing within the hour gives everything back
+        public List<FurnitureSave> furniture = new List<FurnitureSave>();
+    }
+
+    [Serializable]
+    public class DeathBagSave
+    {
+        public int scene;
+        public float x, y, z;
+        public List<ItemSave> items = new List<ItemSave>();   // the very items, grades and stats intact
+    }
+
+    [Serializable]
+    public class BountySave
+    {
+        public int id;
+        public string name;
+        public int level;
+        public int style;              // OfflineServer.BountyStyle
+        public int gender, hair, body, eyebrow, hairR, hairG, hairB;
+        public int scene;
+        public float x, y, z;          // where it waits
+        public string lastSeen;
+        public int silver;
+        public int murders;
+        public long createdAt;         // unix seconds: an hour later it leaves the board, unless started
+        public bool started;           // you took the bounty on: only then does the outlaw wait in the world
+        public int abilityChance;      // percent per swing it uses an ability (its temperament)
+        public float kiteDistance;     // shooters back off when you come closer than this
+        public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death
+    }
+
+    [Serializable]
+    public class KillCount
+    {
+        public int npc;
+        public int count;
+    }
+
+    [Serializable]
     public class CharacterSave
     {
         public string name;
@@ -103,6 +160,30 @@ namespace GSOOffline
         public List<ItemSave> bank = new List<ItemSave>();
         public List<ReturnPoint> returnPoints = new List<ReturnPoint>();   // where interior exits lead back to
         public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
+        public int christmasPetCounter;   // Christmas 2019 crates opened without the untradeable Reindeer; -1 = got it
+        public int halloweenPetCounter;   // Halloween 2019 crates opened without the untradeable Bat; -1 = got it
+        public HouseSave house;           // null = no house
+        public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
+        public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)
+        public float deathTollSeconds;          // playing time left on it
+        public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // gear dropped on death, until fetched
+        public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
+        public long bountyRefreshAt;      // unix seconds: the board fills up again then
+        public int nextBountyId;
+
+        public int GetKills(int npc)
+        {
+            foreach (var k in kills)
+                if (k.npc == npc) return k.count;
+            return 0;
+        }
+
+        public void AddKill(int npc)
+        {
+            foreach (var k in kills)
+                if (k.npc == npc) { k.count++; return; }
+            kills.Add(new KillCount { npc = npc, count = 1 });
+        }
 
         public int GetAbilitySlot(int slot)
         {

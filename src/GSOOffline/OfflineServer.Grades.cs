@@ -37,11 +37,14 @@ namespace GSOOffline
 
         // ---- the grade of a new item ----------------------------------------------------------
 
-        /// <summary>A new item's grade: a walk from its base grade (Normal for items without one), as GenerateNewItemGrade.</summary>
-        private int RollNewItemGrade(int baseGrade)
+        /// <summary>
+        /// A new item's grade: a walk from its base grade (Normal for items without one), as GenerateNewItemGrade.
+        /// <paramref name="announce"/> is false for items that aren't the player's (an outlaw's gear).
+        /// </summary>
+        private int RollNewItemGrade(int baseGrade, bool announce)
         {
             int grade = baseGrade >= 4 ? RollRare(baseGrade) : RollCommon(baseGrade <= 0 ? 2 : baseGrade);
-            if (grade >= 4) Notice($"You received {(grade == 6 ? "an" : "a")} {GradeNames[grade]} item!", "grade" + grade);
+            if (announce && grade >= 4) Notice($"You received {(grade == 6 ? "an" : "a")} {GradeNames[grade]} item!", "grade" + grade);
             return grade;
         }
 

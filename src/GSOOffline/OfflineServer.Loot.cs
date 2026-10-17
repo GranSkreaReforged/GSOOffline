@@ -20,6 +20,8 @@ namespace GSOOffline
             public int silver;
             public readonly List<ItemAmount> items = new List<ItemAmount>();
             public float despawnAt;
+            public List<ItemSave> kept;   // the very items, given back as they are (death bags, bounty gear)
+            public DeathBagSave death;    // gear dropped on death: saved, never despawns
         }
 
         // Reconstructions: the old server's numbers are lost.
@@ -48,8 +50,10 @@ namespace GSOOffline
         /// <summary>Rolls the kill's loot into a bag at the NPC (or at the player, for NPCs flagged droplootatplayer).</summary>
         private void DropLoot(NpcEntity npc, NpcInfo info)
         {
+            if (BountyKilled(npc)) return;   // an outlaw: its bounty and gear instead
             int level = info?.level ?? 1;
             var bag = RollLoot(info);
+            SeasonalDrops(bag, info);
             if (bag.items.Count == 0 && bag.silver <= 0)
             {
                 Plugin.Log.LogInfo($"[loot] {info?.name} (level {level}) dropped nothing");
@@ -232,6 +236,11 @@ namespace GSOOffline
             {
                 Plugin.Log.LogInfo($"[loot] bag {id} too far ({dist:F1}m)");
                 Notice("That's too far away.", "red");
+                return;
+            }
+            if (bag.kept != null)
+            {
+                CollectKeptBag(bag);
                 return;
             }
             foreach (var it in bag.items) GiveItem(it.type, it.amount);

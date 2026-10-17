@@ -43,6 +43,8 @@ namespace GSOOffline
             ResetUlansDungeon();
             ResetPoacherDungeon();
             ResetSewersAndCoral();
+            ResetHousing();
+            ResetBounties();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -76,7 +78,7 @@ namespace GSOOffline
 
         // The start time goes out once per login: resending it on every zone change would turn the clock back
         // (the client's day/night cycle runs on its own, and GSO HD Textures' weather keeps it going across zones).
-        private bool startTimeSent;
+        private bool startTimeSent, eventsAnnounced;
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
@@ -138,6 +140,7 @@ namespace GSOOffline
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
             AddHarpyToWorld();
+            SyncBountyActors();
             LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
@@ -166,12 +169,19 @@ namespace GSOOffline
                 Send(16, 1, (int)Plugin.TimeOfDay.Value, 20);
                 startTimeSent = true;
             }
+            if (!eventsAnnounced)
+            {
+                eventsAnnounced = true;
+                AnnounceSeasonalEvents();
+                AnnounceActiveBounties();
+            }
             SendWayshrines();
             SendPendingEquips();
             SendWeaponAbilities();
             SendHealth();
             SendMana();
             SendGearStats();
+            SendDeathToll();
             RefreshAlignment(true);
             SendSceneLoot();
             SendBoats();
@@ -211,7 +221,9 @@ namespace GSOOffline
             Vector3 p = player.transform.position;
 
             SendQuestObjects();
-            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
+            SendVisibleHouses();
+            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, n => NpcShown(n) && !bountyByUid.ContainsKey(n.uid));
+            SendVisibleBounties(p);
             if (npcs != lastNpcList)
             {
                 lastNpcList = npcs;
@@ -295,11 +307,14 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandleBountyBoard(typeId)) return;   // a wanted board
             if (HandleSewerInteract(typeId)) return;     // the sewers' pillar
             if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
             if (HandleTravelInteract(typeId)) return;
+            if (HandleItemObjectInteract(typeId)) return;   // Kombra's book, the Argi blueprint chest
+            if (HandleFurnitureInteract(typeId)) return;    // house doors and furniture
             if (typeId == InteractChair) SitDown();
             HandleOysterInteract(typeId);   // harpoon guns (the client then waits for the confirm below)
             OnObjectClicked(typeId);

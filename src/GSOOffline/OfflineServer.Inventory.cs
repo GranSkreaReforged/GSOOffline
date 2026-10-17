@@ -45,7 +45,7 @@ namespace GSOOffline
 
         private void RegisterInventoryHandlers()
         {
-            On(3, 4, c => Equip((int)c[2]));
+            On(3, 4, c => RequestEquip((int)c[2]));
             On(3, 5, c => Unequip((int)c[2]));
             On(4, 4, c => DestroyItem((int)c[1], (int)c[2], (int)c[3]));
             // No ground loot yet: dropping destroys (the sewers' pillar props up the bridge where it's dropped).
@@ -142,10 +142,10 @@ namespace GSOOffline
 
         // ---- mutations -----------------------------------------------------------------------
 
-        private ItemSave NewItem(ItemTemplate t, int amount)
+        private ItemSave NewItem(ItemTemplate t, int amount, bool announceGrade = true)
         {
             // Gear rolls its grade around the item's base grade (stacking resources keep theirs), as on the original server.
-            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.Stacks ? t.baseGrade : RollNewItemGrade(t.baseGrade) };
+            var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.Stacks ? t.baseGrade : RollNewItemGrade(t.baseGrade, announceGrade) };
             foreach (var r in t.stats)
                 it.stats.Add(new ItemStat { key = r.key, value = Random.Range(Mathf.Min(r.min, r.max), Mathf.Max(r.min, r.max) + 1) });
             return it;
@@ -227,6 +227,49 @@ namespace GSOOffline
             RemoveFromStack(it, Mathf.Clamp(amount, 1, it.amount));
         }
 
+        /// <summary>3/4: the player equips an item from the bag, if they have the level it asks for.</summary>
+        private void RequestEquip(int itemId)
+        {
+            var it = FindItem(itemId);
+            if (it == null || character == null) return;
+            string why = MissingEquipRequirement(it.typeId);
+            if (why != null)
+            {
+                Plugin.Log.LogInfo($"[inventory] equip refused: {ItemData.Get(it.typeId)?.name} ({it.typeId}): {why}");
+                Notice(why, "red");
+                return;
+            }
+            Equip(itemId);
+        }
+
+        /// <summary>
+        /// The original server's hasRequirementsToEquipItem: gear (type ids below 10000) asks for its item level in
+        /// the skill the client's Scr_ItemHandler says it needs (the item tooltip shows the same), or in combat level.
+        /// Null when the item can be worn. The original's title and honor items (bishop's mitre, Yin and Yang...) are
+        /// left out: there are no titles or honor offline.
+        /// </summary>
+        private string MissingEquipRequirement(int typeId)
+        {
+            if (typeId <= 0 || typeId >= 10000) return null;
+            int level = ItemData.Get(typeId)?.level ?? 0;
+            if (level <= 1) return null;
+            var h = Scr_ItemHandler.instance;
+            if (h == null) return null;
+            const string skillTooLow = "You don't have the level required to equip this item.";
+            if (h.requiresCombatLevel(typeId) && CombatLevel() < level) return "You don't have the combat level required to equip this item.";
+            if (h.requiresSwordsmanship(typeId) && SkillLevel(15) < level) return skillTooLow;
+            if (h.requiresArchery(typeId) && SkillLevel(17) < level) return skillTooLow;
+            if (h.requiresFencing(typeId) && SkillLevel(16) < level) return skillTooLow;
+            if (h.requiresMacefighting(typeId) && SkillLevel(18) < level) return skillTooLow;
+            if (h.requiresLightArmor(typeId) && SkillLevel(25) < level) return skillTooLow;
+            if (h.requiresHeavyArmor(typeId) && SkillLevel(26) < level) return skillTooLow;
+            if (h.requiresElementalgrim(typeId) && SkillLevel(20) < level) return skillTooLow;
+            if (h.requiresMentalgrim(typeId) && SkillLevel(21) < level) return skillTooLow;
+            if (h.requiresHealing(typeId) && SkillLevel(24) < level) return skillTooLow;
+            if (h.requiresElementalOrMentalgrim(typeId) && SkillLevel(20) < level && SkillLevel(21) < level) return skillTooLow;
+            return null;
+        }
+
         private void Equip(int itemId)
         {
             var it = FindItem(itemId);
@@ -250,6 +293,14 @@ namespace GSOOffline
             // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the
             // "Switch weapon" key). The client has no other way to fill that slot, so the old server did this.
             if (t.slot != "Weapon") return;
+            // A gathering tool taken out of the hand goes back in the bag instead, while a real weapon is on the
+            // back: equipping a weapon (or another tool) after harvesting must not push the fighting weapon off.
+            var back = SecondaryWeapon();
+            if (replaced != null && IsAnyTool(replaced.typeId) && back != null && !IsAnyTool(back.typeId))
+            {
+                Plugin.Log.LogInfo($"[inventory] {ItemData.Get(replaced.typeId)?.name} back in the bag; {ItemData.Get(back.typeId)?.name} stays on the back");
+                return;
+            }
             if (replaced != null) SetSecondaryWeapon(replaced);
             else if (it.id == character.secondaryWeaponId) SetSecondaryWeapon(null);
         }
@@ -373,6 +424,7 @@ namespace GSOOffline
         public void AddXp(int skillId, int amount)
         {
             if (character == null || amount <= 0 || !SkillById.TryGetValue(skillId, out var key)) return;
+            amount = Mathf.Max(1, Mathf.RoundToInt(amount * DeathTollXpMultiplier()));
             int before = LevelFromXp(character.GetXp(key));
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);

@@ -138,6 +138,83 @@ namespace GSOOffline
 
         private static void DespawnObj(string[] args) => Scr_SpawnedObjectHandler.instance.RemoveSpawnedObject(int.Parse(args[1]));
 
+        // houses: the house objects the client holds (Scr_HouseHandler.houses), with their doors.
+        private static void Houses(string[] args)
+        {
+            foreach (var h in Scr_HouseHandler.instance.houses)
+            {
+                if (h == null) continue;
+                Plugin.Log.LogInfo($"[dev] house {h.id} type {h.typeid} size {h.size} '{h.houseName}' at {SceneWorld.Vec(h.transform.position)}"
+                    + $" door {(h.door != null ? SceneWorld.Vec(h.door.transform.position) : "none")} furniture {h.furniture.Count}");
+            }
+            Plugin.Log.LogInfo($"[dev] {Scr_HouseHandler.instance.houses.Count} house objects");
+        }
+
+        // fakeplayer spawn|move dx dz|attack id|stop|hit n|die|anim json|gone: a client-side "other player" next to
+        // you, driven straight through the client's receivers (spike for the bounty board, #67).
+        private const string FakeName = "Garrick";
+        private static int fakeHp = 300;
+        private static void FakePlayer(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var ph = Scr_PlayerHandler.instance;
+            var me = ph.player.transform.position;
+            switch (args[1])
+            {
+                case "spawn":
+                    fakeHp = 300;
+                    var p = me + ph.player.transform.forward * 4f;
+                    // name_hp_max_equips_x,y,z_gender_hair_body_eyebrow_r_g_b_size_pvp_criminal_title_bounty_guild_secondary_emblem_bg_color
+                    string entry = string.Join("_", new[] { FakeName, "300", "300", args.Length > 2 ? args[2] : "183,60,61,62",
+                        ((int)p.x) + "," + ((int)p.y) + "," + ((int)p.z), "0", "15", "0", "0", "60", "40", "20", "100", "0", "0", "", "0", "{}", "", "0", "0", "0" });
+                    ph.updateVisiblePlayers(entry);
+                    ph.updatePlayerLocRot(FakeName, p, 0);
+                    break;
+                case "move":
+                    var o = ph.getOtherPlayer(FakeName);
+                    var to = o.transform.position + new UnityEngine.Vector3(float.Parse(args[2], inv), 0f, float.Parse(args[3], inv));
+                    int rot = (int)(UnityEngine.Mathf.Atan2(to.x - o.transform.position.x, to.z - o.transform.position.z) * UnityEngine.Mathf.Rad2Deg);
+                    ph.updatePlayerLocRot(FakeName, to, rot);
+                    break;
+                case "attack": ph.setPlayerAttackId(FakeName, int.Parse(args[2])); break;
+                case "stop": ph.stopPlayerAttack(FakeName); break;
+                case "hit":
+                    int n = int.Parse(args[2]);
+                    fakeHp -= n;
+                    ph.takeDamage(FakeName, -n, 0);
+                    ph.updatePlayerHealth(FakeName, fakeHp, 300);
+                    break;
+                case "die": ph.setPlayerDead(FakeName, true); break;
+                case "anim": ph.UpdateAnimations(FakeName + "," + string.Join(" ", args, 2, args.Length - 2)); break;
+                case "myanim":   // the local player's animation packet (Scr_Animator.SendAnimations), as a template
+                    var an = ph.player.anim;
+                    var a = an.animator;
+                    string json = UnityEngine.JsonUtility.ToJson(new Scr_Animator.AnimationPacket
+                    {
+                        f1 = a.GetFloat("ForwardSpeed"), i1 = a.GetInteger("ActionID"), b1 = a.GetBool("Combat"), f8 = a.GetFloat("MovingDirection"),
+                        b2 = a.GetBool("Jumping"), b3 = a.GetBool("Dead"), i5 = a.GetInteger("CustomMoveAnim"),
+                        f3 = a.GetLayerWeight(0), f4 = a.GetLayerWeight(2), f5 = a.GetLayerWeight(3), f6 = a.GetLayerWeight(4), f9 = a.GetLayerWeight(1), f10 = a.GetLayerWeight(5),
+                        i3 = (int)ph.player.characterModel.transform.localEulerAngles.y, i4 = an.attackId, f7 = a.GetFloat("HorizontalSpeed"),
+                    });
+                    Plugin.Log.LogInfo("[dev] myanim " + json);
+                    break;
+                case "gone": ph.updateVisiblePlayers(string.Empty); break;
+            }
+            var f = ph.getOtherPlayer(FakeName);
+            Plugin.Log.LogInfo($"[dev] fakeplayer {args[1]}: {(f != null ? SceneWorld.Vec(f.transform.position) + " hp " + f.currentHealth + "/" + f.maxHealth + " dead " + f.dead : "none")}");
+        }
+
+        // bountyreset: a fresh bounty board. bountyhere <style 0-4> <level>: an outlaw 8 m away (0 swordsman,
+        // 1 two-hander, 2 archer, 3 crossbowman, 4 fire mage).
+        private static void BountyReset(string[] args) => OfflineServer.Instance.DevBountyReset();
+        private static void Outlaws(string[] args) => OfflineServer.Instance.DevOutlaws();
+
+        // riskinfo: what the risk-zone "?" button does (Menucontroller): the scroll notification with the risk zones
+        // text, which RiskZoneInfoPatch turns into the active bounties.
+        private static void RiskInfo(string[] args) =>
+            Script_WindowController.instance.createScrollNotification("Information", "Risk zones:\n\nBlue\n- No PvP", 600);
+        private static void BountyHere(string[] args) => OfflineServer.Instance.DevBountyHere(int.Parse(args[1]), int.Parse(args[2]));
+
         // interactablesnear [radius]: every scene interactable within radius of the player (default 150 m), active or not.
         private static void InteractablesNear(string[] args)
         {

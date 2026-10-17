@@ -27,6 +27,7 @@ namespace GSOOffline
             if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
             if (ResumeSightseeing(npc)) return;
             if (LakhmuInteractNpc(npc)) return;
+            if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll
             dialogueNpc = npc;
             Send(3, 10, character.name, uid);
 

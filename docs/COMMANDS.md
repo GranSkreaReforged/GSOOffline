@@ -43,7 +43,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `npcbounds [n]` | The nearest *n* NPCs: rendered size, feet height above the ground, animation playing |
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
-| `building [n]` | Lists doors.json's buildings (Yorkhill's shops and houses), or goes into building *n* as clicking its door would; a door inside leads back out |
+| `building [n]` | Lists doors.json's buildings (Yorkhill's and its harbour's shops and houses, Myra's hut), or goes into building *n* as clicking its door would; a door inside leads back out |
 | `doorsigns` | Every shop sign in the scene with the three nearest doors, to tell which building a door belongs to |
 | `hover <npc uid>` / `hover obj <typeId>` / `hover off` | Acts as if the mouse cursor were over that NPC or the nearest object of that type, for the Interact key |
 | `interactprompt [press]` | What the Interact key (F) would use now, and the NPCs and objects within 8 m; `press` uses it as F would |

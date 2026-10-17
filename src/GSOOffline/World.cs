@@ -36,6 +36,10 @@ namespace GSOOffline
         // scripted NPCs (Aellope, OfflineServer.Harpy.cs)
         public bool flying;       // in the air: its script moves and animates it, the ground AI leaves it alone
         public bool ownRespawn;   // its script brings it back, not the respawn timer
+
+        // the next blow of a bounty outlaw's ability (OfflineServer.Bounties.cs)
+        public float blowPower = 1f;
+        public int blowProjectile;
     }
 
     public class HarvestableEntity
