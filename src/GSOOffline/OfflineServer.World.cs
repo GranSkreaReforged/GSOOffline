@@ -44,6 +44,7 @@ namespace GSOOffline
             ResetPoacherDungeon();
             ResetSewersAndCoral();
             ResetHousing();
+            ResetBounties();
             lastNpcList = lastHarvestableList = lastQuestObjects = null;
             // Tell the client, or it keeps playing the gathering animation in the next zone.
             CancelJob("changing zone");
@@ -139,6 +140,7 @@ namespace GSOOffline
             GameData.EnsureLoaded();
             world = SceneWorld.Build(current.id, current.sceneName);
             AddHarpyToWorld();
+            SyncBountyActors();
             LoadFerries(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
@@ -171,6 +173,7 @@ namespace GSOOffline
             {
                 eventsAnnounced = true;
                 AnnounceSeasonalEvents();
+                AnnounceActiveBounties();
             }
             SendWayshrines();
             SendPendingEquips();
@@ -219,7 +222,8 @@ namespace GSOOffline
 
             SendQuestObjects();
             SendVisibleHouses();
-            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, NpcShown);
+            string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, n => NpcShown(n) && !bountyByUid.ContainsKey(n.uid));
+            SendVisibleBounties(p);
             if (npcs != lastNpcList)
             {
                 lastNpcList = npcs;
@@ -303,6 +307,7 @@ namespace GSOOffline
         {
             if (character == null) return;
             int typeId = (int)c[2];
+            if (HandleBountyBoard(typeId)) return;   // a wanted board
             if (HandleSewerInteract(typeId)) return;     // the sewers' pillar
             if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door

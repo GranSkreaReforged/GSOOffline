@@ -92,6 +92,26 @@ namespace GSOOffline
     }
 
     [Serializable]
+    public class BountySave
+    {
+        public int id;
+        public string name;
+        public int level;
+        public int style;              // OfflineServer.BountyStyle
+        public int gender, hair, body, eyebrow, hairR, hairG, hairB;
+        public int scene;
+        public float x, y, z;          // where it waits
+        public string lastSeen;
+        public int silver;
+        public int murders;
+        public long createdAt;         // unix seconds: an hour later it leaves the board, unless started
+        public bool started;           // you took the bounty on: only then does the outlaw wait in the world
+        public int abilityChance;      // percent per swing it uses an ability (its temperament)
+        public float kiteDistance;     // shooters back off when you come closer than this
+        public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death
+    }
+
+    [Serializable]
     public class KillCount
     {
         public int npc;
@@ -147,6 +167,9 @@ namespace GSOOffline
         public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)
         public float deathTollSeconds;          // playing time left on it
         public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // gear dropped on death, until fetched
+        public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
+        public long bountyRefreshAt;      // unix seconds: the board fills up again then
+        public int nextBountyId;
 
         public int GetKills(int npc)
         {

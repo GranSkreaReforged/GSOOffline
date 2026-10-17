@@ -62,6 +62,7 @@ namespace GSOOffline
             RegisterBoatHandlers();
             RegisterOysterHandlers();
             RegisterHousingHandlers();
+            RegisterBountyHandlers();
             RegisterItemCombos();
         }
 
@@ -89,6 +90,7 @@ namespace GSOOffline
         /// <summary>Queue a server->client event. data[0] must be the int sub-opcode.</summary>
         public void Send(byte ev, params object[] data)
         {
+            if (TranslateBountySend(ev, data)) return;   // NPC messages about a bounty outlaw, drawn as a player
             outbox.Enqueue(new Outgoing { ev = ev, data = data });
         }
 
@@ -125,6 +127,7 @@ namespace GSOOffline
             TickOysters();
             TickHousing();
             TickDeathToll();
+            TickBounties();
             TickHarpoons();
             TickAutoLogin();
         }

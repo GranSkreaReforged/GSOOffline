@@ -51,6 +51,22 @@ namespace GSOOffline
         public const int DeathTollMaxStacks = 5, DeathTollDropFromStack = 4;
         public const float DeathDropChance = 0.5f, DeathDropOne = 0.6f, DeathDropTwo = 0.3f;
         public static readonly int[] DeathCleanseFee = { 100, 300, 500, 800, 1000 };
+        // Bounty board (issue #67): 3 to 5 outlaws within 5 levels of your combat level, the board topped up
+        // every 15 minutes and an outlaw not taken on gone after an hour. They are tougher than a creature of their level (they
+        // stand in for a player); their hits and defences come from their gear. Each ability every 4th swing.
+        public const int BountyMin = 3, BountyMax = 5, BountyLevelRange = 5;
+        public const long BountyLifetimeSeconds = 3600, BountyRefreshSeconds = 900;
+        public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f, BountyLootSeconds = 900f;
+        public const int BountyAccuracy = 60, BountyMinLevel = 3;
+        // Each outlaw's temperament: 15-35% of its swings an ability, shooters keeping 5-10 m away.
+        public const int BountyAbilityChanceMin = 15, BountyAbilityChanceMax = 35;
+        public const float BountyKiteMin = 5f, BountyKiteMax = 10f;
+        public const float BountyStep = 2.5f;   // metres per half-second waypoint: a running player
+        public const float BountyKiteCooldown = 8f;   // a shooter backs off at most this often
+        public static int BountyHealth(int level) => NpcHealth(level) * 3;
+        // 50 per level plus 8 x level^1.5 (about 900 at 10, 4,900 at 40, 8,300 at 60), 5% more per level above yours.
+        public static int BountySilver(int level, int combatLevel) =>
+            Mathf.RoundToInt((50f * level + 8f * Mathf.Pow(level, 1.5f)) * (1f + 0.05f * Mathf.Max(0, level - combatLevel)));
         // The explosive potion and black candy: the fuse and reach are the original's; the blow (times the hit of
         // your alchemy level and gear) and the share of your own health if you stay too close are reconstructions.
         public const float ExplosiveFuse = 3f, ExplosionRadius = 6f, ExplosionHitPower = 3f, ExplosionSelfShare = 0.3f;
@@ -509,6 +525,8 @@ namespace GSOOffline
                 if (through > 1.01f) npc.hitSplash = SplashWeakened;   // hit a weakness
                 damage *= through;
             }
+            int outlaw = BountyBlockedHit(npc, damage);   // a bounty outlaw blocks as a player does
+            if (outlaw >= 0) return outlaw;
             return Mathf.Max(1, Mathf.RoundToInt(damage) - info.damageBlock / 10);
         }
 
@@ -691,6 +709,7 @@ namespace GSOOffline
         {
             var c = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(npc.uid) : null;
             if (c != null) npc.pos = c.transform.position;
+            else if (BountyTransform(npc) is Transform outlaw) npc.pos = outlaw.position;   // drawn as a player
             return npc.pos;
         }
 
@@ -718,9 +737,10 @@ namespace GSOOffline
         {
             if (Time.time < npc.nextWaypoint || Time.time < npc.rootedUntil || Time.time < npc.stunnedUntil) return;
             var c = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpc(npc.uid) : null;
-            if (c == null) return;
+            Transform body = c != null ? c.transform : BountyTransform(npc);   // a bounty outlaw is drawn as a player
+            if (body == null) return;
             npc.nextWaypoint = Time.time + 0.5f;
-            Vector3 from = c.transform.position;
+            Vector3 from = body.position;
             npc.pos = from;
             Vector3 flat = npc.dest - from;
             flat.y = 0f;
@@ -732,8 +752,10 @@ namespace GSOOffline
                 Send(13, 2, npc.uid, false);
                 return;
             }
-            float step = Mathf.Min(dist, Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed));   // about a second of walking
-            if (!TryStep(npc, from, flat / dist, step, dist, out var to) && !Detour(npc, from, flat / dist, step, dist, out to))
+            // About a second of walking; an outlaw half a second, the most the client's other-player smoothing follows.
+            float step = Mathf.Min(dist, c != null ? Mathf.Max(2f, c.walking ? c.walkspeed : c.movementSpeed) : CombatRules.BountyStep);
+            bool asPlayer = c == null;   // a bounty outlaw moves by a player's rules (OutlawBlocked)
+            if (!TryStep(npc, from, flat / dist, step, dist, out var to, asPlayer) && !Detour(npc, from, flat / dist, step, dist, out to, asPlayer))
             {
                 // Walled in: stop rather than walk through. A return home ends here.
                 npc.hasDest = false;
@@ -752,16 +774,20 @@ namespace GSOOffline
         /// The waypoint one step from from in direction dir, on the ground, unless the step runs into something.
         /// The last step straight at the destination ends on it exactly.
         /// </summary>
-        private static bool TryStep(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        private static bool TryStep(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to, bool asPlayer = false)
         {
             to = npc.dest;
-            if (Blocked(from, dir, step)) return false;
-            if (step >= dist) return !Inside(to);
+            if (asPlayer ? OutlawBlocked(from, dir, step) : Blocked(from, dir, step)) return false;
+            if (step >= dist)
+            {
+                if (asPlayer && GroundAt(to, to.y + 2.5f, 12f, out var end)) to = end;
+                return asPlayer ? OutlawCanStand(from, to, step) : !Inside(to);
+            }
             to = from + dir * step;
             to.y = Mathf.Lerp(from.y, npc.dest.y, step / dist);
             float top = Mathf.Max(from.y, npc.dest.y) + 2.5f;
             if (GroundAt(to, top, top - Mathf.Min(from.y, npc.dest.y) + 8f, out var ground)) to = ground;
-            return !Inside(to);
+            return asPlayer ? OutlawCanStand(from, to, step) : !Inside(to);
         }
 
         /// <summary>
@@ -792,7 +818,7 @@ namespace GSOOffline
         }
 
         /// <summary>A step around an obstacle, nearest direction first, keeping to the side last used.</summary>
-        private static bool Detour(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to)
+        private static bool Detour(NpcEntity npc, Vector3 from, Vector3 dir, float step, float dist, out Vector3 to, bool asPlayer = false)
         {
             if (npc.detourSide == 0) npc.detourSide = Random.value < 0.5f ? 1 : -1;
             foreach (float angle in new[] { 35f, 70f, 105f, 140f })
@@ -800,7 +826,7 @@ namespace GSOOffline
                 {
                     int sign = side == 0 ? npc.detourSide : -npc.detourSide;
                     // A sideways step is never the last one, so it doesn't end on the destination.
-                    if (!TryStep(npc, from, Quaternion.Euler(0f, angle * sign, 0f) * dir, step, float.MaxValue, out to)) continue;
+                    if (!TryStep(npc, from, Quaternion.Euler(0f, angle * sign, 0f) * dir, step, float.MaxValue, out to, asPlayer)) continue;
                     npc.detourSide = sign;
                     return true;
                 }
@@ -937,6 +963,8 @@ namespace GSOOffline
                     continue;
                 }
 
+                if (BountyKites(npc, pos, playerPos)) continue;   // outlaw shooters keep their distance
+
                 // Ranged NPCs (a projectile and a share of attacks that use it) fight from projectileattackdistance.
                 bool ranged = info.projectile > 0 && info.projectileRate > 0;
                 float reach = ranged ? Mathf.Max(info.attackDistance, info.projectileDistance) : info.attackDistance;
@@ -965,6 +993,7 @@ namespace GSOOffline
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
                 NpcSound(npc, info.sfxAttack);
+                BountyPrepareSwing(npc);
                 bool shoot = ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate);
                 var attacker = npc;
                 var attackerInfo = info;
@@ -982,7 +1011,7 @@ namespace GSOOffline
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({npc.typeId}) {(shoot ? "shoots" : "swings")} from {Vector3.Distance(NpcPosition(npc), player.transform.position):0.0} m");
             if (shoot)
             {
-                NpcShoots(npc, info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
+                NpcShoots(npc, npc.blowProjectile > 0 ? npc.blowProjectile : info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
                 return;
             }
             // Stepping out of reach during the wind-up dodges the blow.
@@ -1000,7 +1029,7 @@ namespace GSOOffline
             if (Random.value < CombatRules.NpcHitChance(info.accuracy))
             {
                 // Your resistance to the blow's kind, then your damage block against every blow, whatever its kind.
-                float roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1);
+                float roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1) * (attacker != null ? attacker.blowPower : 1f);
                 if (info.damageType > 0 && info.damageType < DamageKinds.Count)
                     roll *= 1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(info.damageType)));
                 int block = GearStat("Damageblock");
