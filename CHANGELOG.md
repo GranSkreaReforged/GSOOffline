@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.7.0] - 2026-10-17
 ### Added
 - The wanted boards (Grimwall, Yorkhill, Goldon, the Blue Sea, Bal Sardan town) post bounties on outlaws, since there are no players to hunt (#67):
   - **The board** lists 3 to 5 outlaws within 5 levels of your combat level, above or below. Each entry gives the outlaw's level and fighting style (swordsman, two-hander, archer, crossbowman, fire mage), what they wear, their bounty, and where they were last seen ("East Athagos, about 300 m west of the East Athagos wayshrine, among Wolves (level 5)"). Press "Add bounty" on an outlaw's line to take the bounty on: only then do they wait in the world, and they stay until you get them. The board fills up every 15 minutes; an outlaw nobody took on leaves after an hour.
