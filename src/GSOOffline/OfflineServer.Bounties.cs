@@ -448,7 +448,7 @@ namespace GSOOffline
             }
             if (best == null) return;
             var pick = ties[Random.Range(0, ties.Count)];
-            var it = NewItem(pick, 1);
+            var it = NewItem(pick, 1, announceGrade: false);   // the outlaw's, not yours: no "You received a rare item!"
             it.equipped = true;
             gear.Add(it);
         }
