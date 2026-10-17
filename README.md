@@ -133,11 +133,13 @@ Working:
 - Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
 - Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
-- Doors, dungeon entrances and interiors
+- Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
 - Bank
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild
 - Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
+- Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
+- Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)
 - Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
 - Light and heavy armor XP, shared from kills made shortly after being hit
 - Potions, food, experience scrolls, teleport scrolls and gear crates
@@ -158,7 +160,6 @@ Partially working:
 Not yet implemented:
 - Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
-- Building doors pick one shared spot in each interior scene, because the per-door room mapping is lost
 
 Loot comes from the original server's drop tables (`Loot.xml`, sent by the game's developer, from about update 136), turned into `src/GSOOffline/Data/droptables.json` by GSODevTools' `gen_droptables.py` and rolled as the original rolled them: each drop on its own, 1 in its rate. Every creature can also drop an upgrade or grade stone and a gear crate for its level, by the original's formulas. Creatures added after that snapshot (Bruno, Betsy, Lakhar, Lydia, Jotnar, Argus, the Elder Ent...) and the boss uniques and pets of updates 137-140 come from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA) and the official patch notes on Steam, in `src/GSOOffline/Data/loot.json` (`gen_loot.py`); the wiki names how rare drops were but not the rates, so those are reconstructed chances, and such a creature without a wiki entry drops silver by level.
 
