@@ -25,7 +25,9 @@ namespace GSOOffline
         private const int WindowWantedBoard = 36, InteractWantedBoard = 43;
         private const int BountyTypeBase = 95000, BountyUidBase = 7600000;
         private const int ItemSmallXpScroll = 10327;
-        private const float BountyKiteDistance = 7f, BountyBodySeconds = 30f;
+        private const float BountyBodySeconds = 30f;
+        // The boss name tag every boss in NPCInfo wears: eyes either side of the name (emblem) on a banner (emblemBg).
+        private const int BossEmblem = 156, BossEmblemBg = 244;
 
         private enum BountyStyle { Swordsman, Brute, Archer, Crossbowman, FireMage }
 
@@ -98,6 +100,7 @@ namespace GSOOffline
             public int swings;
             public float nextKiteAt;      // backing off has a cooldown: in between it stands and fights
             public Vector3 lastClear;     // where it last stood with nothing through its body
+            public int lastAbility = -1;
             public float removeAt = -1f;  // dead: the body goes after a while
         }
 
@@ -212,7 +215,7 @@ namespace GSOOffline
         private BountySave MakeBounty()
         {
             int cl = CombatLevel();
-            int wanted = Mathf.Clamp(cl + Random.Range(CombatRules.BountyLevelBelow, CombatRules.BountyLevelAbove + 1), 1, 100);
+            int wanted = Mathf.Clamp(cl + Random.Range(CombatRules.BountyLevelBelow, CombatRules.BountyLevelAbove + 1), CombatRules.BountyMinLevel, 100);
             // A spot whose creatures are all within 5 levels of the outlaw, not taken by another bounty.
             var free = BountySpots.FindAll(s => !character.bounties.Exists(b => b.scene == s.scene
                 && Vector3.Distance(new Vector3(b.x, b.y, b.z), SpotPos(s)) < 60f));
@@ -228,8 +231,12 @@ namespace GSOOffline
                 spot = free[Random.Range(0, Mathf.Min(3, free.Count))];
                 level = Mathf.Clamp(wanted, spot.maxLevel - 5, spot.minLevel + 5);
             }
-            level = Mathf.Clamp(level, 1, 100);
-            var style = (BountyStyle)Random.Range(0, StyleNames.Length);
+            level = Mathf.Clamp(level, CombatRules.BountyMinLevel, 100);
+            // A style nobody on the board has yet, if there is one.
+            var unused = new List<int>();
+            for (int i = 0; i < StyleNames.Length; i++)
+                if (!character.bounties.Exists(o => o.style == i)) unused.Add(i);
+            var style = (BountyStyle)(unused.Count > 0 ? unused[Random.Range(0, unused.Count)] : Random.Range(0, StyleNames.Length));
             Vector2 off = Random.insideUnitCircle * 6f;
             Vector3 pos = SpotPos(spot) + new Vector3(off.x, 0f, off.y);
             var b = new BountySave
@@ -243,6 +250,7 @@ namespace GSOOffline
                 murders = Random.Range(1, 3 + level / 4),
                 createdAt = UnixNow,
             };
+            RollTemperament(b);
             b.gear = RollBountyGear(style, level);
             b.silver = CombatRules.BountySilver(level, cl);
             string among = spot.creatures.Count > 0 ? string.Join(" and ", spot.creatures.ConvertAll(Plural).ToArray()) : "creatures";
@@ -442,37 +450,69 @@ namespace GSOOffline
         {
             if (!bountyByUid.TryGetValue(npc.uid, out var a) || !a.ranged) return false;
             if (npc.hasDest && Time.time < a.nextKiteAt) return true;   // still backing off
-            if (Time.time < a.nextKiteAt || Time.time < npc.rootedUntil || Vector3.Distance(pos, playerPos) >= BountyKiteDistance) return false;
+            float keep = a.save.kiteDistance > 0f ? a.save.kiteDistance : 7f;
+            if (Time.time < a.nextKiteAt || Time.time < npc.rootedUntil || Vector3.Distance(pos, playerPos) >= keep) return false;
             a.nextKiteAt = Time.time + CombatRules.BountyKiteCooldown;
             Vector3 away = pos - playerPos;
             away.y = 0f;
             if (away.sqrMagnitude < 0.01f) away = Vector3.forward;
-            MoveNpc(npc, pos + away.normalized * (BountyKiteDistance + 2f));
+            MoveNpc(npc, pos + away.normalized * (keep + 2f));
             return true;
         }
 
+        /// <summary>An outlaw ability: a blow this much stronger, maybe with its own projectile and an effect on you.</summary>
+        private class OutlawAbility
+        {
+            public string name;
+            public float power;
+            public int projectile, gfx;
+
+            public OutlawAbility(string name, float power, int projectile = 0, int gfx = 0)
+            {
+                this.name = name; this.power = power; this.projectile = projectile; this.gfx = gfx;
+            }
+        }
+
+        // Per style, after the player abilities they're named for (projectiles from XMLs/Projectiles).
+        private static readonly OutlawAbility[][] StyleAbilities =
+        {
+            new[] { new OutlawAbility("Brutal slash", 1.8f, gfx: 18), new OutlawAbility("Lunge", 1.5f), new OutlawAbility("Cripple", 1.4f) },   // swordsman
+            new[] { new OutlawAbility("Crushing blow", 2f, gfx: 18), new OutlawAbility("Whirlwind", 1.6f), new OutlawAbility("Sunder", 1.7f) },  // two-hander
+            new[] { new OutlawAbility("Piercing shot", 1.8f, 20), new OutlawAbility("Flame arrow", 1.6f, 11), new OutlawAbility("Venom arrow", 1.5f, 46) },   // archer
+            new[] { new OutlawAbility("Wounding shot", 1.8f, 56), new OutlawAbility("Explosive bolt", 1.9f, 10), new OutlawAbility("Piercing shot", 1.7f, 20) },   // crossbowman
+            new[] { new OutlawAbility("Fire ball", 2f, 1), new OutlawAbility("Flame lance", 1.8f, 27), new OutlawAbility("Fire arrows", 1.5f, 41) },   // fire mage
+        };
+
         /// <summary>
-        /// Every few swings the outlaw uses an ability of its style: a stronger blow, with its own projectile for the
-        /// shooters. Sets the swing's power and projectile; the hit uses them (<see cref="NpcEntity.blowPower"/>).
+        /// Each outlaw fights its own way: how often it reaches for an ability, and (shooters) how close it lets you
+        /// come before backing off.
+        /// </summary>
+        private static void RollTemperament(BountySave b)
+        {
+            b.abilityChance = Random.Range(CombatRules.BountyAbilityChanceMin, CombatRules.BountyAbilityChanceMax + 1);
+            b.kiteDistance = Random.Range(CombatRules.BountyKiteMin, CombatRules.BountyKiteMax);
+        }
+
+        /// <summary>
+        /// Before each swing: maybe an ability (its own chance per swing), any of its style's but never the same one
+        /// twice running. Sets the swing's power and projectile; the hit uses them (NpcEntity.blowPower).
         /// </summary>
         private void BountyPrepareSwing(NpcEntity npc)
         {
             if (!bountyByUid.TryGetValue(npc.uid, out var a)) return;
             npc.blowPower = 1f;
             npc.blowProjectile = 0;
-            if (++a.swings % CombatRules.BountyAbilityEvery != 0) return;
-            string ability;
-            int gfx = 0;
-            switch ((BountyStyle)a.save.style)
-            {
-                case BountyStyle.Swordsman: ability = "Brutal slash"; npc.blowPower = 1.8f; gfx = 18; break;
-                case BountyStyle.Brute: ability = "Crushing blow"; npc.blowPower = 2f; gfx = 18; break;
-                case BountyStyle.Archer: ability = "Piercing shot"; npc.blowPower = 1.8f; npc.blowProjectile = 20; break;
-                case BountyStyle.Crossbowman: ability = "Wounding shot"; npc.blowPower = 1.8f; npc.blowProjectile = 56; break;
-                default: ability = "Fire ball"; npc.blowPower = 2f; npc.blowProjectile = 1; break;
-            }
-            Notice($"{a.save.name} uses {ability}!", "orange");
-            if (gfx > 0) Later(0.5f, () => PlayPlayerEffect(gfx));
+            int chance = a.save.abilityChance > 0 ? a.save.abilityChance : 25;
+            if (++a.swings < 2 || Random.Range(0, 100) >= chance) return;   // never on the opening swing
+            var pool = StyleAbilities[Mathf.Clamp(a.save.style, 0, StyleAbilities.Length - 1)];
+            int pick = Random.Range(0, pool.Length);
+            if (pick == a.lastAbility && pool.Length > 1) pick = (pick + Random.Range(1, pool.Length)) % pool.Length;
+            a.lastAbility = pick;
+            var ability = pool[pick];
+            npc.blowPower = ability.power;
+            npc.blowProjectile = a.ranged ? ability.projectile : 0;
+            Notice($"{a.save.name} uses {ability.name}!", "orange");
+            if (ability.gfx > 0) Later(0.5f, () => PlayPlayerEffect(ability.gfx));
         }
 
         // ---- 2/8 and the message translation -------------------------------------------------
@@ -495,7 +535,8 @@ namespace GSOOffline
                 {
                     b.name, a.npc.health.ToString(), a.npc.maxHealth.ToString(), string.Join(",", equips.ToArray()),
                     (int)p.x + "," + (int)p.y + "," + (int)p.z, b.gender.ToString(), b.hair.ToString(), b.body.ToString(), b.eyebrow.ToString(),
-                    b.hairR.ToString(), b.hairG.ToString(), b.hairB.ToString(), "100", "0", "0", string.Empty, "0", "{}", string.Empty, "0", "0", "0",
+                    b.hairR.ToString(), b.hairG.ToString(), b.hairB.ToString(), "100", "0", "0", string.Empty, "0", "{}", string.Empty,
+                    BossEmblem.ToString(), BossEmblemBg.ToString(), "0",
                 }));
                 shown.Add(a);
             }
@@ -790,6 +831,7 @@ namespace GSOOffline
                 level = level, style = style, gender = Random.Range(0, 2), hair = Random.Range(0, 16), hairR = 120, hairG = 80, hairB = 40,
                 scene = character.scene, x = me.x + 8f, y = me.y, z = me.z, murders = 1, createdAt = UnixNow, lastSeen = "right here",
             };
+            RollTemperament(b);
             b.gear = RollBountyGear((BountyStyle)style, level);
             b.silver = CombatRules.BountySilver(level, CombatLevel());
             character.bounties.Add(b);

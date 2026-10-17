@@ -105,6 +105,8 @@ namespace GSOOffline
         public int silver;
         public int murders;
         public long createdAt;         // unix seconds: an hour later it leaves the board
+        public int abilityChance;      // percent per swing it uses an ability (its temperament)
+        public float kiteDistance;     // shooters back off when you come closer than this
         public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death
     }
 

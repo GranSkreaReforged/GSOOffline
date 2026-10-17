@@ -57,7 +57,10 @@ namespace GSOOffline
         public const int BountyMin = 3, BountyMax = 5, BountyLevelBelow = -3, BountyLevelAbove = 8;
         public const long BountyLifetimeSeconds = 3600, BountyRefreshSeconds = 900;
         public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f, BountyLootSeconds = 900f;
-        public const int BountyAccuracy = 60, BountyAbilityEvery = 4;
+        public const int BountyAccuracy = 60, BountyMinLevel = 3;
+        // Each outlaw's temperament: 15-35% of its swings an ability, shooters keeping 5-10 m away.
+        public const int BountyAbilityChanceMin = 15, BountyAbilityChanceMax = 35;
+        public const float BountyKiteMin = 5f, BountyKiteMax = 10f;
         public const float BountyStep = 2.5f;   // metres per half-second waypoint: a running player
         public const float BountyKiteCooldown = 8f;   // a shooter backs off at most this often
         public static int BountyHealth(int level) => NpcHealth(level) * 3;
