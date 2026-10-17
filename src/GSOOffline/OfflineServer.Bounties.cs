@@ -214,24 +214,32 @@ namespace GSOOffline
 
         private BountySave MakeBounty()
         {
+            // The outlaw's level stays within BountyLevelRange of your combat level, whatever the spot.
             int cl = CombatLevel();
-            int wanted = Mathf.Clamp(cl + Random.Range(CombatRules.BountyLevelBelow, CombatRules.BountyLevelAbove + 1), CombatRules.BountyMinLevel, 100);
+            int lowest = Mathf.Max(CombatRules.BountyMinLevel, cl - CombatRules.BountyLevelRange), highest = Mathf.Min(100, cl + CombatRules.BountyLevelRange);
+            int wanted = Random.Range(lowest, highest + 1);
             // A spot whose creatures are all within 5 levels of the outlaw, not taken by another bounty.
             var free = BountySpots.FindAll(s => !character.bounties.Exists(b => b.scene == s.scene
                 && Vector3.Distance(new Vector3(b.x, b.y, b.z), SpotPos(s)) < 60f));
             if (free.Count == 0) return null;
             var fits = free.FindAll(s => s.minLevel >= wanted - 5 && s.maxLevel <= wanted + 5);
-            BountySpot spot;
+            BountySpot spot = null;
             int level = wanted;
             if (fits.Count > 0) spot = fits[Random.Range(0, fits.Count)];
             else
             {
-                // None at that level: the closest spot, and an outlaw of a level that fits it.
+                // None at that level: the nearest spot whose creatures allow an outlaw level still within your range.
                 free.Sort((a, b) => Mathf.Abs(a.level - wanted).CompareTo(Mathf.Abs(b.level - wanted)));
-                spot = free[Random.Range(0, Mathf.Min(3, free.Count))];
-                level = Mathf.Clamp(wanted, spot.maxLevel - 5, spot.minLevel + 5);
+                foreach (var s in free)
+                {
+                    int lo = Mathf.Max(lowest, s.maxLevel - 5), hi = Mathf.Min(highest, s.minLevel + 5);
+                    if (lo > hi) continue;
+                    spot = s;
+                    level = Mathf.Clamp(wanted, lo, hi);
+                    break;
+                }
+                if (spot == null) return null;   // nowhere in the world for an outlaw of your level
             }
-            level = Mathf.Clamp(level, CombatRules.BountyMinLevel, 100);
             // A style nobody on the board has yet, if there is one.
             var unused = new List<int>();
             for (int i = 0; i < StyleNames.Length; i++)
