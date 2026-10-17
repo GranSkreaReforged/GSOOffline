@@ -25,6 +25,7 @@ namespace GSOOffline
         private const int WindowWantedBoard = 36, InteractWantedBoard = 43;
         private const int BountyTypeBase = 95000, BountyUidBase = 7600000;
         private const int ItemSmallXpScroll = 10327;
+        private const int SceneDeepheart = 35;
         private const float BountyBodySeconds = 30f;
         // The boss name tag every boss in NPCInfo wears: eyes either side of the name (emblem) on a banner (emblemBg).
         private const int BossEmblem = 156, BossEmblemBg = 244;
@@ -282,6 +283,8 @@ namespace GSOOffline
             long now = UnixNow;
             int before = character.bounties.Count;
             character.bounties.RemoveAll(b => !b.started && now - b.createdAt > CombatRules.BountyLifetimeSeconds && !BountyEngaged(b));
+            // Boards used to send outlaws to Deepheart, which was never released; those bounties are called off.
+            character.bounties.RemoveAll(b => b.scene == SceneDeepheart);
             bool changed = character.bounties.Count != before;
             if (now >= character.bountyRefreshAt)
             {
