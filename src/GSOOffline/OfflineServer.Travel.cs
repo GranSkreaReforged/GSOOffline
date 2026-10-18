@@ -50,6 +50,7 @@ namespace GSOOffline
     public partial class OfflineServer
     {
         private const int DoorInterior = 29, DoorInteriorExit = 28, DoorGeneric = 37, InteractChest = 43;
+        private const int DoorCoral = 42, CoralKey = 10400;
         private const float RoomReach = 25f;   // how far from a building's arrival point a door in its room can be
         private const int WindowBank = 14;
         private static DoorFile doorData;
@@ -118,6 +119,16 @@ namespace GSOOffline
             {
                 // An inn's room is left by its exit door (type 28), which goes back where the player came in.
                 if (door.type == DoorInterior) PushReturnPoint(p);
+                // The Coral dungeon takes a coral key, used up at the door, as in the original game (#82).
+                if (door.type == DoorCoral)
+                {
+                    if (TakeItems(CoralKey, 1) == 0)
+                    {
+                        Notice("It's locked. You need a coral key to open it.");
+                        return true;
+                    }
+                    Notice("You use the coral key to open the door. The key breaks in the process.");
+                }
                 UseDoor(door);
                 return true;
             }
