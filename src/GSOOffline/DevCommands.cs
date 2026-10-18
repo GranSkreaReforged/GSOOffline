@@ -699,6 +699,60 @@ namespace GSOOffline
         // bountypress <name start>: the wanted board's button on that outlaw's line (start the hunt, or abandon it).
         private static void BountyPress(string[] args) => OfflineServer.Instance.DevBoardPress(string.Join(" ", args, 1, args.Length - 1));
 
+        // gfxprobe: which particle shaders the build has, the particle materials in the scene, and what the local
+        // player's worn models are made of (for effects on gear).
+        private static void GfxProbe(string[] args)
+        {
+            foreach (var name in new[] { "Particles/Additive", "Legacy Shaders/Particles/Additive", "Particles/Alpha Blended", "Mobile/Particles/Additive", "Particles/Additive (Soft)", "Sprites/Default", "Unlit/Transparent" })
+                Plugin.Log.LogInfo($"[dev] shader '{name}': {(UnityEngine.Shader.Find(name) != null ? "yes" : "no")}");
+            var mats = new System.Collections.Generic.HashSet<string>();
+            foreach (var r in UnityEngine.Object.FindObjectsOfType<UnityEngine.ParticleSystemRenderer>())
+                if (r.sharedMaterial != null && mats.Add(r.sharedMaterial.name + " / " + r.sharedMaterial.shader.name) && mats.Count <= 25)
+                    Plugin.Log.LogInfo($"[dev] particle material '{r.sharedMaterial.name}' shader '{r.sharedMaterial.shader.name}' on {r.gameObject.name}");
+            var loader = Inventory.instance != null ? Inventory.instance.eqLoader : null;
+            if (loader == null) return;
+            foreach (var s in Inventory.instance.items)
+                if (s.item.currentlyEquipped)
+                    Plugin.Log.LogInfo($"[dev] worn {s.item.itemName} ({s.item.itemTypeID}, {s.item.itemSlot}): model {(UnityEngine.Resources.Load("1LoadingAssets/ab_eq_" + s.item.itemTypeID) != null ? "yes" : "none")}");
+            foreach (var s in loader.eqSlots)
+            {
+                if (s.instancedObject == null) continue;
+                foreach (var r in s.instancedObject.GetComponentsInChildren<UnityEngine.Renderer>(true))
+                    Plugin.Log.LogInfo($"[dev] slot {s.slot} item {s.itemTypeId}: {r.GetType().Name} '{r.name}' shader '{r.sharedMaterial?.shader.name}' bounds {r.bounds.size}");
+            }
+        }
+
+        // gearfx <grade>: shows that grade's shimmer on everything the player wears (0 = the real grades again).
+        private static void GearFx(string[] args)
+        {
+            int grade = int.Parse(args[1]);
+            var inv = Inventory.instance;
+            foreach (var s in inv.eqLoader.eqSlots)
+            {
+                if (s.instancedObject == null) continue;
+                var item = inv.getEquippedItem(s.slot);
+                GradeAura.Apply(s.instancedObject, grade > 0 ? grade : item != null ? item.itemGrade : 0);
+                foreach (var ps in s.instancedObject.GetComponentsInChildren<UnityEngine.ParticleSystem>())
+                    Plugin.Log.LogInfo($"[dev] gearfx {s.slot}: {ps.transform.parent.name} lossy {ps.transform.lossyScale} rate {ps.emission.rateOverTime.constant} size {ps.main.startSize.constantMax}");
+            }
+        }
+
+        // gearfxinfo: a few live sparkles of each worn piece: where they are (from the player) and how big.
+        private static void GearFxInfo(string[] args)
+        {
+            var me = Scr_PlayerHandler.instance.player.transform.position;
+            var buf = new UnityEngine.ParticleSystem.Particle[3];
+            foreach (var ps in UnityEngine.Object.FindObjectsOfType<UnityEngine.ParticleSystem>())
+            {
+                if (ps.name != "GSO grade aura") continue;
+                int n = ps.GetParticles(buf);
+                var r = ps.GetComponent<UnityEngine.ParticleSystemRenderer>();
+                Plugin.Log.LogInfo($"[dev] gearfx: {ps.particleCount} live, playing {ps.isPlaying}, at {ps.transform.position - me}, box {ps.shape.scale}, layer {ps.gameObject.layer}, rate {ps.emission.rateOverTime.constant}, renderer {r.enabled} material {r.sharedMaterial?.shader.name}");
+                for (int i = 0; i < n; i++)
+                    Plugin.Log.LogInfo($"[dev]   at {buf[i].position - me} size {buf[i].GetCurrentSize(ps)} colour {buf[i].GetCurrentColor(ps)}");
+            }
+        }
+
         // huntage <seconds>: takes that much playing time off every active bounty's hour.
         private static void HuntAge(string[] args) => OfflineServer.Instance.DevHuntAge(float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture));
 
