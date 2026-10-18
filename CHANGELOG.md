@@ -5,6 +5,12 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Fixed
+- Upgrading gear you're wearing (or using a grade stone on it) now updates its sparkles straight away; before, they only changed after re-equipping it or logging in again.
+
+### Changed
+- Gear sparkles are 50% bigger, and small pieces such as helmets and boots give off as many as a body piece, so a Mythic helmet clearly shows.
+
 ## [1.7.1] - 2026-10-18
 ### Added
 - Gear of Rare grade and better sparkles while you wear it: small sparkles in the grade's colour come off the piece where it's worn (helmet, weapon, armour, trousers, boots), more the better the grade. From Epic they drift upwards, and Mythic's colour wanders between red and gold. `GearEffects` in the config turns it off (#87).

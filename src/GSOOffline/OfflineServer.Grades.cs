@@ -150,6 +150,7 @@ namespace GSOOffline
             Send(198, 16, WireId(item), grade);
             if (item.equipped)
             {
+                GradeAura.Refresh(WireId(item), grade);
                 SendHealth();
                 SendMana();
                 SendGearStats();
