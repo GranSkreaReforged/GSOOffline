@@ -253,6 +253,8 @@ namespace GSOOffline
             WindowOpened(WindowBank);
         }
 
+        internal void DevOpenBank() => OpenBank();
+
         private void SendBank()
         {
             foreach (var it in character.bank)

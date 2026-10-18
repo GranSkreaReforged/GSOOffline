@@ -666,6 +666,9 @@ namespace GSOOffline
         // so the two orders must match; stacks must be id 0 on the client or their counts aren't drawn.
         private static void InvOrder(string[] args) => OfflineServer.Instance.CompareInventories();
 
+        // devbank: opens the bank window as a banker does.
+        private static void DevBank(string[] args) => OfflineServer.Instance.DevOpenBank();
+
         // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
         private static void SortInv(string[] args)
         {
