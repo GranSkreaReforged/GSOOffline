@@ -30,7 +30,9 @@ namespace GSOOffline
             }
             if (Pair(targetType, usedType, ItemFragileKey, ItemSoftClay))
             {
+                // The fragile key goes into the mould and isn't needed again (the original game kept it; #83).
                 TakeItems(ItemSoftClay, 1);
+                TakeItems(ItemFragileKey, 1);
                 GiveItem(ItemKeyMould);
                 Notice("You press the key in the clay and make a key mould.");
                 return;

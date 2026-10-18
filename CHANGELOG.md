@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Changed
+- Making the strong key for Ulan's dungeon no longer leaves the pieces in your bag. Pressing the fragile key into soft clay uses up the key along with the clay, and smelting the strong key uses up the mould along with the iron. The strong key stays with you, so you only make it once (#83).
 - The Coral dungeon's door takes a coral key again, as in the original game. The key breaks as the door opens. Without one, the door is locked. Coral keys drop from beach crabs and the Red Crab (#82).
 ### Fixed
 - The Sort menu in the inventory and the bank takes its own clicks. "By name" used to open the silver deposit or withdraw window under it, and in the bank the weight buttons could click into the search field (#78).
