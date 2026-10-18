@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- The Sort menu in the inventory and the bank takes its own clicks. "By name" used to open the silver deposit or withdraw window under it, and in the bank the weight buttons could click into the search field (#78).
 
 ## [1.7.0] - 2026-10-17
 ### Added
