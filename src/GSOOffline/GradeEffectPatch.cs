@@ -35,6 +35,15 @@ namespace GSOOffline
             model.AddComponent<GradeAura>().Setup(grade);
         }
 
+        /// <summary>A worn item's grade changed (an upgrade or a grade stone): the client keeps its model, so redo its aura.</summary>
+        internal static void Refresh(int itemId, int grade)
+        {
+            if (Inventory.instance == null || Inventory.instance.eqLoader == null) return;
+            foreach (var slot in Inventory.instance.eqLoader.eqSlots)
+                if (slot.itemId == itemId && slot.instancedObject != null)
+                    Apply(slot.instancedObject, grade);
+        }
+
         private void Setup(int g)
         {
             grade = g;
@@ -89,14 +98,15 @@ namespace GSOOffline
             var ps = go.AddComponent<ParticleSystem>();
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-            float size = Mathf.Clamp(bounds.size.magnitude, 0.3f, 2f);
+            // A floor so small pieces still show: a Mythic helmet (0.64 across) at 0.3 gave 6 a second, hard to see.
+            float size = Mathf.Clamp(bounds.size.magnitude, 1.2f, 2f);
             var main = ps.main;
             main.loop = true;
             main.duration = 1f;
             main.startLifetime = new ParticleSystem.MinMaxCurve(0.6f, grade >= 7 ? 1.4f : 1f);
             main.startSpeed = new ParticleSystem.MinMaxCurve(0f, 0.02f);
-            // Playtested: 15% bigger than first tried, and Mythic 25% so it feels rare.
-            float scale = grade == 8 ? 1.25f : 1.15f;
+            // Playtested: 15% bigger than first tried, and Mythic 25% so it feels rare; then 50% bigger again.
+            float scale = (grade == 8 ? 1.25f : 1.15f) * 1.5f;
             main.startSize = new ParticleSystem.MinMaxCurve(0.03f * scale, (grade >= 7 ? 0.08f : 0.06f) * scale);
             main.startColor = new Color(color.r, color.g, color.b, 0.8f);
             main.simulationSpace = ParticleSystemSimulationSpace.World;
