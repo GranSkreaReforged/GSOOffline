@@ -6,6 +6,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ## [Unreleased]
 ### Fixed
 - The Sort menu in the inventory and the bank takes its own clicks. "By name" used to open the silver deposit or withdraw window under it, and in the bank the weight buttons could click into the search field (#78).
+- An item's tooltip stays up while you move the cursor over the item. It used to vanish and come back with every small movement (#81).
 
 ## [1.7.0] - 2026-10-17
 ### Added
