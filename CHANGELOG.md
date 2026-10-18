@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [1.7.1] - 2026-10-18
 ### Added
 - Gear of Rare grade and better sparkles while you wear it: small sparkles in the grade's colour come off the piece where it's worn (helmet, weapon, armour, trousers, boots), more the better the grade. From Epic they drift upwards, and Mythic's colour wanders between red and gold. `GearEffects` in the config turns it off (#87).
 - Items in the inventory and the bank show their grade at a glance: a frame round the slot in the grade's colour, the same colours as item names in tooltips (grey for poor, green, blue, gold, purple, orange, red). Normal items have no frame (#80).
