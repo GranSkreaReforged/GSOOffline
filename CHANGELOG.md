@@ -5,6 +5,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Hovering gear you aren't wearing shows how it compares with what you wear in that slot: a panel beside the tooltip lists every stat that changes, with grades counted, green where it's better and red where it's worse, and the difference in weight (#77).
+- The character window's equipped gear shows its tooltip when you point at it (#77).
 - Bounties can be given up (#86). On the wanted board, an outlaw you're hunting has an "Abandon bounty" button: press it once to see what it costs, and "Confirm abandon" within 30 seconds to give the bounty up. `/abandon` and the outlaw's name does the same.
 - A bounty you take on lasts an hour of play. The board and the Active bounties window show the time left. If it runs out, the outlaw gets away (never in the middle of a fight) (#86).
 - Giving up a bounty, or letting one get away, earns Coward's mark: 5% less experience for 10 minutes of play. Each one while it lasts adds 5% and 10 minutes, up to 25% for 50 minutes. It adds to Death's toll, and only time wears it off: John Brech can't lift it (#86).
