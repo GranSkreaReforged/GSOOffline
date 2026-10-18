@@ -183,6 +183,7 @@ namespace GSOOffline
             SendMana();
             SendGearStats();
             SendDeathToll();
+            SendCowardMark();
             RefreshAlignment(true);
             SendSceneLoot();
             SendBoats();

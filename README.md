@@ -109,6 +109,7 @@ src/GSOOffline/
   OfflineServer.Housing.cs     houses on plots, furniture
   OfflineServer.Death.cs       Death's toll, death bags
   OfflineServer.Bounties.cs    bounty board, outlaws drawn as players
+  OfflineServer.Coward.cs      abandoning bounties, the hunt's hour, Coward's mark
   FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
@@ -135,7 +136,7 @@ Working:
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
 - Bank
-- Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild
+- Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver

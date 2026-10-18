@@ -13,19 +13,19 @@ namespace GSOOffline
     public partial class OfflineServer
     {
         private const int DeathBuffIcon = 120;     // an id the client's Buffs.xml doesn't use: registered at runtime
-        private const int DeathBuffIconLook = 76;  // drawn with the Weakness icon
+        private const int DeathBuffIconLook = 83;  // drawn with the Plague icon
         private const int CleanserEmblem = 163;    // the silver skull, one of the client's name tag emblems
         private const int CleanserNpc = 127;       // John Brech, a Yorkhill citizen with no dialogue of his own
         private const float CleanseConfirmSeconds = 30f;
 
         private float cleanseOfferedUntil = -1f;
-        private bool deathBuffRegistered;
+        private readonly HashSet<int> runtimeBuffIcons = new HashSet<int>();
 
         private bool DeathTollActive => character != null && character.deathStacks > 0 && character.deathTollSeconds > 0f;
 
-        /// <summary>The share of experience kept while the toll is on (1 when it isn't).</summary>
-        private float DeathTollXpMultiplier() =>
-            DeathTollActive ? 1f - CombatRules.DeathTollXpLoss * character.deathStacks : 1f;
+        /// <summary>The share of experience kept: Death's toll and Coward's mark each take theirs (1 with neither).</summary>
+        private float ExperienceKept() =>
+            Mathf.Max(0f, 1f - (DeathTollActive ? CombatRules.DeathTollXpLoss * character.deathStacks : 0f) - CowardXpLoss());
 
         /// <summary>From PlayerDies: the toll grows (or starts), and from the 4th death gear may fall.</summary>
         private void ApplyDeathToll(Vector3 where)
@@ -49,26 +49,36 @@ namespace GSOOffline
         /// <summary>The toll's icon and tooltip, added to the client's buff list (its text says how bad it is now).</summary>
         private void RegisterDeathBuff()
         {
+            if (character == null) return;
+            RegisterRuntimeBuff(DeathBuffIcon, "Death's toll", DeathBuffIconLook,
+                $"You gain {character.deathStacks * CombatRules.DeathTollXpLoss * 100:F0}% less experience. "
+                + (character.deathStacks >= CombatRules.DeathTollDropFromStack - 1 ? "Dying again may cost you equipped gear. " : "")
+                + $"John Brech in Yorkhill can lift it for {CleanseFee()} silver.");
+        }
+
+        /// <summary>
+        /// A buff the client's Buffs.xml doesn't have: its name and tooltip, and its icon borrowed from a real one. The
+        /// icon comes straight from the resources (Tex_BuffIcon_*): getBuffIcon hands out the blank "no icon" during
+        /// a scene load and for ids without a texture, and 1.7's Death's toll asked for one (76) that doesn't exist.
+        /// </summary>
+        private void RegisterRuntimeBuff(int id, string name, int look, string description)
+        {
             var bc = BuffController.instance;
-            if (bc == null || character == null) return;
-            var info = bc.GetBuffInfo(DeathBuffIcon);
+            if (bc == null) return;
+            var info = bc.GetBuffInfo(id);
             if (info == null)
             {
-                info = new BuffController.BuffInfo { id = DeathBuffIcon, buffName = "Death's toll" };
+                info = new BuffController.BuffInfo { id = id, buffName = name };
                 bc.infoBuffs.Add(info);
             }
-            info.buffDescription = $"You gain {character.deathStacks * CombatRules.DeathTollXpLoss * 100:F0}% less experience. "
-                + (character.deathStacks >= CombatRules.DeathTollDropFromStack - 1 ? "Dying again may cost you equipped gear. " : "")
-                + $"John Brech in Yorkhill can lift it for {CleanseFee()} silver.";
-            if (deathBuffRegistered) return;
+            info.buffDescription = description;
             var loader = Scr_TextureLoader.instance;
-            if (loader != null)
-            {
-                Texture2D look = loader.getBuffIcon(DeathBuffIconLook);
-                if (look != null && !loader.loadedIcons.buffIcons.Exists(i => i.id == DeathBuffIcon))
-                    loader.loadedIcons.buffIcons.Add(new Scr_TextureLoader.itemIcon { id = DeathBuffIcon, icon = look });
-            }
-            deathBuffRegistered = true;
+            if (loader == null || runtimeBuffIcons.Contains(id)) return;
+            var icon = Resources.Load<Texture2D>("1LoadingAssets/Tex/BuffIcons/Tex_BuffIcon_" + look);
+            if (icon == null) return;
+            loader.loadedIcons.buffIcons.RemoveAll(i => i.id == id);
+            loader.loadedIcons.buffIcons.Add(new Scr_TextureLoader.itemIcon { id = id, icon = icon });
+            runtimeBuffIcons.Add(id);
         }
 
         /// <summary>
@@ -83,6 +93,8 @@ namespace GSOOffline
             template.title = "Lifts Death's toll";
             template.emblem = CleanserEmblem;
         }
+
+        internal void DevShowBuff(int id) => Send(4, 9, character.name, id, 600, 600);
 
         /// <summary>Counts down while playing (not while logged out); at 0 the toll is gone.</summary>
         private void TickDeathToll()

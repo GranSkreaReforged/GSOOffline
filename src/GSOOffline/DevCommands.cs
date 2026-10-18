@@ -677,6 +677,31 @@ namespace GSOOffline
             Scr_RPCSender.instance.IssueSortInventory(2, true);
         }
 
+        // bufficons [max]: which buff icons the client's resources hold (Tex_BuffIcon_<id>), and the size of each.
+        private static void BuffIcons(string[] args)
+        {
+            int max = args.Length > 1 ? int.Parse(args[1]) : 200;
+            var found = new System.Collections.Generic.List<string>();
+            for (int i = 0; i <= max; i++)
+            {
+                var t = UnityEngine.Resources.Load<UnityEngine.Texture2D>("1LoadingAssets/Tex/BuffIcons/Tex_BuffIcon_" + i);
+                if (t != null) found.Add(i + ":" + t.width + "x" + t.height);
+            }
+            Plugin.Log.LogInfo($"[dev] buff icons ({found.Count}): {string.Join(" ", found.ToArray())}");
+        }
+
+        // showbuff <id...>: puts those buffs' icons on the player's buff bar for a minute (to look at them).
+        private static void ShowBuff(string[] args)
+        {
+            for (int i = 1; i < args.Length; i++) OfflineServer.Instance.DevShowBuff(int.Parse(args[i]));
+        }
+
+        // bountypress <name start>: the wanted board's button on that outlaw's line (start the hunt, or abandon it).
+        private static void BountyPress(string[] args) => OfflineServer.Instance.DevBoardPress(string.Join(" ", args, 1, args.Length - 1));
+
+        // huntage <seconds>: takes that much playing time off every active bounty's hour.
+        private static void HuntAge(string[] args) => OfflineServer.Instance.DevHuntAge(float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture));
+
         // loot: the loot bags the server holds in this scene, and how many the client shows.
         private static void Loot(string[] args) => OfflineServer.Instance.LogLoot();
 
