@@ -164,6 +164,7 @@ namespace GSOOffline
 
             character = ch;
             LoadLootBags();   // first: any save from here on writes this character's bags
+            LoadHuntTimers();
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             FixStatKeys(ch);
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it

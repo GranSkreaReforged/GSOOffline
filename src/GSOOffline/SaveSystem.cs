@@ -121,6 +121,7 @@ namespace GSOOffline
         public int murders;
         public long createdAt;         // unix seconds: an hour later it leaves the board, unless started
         public bool started;           // you took the bounty on: only then does the outlaw wait in the world
+        public float secondsLeft;      // once started: playing time left to catch them
         public int abilityChance;      // percent per swing it uses an ability (its temperament)
         public float kiteDistance;     // shooters back off when you come closer than this
         public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death
@@ -181,6 +182,8 @@ namespace GSOOffline
         public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
         public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)
         public float deathTollSeconds;          // playing time left on it
+        public int cowardStacks;                // Coward's mark: bounties given up while it lasted (0 = none)
+        public float cowardSeconds;             // playing time left on it
         public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // before 1.8; moved to lootBags on login
         public List<LootBagSave> lootBags = new List<LootBagSave>();      // every bag on the ground, all scenes
         public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
