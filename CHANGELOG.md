@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Changed
+- John Brech's name tag says what he does: "Lifts Death's toll" under his name, with a skull either side, when you point at him or target him (#85).
 - Making the strong key for Ulan's dungeon no longer leaves the pieces in your bag. Pressing the fragile key into soft clay uses up the key along with the clay, and smelting the strong key uses up the mould along with the iron. The strong key stays with you, so you only make it once (#83).
 - The Coral dungeon's door takes a coral key again, as in the original game. The key breaks as the door opens. Without one, the door is locked. Coral keys drop from beach crabs and the Red Crab (#82).
 ### Fixed

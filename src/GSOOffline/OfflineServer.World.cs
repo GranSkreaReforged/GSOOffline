@@ -138,6 +138,7 @@ namespace GSOOffline
             character.scene = current.id;
 
             GameData.EnsureLoaded();
+            MarkCleanser();
             world = SceneWorld.Build(current.id, current.sceneName);
             AddHarpyToWorld();
             SyncBountyActors();
