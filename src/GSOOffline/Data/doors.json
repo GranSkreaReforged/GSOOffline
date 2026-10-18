@@ -10,9 +10,9 @@
    ],
    "toScene": 2,
    "toPos": [
-    0.71,
-    44.06,
-    2.49
+    0.8,
+    44.2,
+    3.18
    ],
    "note": "Prefab_Object_Interactable_10ExitFromYorkhillMiningCave"
   },
@@ -26,9 +26,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    655.16,
-    15.91,
-    1446.98
+    651.7,
+    16.0,
+    1441.3
    ],
    "note": "Prefab_Object_Interactable_9EntranceToYorkhillMiningCave"
   },
@@ -43,8 +43,8 @@
    "toScene": 5,
    "toPos": [
     442.5,
-    108.39,
-    1592.96
+    108.5,
+    1593.4
    ],
    "note": "Prefab_Object_Interactable_11ExitFromEvilMonkDungeon"
   },
@@ -58,9 +58,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    557.77,
-    22.22,
-    1206.24
+    556.3,
+    23.1,
+    1203.7
    ],
    "note": "Prefab_Object_Interactable_12EntranceToEvilMonkDungeon"
   },
@@ -74,9 +74,9 @@
    ],
    "toScene": 5,
    "toPos": [
-    478.71,
-    119.1,
-    1778.86
+    482.5,
+    118.7,
+    1778.8
    ],
    "note": "Prefab_Object_Interactable_16ExitFromRokeDungeonToForest"
   },
@@ -90,9 +90,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    509.65,
-    3.66,
-    1171.27
+    505.2,
+    3.4,
+    1169.7
    ],
    "note": "Prefab_Object_Interactable_15EntranceRokeDungeonFromForest"
   },
@@ -106,9 +106,9 @@
    ],
    "toScene": 5,
    "toPos": [
-    761.59,
-    130.56,
-    1860.13
+    760.5,
+    131.4,
+    1860.4
    ],
    "note": "Prefab_Object_Interactable_13ExitFromRokeDungeonToMonastery"
   },
@@ -122,9 +122,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    725.31,
-    34.44,
-    1558.32
+    719.6,
+    33.9,
+    1566.2
    ],
    "note": "Prefab_Object_Interactable_14ExitFromRokeDungeonToMonastery"
   },
@@ -138,9 +138,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    725.31,
-    34.44,
-    1558.32
+    719.6,
+    33.9,
+    1566.2
    ],
    "note": "Prefab_Object_Interactable_14ExitFromRokeDungeonToMonastery"
   },
@@ -154,9 +154,9 @@
    ],
    "toScene": 16,
    "toPos": [
-    259.47,
-    21.76,
-    417.07
+    260.9,
+    17.5,
+    410.4
    ],
    "note": "Prefab_Object_Interactable_23ExitFromSilkCrabCave"
   },
@@ -170,9 +170,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    482.84,
-    4.26,
-    1628.6
+    485.5,
+    3.5,
+    1631.6
    ],
    "note": "Prefab_Object_Interactable_22EntranceToSilkCrabCave"
   },
@@ -186,9 +186,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    686.13,
-    34.21,
-    1551.2
+    688.5,
+    33.7,
+    1551.3
    ],
    "note": "Prefab_Object_Interactable_25_ExitFromYorkhillMonastery (1)"
   },
@@ -202,9 +202,9 @@
    ],
    "toScene": 1,
    "toPos": [
-    669.37,
-    34.21,
-    1535.7
+    664.7,
+    33.8,
+    1542.6
    ],
    "note": "Prefab_Object_Interactable_24_EntranceToYorkhillMonastery"
   },
@@ -282,11 +282,75 @@
    ],
    "toScene": 27,
    "toPos": [
-    211.11,
+    210.34,
     157.5,
-    80.38
+    239.19
    ],
    "note": "Coral dungeon"
+  },
+  {
+   "type": 37,
+   "scene": 27,
+   "pos": [
+    210.34,
+    157.0,
+    239.19
+   ],
+   "toScene": 16,
+   "toPos": [
+    80.09,
+    6.12,
+    74.67
+   ],
+   "note": "Coral dungeon (out)"
+  },
+  {
+   "type": 37,
+   "scene": 27,
+   "pos": [
+    19.39,
+    157.0,
+    21.05
+   ],
+   "toScene": 28,
+   "toPos": [
+    264.61,
+    208.69,
+    414.01
+   ],
+   "note": "Coral dungeon boss room"
+  },
+  {
+   "type": 37,
+   "scene": 28,
+   "pos": [
+    264.61,
+    208.19,
+    414.01
+   ],
+   "toScene": 27,
+   "toPos": [
+    19.39,
+    157.5,
+    21.05
+   ],
+   "note": "Coral dungeon boss room (out)"
+  },
+  {
+   "type": 43,
+   "scene": 34,
+   "pos": [
+    -412.68,
+    51.08,
+    -608.89
+   ],
+   "toScene": 8,
+   "toPos": [
+    960.0,
+    22.5,
+    1330.0
+   ],
+   "note": "Snowy portal back to Yorkhill"
   },
   {
    "type": 37,
@@ -514,19 +578,51 @@
   },
   {
    "type": 37,
+   "scene": 13,
+   "pos": [
+    947.76,
+    21.26,
+    1303.66
+   ],
+   "toScene": 8,
+   "toPos": [
+    947.4,
+    21.4,
+    1308.91
+   ],
+   "note": "Yorkhill gate (East Athagos)"
+  },
+  {
+   "type": 37,
    "scene": 8,
    "pos": [
     947.57,
     20.9,
     1306.42
    ],
-   "toScene": 1,
+   "toScene": 13,
    "toPos": [
-    948.5,
-    21.4,
-    1302.53
+    947.93,
+    21.76,
+    1301.17
    ],
-   "note": "Yorkhill gate (out only)"
+   "note": "Yorkhill gate (East Athagos)"
+  },
+  {
+   "type": 37,
+   "scene": 13,
+   "pos": [
+    1097.19,
+    8.69,
+    1261.4
+   ],
+   "toScene": 8,
+   "toPos": [
+    1095.19,
+    9.59,
+    1267.31
+   ],
+   "note": "Yorkhill gate (East Athagos)"
   },
   {
    "type": 37,
@@ -536,13 +632,13 @@
     9.09,
     1264.94
    ],
-   "toScene": 1,
+   "toScene": 13,
    "toPos": [
-    1099.28,
-    9.59,
-    1262.66
+    1097.99,
+    9.19,
+    1259.03
    ],
-   "note": "Yorkhill gate (out only)"
+   "note": "Yorkhill gate (East Athagos)"
   },
   {
    "type": 29,
@@ -1105,9 +1201,9 @@
    ],
    "toScene": 37,
    "toPos": [
-    31.57,
-    15.38,
-    110.84
+    30.25,
+    14.9,
+    111.2
    ],
    "note": "hall of heroes"
   }
@@ -1191,9 +1287,9 @@
  "portal": {
   "scene": 34,
   "pos": [
-   -296.61,
-   12.31,
-   -420.98
+   -412.0,
+   50.5,
+   -609.0
   ]
  }
 }
