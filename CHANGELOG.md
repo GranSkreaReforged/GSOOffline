@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Gear of Rare grade and better sparkles while you wear it: small sparkles in the grade's colour come off the piece where it's worn (helmet, weapon, armour, trousers, boots), more the better the grade. From Epic they drift upwards, and Mythic's colour wanders between red and gold. `GearEffects` in the config turns it off (#87).
 - Items in the inventory and the bank show their grade at a glance: a frame round the slot in the grade's colour, the same colours as item names in tooltips (grey for poor, green, blue, gold, purple, orange, red). Normal items have no frame (#80).
 - Hovering gear you aren't wearing shows how it compares with what you wear in that slot: a panel beside the tooltip lists every stat that changes, with grades counted, green where it's better and red where it's worse, and the difference in weight (#77).
 - The character window's equipped gear shows its tooltip when you point at it (#77).
