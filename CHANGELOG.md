@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Added
+- Items in the inventory and the bank show their grade at a glance: a frame round the slot in the grade's colour, the same colours as item names in tooltips (grey for poor, green, blue, gold, purple, orange, red). Normal items have no frame (#80).
 - Hovering gear you aren't wearing shows how it compares with what you wear in that slot: a panel beside the tooltip lists every stat that changes, with grades counted, green where it's better and red where it's worse, and the difference in weight (#77).
 - The character window's equipped gear shows its tooltip when you point at it (#77).
 - Bounties can be given up (#86). On the wanted board, an outlaw you're hunting has an "Abandon bounty" button: press it once to see what it costs, and "Confirm abandon" within 30 seconds to give the bounty up. `/abandon` and the outlaw's name does the same.
