@@ -14,6 +14,7 @@ namespace GSOOffline
     {
         private const int DeathBuffIcon = 120;     // an id the client's Buffs.xml doesn't use: registered at runtime
         private const int DeathBuffIconLook = 76;  // drawn with the Weakness icon
+        private const int CleanserEmblem = 163;    // the silver skull, one of the client's name tag emblems
         private const int CleanserNpc = 127;       // John Brech, a Yorkhill citizen with no dialogue of his own
         private const float CleanseConfirmSeconds = 30f;
 
@@ -68,6 +69,19 @@ namespace GSOOffline
                     loader.loadedIcons.buffIcons.Add(new Scr_TextureLoader.itemIcon { id = DeathBuffIcon, icon = look });
             }
             deathBuffRegistered = true;
+        }
+
+        /// <summary>
+        /// John Brech's name tag says what he does (#85): "Lifts Death's toll" under his name, and a skull either side
+        /// of it, where bosses wear their eyes. The client copies a template's tag when it spawns the NPC, so this runs
+        /// before a scene's NPCs are sent.
+        /// </summary>
+        private static void MarkCleanser()
+        {
+            var template = Scr_NpcHandler.instance != null ? Scr_NpcHandler.instance.getNpcTemplate(CleanserNpc) : null;
+            if (template == null) return;
+            template.title = "Lifts Death's toll";
+            template.emblem = CleanserEmblem;
         }
 
         /// <summary>Counts down while playing (not while logged out); at 0 the toll is gone.</summary>
