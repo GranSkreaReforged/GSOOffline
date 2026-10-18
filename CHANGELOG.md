@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.7.2] - 2026-10-18
 ### Fixed
 - Yorkhill's south and south-east gates lead out to East Athagos, and East Athagos' gates lead back in. They used to drop you at the edge of West Athagos, in the wrong zone.
 - The Coral dungeon has a way out again: its double door goes back to the silk crab cave, and the door to the Red Crab's lair works both ways. You also arrive by the dungeon's door instead of in the middle of it.
