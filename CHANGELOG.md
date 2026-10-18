@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- An item's tooltip stays up while you move the cursor over the item. It used to vanish and come back with every small movement (#81).
 
 ## [1.7.0] - 2026-10-17
 ### Added
