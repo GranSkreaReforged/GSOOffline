@@ -63,8 +63,8 @@ Payloads are listed after the sub-opcode. "name" means the player name.
   - 3/4 equip and 3/5 unequip (name, itemId)
   - 6/5 switch to the secondary weapon, 6/6 unequip it (no arguments)
   - 3/18 use (name, typeId)
-  - 4/4 remove (itemId, typeId, amount, name)
-  - 4/14 drop
+  - 4/4 remove (itemId, typeId, amount, name): destroys; the client never sent it, GSOOffline's Destroy button does
+  - 4/14 drop: the server puts the item in a loot bag at the player's feet
   - 198/15 swap and 198/17 insert (index1, index2)
   - 198/11 use an item on another: name, target item id, used item id, target type, used type (OfflineServer.ItemCombos.cs); S→C 198/16 sets an item's grade (item id, grade)
   - 198/16 sort (type, ascending). The client has already sorted its own list when it sends this; the server adopts that order.

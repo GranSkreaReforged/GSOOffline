@@ -878,7 +878,7 @@ namespace GSOOffline
             foreach (var it in drop) it.equipped = false;
             var scroll = NewItem(ItemData.Get(ItemSmallXpScroll), 1);
             drop.Add(scroll);
-            var bag = new LootBag { id = nextLootId++, scene = character.scene, pos = NpcPosition(npc), despawnAt = Time.time + CombatRules.BountyLootSeconds, kept = drop };
+            var bag = new LootBag { id = nextLootId++, scene = character.scene, pos = NpcPosition(npc), kept = drop };
             foreach (var it in drop) bag.items.Add(new ItemAmount { type = it.typeId, amount = it.amount });
             SceneLoot(bag.scene).Add(bag);
             Send(198, 34, LootEntry(bag));

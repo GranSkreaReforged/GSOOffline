@@ -56,7 +56,7 @@ namespace GSOOffline
         // stand in for a player); their hits and defences come from their gear. Each ability every 4th swing.
         public const int BountyMin = 3, BountyMax = 5, BountyLevelRange = 5;
         public const long BountyLifetimeSeconds = 3600, BountyRefreshSeconds = 900;
-        public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f, BountyLootSeconds = 900f;
+        public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f;
         public const int BountyAccuracy = 60, BountyMinLevel = 3;
         // Each outlaw's temperament: 15-35% of its swings an ability, shooters keeping 5-10 m away.
         public const int BountyAbilityChanceMin = 15, BountyAbilityChanceMax = 35;

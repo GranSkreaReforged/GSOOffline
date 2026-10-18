@@ -143,7 +143,7 @@ Working:
 - Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
 - Light and heavy armor XP, shared from kills made shortly after being hit
 - Potions, food, experience scrolls, teleport scrolls and gear crates
-- Loot bags: kills drop a bag with the monster's loot; click it to take everything
+- Loot bags: kills drop a bag with the monster's loot; click it to take everything. Dropping an item (Shift+click, the item window's Drop, or dragging it out of the windows) puts it in a bag at your feet, and the item window's Destroy gets rid of it for good. Every bag is saved and lasts 20 minutes of play
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches

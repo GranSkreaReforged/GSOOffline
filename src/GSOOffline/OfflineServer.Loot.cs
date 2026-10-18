@@ -9,6 +9,8 @@ namespace GSOOffline
     /// Loot bags. A kill rolls the NPC's drop table (LootData) into one bag on the ground; clicking it (3/17)
     /// hands over everything in it. Bags stay for a while per scene and are re-sent when the scene loads,
     /// because the client only ever adds bags (198/34) or removes them (198/35) and loses them with the scene.
+    /// Every bag (a kill's loot, items the player dropped, gear lost on death) is saved with the character and lasts
+    /// 20 minutes of playing time (#79); the original server cleared bags after 30 minutes.
     /// </summary>
     public partial class OfflineServer
     {
@@ -19,13 +21,13 @@ namespace GSOOffline
             public Vector3 pos;
             public int silver;
             public readonly List<ItemAmount> items = new List<ItemAmount>();
-            public float despawnAt;
-            public List<ItemSave> kept;   // the very items, given back as they are (death bags, bounty gear)
-            public DeathBagSave death;    // gear dropped on death: saved, never despawns
+            public float secondsLeft = LootBagLifetime;   // playing time until it's gone
+            public List<ItemSave> kept;   // the very items, given back as they are (death bags, dropped items, bounty gear)
+            public bool death;            // gear lost on death
+            public bool dropped;          // items the player dropped
         }
 
-        // Reconstructions: the old server's numbers are lost.
-        private const float LootBagLifetime = 300f;   // seconds a bag stays on the ground
+        private const float LootBagLifetime = 1200f;  // playing time a bag stays on the ground
         private const float LootPickupRange = 12f;    // loose: the client already gates the click on distance
         // The client draws a bag's item model from its type id. A plain stackable keeps the default sack,
         // for bags that hold only silver (the game has no silver item).
@@ -61,7 +63,6 @@ namespace GSOOffline
             }
             bag.id = nextLootId++;
             bag.scene = character.scene;
-            bag.despawnAt = Time.time + LootBagLifetime;
             bag.pos = LootPosition(npc, info);
             SceneLoot(bag.scene).Add(bag);
             Plugin.Log.LogInfo($"[loot] {info?.name} (level {level}) -> bag {bag.id}: {LootLabel(bag)}");
@@ -249,11 +250,62 @@ namespace GSOOffline
             RemoveLoot(bag);
         }
 
+        /// <summary>Bags wear away only while playing, in every scene.</summary>
         private void TickLoot()
         {
+            if (character == null || !sceneReady) return;
             foreach (var list in lootByScene.Values)
                 for (int i = list.Count - 1; i >= 0; i--)
-                    if (Time.time >= list[i].despawnAt) RemoveLoot(list[i]);
+                {
+                    list[i].secondsLeft -= Time.deltaTime;
+                    if (list[i].secondsLeft <= 0f)
+                    {
+                        Plugin.Log.LogInfo($"[loot] bag {list[i].id} in scene {list[i].scene} wore away: {LootLabel(list[i])}");
+                        RemoveLoot(list[i]);
+                    }
+                }
+        }
+
+        // ---- saving --------------------------------------------------------------------------
+
+        /// <summary>Before a save: the bags on the ground, as they are now.</summary>
+        private void SnapshotLootBags()
+        {
+            character.lootBags.Clear();
+            foreach (var list in lootByScene.Values)
+                foreach (var bag in list)
+                    character.lootBags.Add(new LootBagSave
+                    {
+                        scene = bag.scene, x = bag.pos.x, y = bag.pos.y, z = bag.pos.z, secondsLeft = bag.secondsLeft,
+                        death = bag.death, dropped = bag.dropped, silver = bag.silver,
+                        loot = bag.kept == null ? new List<ItemAmount>(bag.items) : new List<ItemAmount>(), kept = bag.kept,
+                    });
+        }
+
+        /// <summary>Entering the world: this character's bags back on the ground, nobody else's.</summary>
+        private void LoadLootBags()
+        {
+            lootByScene.Clear();
+            foreach (var old in character.deathBags)   // saves from before 1.8
+            {
+                foreach (var it in old.items)
+                    if (it.amount <= 0) it.amount = 1;   // 1.7 bagged gear after emptying its stack
+                character.lootBags.Add(new LootBagSave { scene = old.scene, x = old.x, y = old.y, z = old.z, secondsLeft = LootBagLifetime, death = true, kept = old.items });
+            }
+            character.deathBags.Clear();
+            foreach (var s in character.lootBags)
+            {
+                var bag = new LootBag
+                {
+                    id = nextLootId++, scene = s.scene, pos = new Vector3(s.x, s.y, s.z), secondsLeft = s.secondsLeft,
+                    death = s.death, dropped = s.dropped, silver = s.silver, kept = s.kept,
+                };
+                if (s.kept != null)
+                    foreach (var it in s.kept) bag.items.Add(new ItemAmount { type = it.typeId, amount = it.amount });
+                else if (s.loot != null)
+                    bag.items.AddRange(s.loot);
+                SceneLoot(bag.scene).Add(bag);
+            }
         }
 
         /// <summary>Dev: rolls an NPC type's loot n times without dropping anything, and logs the totals.</summary>
@@ -275,12 +327,18 @@ namespace GSOOffline
                 Plugin.Log.LogInfo($"[dev]   {ItemData.Get(kv.Key)?.name} x{kv.Value}");
         }
 
+        internal void DevAgeLoot(float seconds)
+        {
+            foreach (var list in lootByScene.Values)
+                foreach (var bag in list) bag.secondsLeft -= seconds;
+        }
+
         /// <summary>Dev: the bags the server holds in the current scene.</summary>
         internal void LogLoot()
         {
             if (character == null) return;
             foreach (var bag in SceneLoot(character.scene))
-                Plugin.Log.LogInfo($"[dev] loot bag {bag.id} at {bag.pos} ({Mathf.RoundToInt(bag.despawnAt - Time.time)}s left): {LootLabel(bag)}");
+                Plugin.Log.LogInfo($"[dev] loot bag {bag.id} at {bag.pos} ({Mathf.RoundToInt(bag.secondsLeft)}s left{(bag.dropped ? ", dropped" : bag.death ? ", death" : "")}): {LootLabel(bag)}");
             int live = 0, gone = 0;
             if (Scr_LootHandler.instance != null)
                 foreach (var lb in Scr_LootHandler.instance.lootList)

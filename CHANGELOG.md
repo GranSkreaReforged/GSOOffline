@@ -4,11 +4,17 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Added
+- Dropping an item puts it in a bag at your feet, as in the original game, instead of destroying it. The item stays whole in the bag (grade, stats, upgrades), and dropping more within 2 m adds to the same bag. Equipped items can't be dropped (#79).
+- Drag an item out of the inventory and let go over the world to drop it. It asks first, like Shift+click (#79).
+- The item window has a Destroy button next to Drop, for getting rid of an item for good. It asks how many first (#79).
 ### Changed
+- Loot bags are saved with your character and stay through logging out: a kill's loot, dropped items and gear lost on death. Each lasts 20 minutes of play, then it's gone. Kill loot used to vanish after 5 minutes, bounty gear after 15, and death bags never did (#79).
 - John Brech's name tag says what he does: "Lifts Death's toll" under his name, with a skull either side, when you point at him or target him (#85).
 - Making the strong key for Ulan's dungeon no longer leaves the pieces in your bag. Pressing the fragile key into soft clay uses up the key along with the clay, and smelting the strong key uses up the mould along with the iron. The strong key stays with you, so you only make it once (#83).
 - The Coral dungeon's door takes a coral key again, as in the original game. The key breaks as the door opens. Without one, the door is locked. Coral keys drop from beach crabs and the Red Crab (#82).
 ### Fixed
+- Gear lost on death went into its bag with an amount of 0. It's now kept whole, and bags already on the ground are repaired when you log in.
 - The Sort menu in the inventory and the bank takes its own clicks. "By name" used to open the silver deposit or withdraw window under it, and in the bank the weight buttons could click into the search field (#78).
 - An item's tooltip stays up while you move the cursor over the item. It used to vanish and come back with every small movement (#81).
 
