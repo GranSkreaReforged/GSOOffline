@@ -109,6 +109,7 @@ src/GSOOffline/
   OfflineServer.Housing.cs     houses on plots, furniture
   OfflineServer.Death.cs       Death's toll, death bags
   OfflineServer.Bounties.cs    bounty board, outlaws drawn as players
+  OfflineServer.Coward.cs      abandoning bounties, the hunt's hour, Coward's mark
   FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
@@ -135,7 +136,7 @@ Working:
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
 - Bank
-- Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild
+- Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
@@ -143,13 +144,13 @@ Working:
 - Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
 - Light and heavy armor XP, shared from kills made shortly after being hit
 - Potions, food, experience scrolls, teleport scrolls and gear crates
-- Loot bags: kills drop a bag with the monster's loot; click it to take everything
+- Loot bags: kills drop a bag with the monster's loot; click it to take everything. Dropping an item (Shift+click, the item window's Drop, or dragging it out of the windows) puts it in a bag at your feet, and the item window's Destroy gets rid of it for good. Every bag is saved and lasts 20 minutes of play
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
 - NPCs and harvestables placed in the world
 - Client-side interactables such as workbenches
 - Chat
 - Aellope, Goldon's flying world boss: patrols one of five routes over the island, dives when shot, fights on the ground, takes off again after 20 seconds without damage, feeds on a fallen player, and returns an hour after she's killed (the original server's behaviour)
-- Dungeon mechanics from the original server: Lakhmu's basement (lock puzzle, falling rocks), Ulan's dungeon (gate and key, lift, levers), the Poacher dungeon (vault, storage room and dynamite, lava room, traps, chests), the Yorkhill sewers' bridge, the Coral dungeon (water, tidal waves, explosions)
+- Dungeon mechanics from the original server: Lakhmu's basement (lock puzzle, falling rocks), Ulan's dungeon (gate and key, lift, levers), the Poacher dungeon (vault, storage room and dynamite, lava room, traps, chests), the Yorkhill sewers' bridge, the Coral dungeon (a coral key to get in, water, tidal waves, explosions)
 - Boss mechanics from the original server: Nirish (webs, poison clouds, his healing spiderling), George (dynamite), Sytrax (flight and fire), Sepitus (bolts, plague, healing bird, lava hounds) and Phraustie (snowballs, Snow Apostles)
 - Reconstructed boss mechanics: fog fields, water and psychic explosions, stuns, ground slams and summoned minions (the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
 - Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)

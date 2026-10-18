@@ -11,6 +11,7 @@ namespace GSOOffline
     ///   with the returning lever (39). A fragile key snaps back into its halves.
     /// - The key: search the skeleton (31) for a key broken in half, combine the halves into a fragile key, press it
     ///   into soft clay (the clay nodes) for a key mould, and smelt iron ore into the mould at the dungeon's forges.
+    ///   Each step uses up what went into it; only the strong key is kept.
     /// - The deep door to the Cave Dragons (35) opens when both levers (36) are pulled. The original reset each lever
     ///   after 2 seconds, which needed two players 40 m apart; offline a pulled lever stays down for 30 seconds.
     /// - Ulan follows the player through the dungeon during quest 17 (phase 2), and the lowest floor ends the phase.
@@ -119,7 +120,9 @@ namespace GSOOffline
             {
                 case InteractForge:
                     if (CountItem(ItemIronOre) == 0 || CountItem(ItemKeyMould) == 0 || CountItem(ItemStrongKey) > 0) return false;   // an ordinary forge
+                    // The mould is used up casting the key (the original game kept it; #83). The strong key is kept.
                     TakeItems(ItemIronOre, 1);
+                    TakeItems(ItemKeyMould, 1);
                     GiveItem(ItemStrongKey);
                     Notice("You smelt some iron into a strong key.");
                     return true;

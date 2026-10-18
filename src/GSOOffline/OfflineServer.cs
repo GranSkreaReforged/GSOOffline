@@ -127,6 +127,7 @@ namespace GSOOffline
             TickOysters();
             TickHousing();
             TickDeathToll();
+            TickCowardMark();
             TickBounties();
             TickHarpoons();
             TickAutoLogin();

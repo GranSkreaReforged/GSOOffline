@@ -48,8 +48,13 @@ namespace GSOOffline
             On(3, 4, c => RequestEquip((int)c[2]));
             On(3, 5, c => Unequip((int)c[2]));
             On(4, 4, c => DestroyItem((int)c[1], (int)c[2], (int)c[3]));
-            // No ground loot yet: dropping destroys (the sewers' pillar props up the bridge where it's dropped).
-            On(4, 14, c => { if (DropPillar((int)c[3]) || !OnQuestItemUsed((int)c[3])) DestroyItem((int)c[2], (int)c[3], (int)c[4]); });
+            // Dropping puts the item in a bag on the ground (the sewers' pillar props up the bridge where it's dropped).
+            On(4, 14, c =>
+            {
+                int id = (int)c[2], type = (int)c[3], amount = (int)c[4];
+                if (DropPillar(type)) DestroyItem(id, type, amount);
+                else if (!OnQuestItemUsed(type)) DropToGround(id, type, amount);
+            });
             On(4, 1, OnChangeTab);
             On(198, 15, OnSwapItems);
             On(198, 17, OnInsertItem);
@@ -225,6 +230,56 @@ namespace GSOOffline
             var it = ItemData.Get(typeId)?.Stacks == true ? FindStack(typeId) : FindItem(itemId);
             if (it == null || it.typeId != typeId) return;
             RemoveFromStack(it, Mathf.Clamp(amount, 1, it.amount));
+        }
+
+        private const float DropMergeRange = 2f;   // dropping near your own dropped bag adds to it
+
+        /// <summary>
+        /// 4/14: the item goes into a bag at the player's feet, as on the original server (#79), which keeps it whole:
+        /// grade, stats and upgrades. Dropping again within 2 m adds to that bag and restarts its 20 minutes.
+        /// Equipped items stay on, as the original server said.
+        /// </summary>
+        private void DropToGround(int itemId, int typeId, int amount)
+        {
+            var player = LocalPlayer;
+            if (character == null || player == null) return;
+            bool stacks = ItemData.Get(typeId)?.Stacks == true;
+            var it = stacks ? FindStack(typeId) : FindItem(itemId);
+            if (it == null || it.typeId != typeId) return;
+            if (it.equipped)
+            {
+                Notice("Unable to drop an equipped item.", "red");
+                return;
+            }
+            amount = Mathf.Clamp(amount, 1, it.amount);
+            Vector3 at = player.transform.position;
+            var bag = SceneLoot(character.scene).Find(b => b.dropped && Vector3.Distance(b.pos, at) < DropMergeRange);
+            if (bag == null)
+            {
+                bag = new LootBag { id = nextLootId++, scene = character.scene, pos = at, dropped = true, kept = new List<ItemSave>() };
+                SceneLoot(bag.scene).Add(bag);
+            }
+            else
+                Send(198, 35, bag.id);   // shown again below, with what's in it now
+
+            RemoveFromStack(it, amount);
+            if (stacks)
+            {
+                var same = bag.kept.Find(k => k.typeId == typeId);
+                if (same != null) same.amount += amount;
+                else bag.kept.Add(new ItemSave { typeId = typeId, amount = amount, grade = it.grade });
+            }
+            else
+            {
+                it.amount = amount;   // the very item, whole
+                bag.kept.Add(it);
+            }
+            bag.items.Clear();
+            foreach (var k in bag.kept) bag.items.Add(new ItemAmount { type = k.typeId, amount = k.amount });
+            bag.secondsLeft = LootBagLifetime;
+            Send(198, 34, LootEntry(bag));
+            Plugin.Log.LogInfo($"[loot] dropped {ItemData.Get(typeId)?.name} x{amount} -> bag {bag.id}: {LootLabel(bag)}");
+            SaveCurrentCharacter();
         }
 
         /// <summary>3/4: the player equips an item from the bag, if they have the level it asks for.</summary>
@@ -424,7 +479,7 @@ namespace GSOOffline
         public void AddXp(int skillId, int amount)
         {
             if (character == null || amount <= 0 || !SkillById.TryGetValue(skillId, out var key)) return;
-            amount = Mathf.Max(1, Mathf.RoundToInt(amount * DeathTollXpMultiplier()));
+            amount = Mathf.Max(1, Mathf.RoundToInt(amount * ExperienceKept()));
             int before = LevelFromXp(character.GetXp(key));
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);

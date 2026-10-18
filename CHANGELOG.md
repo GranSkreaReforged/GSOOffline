@@ -5,6 +5,29 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.7.1] - 2026-10-18
+### Added
+- Gear of Rare grade and better sparkles while you wear it: small sparkles in the grade's colour come off the piece where it's worn (helmet, weapon, armour, trousers, boots), more the better the grade. From Epic they drift upwards, and Mythic's colour wanders between red and gold. `GearEffects` in the config turns it off (#87).
+- Items in the inventory and the bank show their grade at a glance: a frame round the slot in the grade's colour, the same colours as item names in tooltips (grey for poor, green, blue, gold, purple, orange, red). Normal items have no frame (#80).
+- Hovering gear you aren't wearing shows how it compares with what you wear in that slot: a panel beside the tooltip lists every stat that changes, with grades counted, green where it's better and red where it's worse, and the difference in weight (#77).
+- The character window's equipped gear shows its tooltip when you point at it (#77).
+- Bounties can be given up (#86). On the wanted board, an outlaw you're hunting has an "Abandon bounty" button: press it once to see what it costs, and "Confirm abandon" within 30 seconds to give the bounty up. `/abandon` and the outlaw's name does the same.
+- A bounty you take on lasts an hour of play. The board and the Active bounties window show the time left. If it runs out, the outlaw gets away (never in the middle of a fight) (#86).
+- Giving up a bounty, or letting one get away, earns Coward's mark: 5% less experience for 10 minutes of play. Each one while it lasts adds 5% and 10 minutes, up to 25% for 50 minutes. It adds to Death's toll, and only time wears it off: John Brech can't lift it (#86).
+- Dropping an item puts it in a bag at your feet, as in the original game, instead of destroying it. The item stays whole in the bag (grade, stats, upgrades), and dropping more within 2 m adds to the same bag. Equipped items can't be dropped (#79).
+- Drag an item out of the inventory and let go over the world to drop it. It asks first, like Shift+click (#79).
+- The item window has a Destroy button next to Drop, for getting rid of an item for good. It asks how many first (#79).
+### Changed
+- Loot bags are saved with your character and stay through logging out: a kill's loot, dropped items and gear lost on death. Each lasts 20 minutes of play, then it's gone. Kill loot used to vanish after 5 minutes, bounty gear after 15, and death bags never did (#79).
+- John Brech's name tag says what he does: "Lifts Death's toll" under his name, with a skull either side, when you point at him or target him (#85).
+- Making the strong key for Ulan's dungeon no longer leaves the pieces in your bag. Pressing the fragile key into soft clay uses up the key along with the clay, and smelting the strong key uses up the mould along with the iron. The strong key stays with you, so you only make it once (#83).
+- The Coral dungeon's door takes a coral key again, as in the original game. The key breaks as the door opens. Without one, the door is locked. Coral keys drop from beach crabs and the Red Crab (#82).
+### Fixed
+- Death's toll shows its icon on the buff bar. It asked the game for an icon that doesn't exist and showed a blank square.
+- Gear lost on death went into its bag with an amount of 0. It's now kept whole, and bags already on the ground are repaired when you log in.
+- The Sort menu in the inventory and the bank takes its own clicks. "By name" used to open the silver deposit or withdraw window under it, and in the bank the weight buttons could click into the search field (#78).
+- An item's tooltip stays up while you move the cursor over the item. It used to vanish and come back with every small movement (#81).
+
 ## [1.7.0] - 2026-10-17
 ### Added
 - The wanted boards (Grimwall, Yorkhill, Goldon, the Blue Sea, Bal Sardan town) post bounties on outlaws, since there are no players to hunt (#67):

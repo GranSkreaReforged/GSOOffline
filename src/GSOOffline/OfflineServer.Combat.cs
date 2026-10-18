@@ -56,8 +56,14 @@ namespace GSOOffline
         // stand in for a player); their hits and defences come from their gear. Each ability every 4th swing.
         public const int BountyMin = 3, BountyMax = 5, BountyLevelRange = 5;
         public const long BountyLifetimeSeconds = 3600, BountyRefreshSeconds = 900;
-        public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f, BountyLootSeconds = 900f;
+        public const float BountyAggroDistance = 15f, BountyShootDistance = 18f, BountyGearDropChance = 0.4f;
         public const int BountyAccuracy = 60, BountyMinLevel = 3;
+        // A bounty taken on lasts an hour of play (issue #86). Giving one up, or letting it run out, earns Coward's
+        // mark: 5% less experience for 10 minutes of play per bounty, each one while it lasts adding 5% and 10
+        // minutes, up to 5 (25%, 50 minutes). It adds to Death's toll, and only time takes it away.
+        public const float BountyHuntSeconds = 3600f;
+        public const float CowardXpLoss = 0.05f, CowardMinutesPerStack = 10f;
+        public const int CowardMaxStacks = 5;
         // Each outlaw's temperament: 15-35% of its swings an ability, shooters keeping 5-10 m away.
         public const int BountyAbilityChanceMin = 15, BountyAbilityChanceMax = 35;
         public const float BountyKiteMin = 5f, BountyKiteMax = 10f;
@@ -1115,6 +1121,7 @@ namespace GSOOffline
             else
                 Teleport(StartScene, StartPos);
             SendDeathToll();   // a respawn in the same scene doesn't reload it
+            SendCowardMark();
         }
 
         private void TickCombat()

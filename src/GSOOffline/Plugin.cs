@@ -29,6 +29,7 @@ namespace GSOOffline
         internal static ConfigEntry<string> AutoCharacter;
         internal static ConfigEntry<bool> ShowVersion;
         internal static ConfigEntry<bool> CheckForUpdates;
+        internal static ConfigEntry<bool> GearEffects;
 
         private void Awake()
         {
@@ -46,6 +47,7 @@ namespace GSOOffline
             SeasonalEvents = Config.Bind("World", "SeasonalEvents", "Auto", new ConfigDescription(
                 "Holiday events (creatures drop Halloween or Christmas crates). Auto: Halloween from 15 October to 7 November, Christmas from 1 December to 6 January, by this computer's date.",
                 new AcceptableValueList<string>("Auto", "Off", "Halloween", "Christmas", "Both")));
+            GearEffects = Config.Bind("World", "GearEffects", true, "Worn gear of Rare grade and better shimmers in its grade's colour, more the better the grade.");
             LogUnhandledEvents = Config.Bind("Debug", "LogUnhandledEvents", true, "Log client->server events the offline server does not implement yet.");
             AutoLogin = Config.Bind("Convenience", "AutoLogin", "", "If set, log in automatically with this account name (skips the login screen).");
             AutoCharacter = Config.Bind("Convenience", "AutoCharacter", "", "If set together with AutoLogin, enter the world with this character (created if missing).");

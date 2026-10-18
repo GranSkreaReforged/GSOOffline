@@ -460,7 +460,6 @@ namespace GSOOffline
             bag.silver = Random.Range(1000, 2001);
             bag.id = nextLootId++;
             bag.scene = ScenePoacher;
-            bag.despawnAt = Time.time + LootBagLifetime;
             bag.pos = VaultLootSpot;
             SceneLoot(bag.scene).Add(bag);
             Plugin.Log.LogInfo($"[loot] vault -> bag {bag.id}: {LootLabel(bag)}");

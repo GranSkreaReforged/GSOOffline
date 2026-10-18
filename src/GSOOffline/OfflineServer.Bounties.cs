@@ -142,17 +142,26 @@ namespace GSOOffline
         }
 
         /// <summary>
-        /// One board line. A bounty not yet started shows as an "Outlaw" in red, which is the client's only entry with
-        /// a button ("Add bounty", 7/32): pressing it starts the hunt. A started one shows plain, marked "hunting".
+        /// One board line, shown as an "Outlaw" in red: the client's only entry with a button (7/32 with the name
+        /// line). Not yet started, the button is "Add bounty" and starts the hunt. Being hunted, the line says how long
+        /// is left and BountyBoardPatch relabels the button "Abandon bounty" (#86).
         /// </summary>
         private static Scr_WantedBoard.WantedCriminal BoardEntry(BountySave b) => new Scr_WantedBoard.WantedCriminal
         {
-            playerName = $"{b.name}, level {b.level} {StyleNames[b.style]}" + (b.started ? " (hunting)" : string.Empty),
+            playerName = $"{b.name}, level {b.level} {StyleNames[b.style]}" + (b.started ? $" ({BountyHuntingTag}, {TimeLeft(b.secondsLeft)} left)" : string.Empty),
             lastArea = $"{b.lastSeen}. Wears {GearSummary(b)}",
-            criminalTimer = b.started ? 0 : 1801,
+            criminalTimer = 1801,
             murderCount = b.murders,
             bounty = b.silver,
         };
+
+        internal const string BountyHuntingTag = "hunting";
+
+        private static string TimeLeft(float seconds)
+        {
+            int minutes = Mathf.Max(1, Mathf.CeilToInt(seconds / 60f));
+            return minutes == 1 ? "1 minute" : minutes + " minutes";
+        }
 
         /// <summary>
         /// 7/32, the board's "Add bounty" button (it sends the entry's name line): the bounty starts, and the outlaw
@@ -165,16 +174,14 @@ namespace GSOOffline
             if (b == null) return;
             if (b.started)
             {
-                Notice($"You're already hunting {b.name}.", "gray");
+                RequestAbandon(b);
                 return;
             }
             b.started = true;
-            Notice($"You take the bounty on {b.name}: {b.silver} silver. Last seen: {b.lastSeen}.", "green");
+            b.secondsLeft = CombatRules.BountyHuntSeconds;
+            Notice($"You take the bounty on {b.name}: {b.silver} silver. Last seen: {b.lastSeen}. You have {TimeLeft(b.secondsLeft)}.", "green");
             Plugin.Log.LogInfo($"[bounty] started: {b.name}");
-            var list = Script_WindowController.instance?.window_wantedCriminals?.criminalsList;
-            if (list != null)
-                for (int i = 0; i < list.Count; i++)
-                    if (list[i].playerName.StartsWith(b.name + ",")) list[i] = BoardEntry(b);
+            UpdateBoardLine(b);
             if (world != null) SyncBountyActors();
             SaveCurrentCharacter();
             ShowActiveBounties();
@@ -203,10 +210,13 @@ namespace GSOOffline
                 foreach (var b in active)
                     sb.Append(b.name).Append(", level ").Append(b.level).Append(' ').Append(StyleNames[b.style]).Append("\n")
                       .Append("Bounty: ").Append(b.silver).Append(" silver\n")
+                      .Append("Time left: ").Append(TimeLeft(b.secondsLeft)).Append("\n")
                       .Append("Last seen: ").Append(b.lastSeen).Append("\n")
                       .Append("Wears ").Append(GearSummary(b)).Append("\n\n");
-                sb.Append("Defeat them to collect the bounty. More are posted on the wanted boards.");
-                length = 120 + 130 * active.Count;
+                sb.Append("Defeat them to collect the bounty. More are posted on the wanted boards.\n\n")
+                  .Append("To give one up, press \"Abandon bounty\" on a wanted board or type /abandon and their name. ")
+                  .Append("Giving up, or letting them get away when the time runs out, earns Coward's mark: less experience for a while.");
+                length = 200 + 145 * active.Count;
             }
             text = sb.ToString();
         }
@@ -229,13 +239,30 @@ namespace GSOOffline
                 ShowActiveBounties();
         }
 
-        /// <summary>Chat: /bounties opens the active bounties window. True if it was that.</summary>
-        private bool RunBountyCommand(string cmd)
+        /// <summary>Chat: /bounties opens the active bounties window, /abandon [name] gives one up. True if it was one.</summary>
+        private bool RunBountyCommand(string cmd, string[] a)
         {
+            if (cmd == "abandon")
+            {
+                AbandonCommand(string.Join(" ", a, 1, a.Length - 1));
+                return true;
+            }
             if (cmd != "bounties") return false;
             ShowActiveBounties();
             return true;
         }
+
+        /// <summary>The open board's line for this outlaw, redrawn (it started, or its time moved on).</summary>
+        private void UpdateBoardLine(BountySave b)
+        {
+            var list = Script_WindowController.instance?.window_wantedCriminals?.criminalsList;
+            if (list == null) return;
+            for (int i = 0; i < list.Count; i++)
+                if (list[i].playerName.StartsWith(b.name + ",")) list[i] = BoardEntry(b);
+        }
+
+        private static void RemoveBoardLine(BountySave b) =>
+            Script_WindowController.instance?.window_wantedCriminals?.criminalsList?.RemoveAll(e => e.playerName.StartsWith(b.name + ","));
 
         /// <summary>Entering the world with bounties on: the window comes up once per login.</summary>
         private void AnnounceActiveBounties()
@@ -878,7 +905,7 @@ namespace GSOOffline
             foreach (var it in drop) it.equipped = false;
             var scroll = NewItem(ItemData.Get(ItemSmallXpScroll), 1);
             drop.Add(scroll);
-            var bag = new LootBag { id = nextLootId++, scene = character.scene, pos = NpcPosition(npc), despawnAt = Time.time + CombatRules.BountyLootSeconds, kept = drop };
+            var bag = new LootBag { id = nextLootId++, scene = character.scene, pos = NpcPosition(npc), kept = drop };
             foreach (var it in drop) bag.items.Add(new ItemAmount { type = it.typeId, amount = it.amount });
             SceneLoot(bag.scene).Add(bag);
             Send(198, 34, LootEntry(bag));
@@ -903,6 +930,7 @@ namespace GSOOffline
                 unstickTimer = 1f;
                 UnstickOutlaws();
             }
+            TickHuntTimers();
             bountyTickTimer -= Time.deltaTime;
             if (bountyTickTimer > 0f) return;
             bountyTickTimer = 60f;
@@ -938,7 +966,7 @@ namespace GSOOffline
             {
                 id = ++character.nextBountyId, name = FirstNames[Random.Range(0, FirstNames.Length)] + " " + Epithets[Random.Range(0, Epithets.Length)],
                 level = level, style = style, gender = Random.Range(0, 2), hair = Random.Range(0, 16), hairR = 120, hairG = 80, hairB = 40,
-                scene = character.scene, x = me.x + 8f, y = me.y, z = me.z, murders = 1, createdAt = UnixNow, lastSeen = "right here", started = true,
+                scene = character.scene, x = me.x + 8f, y = me.y, z = me.z, murders = 1, createdAt = UnixNow, lastSeen = "right here", started = true, secondsLeft = CombatRules.BountyHuntSeconds,
             };
             RollTemperament(b);
             b.gear = RollBountyGear((BountyStyle)style, level);

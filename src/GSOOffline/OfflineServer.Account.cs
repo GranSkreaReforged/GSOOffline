@@ -163,6 +163,8 @@ namespace GSOOffline
             }
 
             character = ch;
+            LoadLootBags();   // first: any save from here on writes this character's bags
+            LoadHuntTimers();
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             FixStatKeys(ch);
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it
@@ -170,7 +172,6 @@ namespace GSOOffline
             startTimeSent = false;   // zone changes reset the world state too, but keep the clock
             eventsAnnounced = false;
             cleanseOfferedUntil = -1f;
-            LoadDeathBags();
             Plugin.Log.LogInfo($"'{ch.name}' entering world: scene {ch.scene} at {ch.Position}.");
 
             Send(2, 42, ch.name, BuildPlayerData(ch));
@@ -222,6 +223,7 @@ namespace GSOOffline
                 character.Position = player.transform.position;
                 character.rot = (int)player.transform.eulerAngles.y;
             }
+            SnapshotLootBags();
             SaveSystem.SaveCharacter(character);
         }
 
