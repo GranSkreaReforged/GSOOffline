@@ -7,7 +7,7 @@ namespace GSOOffline
     /// What dying costs offline (issue #69). The original dropped your gear where you fell, for anyone to take; alone,
     /// that's harsher than it was. Instead each death adds "Death's toll": less experience from everything for a
     /// while, worse with every death before it wears off, and from the 4th a chance that equipped gear falls into a
-    /// bag where you died (it stays there, through logouts, until you fetch it). Time spent playing wears it off,
+    /// bag where you died (it stays there, through logouts, for 20 minutes of play). Time spent playing wears it off,
     /// or John Brech in Yorkhill lifts it for silver, more the stronger you are. The numbers are in CombatRules.
     /// </summary>
     public partial class OfflineServer
@@ -154,40 +154,27 @@ namespace GSOOffline
             float r = Random.value;
             int n = r < CombatRules.DeathDropOne ? 1 : r < CombatRules.DeathDropOne + CombatRules.DeathDropTwo ? 2 : Random.Range(3, worn.Count + 1);
             n = Mathf.Min(n, worn.Count);
-            var bag = new DeathBagSave { scene = character.scene, x = where.x, y = where.y, z = where.z };
+            var loot = new LootBag { id = nextLootId++, scene = character.scene, pos = where, death = true, kept = new List<ItemSave>() };
             for (int i = 0; i < n; i++)
             {
                 var it = worn[Random.Range(0, worn.Count)];
                 worn.Remove(it);
-                RemoveFromStack(it, it.amount);   // unequips and tells the client
+                int amount = it.amount;
+                RemoveFromStack(it, amount);   // unequips and tells the client
+                it.amount = amount;            // the very item goes in the bag, whole
                 it.equipped = false;
-                bag.items.Add(it);
+                loot.kept.Add(it);
+                loot.items.Add(new ItemAmount { type = it.typeId, amount = amount });
             }
             GearChanged();
-            character.deathBags.Add(bag);
-            var loot = AddDeathBagLoot(bag);
+            SceneLoot(loot.scene).Add(loot);
             Send(198, 34, LootEntry(loot));
-            Notice($"In death you dropped {LootLabel(loot)}. It lies where you fell.", "red");
-            Plugin.Log.LogInfo($"[death] dropped {LootLabel(loot)} in scene {bag.scene} at {SceneWorld.Vec(where)}");
+            Notice($"In death you dropped {LootLabel(loot)}. It lies where you fell for 20 minutes of play.", "red");
+            Plugin.Log.LogInfo($"[death] dropped {LootLabel(loot)} in scene {loot.scene} at {SceneWorld.Vec(where)}");
             SaveCurrentCharacter();
         }
 
-        private LootBag AddDeathBagLoot(DeathBagSave save)
-        {
-            var bag = new LootBag { id = nextLootId++, scene = save.scene, pos = new Vector3(save.x, save.y, save.z), despawnAt = float.MaxValue, death = save, kept = save.items };
-            foreach (var it in save.items) bag.items.Add(new ItemAmount { type = it.typeId, amount = it.amount });
-            SceneLoot(save.scene).Add(bag);
-            return bag;
-        }
-
-        /// <summary>Login: this character's death bags back on the ground, nobody else's.</summary>
-        private void LoadDeathBags()
-        {
-            foreach (var list in lootByScene.Values) list.RemoveAll(b => b.death != null);
-            foreach (var save in character.deathBags) AddDeathBagLoot(save);
-        }
-
-        /// <summary>Picking up a bag of kept items (a death bag, a bounty's gear): the very same items back in the bag.</summary>
+        /// <summary>Picking up a bag of kept items (a death bag, dropped items, a bounty's gear): the very same items back in the bag.</summary>
         private void CollectKeptBag(LootBag bag)
         {
             foreach (var it in bag.kept)
@@ -201,9 +188,8 @@ namespace GSOOffline
                 character.items.Add(it);
                 SendItemAdded(it, it.amount);
             }
-            if (bag.death != null) character.deathBags.Remove(bag.death);
             CheckItemTriggers();
-            Notice((bag.death != null ? "You recover " : "You loot ") + LootLabel(bag) + ".");
+            Notice((bag.death ? "You recover " : bag.dropped ? "You pick up " : "You loot ") + LootLabel(bag) + ".");
             RemoveLoot(bag);
             SaveCurrentCharacter();
         }

@@ -83,12 +83,27 @@ namespace GSOOffline
         public List<FurnitureSave> furniture = new List<FurnitureSave>();
     }
 
+    /// <summary>Before 1.8: gear dropped on death, until fetched. Read once from old saves and moved to lootBags.</summary>
     [Serializable]
     public class DeathBagSave
     {
         public int scene;
         public float x, y, z;
         public List<ItemSave> items = new List<ItemSave>();   // the very items, grades and stats intact
+    }
+
+    /// <summary>A loot bag on the ground: a kill's loot, items the player dropped, or gear lost on death.</summary>
+    [Serializable]
+    public class LootBagSave
+    {
+        public int scene;
+        public float x, y, z;
+        public float secondsLeft;      // playing time until it's gone
+        public bool death;             // gear lost on death
+        public bool dropped;           // items the player dropped
+        public int silver;
+        public List<ItemAmount> loot = new List<ItemAmount>();   // rolled loot, made into items on pickup
+        public List<ItemSave> kept;    // the very items, grades and stats intact (null for rolled loot)
     }
 
     [Serializable]
@@ -166,7 +181,8 @@ namespace GSOOffline
         public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
         public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)
         public float deathTollSeconds;          // playing time left on it
-        public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // gear dropped on death, until fetched
+        public List<DeathBagSave> deathBags = new List<DeathBagSave>();   // before 1.8; moved to lootBags on login
+        public List<LootBagSave> lootBags = new List<LootBagSave>();      // every bag on the ground, all scenes
         public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
         public long bountyRefreshAt;      // unix seconds: the board fills up again then
         public int nextBountyId;
