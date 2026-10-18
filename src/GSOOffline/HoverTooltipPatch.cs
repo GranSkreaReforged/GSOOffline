@@ -19,13 +19,17 @@ namespace GSOOffline
         private static Item shown;
         private static float shownAt = -1f;
 
+        /// <summary>This pass draws the tooltip, as far as the delay goes (GearCompare draws its panel beside it).</summary>
+        internal static bool ShowingNow { get; private set; }
+
         private static void Prefix(Menucontroller __instance, Item h, out float __state)
         {
             __state = __instance.mouseStillTimer;
             float now = Time.unscaledTime;
             if (h != null && h == shown && now - shownAt < Grace)
                 __instance.mouseStillTimer = 0f;
-            if (__instance.mouseStillTimer <= 0f)
+            ShowingNow = __instance.mouseStillTimer <= 0f;
+            if (ShowingNow)
             {
                 shown = h;
                 shownAt = now;
