@@ -142,6 +142,7 @@ Working:
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
 - Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)
+- Weapon abilities as the original server had them: each weapon rolls its own when it's made, two-handed weapons fill keys 2-5, others share them with the shield, and boss uniques have theirs
 - Abilities as the original server had them: attacks, area attacks, ground effects, stuns, roots and slows, damage over time, heals, bandages and buffs with their icons (a few later abilities are reconstructions)
 - Combat experience shared between the skills used in the last 20 seconds, armor skills included
 - Potions, food, experience scrolls, teleport scrolls and gear crates

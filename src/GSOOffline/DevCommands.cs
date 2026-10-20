@@ -808,6 +808,9 @@ namespace GSOOffline
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
 
+        // weaponbar: what's in hand, on the back and in the shield slot, each item's Ability1..4, and bar slots 1-4.
+        private static void WeaponBar(string[] args) => OfflineServer.Instance.DevWeaponBar();
+
         // worldnpcs [type...]: the server's NPCs of those types in this scene (all if none), including hidden quest copies.
         private static void WorldNpcs(string[] args)
         {

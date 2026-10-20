@@ -167,6 +167,8 @@ namespace GSOOffline
             LoadLootBags();   // first: any save from here on writes this character's bags
             LoadHuntTimers();
             FixStatKeys(ch);
+            FixTwoHandedWithShield(ch);
+            ResetWeaponSlots();
             devBaseHealth = 0;
             ch.health = CombatRules.BaseHealth(CombatLevel());   // 100 per combat level, before BuildPlayerData sends it
             if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
