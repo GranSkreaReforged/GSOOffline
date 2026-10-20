@@ -4,45 +4,66 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// Tunable combat numbers. The real formulas died with the server; these aim for the feel of the
-    /// early game (a level-2 crab takes a handful of sword swings and can't kill a fresh character alone).
+    /// Combat numbers. Health, damage and experience are the original server's formulas (update 136,
+    /// Scr_NpcHandler and Scr_PlayerHandler) with the later patch notes' changes on top; the attacks' own formulas
+    /// are in OfflineServer.OriginalCombat.cs and OfflineServer.Abilities.cs. Single-player additions are marked.
     /// </summary>
     internal static class CombatRules
     {
-        public static int NpcHealth(int level) => 10 + 8 * Mathf.Max(1, level);
-        // Bosses: the patch notes' changes relative to ordinary creatures, compounded. Health: bosses +100% (136),
-        // +50% (137) against creatures +50% (137), -11.1% (139) = 2.25x. Damage: bosses +60% (136), +25% (137),
-        // -12.5% (139) against creatures +30% (136) = 1.35x. The game data gives bosses no health of their own,
-        // and its few damage values (Lakhar 1700) are on the old server's scale, so bosses use the level formula.
-        public const float BossHealthMultiplier = 2.25f, BossDamageMultiplier = 1.35f;
-        public static int BossHealth(int level) => Mathf.RoundToInt(NpcHealth(level) * BossHealthMultiplier);
-        public static int NpcMaxHit(NpcInfo n) =>
-            n.boss ? Mathf.RoundToInt((2 + 2 * Mathf.Max(1, n.level)) * BossDamageMultiplier)
-            : n.damage > 0 ? n.damage : 2 + 2 * Mathf.Max(1, n.level);
-        // Share of a creature's hit that Damage block on your gear absorbs: diminishing, and less against stronger
-        // creatures (about a third for gear of the creature's level, ~200 block at 40). Never all of it.
-        public static float BlockReduction(int block, int attackerLevel) =>
-            block <= 0 ? 0f : block / (block + 10f * Mathf.Max(1, attackerLevel));
-        public static int PlayerMaxHit(int weaponDamage, int skillLevel) => 4 + weaponDamage + skillLevel;
-        public static float HitChance = 0.85f;   // the player's blows
-        // An NPC's blows land by its accuracy (1-100): 70% at 1, 82% at 50, 95% at 100 (it was 85% for all).
-        public static float NpcHitChance(int accuracy) => 0.7f + 0.25f * Mathf.Clamp(accuracy, 0, 100) / 100f;
-        // Your gear's resistance to a blow's kind, in percent (a full set of one level gives about 40-60), through the
-        // soft cap of update 136: full value to 60%, then half to 80 (70% effective), a quarter to 120 (80%),
-        // an eighth to 200 (90%), and never past 90%.
+        // Creature health: 100 + 5 x level^2.3, then +50% (update 137) and -11.1% (139). Bosses: 100 + 10 x level^2.3,
+        // then +50% (137): Zalranaz at 90 has 468,800, as videos of the live game show.
+        public const float CreatureHealthPatches = 1.5f * (8f / 9f), BossHealthPatches = 1.5f;
+        public static int NpcHealth(int level) => (int)((100 + 5f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * CreatureHealthPatches);
+        public static int BossHealth(int level) => (int)((100 + 10f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * BossHealthPatches);
+
+        // Single player: bosses were made for groups, so they have this share of their health (config
+        // Combat.BossHealthShare, 1 = the original's). Their damage is the original's.
+        public static float BossHealthShare => Mathf.Clamp(Plugin.BossHealthShare?.Value ?? 0.25f, 0.05f, 1f);
+
+        // Creature damage: 10 + 0.65 x level^2; bosses 10 + 0.8 x level^2, then +25% (update 137) and -12.5% (139).
+        // A blow rolls 1 to one less than this (Random.Range(1, damage)). The data's own damage replaces it, except the
+        // few single-digit values (Argus, Argo, Argi), which are on another scale.
+        public const float BossDamagePatches = 1.25f * 0.875f;
+        public static int NpcDamage(int level, bool boss)
+        {
+            float l = Mathf.Max(1, level);
+            return boss ? (int)((10 + 0.8f * l * l) * BossDamagePatches) : (int)(10 + 0.65f * l * l);
+        }
+
+        public static int NpcMaxHit(NpcInfo n) => n.damage >= 10 ? n.damage : NpcDamage(n.level, n.boss);
+
+        // Your base health: 100 per combat level (update 136), gear on top.
+        public static int BaseHealth(int combatLevel) => 100 * Mathf.Max(1, combatLevel);
+
+        // Your gear's resistance to a blow's kind, through the soft cap of update 136, exactly as the original's
+        // Scr_StatsHandler.CalculateEffectiveResistance (its bands overlap a little: 81 gives 72, 121 gives 85).
         public static float PlayerResistance(int percent) => EffectiveResistance(percent) / 100f;
 
-        public static float EffectiveResistance(int percent)
+        public static int EffectiveResistance(int resistance)
         {
-            float p = Mathf.Max(-100, percent);
-            if (p <= 60f) return p;
-            if (p <= 80f) return 60f + (p - 60f) * 0.5f;
-            if (p <= 120f) return 70f + (p - 80f) * 0.25f;
-            return Mathf.Min(90f, 80f + (p - 120f) * 0.125f);
+            if (resistance <= 60) return resistance;
+            if (resistance <= 80) return 60 + (int)((resistance - 60) * 0.5f);
+            if (resistance <= 120) return 70 + (int)((resistance - 70) * 0.25f);
+            if (resistance <= 200) return 80 + (int)((resistance - 80) * 0.125f);
+            return 90;
         }
 
         // No single blow takes more than this share of your maximum health (update 140).
         public const float MaxHitShare = 0.48f;
+        // Bleeding on creatures: 0.25% of their health a second (update 137, from 0.35%), at most 400 (from 600).
+        public const float NpcBleedShare = 0.0025f;
+        public const int NpcBleedCap = 400;
+        // A kill's experience: (1.35 x level)^1.93 + 30 (Scr_NpcHandler.DropXp), shared between the combat skills
+        // used in the last 20 seconds, less for a skill above the creature's level.
+        public static int KillXp(int npcLevel) => (int)(Mathf.Pow(1.35f * Mathf.Max(1, npcLevel), 1.93f) + 30);
+        public const float XpCounterSeconds = 20f;
+
+        public static float XpShareAgainst(int skillLevel, int npcLevel)
+        {
+            if (skillLevel <= npcLevel) return 1f;
+            float pow2 = Mathf.Pow(0.99995f, Mathf.Pow(Mathf.Abs(npcLevel - skillLevel), 3.2f));
+            return (1 + (int)(10 + 90 * pow2)) * 0.01f;
+        }
         // Death's toll (issue #69): each death in a row takes 5% more experience for 5 more minutes of play, up to
         // 5 deaths (25%, 25 minutes). From the 4th, half the deaths drop equipped gear into a bag where you fell:
         // one piece 60%, two 30%, else three to all of it. John Brech's fee per level of the toll, times
@@ -64,46 +85,28 @@ namespace GSOOffline
         public const float BountyHuntSeconds = 3600f;
         public const float CowardXpLoss = 0.05f, CowardMinutesPerStack = 10f;
         public const int CowardMaxStacks = 5;
+        // Outlaws block like players: their level against your accuracy, up to their gear's damage block.
         // Each outlaw's temperament: 15-35% of its swings an ability, shooters keeping 5-10 m away.
         public const int BountyAbilityChanceMin = 15, BountyAbilityChanceMax = 35;
         public const float BountyKiteMin = 5f, BountyKiteMax = 10f;
         public const float BountyStep = 2.5f;   // metres per half-second waypoint: a running player
         public const float BountyKiteCooldown = 8f;   // a shooter backs off at most this often
-        public static int BountyHealth(int level) => NpcHealth(level) * 3;
+        // Reconstruction (the original had no outlaws): half again a creature of its level, its gear's health on top.
+        public static int BountyHealth(int level) => NpcHealth(level) * 3 / 2;
         // 50 per level plus 8 x level^1.5 (about 900 at 10, 4,900 at 40, 8,300 at 60), 5% more per level above yours.
         public static int BountySilver(int level, int combatLevel) =>
             Mathf.RoundToInt((50f * level + 8f * Mathf.Pow(level, 1.5f)) * (1f + 0.05f * Mathf.Max(0, level - combatLevel)));
-        // The explosive potion and black candy: the fuse and reach are the original's; the blow (times the hit of
-        // your alchemy level and gear) and the share of your own health if you stay too close are reconstructions.
-        public const float ExplosiveFuse = 3f, ExplosionRadius = 6f, ExplosionHitPower = 3f, ExplosionSelfShare = 0.3f;
-        // After a stun wears off, the target can't be stunned again for this long (updates 117 and 131; NPCs too, 126).
-        public const float StunImmunity = 4f;
-        // Pets (update 132): a pet's blow is this share of its owner's basic hit (reconstruction; the notes only
-        // say it comes from the owner's damage and weapon level), times its grade: 94% Damaged to 136% Mythic
-        // (update 138). Flying followers instead add 8.5% (Damaged) to 19% (Mythic) to your damage (update 136;
-        // update 140 lowered it by an unrecorded amount).
-        public const float PetDamageShare = 0.5f;
-        public static float PetGradeMultiplier(int grade) => 1f + 0.06f * (Mathf.Clamp(grade, 1, 8) - 2);
-        public static float FlyingPetBonus(int grade) => 0.085f + 0.015f * (Mathf.Clamp(grade, 1, 8) - 1);
+        // The explosive potion and black candy (Scr_PlayerInventory): (1000 + 2 x (Damage + FireDamage) + 40 x Alchemy)
+        // x 0.8-1 fire to everything within 6 m after a 3 second fuse. It only hurt players in PvP, so not you.
+        public const float ExplosiveFuse = 3f, ExplosionRadius = 6f;
+        // After a stun wears off, the target can't be stunned again for this long (the original's buff 47).
+        public const float StunImmunity = 5f;
+        // Flying followers add a tenth of their grade's multiplier to your damage (8.8% Damaged to 17.2% Mythic with
+        // update 138's grades; update 140 lowered it by an unrecorded amount).
+        public static float FlyingPetBonus(int grade) => OfflineServer.GradeMultiplier(Mathf.Clamp(grade, 1, 8)) * 0.1f;
 
         // Bosses give double experience (update 137).
         public const int BossXpMultiplier = 2;
-
-        // Abilities with their own lowest roll: Brutal slash and Cripple (update 130), Fire ball (update 134).
-        public static readonly Dictionary<int, float> AbilityMinDamageShare = new Dictionary<int, float>
-        {
-            { 86, 0.75f }, { 88, 0.5f }, { 1, 0.6f },
-        };
-
-        // A weapon's lowest basic-attack roll as a share of its highest (update 130); unlisted weapons roll from 1.
-        public static float MinDamageShare(ItemTemplate w)
-        {
-            if (w == null) return 0f;
-            if (w.flags.Contains("isHalberd")) return 0.65f;
-            if (w.flags.Contains("isBroadsword") || w.flags.Contains("isBow")) return 0.5f;
-            if (w.flags.Contains("isGreatsword")) return 0.3f;
-            return 0f;
-        }
 
         // Armor alignment (update 135): worn light or heavy armor scores chest 4, legs 3, head 2, back, gloves and
         // boots 1 each (shields don't count). 7 points in one type give its passive.
@@ -122,15 +125,20 @@ namespace GSOOffline
         public const float LightAlignmentDamage = 1.15f, HeavyAlignmentTaken = 0.9f;
         public const int BuffLightArmor = 94, BuffHeavyArmor = 95;   // client buff icons (XMLs/Buffs)
 
-        // Combat level (update 136): the three best combat skills count in full (/3), every other one a twelfth.
-        public static readonly int[] CombatSkills = { 15, 16, 17, 18, 20, 21, 22, 23, 24, 25, 26 };
-        // Block also takes a flat bite out of every blow, so well-armoured players shrug off weak creatures (a crab's
-        // few points against ~200 block at level 40) while creatures of their own level still hurt.
-        public static float FlatBlock(int block) => Mathf.Max(0, block) / 20f;
-        public const float AbilityMultiplier = 1.6f;
-        public static int KillXp(int npcLevel) => 12 * Mathf.Max(1, npcLevel);
-        // Armor skills share a kill's XP if the player was hit this recently before it (community wiki: 30 s).
-        public const float ArmorXpWindow = 30f;
+        // Combat level (update 136, Scr_PlayerHandler.CalculateCombatLevel): the three best of Archery, Healing, the
+        // armor skills, Elemental grimoire, Swordsmanship and Wrestling in full, the other four a quarter, all x 0.333.
+        public static readonly int[] CombatSkills = { 17, 24, 26, 25, 20, 15, 23 };
+
+        public static int CombatLevel(List<int> levels)
+        {
+            levels.Sort((a, b) => b.CompareTo(a));
+            int best = 0, rest = 0;
+            for (int i = 0; i < levels.Count; i++)
+                if (i < 3) best += levels[i];
+                else rest += levels[i];
+            return (int)((best + rest * 0.25f) * 0.333f);
+        }
+
         // Silver in the loot bag of NPCs the wiki has no drop table for.
         public static int SilverDrop(int npcLevel) => Random.Range(0, 3 * Mathf.Max(1, npcLevel) + 1);
         public const float LeashDistance = 40f;
@@ -190,7 +198,6 @@ namespace GSOOffline
         private readonly Dictionary<int, float> swingLength = new Dictionary<int, float>();
         private float respawnPlayerAt = -1f;
         private float aggroImmuneUntil;
-        private float lastHitTaken = -1000f;
         private bool PlayerDead => respawnPlayerAt > 0f;
 
         private void RegisterCombatHandlers()
@@ -208,6 +215,7 @@ namespace GSOOffline
             clickTargetPos = null;
             pendingBlow = null;   // a swing from the old scene
             measureSwingAt = -1f;
+            areas.Clear();        // fire walls, mines and plants stay in the scene they were cast in
             StopAttacking();
         }
 
@@ -325,15 +333,6 @@ namespace GSOOffline
             return 3f + slack;
         }
 
-        private float WeaponSpeed(ItemSave weapon)
-        {
-            var flags = weapon != null ? ItemData.Get(weapon.typeId)?.flags : null;
-            if (flags == null) return 2.4f;
-            if (flags.Contains("isDagger")) return 1.8f;
-            if (flags.Contains("isGreatsword") || flags.Contains("isHalberd")) return 3.2f;
-            return 2.4f;
-        }
-
         private void TickPlayerAttack(Vector3 playerPos)
         {
             MeasureSwing();
@@ -348,7 +347,8 @@ namespace GSOOffline
             if (Vector3.Distance(NpcPosition(npc), playerPos) > WeaponRange(weapon)) return;   // walk closer
 
             // One swing per play of the attack animation. Damage per hit scales so damage per second stays that of
-            // a swing every WeaponSpeed seconds, and attack speed buffs add damage rather than cut the animation short.
+            // a swing every WeaponSpeed seconds (the original's attack time), and attack speed buffs add damage
+            // rather than cut the animation short.
             float interval = swingLength.TryGetValue(weapon?.typeId ?? 0, out float len) ? len : WeaponSpeed(weapon);
             nextPlayerSwing = Time.time + interval;
             lastPlayerSwing = Time.time;
@@ -360,16 +360,27 @@ namespace GSOOffline
             swingShown = true;   // attack id 0: basic attack animation for the equipped weapon
             Aggro(npc);
             WeaponSounds(weapon, out int swingSfx, out int hitSfx);
-            int projectile = WeaponProjectile(weapon);
+            var blow = BasicBlow(weapon);
+            int projectile = blow.projectile;
             if (projectile == 0) PlaySound(swingSfx, playerPos);   // a shot's sound goes with the release
 
-            int hit = RollPlayerHit(weapon, npc, interval / (WeaponSpeed(weapon) * AttackSpeedMultiplier()));
-            int skill = WeaponSkill(weapon);
+            float power = interval / (WeaponSpeed(weapon) * AttackSpeedMultiplier());
+            bool punch = BasicBlowIsPunch(weapon);
             System.Action land = () =>
             {
                 if (npc.dead) return;
-                if (hit > 0) PlaySound(hitSfx, NpcPosition(npc));
-                DealDamage(npc, hit, skill, reflectable: true);
+                int damage = Mathf.RoundToInt((projectile > 0 ? ShotDamage(projectile, blow.damage, blow.explicitDamage) : blow.damage) * power);
+                if (projectile == 41) FireArrowHit(npc, damage);   // Fire arrows
+                else
+                {
+                    if (HitNpc(npc, damage, blow.type) > 0) PlaySound(hitSfx, NpcPosition(npc));
+                    if (weapon != null && weapon.typeId == 380 && !npc.dead) BalSardanWandHit(npc, damage);
+                    if (punch && Time.time >= punchStunReadyAt)
+                    {
+                        StunNpc(npc, 2f);
+                        punchStunReadyAt = Time.time + 10f;
+                    }
+                }
             };
             pendingBlow = (strike, strikes) =>
             {
@@ -492,87 +503,46 @@ namespace GSOOffline
             if (!autoAttacking) StopAttacking();
         }
 
-        // Every damage stat on everything worn: Damage, the physical kinds (SlashDamage...) and the elemental ones
-        // (FireDamage, PsychicDamage, DmgPoison...), so staffs, wands and lutes count theirs, and so do rings,
-        // amulets and armour (only the weapon's used to count). The weapon on your back isn't equipped.
-        private int GearDamage()
-        {
-            int sum = 0;
-            foreach (var it in character.items)
-                if (it.equipped)
-                    foreach (var s in it.stats)
-                        if (s.key.EndsWith("Damage") || s.key == "DmgPoison") sum += Graded(it, s.value);
-            return sum;
-        }
-
         // Hit splash styles (Scr_EffectController.createHitSplash): 0 plain, 1 blocked, 3 weakened, 4 poisoned.
         private const int SplashPlain = 0, SplashBlocked = 1, SplashWeakened = 3, SplashPoisoned = 4;
-        private const int AggressiveSnowball = 152;   // the only thing that hurts Snowmen and the winter bosses
 
-        private int RollPlayerHit(ItemSave weapon, NpcEntity npc, float power = 1f, AbilityInfo ability = null)
+        /// <summary>The basic attack is a punch: no weapon, or something that isn't one (a tool).</summary>
+        private static bool BasicBlowIsPunch(ItemSave weapon)
         {
-            npc.hitSplash = SplashPlain;
-            if (Random.value >= CombatRules.HitChance) return 0;
-            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
-            float minShare = ability == null ? CombatRules.MinDamageShare(weapon != null ? ItemData.Get(weapon.typeId) : null)
-                : CombatRules.AbilityMinDamageShare.TryGetValue(ability.id, out float s) ? s : 0f;
-            int min = Mathf.Clamp(Mathf.RoundToInt(max * minShare), 1, max);
-            float damage = Random.Range(min, max + 1) * power * DamageDealtMultiplier();
-            if (weapon != null) damage *= WeaponGradeMultiplier(weapon.grade);
-            if (!GameData.Npcs.TryGetValue(npc.typeId, out var info)) return Mathf.RoundToInt(damage);
-            if (ability == null || ability.id != AggressiveSnowball)
-            {
-                float through = HitThrough(weapon, info, ability, max);
-                if (through <= 0f)
+            if (weapon == null) return true;
+            var ih = Scr_ItemHandler.instance;
+            int t = weapon.typeId;
+            return !(ih.isBroadsword(t) || ih.isGreatsword(t) || ih.isHalberd(t) || ih.isDagger(t) || ih.isMace(t) || ih.isBow(t)
+                || ih.isCrossBow(t) || ih.isInstrument(t) || ih.isStaff(t) || ih.isWand(t));
+        }
+
+        /// <summary>A Fire arrows shot (projectile 41): the piercing hit, a fifth of it again as fire plus your
+        /// FireDamage, and a burn of up to three stacks (10 + 0.3 x (Damage + FireDamage) + 2 x Archery a second, 10 s).</summary>
+        private void FireArrowHit(NpcEntity npc, int damage)
+        {
+            int fire = StatDamageOf(DamageKinds.Fire);
+            HitNpc(npc, damage, DamageKinds.Piercing);
+            HitNpc(npc, (int)(damage * 0.2f) + fire, DamageKinds.Fire);
+            int burn = (int)(10 + (StatDamage() + fire) * 0.3f + SkillLevel(SkillArchery) * 2f);
+            for (int id = 87; id <= 89; id++)
+                if (!npc.dots.Exists(d => d.id == id))
                 {
-                    npc.hitSplash = SplashBlocked;   // immune: Snowmen to all but snowballs, Golems to poison...
-                    return 0;
+                    AddDot(npc, id, burn, DamageKinds.Fire, 1f, 10f);
+                    PlayNpcEffect(npc, 49);
+                    break;
                 }
-                if (through > 1.01f) npc.hitSplash = SplashWeakened;   // hit a weakness
-                damage *= through;
-            }
-            int outlaw = BountyBlockedHit(npc, damage);   // a bounty outlaw blocks as a player does
-            if (outlaw >= 0) return outlaw;
-            return Mathf.Max(1, Mathf.RoundToInt(damage) - info.damageBlock / 10);
         }
 
-        /// <summary>
-        /// The share of a hit that gets through an NPC's resistances. A hit is the sum of its kinds: each damage stat
-        /// on your gear is its own kind (a staff's FireDamage, a ring's IceDamage), and the rest (the base, plain
-        /// Damage and your skill level) is the ability's element, or your weapon's main kind for plain blows.
-        /// </summary>
-        private float HitThrough(ItemSave weapon, NpcInfo info, AbilityInfo ability, int max)
+        /// <summary>The Bal Sardan wand: a second after its blow the target heals a quarter to four times it (buff 55).</summary>
+        private void BalSardanWandHit(NpcEntity npc, int damage)
         {
-            int element = ability != null ? DamageKinds.OfAbility(ability.name) : DamageKinds.None;
-            int main = element != DamageKinds.None ? element : WeaponKind(weapon);
-            float through = 0f;
-            int typed = 0;
-            for (int k = 1; k < DamageKinds.Count; k++)
+            int heal = (int)Random.Range(damage * 0.25f, damage * 4f);
+            Later(1f, () =>
             {
-                int part = GearStat(DamageKinds.DamageStat(k));
-                if (part <= 0) continue;
-                typed += part;
-                through += part * DamageKinds.Through(info.resistance[k]);
-            }
-            int rest = Mathf.Max(0, max - typed);
-            through += rest * DamageKinds.Through(info.resistance[main]);
-            return max > 0 ? through / max : 1f;
-        }
-
-        /// <summary>Dev: what share of your hit (plain, or with an ability) gets through an NPC (bridge command hitcheck).</summary>
-        internal void DevHitCheck(int typeId, int abilityId)
-        {
-            if (character == null || !GameData.Npcs.TryGetValue(typeId, out var info)) return;
-            var weapon = EquippedWeapon();
-            SkillData.Abilities.TryGetValue(abilityId, out var ability);
-            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
-            var res = new List<string>();
-            for (int k = 1; k < DamageKinds.Count; k++)
-                if (info.resistance[k] != 0) res.Add(DamageKinds.Name(k) + " " + info.resistance[k]);
-            string through = ability != null && ability.id == AggressiveSnowball ? "100% (snowball)" : (HitThrough(weapon, info, ability, max) * 100f).ToString("F0") + "%";
-            Plugin.Log.LogInfo($"[dev] hit on {info.name} ({typeId}) with {(ability != null ? ability.name + " (" + DamageKinds.Name(DamageKinds.OfAbility(ability.name)) + ")" : "plain blows")}, " +
-                $"weapon kind {DamageKinds.Name(WeaponKind(weapon))}, max hit {max}: {through} gets through; resistances [{string.Join(", ", res.ToArray())}]; " +
-                $"its blows: {DamageKinds.Name(info.damageType)}, land {CombatRules.NpcHitChance(info.accuracy) * 100f:F0}%");
+                if (npc.dead) return;
+                npc.health = Mathf.Min(npc.maxHealth, npc.health + heal);
+                Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
+            });
         }
 
         /// <summary>The kind of the weapon's blows: its largest damage stat; slash for a sword, blunt for fists.</summary>
@@ -611,10 +581,13 @@ namespace GSOOffline
             if (npc.health <= 0) KillNpc(npc, skill);
         }
 
-        /// <summary>Dev: a test character's base health, e.g. to stand in front of bosses (bridge command devhealth).</summary>
+        /// <summary>Dev: a test character's base health, e.g. to stand in front of bosses (bridge command devhealth);
+        /// 0 goes back to 100 per combat level.</summary>
         internal void DevSetHealth(int health)
         {
-            character.health = Mathf.Max(1, health);
+            devBaseHealth = Mathf.Max(0, health);
+            character.health = devBaseHealth > 0 ? devBaseHealth : CombatRules.BaseHealth(CombatLevel());
+            Send(16, 5, StatHealth, character.health);
             character.currentHealth = MaxHealth();
             SendHealth();
             Plugin.Log.LogInfo($"[dev] health {character.currentHealth}/{MaxHealth()}");
@@ -648,32 +621,10 @@ namespace GSOOffline
             SetAnim(npc, info?.animDeath ?? NpcAnims.Death);
             if (info != null) NpcSound(npc, info.sfxDeath);
 
-            int level = info?.level ?? 1;
-            AwardKillXp(skill, CombatRules.KillXp(level) * (info != null && info.boss ? CombatRules.BossXpMultiplier : 1));
+            AwardKillXp(info);
             if (npc.master == null) DropLoot(npc, info);   // summoned minions carry nothing
             OnNpcKilled(npc.typeId);
             OnBossKilled(npc);
-        }
-
-        /// <summary>
-        /// Kill XP goes to the weapon skill and, if the player was hit within <see cref="CombatRules.ArmorXpWindow"/>,
-        /// is shared with the armor skills worn (light and/or heavy), split evenly as the community wiki describes.
-        /// </summary>
-        private void AwardKillXp(int weaponSkill, int xp)
-        {
-            var skills = new List<int> { weaponSkill };
-            if (Time.time - lastHitTaken <= CombatRules.ArmorXpWindow)
-            {
-                foreach (var it in character.items)
-                {
-                    if (!it.equipped) continue;
-                    var flags = ItemData.Get(it.typeId)?.flags;
-                    if (flags == null) continue;
-                    if (flags.Contains("isLightArmor") && !skills.Contains(25)) skills.Add(25);
-                    if (flags.Contains("isHeavyArmor") && !skills.Contains(26)) skills.Add(26);
-                }
-            }
-            foreach (int s in skills) AddXp(s, xp / skills.Count);
         }
 
         /// <summary>Stunned or rooted NPCs stop where they are (the client keeps walking to the last waypoint).</summary>
@@ -994,7 +945,7 @@ namespace GSOOffline
                     Send(198, 28, npc.uid, playerPos);   // turn to the player: the client only turns NPCs as they walk
                 }
                 if (Time.time < npc.nextSwing) continue;
-                npc.nextSwing = Time.time + info.attackSpeed;
+                npc.nextSwing = Time.time + info.attackSpeed * (Time.time < npc.chilledUntil ? 1.25f : 1f);   // chilled: a quarter slower
                 Send(198, 28, npc.uid, playerPos);
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
@@ -1017,35 +968,31 @@ namespace GSOOffline
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({npc.typeId}) {(shoot ? "shoots" : "swings")} from {Vector3.Distance(NpcPosition(npc), player.transform.position):0.0} m");
             if (shoot)
             {
-                NpcShoots(npc, npc.blowProjectile > 0 ? npc.blowProjectile : info.projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc); });
+                int projectile = npc.blowProjectile > 0 ? npc.blowProjectile : info.projectile;
+                NpcShoots(npc, projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc, projectile); });
                 return;
             }
-            // Stepping out of reach during the wind-up dodges the blow.
-            if (Vector3.Distance(NpcPosition(npc), player.transform.position) > info.attackDistance + info.attackMissDistance)
-            {
-                Send(8, 2, character.name, 0, PlayerSplash(info));
-                return;
-            }
+            // The original's blows land wherever you are within 50 m of the creature once its swing is under way.
             NpcHitsPlayer(info, npc);
         }
 
-        private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker)
+        /// <summary>
+        /// A creature's blow (Scr_NPCAI.AttackHit): 1 to one less than its damage, or its shot's roll, then through
+        /// your defences (<see cref="PlayerDamageTaken"/>) with its accuracy against your block.
+        /// </summary>
+        private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker, int projectile = 0)
         {
-            int damage = 0;
-            if (Random.value < CombatRules.NpcHitChance(info.accuracy))
+            int max = CombatRules.NpcMaxHit(info);
+            float roll = projectile > 0 ? NpcShotDamage(projectile, max) : Random.Range(1, Mathf.Max(2, max));
+            roll *= attacker != null ? attacker.blowPower : 1f;
+            int type = projectile > 0 && ProjectileType(projectile) > 0 ? ProjectileType(projectile) : info.damageType;
+            if (projectile == 45 && character.currentMana > 0)   // Diminish takes mana too
             {
-                // Your resistance to the blow's kind, then your damage block against every blow, whatever its kind.
-                float roll = Random.Range(1, CombatRules.NpcMaxHit(info) + 1) * (attacker != null ? attacker.blowPower : 1f);
-                if (info.damageType > 0 && info.damageType < DamageKinds.Count)
-                    roll *= 1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(info.damageType)));
-                int block = GearStat("Damageblock");
-                roll *= 1f - CombatRules.BlockReduction(block, info.level);
-                damage = Mathf.Max(0, Mathf.RoundToInt(roll - CombatRules.FlatBlock(block)));
-                lastHitTaken = Time.time;
-                damage = ApplyDefensiveBuffs(damage, attacker);
-                damage = Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
+                character.currentMana = Mathf.Max(0, character.currentMana - (int)(roll * 0.05f));
+                SendMana();
             }
-            if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} (health {character.currentHealth - damage}/{MaxHealth()})");
+            int damage = PlayerDamageTaken(Mathf.RoundToInt(roll), type, attacker, info.accuracy);
+            if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} of {roll:0} (health {character.currentHealth - damage}/{MaxHealth()})");
             HurtPlayer(damage, PlayerSplash(info));
         }
 
@@ -1057,19 +1004,6 @@ namespace GSOOffline
             Send(8, 2, character.name, -damage, splash);
             SendHealth();
             if (character.currentHealth <= 0) PlayerDies();
-        }
-
-        /// <summary>
-        /// Damage the original server dealt in its own numbers (100 health per combat level), taken as the same share
-        /// of this player's health, less their resistance to its kind: the dungeons' scripted hazards.
-        /// </summary>
-        private int HurtByOriginal(int originalDamage, int damageKind, int splash = SplashPlain)
-        {
-            float share = Mathf.Min(1f, originalDamage / (Mathf.Max(1, CombatLevel()) * 100f));
-            float res = damageKind > 0 && damageKind < DamageKinds.Count ? CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(damageKind))) : 0f;
-            int damage = Mathf.RoundToInt(MaxHealth() * share * (1f - res));
-            HurtPlayer(damage, splash);
-            return damage;
         }
 
         // The splash style for a blow on you. damagetype used to go straight through, but splash styles aren't damage
@@ -1085,7 +1019,9 @@ namespace GSOOffline
             npc.hasDest = false;
             npc.attackAnimUntil = 0f;
             npc.stunnedUntil = npc.rootedUntil = npc.stunImmuneUntil = 0f;
-            npc.dotTicks = 0;
+            npc.slowedUntil = npc.freezeUntil = npc.chilledUntil = npc.weakenedUntil = 0f;
+            npc.freezeStacks = 0;
+            npc.dots.Clear();
             Send(13, 0, npc.uid, false);
             Send(9, 1, npc.uid, npc.spawnPos);
             Send(12, 0, npc.uid, npc.health, npc.maxHealth, 0);
@@ -1130,10 +1066,12 @@ namespace GSOOffline
             var player = LocalPlayer;
             if (player == null) return;
             Vector3 p = player.transform.position;
+            TrackMovement(p);
             TickPlayerRespawn();
             if (world == null || !sceneReady) return;   // respawned into another zone: this world is gone
             TickBuffs();
             TickNpcEffects();
+            TickAreaEffects();
             TickCastEnd();
             TickSwingProfile();
             TickPlayerAttack(p);

@@ -30,6 +30,7 @@ namespace GSOOffline
         internal static ConfigEntry<bool> ShowVersion;
         internal static ConfigEntry<bool> CheckForUpdates;
         internal static ConfigEntry<bool> GearEffects;
+        internal static ConfigEntry<float> BossHealthShare;
 
         private void Awake()
         {
@@ -48,6 +49,9 @@ namespace GSOOffline
                 "Holiday events (creatures drop Halloween or Christmas crates). Auto: Halloween from 15 October to 7 November, Christmas from 1 December to 6 January, by this computer's date.",
                 new AcceptableValueList<string>("Auto", "Off", "Halloween", "Christmas", "Both")));
             GearEffects = Config.Bind("World", "GearEffects", true, "Worn gear of Rare grade and better shimmers in its grade's colour, more the better the grade.");
+            BossHealthShare = Config.Bind("Combat", "BossHealthShare", 0.25f, new ConfigDescription(
+                "Bosses were made for groups of players. Alone, you fight them with this share of their original health (1 = the original game's). Their damage is always the original's. Takes effect on the next start of the game.",
+                new AcceptableValueRange<float>(0.05f, 1f)));
             LogUnhandledEvents = Config.Bind("Debug", "LogUnhandledEvents", true, "Log client->server events the offline server does not implement yet.");
             AutoLogin = Config.Bind("Convenience", "AutoLogin", "", "If set, log in automatically with this account name (skips the login screen).");
             AutoCharacter = Config.Bind("Convenience", "AutoCharacter", "", "If set together with AutoLogin, enter the world with this character (created if missing).");

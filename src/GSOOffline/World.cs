@@ -30,8 +30,11 @@ namespace GSOOffline
         public NpcEntity master;
         public float absorbUntil;       // a boss's Absorb (aura on) until then
         public float reflectFrom;       // ...and from then the player's hits come back at them        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
-        public int dotDamage, dotTicks, dotSkill;
-        public float nextDot;
+        public readonly List<NpcDot> dots = new List<NpcDot>();   // damage over time (OfflineServer.OriginalCombat.cs)
+        public float slowedUntil;       // walks instead of running
+        public int freezeStacks;        // Icy touch / Glacial spike: five chill it
+        public float freezeUntil, chilledUntil;   // chilled: its swings a quarter slower
+        public float weakenedUntil;     // the weakness arrow: 15 less of every resistance
 
         // scripted NPCs (Aellope, OfflineServer.Harpy.cs)
         public bool flying;       // in the air: its script moves and animates it, the ground AI leaves it alone

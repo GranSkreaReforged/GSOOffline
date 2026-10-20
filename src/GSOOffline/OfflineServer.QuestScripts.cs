@@ -69,7 +69,7 @@ namespace GSOOffline
         // ---- reconstructed quests (2020 content the original's 2019 code doesn't have) --------------
 
         private const int QuestMagicalJourney = 16, QuestHuntersGuild = 35, QuestGrantsGloves = 34;
-        private const int ItemInsignia = 10730, SceneAthagosInteriors = 23, SceneMagesGuild = 21, AbilityFlameLance = 116, TrainingDummy = 80;
+        private const int ItemInsignia = 10730, SceneAthagosInteriors = 23, SceneMagesGuild = 21, TrainingDummy = 80;
         private static readonly Vector3 HuntersGuildHall = new Vector3(108f, 139.5f, 447f);
         private bool pendingInsideGuild;
 

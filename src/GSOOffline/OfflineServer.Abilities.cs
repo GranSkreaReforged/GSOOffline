@@ -5,7 +5,7 @@ namespace GSOOffline
 {
     internal enum AbilityKind
     {
-        Strike,         // the target: a basic hit x power (the default for targeted abilities)
+        Strike,         // the target (the default for targeted abilities)
         Splash,         // the target and everything hostile within radius of it
         Sweep,          // everything hostile within radius of the player
         Buff,           // a timed effect on the player
@@ -19,153 +19,137 @@ namespace GSOOffline
     }
 
     /// <summary>
-    /// What one ability does. The game data only names abilities and gives level, mana, range and cooldown;
-    /// the effects were server code. These rules rebuild them from the ability descriptions, and the numbers
-    /// (multipliers, durations, radii) are reconstructions tuned for the feel of the game.
+    /// What one ability does. The game data only names abilities and gives level, mana, range and cooldown; the
+    /// effects were server code. Abilities the original server had (update 136) run its code
+    /// (OfflineServer.OriginalAbilities.cs) and use this only for the kind of target they need. The later ones
+    /// it had no code for (Shatter, Frostburn, Ice hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma,
+    /// the archery landmine, Condensed psyche and ice, Halberd ice attack) are reconstructions: power x the
+    /// original's basic blow for the weapon, or the effect described.
     /// </summary>
     internal class AbilityRule
     {
         public AbilityKind kind = AbilityKind.Strike;
-        public float power = CombatRules.AbilityMultiplier;   // damage x basic hit, or heal fraction of max health
+        public float power = 1f;      // reconstructions: damage x the weapon's basic blow
         public float radius;
         public int buff;              // client buff id (XMLs/Buffs) shown while the effect lasts; 0 = no icon
         public float duration;        // seconds
         public int bandage;           // item consumed by Bandage
+        public int bandageLevel;      // the bandage's level in the original's heal: (Healing + level) x 15
+        public float bandageMax = 1.7f;   // ...times 0.9 to this
         public int manaCap;           // ManaBurst: most mana spent
-        public float stun, root;      // seconds the targets can't act / can't move
-        public float dot;             // seconds of damage over time on the targets (power is split over it)
         public BuffEffect effect;     // Buff: what the effect does
 
         public static AbilityRule Of(AbilityKind kind) => new AbilityRule { kind = kind };
     }
 
-    /// <summary>The server-side part of a player buff. Unset fields have no effect.</summary>
+    /// <summary>The server-side part of a player buff that isn't one of the original's own (see OriginalAbilities).
+    /// Unset fields have no effect.</summary>
     internal class BuffEffect
     {
-        public float damageDealt = 1f;     // x outgoing damage
+        public float damageDealt = 1f;     // x outgoing damage (reconstructed abilities only)
         public float damageTaken = 1f;     // x incoming damage (0 = immune)
         public float attackSpeed = 1f;     // x time between basic attacks
-        public float reflect;              // share of incoming damage dealt back to the attacker
         public int bonusHealthPercent;     // + max health while it lasts (Survivor, health boost)
         public bool payBackHealth;         // Survivor: the bonus is taken as damage when it ends
         public float manaPerSecond;
         public float healPercentPerSecond; // of max health (negative: damage over time)
         public bool poisonDamage;          // that damage is poison (Nirish's venom): poison resistance applies
         public bool plague;                // Sepitus's plague: heals hurt instead (Vitals.Heal)
-        public bool manaFromDamage;        // Embrace the pain
         public bool peace;                 // NPCs up to the player's Healing level don't aggro
-        public bool absorb;                // Energy blade: damage taken is stored and released around the player
-        public bool crossbowOnly, bowOnly; // attack speed / damage only with that weapon
         public float craftTime = 1f, gatherTime = 1f;
         public float alchemyXp = 1f;
     }
 
     public partial class OfflineServer
     {
-        private static AbilityRule Strike(float power = CombatRules.AbilityMultiplier) => new AbilityRule { power = power };
-        private static AbilityRule Sweep(float radius, float power = CombatRules.AbilityMultiplier) =>
+        private static AbilityRule Strike(float power = 1f) => new AbilityRule { power = power };
+        private static AbilityRule Sweep(float radius, float power = 1f) =>
             new AbilityRule { kind = AbilityKind.Sweep, radius = radius, power = power };
-        private static AbilityRule Splash(float radius, float power = CombatRules.AbilityMultiplier) =>
+        private static AbilityRule Splash(float radius, float power = 1f) =>
             new AbilityRule { kind = AbilityKind.Splash, radius = radius, power = power };
         private static AbilityRule Buff(int icon, float seconds, BuffEffect e) =>
             new AbilityRule { kind = AbilityKind.Buff, buff = icon, duration = seconds, effect = e };
-        private static AbilityRule Bandage(int item) => new AbilityRule { kind = AbilityKind.Bandage, bandage = item };
+        private static AbilityRule Bandage(int item, int level, float max = 1.7f) =>
+            new AbilityRule { kind = AbilityKind.Bandage, bandage = item, bandageLevel = level, bandageMax = max };
+
+        // Ability ids the combat rules check for.
+        private const int AbilityThickSkin = 15, AbilityShieldBlock = 26, AbilityFocus = 61, AbilityFrenzy = 84,
+            AbilityHealingMusic = 98, AbilityHealingAura = 99, AbilityStrength = 100, AbilitySurvivor = 103, AbilityDisperse = 104,
+            AbilityFireWisp = 107, AbilityFireWisp2 = 1107, AbilityFlameBarrier = 115, AbilityFlameLance = 116, AbilityImmolate = 117,
+            AbilityFirestorm = 121, AbilityIceBarrier = 125, AbilityCryostasis = 126, AbilityEnergyBlade = 139, AbilityHackAndSlash = 140,
+            AbilityStability = 142, AbilityTruce = 143, AbilityGlyph = 149, AbilityFireArrows = 150, AbilityManaSurge = 168,
+            AbilityEmbraceThePain = 169, AbilityTraverse = 170;
 
         // Ability id -> rule. Targeted abilities missing here are plain strikes; untargeted ones are utilities.
         private static readonly Dictionary<int, AbilityRule> AbilityRules = new Dictionary<int, AbilityRule>
         {
-            // Bandages (Healing). Healing other players has nobody to heal offline, so it heals you.
-            { 72, Bandage(10367) }, { 73, Bandage(10368) }, { 82, Bandage(10369) }, { 83, Bandage(10370) },
-            { 110, Bandage(10443) }, { 111, Bandage(10444) },
-            { 78, Bandage(10367) }, { 79, Bandage(10368) }, { 80, Bandage(10369) }, { 81, Bandage(10370) },
-            { 108, Bandage(10443) }, { 109, Bandage(10444) },
+            // Bandages (Healing): wool 3, cotton 7, silk 15, jute 31, flax 43, ramie 76 (the original's bandage
+            // levels). Healing other players has nobody to heal offline, so it heals you.
+            { 72, Bandage(10367, 3) }, { 73, Bandage(10368, 7) }, { 82, Bandage(10369, 15) }, { 83, Bandage(10370, 31, 1.8f) },
+            { 110, Bandage(10443, 43, 1.8f) }, { 111, Bandage(10444, 76, 1.8f) },
+            { 78, Bandage(10367, 3) }, { 79, Bandage(10368, 7) }, { 80, Bandage(10369, 15) }, { 81, Bandage(10370, 31) },
+            { 108, Bandage(10443, 43, 1.8f) }, { 109, Bandage(10444, 76, 1.8f) },
 
-            // Heals
-            { 94, new AbilityRule { kind = AbilityKind.Heal, power = 0.25f } },                         // Charm
-            { 96, new AbilityRule { kind = AbilityKind.Heal, power = 0.15f } },                         // Purification
-            { 156, new AbilityRule { kind = AbilityKind.Heal, power = 0.2f } },                         // Healing bird
-            { 98, new AbilityRule { kind = AbilityKind.HealOverTime, power = 0.2f, duration = 10f, buff = 103 } },  // Healing music
-            { 99, new AbilityRule { kind = AbilityKind.HealOverTime, power = 0.3f, duration = 15f, buff = 103 } },  // Healing aura
-            { 158, new AbilityRule { kind = AbilityKind.HealOverTime, power = 0.3f, duration = 10f, buff = 103 } }, // Healing plant
+            // Heals (OriginalAbilities works out how much)
+            { 94, Of(AbilityKind.Heal) },             // Charm
+            { 96, Of(AbilityKind.Heal) },             // Purification
+            { 156, Of(AbilityKind.Heal) },            // Healing bird
+            { 98, Of(AbilityKind.HealOverTime) },     // Healing music
+            { 99, Of(AbilityKind.HealOverTime) },     // Healing aura
+            { 158, Of(AbilityKind.HealOverTime) },    // Healing plant
 
-            // Area attacks around the player
-            { 85, Sweep(5f) }, { 87, Sweep(5f) }, { 161, Sweep(5f) }, { 162, Sweep(5f) },   // Slashing
-            { 95, Sweep(6f, 2f) },        // Demolition
-            { 113, Sweep(5f, 2f) },       // Blast
-            { 119, new AbilityRule { kind = AbilityKind.Sweep, radius = 5f, power = 2f, dot = 6f } },   // Fire wall: applies Combustion
-            { 121, Sweep(5f, 1.8f) },     // Firestorm
-            { 122, Sweep(3f, 2f) }, { 172, Sweep(3f, 2f) },   // Landmine
-            { 123, new AbilityRule { kind = AbilityKind.Sweep, radius = 5f, power = 1f, root = 3f } },  // Flashfreeze
-            { 128, Sweep(6f, 1.8f) },     // Glacial spike
+            // Area attacks around the player or a clicked spot
+            { 85, Sweep(5f) }, { 87, Sweep(3f) }, { 161, Sweep(3f) }, { 162, Sweep(5f) },   // Slashing
+            { 95, Sweep(5f) },            // Demolition
+            { 113, Sweep(5f) },           // Blast
+            { 119, Sweep(5f) },           // Fire wall
+            { 121, Of(AbilityKind.Buff) },   // Firestorm: a storm around you for 8 seconds
+            { 122, Sweep(6f) },           // Landmine
+            { 123, Sweep(4f) },           // Flashfreeze
+            { 149, Sweep(8f) },           // Psychic glyph
+            // Reconstructions: the original had no code for these.
+            { 128, Strike() },            // Glacial spike (the original's: a single target)
             { 129, Sweep(6f, 1.8f) },     // Shatter
-            { 131, new AbilityRule { kind = AbilityKind.Sweep, radius = 6f, power = 1.6f, dot = 6f } },  // Frostburn
+            { 131, Sweep(6f, 1.6f) },     // Frostburn
             { 132, Sweep(8f, 2f) },       // Ice hail
             { 133, Sweep(8f, 2.2f) },     // Frozen barrage
+            { 172, Sweep(2f, 2f) },       // Landmine (archery): 35 s, 2 m blast, as its description says
 
             // Area attacks around the target
-            { 1, Splash(2f) },            // Fire ball: 2 m splash
-            { 65, Splash(3f) },           // Explosive arrow
-            { 120, Splash(4f, 2f) },      // Eruption
+            { 1, Splash(2f) },            // Fire ball
+            { 65, Splash(5f) },           // Explosive arrow
+            { 120, Splash(5f) },          // Eruption
+            { 52, Splash(3f) },           // Broadsword electric attack
+            { 64, Splash(3f) },           // Electric arrow
+            { 92, Splash(5f) },           // Mace multiple hit
 
-            // Strikes with extra effects
-            { 57, new AbilityRule { power = 1.6f, stun = 3f } },      // Stranglevine
-            { 58, new AbilityRule { power = 1.6f, stun = 2f } },      // Rockslide
-            { 88, new AbilityRule { power = 1f, root = 4f } },        // Cripple
-            { 89, new AbilityRule { power = 1f, stun = 3f } },        // Stun
-            { 105, new AbilityRule { power = 1.4f, stun = 3f } },     // Stunning blow
-            { 90, new AbilityRule { power = 0.5f, root = 5f } },      // Hunting net
-            { 155, new AbilityRule { power = 1.4f, root = 4f, dot = 6f } },   // Thorny vines
-            { 66, new AbilityRule { power = 1.8f, dot = 10f } },      // Poison arrow
-            { 112, new AbilityRule { power = 3f, dot = 10f } },       // Combustion: damage over 10 seconds
-            { 154, new AbilityRule { power = 2.2f, dot = 8f } },      // Venom arrow
-            { 160, new AbilityRule { power = 1.6f, dot = 8f } },      // Poisonous stab
-            { 165, new AbilityRule { power = 2f, dot = 30f } },       // Wounding shot: bleeds for 30 seconds
-            { 91, Strike(2f) },           // Piercing shot (ignores resistances)
-            { 86, Strike(2f) },           // Brutal slash
-            { 116, Strike(2.2f) },        // Flame lance
-            { 101, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 400 } },   // Tritone
-            { 173, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 400 } },   // Condensed psyche
-            { 174, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 300 } },   // Condensed ice
+            // Strikes (stuns, roots and damage over time come with the original's code)
+            { 91, Strike() },             // Piercing shot
+            { 101, Strike() },            // Tritone (update 137: no longer spends mana, twice the damage)
+            { 171, Strike(1.6f) },        // Thoracic trauma (reconstruction)
+            { 175, Strike(1.6f) },        // Halberd ice attack (reconstruction)
+            { 173, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 400 } },   // Condensed psyche (reconstruction)
+            { 174, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 300 } },   // Condensed ice (reconstruction)
             { 141, Of(AbilityKind.Taunt) },
 
-            // Buffs
-            { 15, Buff(15, 15f, new BuffEffect { damageTaken = 0.7f }) },                    // Thick skin
-            { 26, Buff(16, 3f, new BuffEffect { damageTaken = 0f }) },                       // Heavy shield block
-            { 100, Buff(7, 20f, new BuffEffect { damageDealt = 1.25f }) },                   // Strength
-            { 102, Buff(8, 20f, new BuffEffect { peace = true }) },                          // Peace
-            { 103, Buff(10, 15f, new BuffEffect { bonusHealthPercent = 30, payBackHealth = true }) },   // Survivor
-            { 104, Buff(11, 20f, new BuffEffect { reflect = 0.2f }) },                       // Disperse
-            { 84, Buff(0, 8f, new BuffEffect { attackSpeed = 0.6f }) },                      // Frenzy
-            { 140, Buff(51, 15f, new BuffEffect { attackSpeed = 0.85f, damageDealt = 1.1f }) },   // Hack and slash
-            { 61, Buff(79, 10f, new BuffEffect { attackSpeed = 0.5f, crossbowOnly = true }) },     // Focus
-            { 115, Buff(36, 15f, new BuffEffect { reflect = 0.5f }) },                       // Flame barrier
-            { 117, Buff(35, 20f, new BuffEffect { damageDealt = 1.2f }) },                   // Immolate
-            { 125, Buff(0, 10f, new BuffEffect { damageTaken = 0.6f }) },                    // Ice barrier
-            { 126, Buff(0, 4f, new BuffEffect { damageTaken = 0f }) },                       // Cryostasis
-            { 130, Buff(0, 5f, new BuffEffect { damageTaken = 0f }) },                       // Iceblock
-            { 134, Buff(0, 20f, new BuffEffect { damageDealt = 1.2f }) },                    // Inner frost
-            { 139, Buff(50, 5f, new BuffEffect { absorb = true }) },                         // Energy blade
-            { 142, Buff(52, 8f, new BuffEffect { damageTaken = 0.5f }) },                    // Stability
-            { 143, Buff(53, 8f, new BuffEffect { damageTaken = 0f, peace = true }) },        // Truce
-            { 170, Buff(96, 5f, new BuffEffect { damageTaken = 0f }) },                      // Traverse
-            { 149, Buff(73, 20f, new BuffEffect { damageDealt = 1.3f }) },                   // Psychic glyph
-            { 107, Buff(85, 60f, new BuffEffect { damageDealt = 1.1f }) },                   // Fire wisp
-            { 150, Buff(74, 20f, new BuffEffect { damageDealt = 1.3f, bowOnly = true }) },   // Fire arrows
-            { 168, Buff(92, 10f, new BuffEffect { manaPerSecond = 10f }) },                  // Mana surge
-            { 169, Buff(93, 15f, new BuffEffect { manaFromDamage = true }) },                // Embrace the pain
-            { 146, Buff(65, 300f, new BuffEffect { alchemyXp = 1.2f }) },                    // Ambitious apprentice
-            // Movement buffs: the client's run speed can't be changed from the server, so only the icon shows.
-            { 137, Buff(49, 7f, new BuffEffect()) },     // Charge
-            { 114, Buff(33, 10f, new BuffEffect()) },    // Trail blaze
-            { 167, Buff(91, 30f, new BuffEffect()) },    // Windwalking
-            { 124, Buff(0, 30f, new BuffEffect()) },     // Waterwalk
+            // Buffs (durations and effects: OriginalAbilities)
+            { 15, Of(AbilityKind.Buff) }, { 26, Of(AbilityKind.Buff) }, { 61, Of(AbilityKind.Buff) }, { 84, Of(AbilityKind.Buff) },
+            { 100, Of(AbilityKind.Buff) }, { 102, Of(AbilityKind.Buff) }, { 103, Of(AbilityKind.Buff) }, { 104, Of(AbilityKind.Buff) },
+            { 107, Of(AbilityKind.Buff) }, { 114, Of(AbilityKind.Buff) }, { 115, Of(AbilityKind.Buff) }, { 116, Strike() },
+            { 117, Of(AbilityKind.Buff) }, { 124, Of(AbilityKind.Buff) }, { 125, Of(AbilityKind.Buff) }, { 126, Of(AbilityKind.Buff) },
+            { 137, Of(AbilityKind.Buff) }, { 139, Of(AbilityKind.Buff) }, { 140, Of(AbilityKind.Buff) }, { 142, Of(AbilityKind.Buff) },
+            { 143, Of(AbilityKind.Buff) }, { 146, Of(AbilityKind.Buff) }, { 150, Of(AbilityKind.Buff) }, { 167, Of(AbilityKind.Buff) },
+            { 168, Of(AbilityKind.Buff) }, { 169, Of(AbilityKind.Buff) }, { 170, Of(AbilityKind.Buff) },
+            // Reconstructions of the ice spells with no original code.
+            { 130, Buff(0, 5f, new BuffEffect { damageTaken = 0f }) },       // Iceblock
+            { 134, Buff(0, 20f, new BuffEffect { damageDealt = 1.2f }) },    // Inner frost
 
-            // Weapon handling with no server effect
+            // Weapon handling
             { 76, Of(AbilityKind.Utility) }, { 163, Of(AbilityKind.Utility) },   // pistol reloads
-            { 151, Of(AbilityKind.Utility) },   // Friendly snowball
+            { 151, Strike() },   // Friendly snowball
 
             // Need other players, pets or housing
-            { 2, Of(AbilityKind.Unavailable) }, { 118, Of(AbilityKind.Unavailable) },
+            { 2, Of(AbilityKind.Unavailable) },
             { 135, Of(AbilityKind.Unavailable) },   // Portal
             { 136, Of(AbilityKind.Unavailable) },   // Fire cannon
             { 147, Of(AbilityKind.Unavailable) },   // Drop
@@ -187,6 +171,9 @@ namespace GSOOffline
         /// </summary>
         private string MissingEquipmentFor(AbilityInfo a, AbilityRule rule)
         {
+            if (a.id == 165 && EquippedWeapon()?.typeId != HuntersBow) return "the hunter's bow in hand";   // Wounding shot
+            if ((a.id == 66) && CountItem(PoisonForArrows) == 0) return "poison for the arrows";
+            if ((a.id == 151 || a.id == 152) && CountItem(ItemSnowball) == 0) return "a snowball";
             if (a.weaponSkill || AnyWeaponAbilities.Contains(a.id) || rule.kind == AbilityKind.Bandage) return null;
             var w = EquippedWeapon();
             int t = w != null ? w.typeId : 0;
@@ -226,31 +213,39 @@ namespace GSOOffline
             public BuffEffect effect;
             public int bonusHealth;   // Survivor: the health added, taken back at the end
             public int absorbed;      // Energy blade: damage stored
+            public int amount;        // the original's buff amount (Strength's slash damage, Fire wisp's fire damage...)
+            public float multiplier = 1f;   // Hack and slash: the next blow's
+            public Vector3 origin;    // where it was cast (Psychic glyph, Flame lance)
+            public NpcEntity target;  // Flame lance: what it burns
         }
 
         private readonly List<ActiveBuff> buffs = new List<ActiveBuff>();
         private float buffTick;
 
         private bool HasBuff(int icon) => buffs.Exists(b => b.icon == icon);
+        private bool HasBuffFrom(int source) => buffs.Exists(b => b.ability == source);
+        private int BuffAmount(int source) => buffs.Find(b => b.ability == source)?.amount ?? 0;
 
         /// <summary>Starts (or refreshes) a buff from an ability or item, with its client icon.</summary>
-        private void AddBuff(int source, int icon, float seconds, BuffEffect effect)
+        private ActiveBuff AddBuff(int source, int icon, float seconds, BuffEffect effect, int amount = 0)
         {
             RemoveBuff(source, false);
-            var b = new ActiveBuff { ability = source, icon = icon, until = Time.time + seconds, effect = effect };
-            if (effect.bonusHealthPercent > 0)
+            var b = new ActiveBuff { ability = source, icon = icon, until = Time.time + seconds, effect = effect ?? new BuffEffect(), amount = amount };
+            if (LocalPlayer != null) b.origin = LocalPlayer.transform.position;
+            if (b.effect.bonusHealthPercent > 0 || amount > 0 && source == AbilitySurvivor)
             {
-                b.bonusHealth = MaxHealth() * effect.bonusHealthPercent / 100;
+                b.bonusHealth = source == AbilitySurvivor ? amount : MaxHealth() * b.effect.bonusHealthPercent / 100;
                 buffs.Add(b);
                 character.currentHealth += b.bonusHealth;
                 SendHealth();
             }
             else buffs.Add(b);
-            if (effect.peace) CalmEnemies();
+            if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();   // the wisp takes its fire out of your mana
             // 4/9: name, buff id, time left and total time in tenths of a second
             int tenths = Mathf.RoundToInt(seconds * 10f);
             if (icon > 0) Send(4, 9, character.name, icon, tenths, tenths);
-            Plugin.Log.LogInfo($"[buff] {source} on for {seconds}s (icon {icon})");
+            Plugin.Log.LogInfo($"[buff] {source} on for {seconds}s (icon {icon}, amount {amount})");
+            return b;
         }
 
         private void RemoveBuff(int source, bool expired)
@@ -266,7 +261,10 @@ namespace GSOOffline
                 character.currentHealth = Mathf.Min(character.currentHealth, MaxHealth());
                 SendHealth();
             }
-            if (b.effect.absorb && b.absorbed > 0 && expired) ReleaseAbsorbed(b.absorbed * 2);
+            if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();
+            if (source == AbilityCryostasis && !PlayerDead) Send(1, 4, character.name, true);   // free to move again
+            // Energy blade: twice what it stored goes off around you (10 m), halved by update 137.
+            if (b.ability == AbilityEnergyBlade && b.absorbed > 0 && expired) ReleaseAbsorbed(b.absorbed);
             Plugin.Log.LogInfo($"[buff] {source} {(expired ? "expired" : "removed")}");
         }
 
@@ -280,29 +278,23 @@ namespace GSOOffline
             foreach (var b in buffs.ToArray()) RemoveBuff(b.ability, false);
         }
 
-        private bool BuffApplies(BuffEffect e)
-        {
-            if (!e.crossbowOnly && !e.bowOnly) return true;
-            var w = EquippedWeapon();
-            var ih = Scr_ItemHandler.instance;
-            if (w == null) return false;
-            return e.crossbowOnly ? ih.isCrossBow(w.typeId) : ih.isBow(w.typeId) || ih.isCrossBow(w.typeId);
-        }
-
         private float BuffProduct(System.Func<BuffEffect, float> f)
         {
             float m = 1f;
-            foreach (var b in buffs)
-                if (BuffApplies(b.effect)) m *= f(b.effect);
+            foreach (var b in buffs) m *= f(b.effect);
             return m;
         }
 
-        private float DamageDealtMultiplier() => BuffProduct(e => e.damageDealt) * AlignmentDamageDealt() * FlyingPetDamage();
-        private float AttackSpeedMultiplier() => BuffProduct(e => e.attackSpeed);
+        // Hack and slash (the original's attackSpeedMultiplier -0.15).
+        private float AttackSpeedMultiplier() => BuffProduct(e => e.attackSpeed) - (HasBuffFrom(AbilityHackAndSlash) ? 0.15f : 0f);
         internal float CraftTimeMultiplier() => BuffProduct(e => e.craftTime);
         internal float GatherTimeMultiplier() => BuffProduct(e => e.gatherTime);
         internal float AlchemyXpMultiplier() => BuffProduct(e => e.alchemyXp);
         private bool HasPeace() => buffs.Exists(b => b.effect.peace);
+
+        // Psychic glyph: +150 damage and psychic damage, +20 psychic resistance, while you stay within 8 m of it.
+        private const int GlyphDamage = 150, GlyphResistance = 20;
+        private bool GlyphActive() => HasBuffFrom(AbilityGlyph);
 
         private int BonusHealth()
         {
@@ -311,46 +303,17 @@ namespace GSOOffline
             return sum;
         }
 
-        /// <summary>
-        /// Incoming damage through the player's buffs: reduction, immunity, absorbing, reflecting and mana gain.
-        /// Returns what the player actually takes.
-        /// </summary>
-        private int ApplyDefensiveBuffs(int damage, NpcEntity attacker)
-        {
-            if (damage <= 0) return damage;
-            damage = Mathf.RoundToInt(damage * AlignmentDamageTaken());
-            if (buffs.Count == 0) return damage;
-            int raw = damage;
-            foreach (var b in buffs)
-                if (b.effect.absorb)
-                {
-                    b.absorbed += damage;
-                    damage = 0;
-                }
-            damage = Mathf.RoundToInt(damage * BuffProduct(e => e.damageTaken));
-            float reflect = 0f;
-            foreach (var b in buffs) reflect += b.effect.reflect;
-            if (reflect > 0f && attacker != null && !attacker.dead)
-                DealDamage(attacker, Mathf.Max(1, Mathf.RoundToInt(raw * reflect)), WeaponSkill(EquippedWeapon()));
-            if (buffs.Exists(b => b.effect.manaFromDamage) && raw > 0)
-            {
-                character.currentMana = Mathf.Min(MaxMana(), character.currentMana + raw);
-                SendMana();
-            }
-            return damage;
-        }
-
+        /// <summary>Energy blade going off: everything within 10 m takes what it stored (the original's AoeDamage, type 0).</summary>
         private void ReleaseAbsorbed(int damage)
         {
             var player = LocalPlayer;
             if (world == null || player == null) return;
-            var hits = new List<NpcEntity>();
-            foreach (var n in world.npcs)
-                if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), player.transform.position) <= 6f) hits.Add(n);
-            foreach (var n in hits) DealDamage(n, damage / Mathf.Max(1, hits.Count), WeaponSkill(EquippedWeapon()));
+            PlaySound(368, player.transform.position, 50);
+            PlayEffect(88, player.transform.position);
+            AoeDamage(player.transform.position, damage, DamageKinds.None, 10f);
         }
 
-        /// <summary>Peace and Truce: enemies up to the player's Healing level stop fighting.</summary>
+        /// <summary>Truce: enemies up to the player's Healing level stop fighting. (Peace only keeps new ones off.)</summary>
         private void CalmEnemies()
         {
             if (world == null) return;
@@ -388,10 +351,11 @@ namespace GSOOffline
             else if (heal < 0f && !PlayerDead)
             {
                 // Damage over time: Nirish's venom (the original's spider venom buff, a share of health each second).
-                float res = buffs.Exists(b => b.effect.poisonDamage) ? CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Poison))) : 0f;
+                float res = buffs.Exists(b => b.effect.poisonDamage) ? CombatRules.PlayerResistance(StatResistance(DamageKinds.Poison)) : 0f;
                 PlayPlayerEffect(110);
                 HurtPlayer(Mathf.RoundToInt(MaxHealth() * -heal * (1f - res)), SplashPoisoned);
             }
+            TickOriginalBuffs();
         }
 
         /// <summary>Dev: raise a skill to a level (bridge command setlevel).</summary>
@@ -406,15 +370,15 @@ namespace GSOOffline
         internal void LogBuffs()
         {
             foreach (var b in buffs)
-                Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: dealt x{b.effect.damageDealt} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} reflect {b.effect.reflect} absorbed {b.absorbed}");
-            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}, gear damage {(character != null ? GearDamage() : 0)}");
+                Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: amount {b.amount} x{b.multiplier} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} absorbed {b.absorbed}");
+            Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}, damage {(character != null ? StatDamage() : 0)}");
         }
 
         // ---- using abilities -----------------------------------------------------------------
 
         /// <summary>
-        /// Abilities from XMLs/Abilities: level, mana, range and cooldown come from the data, the effect from
-        /// <see cref="AbilityRules"/>. Damage is the kind's power x a basic hit with the equipped weapon.
+        /// Abilities from XMLs/Abilities: level, mana, range and cooldown come from the data, what they do from the
+        /// original server's code (<see cref="CastOriginal"/>) or, for the few it lacked, <see cref="AbilityRules"/>.
         /// </summary>
         private void UseSkillAbility(int slot, AbilityInfo a)
         {
@@ -447,6 +411,12 @@ namespace GSOOffline
                 Notice($"You have no {ItemData.Get(rule.bandage)?.name.ToLowerInvariant() ?? "bandages"}.", "red");
                 return;
             }
+            if ((a.id == 77 || a.id == 164) && Bullets(a.id == 164) <= 0)
+            {
+                Notice("The gun is not loaded!", "red");
+                PlaySound(304, LocalPlayer.transform.position, 40);
+                return;
+            }
 
             NpcEntity npc = null;
             bool needsEnemy = rule.kind == AbilityKind.Strike || rule.kind == AbilityKind.Splash || rule.kind == AbilityKind.ManaBurst;
@@ -476,6 +446,9 @@ namespace GSOOffline
                 center = spot;
             }
 
+            // Using any other ability puts out Flame lance (Scr_PlayerAttacksHandler.onAbilityUse).
+            if (a.id != AbilityFlameLance) RemoveBuff(AbilityFlameLance, false);
+
             // Costs, cooldown and the cast itself
             character.currentMana -= a.manaCost;
             if (a.manaCost > 0) SendMana();
@@ -498,116 +471,83 @@ namespace GSOOffline
             if (AbilityGroundGfx.TryGetValue(a.id, out int groundGfx)) PlayEffect(groundGfx, center);
             Plugin.Log.LogInfo($"[ability] {a.id} {a.name}: {rule.kind}");
 
-            int xpSkill = skill != 0 ? skill : WeaponSkill(EquippedWeapon());
+            if (rule.kind == AbilityKind.Bandage)
+            {
+                TakeItems(rule.bandage, 1);
+                CountXp(SkillHealing);
+                int maxHeal = (SkillLevel(SkillHealing) + rule.bandageLevel) * 15;
+                Heal((int)Random.Range(maxHeal * 0.9f, maxHeal * rule.bandageMax));
+                Notice("You successfully apply a bandage. It heals some health.", "green");
+                OnHealed();
+                return;
+            }
+
+            if (npc != null) OnAbilityCastAt(npc, a);   // quests that ask for a spell on something (A Magical Journey)
+            if (!CastOriginal(a, npc, center, out var release)) release = CastReconstructed(a, rule, npc, center, skill);
+            // The blows land when the cast animation strikes: MeasureSwing finds the clip, and attackdelay is the
+            // fallback for clips that haven't been measured.
+            if (release != null)
+            {
+                var hit = weaponHitSfx;
+                int targetGfx = a.hitGfx > 0 ? a.hitGfx : AbilityTargetGfx.TryGetValue(a.id, out int g) ? g : 0;
+                pendingBlow = (strike, strikes) =>
+                {
+                    if (strike > 0 || PlayerDead) return;
+                    if (npc != null && !npc.dead)
+                    {
+                        PlayNpcEffect(npc, targetGfx);
+                        PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : hit, NpcPosition(npc));
+                    }
+                    release();
+                };
+                pendingBlowFallback = Mathf.Min(a.attackDelay, a.attackTime);
+            }
+            if (npc != null) autoAttacking = !npc.dead;
+        }
+
+        /// <summary>
+        /// The abilities the original had no code for: power x the weapon's basic blow on the target, or around
+        /// the player or clicked spot for sweeps; mana bursts add half the mana spent, as before.
+        /// </summary>
+        private System.Action CastReconstructed(AbilityInfo a, AbilityRule rule, NpcEntity npc, Vector3 center, int skill)
+        {
+            CountXp(skill != 0 ? skill : WeaponSkill(EquippedWeapon()));
             switch (rule.kind)
             {
-                case AbilityKind.Bandage:
-                {
-                    TakeItems(rule.bandage, 1);
-                    int level = SkillLevel(24);
-                    Heal(BandageHeal(rule.bandage, level));
-                    AddXp(24, SkillData.BaseXp(Mathf.Max(level, a.level)));
-                    OnHealed();
-                    return;
-                }
-                case AbilityKind.Heal:
-                    Heal(Mathf.RoundToInt(MaxHealth() * rule.power) + 2 * SkillLevel(24));
-                    if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-                    OnHealed();
-                    return;
-                case AbilityKind.HealOverTime:
-                    AddBuff(a.id, rule.buff, rule.duration, new BuffEffect { healPercentPerSecond = rule.power / rule.duration });
-                    if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-                    OnHealed();
-                    return;
                 case AbilityKind.Buff:
                     AddBuff(a.id, rule.buff, rule.duration, rule.effect);
-                    if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-                    return;
+                    return null;
                 case AbilityKind.Utility:
-                    return;
+                case AbilityKind.Heal:
+                case AbilityKind.HealOverTime:
                 case AbilityKind.Taunt:
-                    TauntEnemies();
-                    if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-                    return;
+                    return null;
             }
-
-            // Attacks
-            if (skill != 0) AddXp(skill, SkillData.BaseXp(a.level));
-            var targets = new List<NpcEntity>();
-            if (rule.kind == AbilityKind.Sweep)
-            {
-                // Around the player, or around the clicked spot for click-target abilities.
-                float reach = a.clickTarget ? rule.radius : Mathf.Max(rule.radius, WeaponRange(EquippedWeapon()));
-                foreach (var n in world.npcs)
-                    if (!n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), center) <= reach) targets.Add(n);
-                if (targets.Count == 0) Plugin.Log.LogInfo($"[ability] {a.name}: nothing within {reach}m");
-            }
-            else
-            {
-                targets.Add(npc);
-                if (rule.kind == AbilityKind.Splash)
-                {
-                    Vector3 c = NpcPosition(npc);
-                    foreach (var n in world.npcs)
-                        if (n != npc && !n.dead && CanFight(n) && Vector3.Distance(NpcPosition(n), c) <= rule.radius) targets.Add(n);
-                }
-            }
-
-            float power = rule.power;
+            var weapon = EquippedWeapon();
+            var blow = BasicBlow(weapon);
+            int type = DamageKinds.OfAbility(a.name);
+            if (type == DamageKinds.None) type = blow.type;
+            float power = rule.power * BuffProduct(e => e.damageDealt);
             int burst = 0;
             if (rule.kind == AbilityKind.ManaBurst)
             {
                 burst = Mathf.Min(character.currentMana, rule.manaCap);
                 character.currentMana -= burst;
                 SendMana();
-                power = 1f;
+                power = 1f + burst / 100;   // the original Tritone's mana multiplier
             }
-
-            var weapon = EquippedWeapon();
-            int targetGfx = a.hitGfx > 0 ? a.hitGfx : AbilityTargetGfx.TryGetValue(a.id, out int g) ? g : 0;
-            AbilityProjectile.TryGetValue(a.id, out int projectile);
-            bool vampiric = a.id == 144, execution = a.id == 138;
-            var releases = new List<System.Action<int, int>>();
-            foreach (var t in targets)
+            int damage = Mathf.RoundToInt(blow.damage * power);
+            if (a.id == 172)
             {
-                Aggro(t);
-                OnAbilityCastAt(t, a);   // quests that ask for a spell on something (A Magical Journey)
-                var target = t;
-                int hit = RollPlayerHit(weapon, t, power, a);
-                if (hit > 0) hit += burst / 2;   // an immune target takes nothing, mana burst included
-                if (execution && Time.time < t.stunnedUntil)
-                {
-                    hit *= 2;   // "Double damage for stunned targets"
-                    Plugin.Log.LogInfo($"[ability] Execution doubled on stunned {t.uid}: {hit}");
-                }
-                // Damage over time replaces part of the up-front hit; a flurry splits the rest between its strikes.
-                int upFront = rule.dot > 0f ? hit / 2 : hit;
-                System.Action<int, int> land = (strike, strikes) =>
-                {
-                    if (target.dead) return;
-                    PlayNpcEffect(target, targetGfx);
-                    PlaySound(a.hitSfx.Length > 0 ? Pick(a.hitSfx) : weaponHitSfx, NpcPosition(target));
-                    if (strike == 0 && hit > 0) ApplyNpcEffects(target, rule, hit, xpSkill);
-                    int share = upFront / strikes + (strike == strikes - 1 ? upFront % strikes : 0);
-                    DealDamage(target, share, xpSkill, reflectable: true);
-                    if (vampiric && share > 0) Heal(share / 2);
-                };
-                releases.Add((strike, strikes) =>
-                {
-                    if (target.dead) return;
-                    if (projectile == 0) land(strike, strikes);
-                    else if (strike == 0) ShootAtNpc(projectile, target, () => land(0, 1));
-                });
+                PlaceMine(center, damage, 35f, rule.radius);
+                return null;
             }
-            // The blows land when the cast animation strikes: MeasureSwing finds the clip, and attackdelay is the
-            // fallback for clips that haven't been measured.
-            if (releases.Count > 0)
+            bool aroundPlayer = rule.kind == AbilityKind.Sweep;
+            return () =>
             {
-                pendingBlow = (strike, strikes) => { foreach (var r in releases) r(strike, strikes); };
-                pendingBlowFallback = Mathf.Min(a.attackDelay, a.attackTime);
-            }
-            if (npc != null) autoAttacking = !npc.dead;
+                if (aroundPlayer) AoeDamage(a.clickTarget ? center : LocalPlayer.transform.position, damage, type, rule.radius);
+                else if (npc != null && !npc.dead) HitNpc(npc, damage, type);
+            };
         }
 
         // Most abilities name no sound. Attacks sound like the weapon; heals and buffs use Charm's heal sound (308).
@@ -628,66 +568,21 @@ namespace GSOOffline
             }
         }
 
-        // Reconstructed: a bandage heals more the better it is and the higher the Healing level.
-        private static int BandageHeal(int bandage, int level)
-        {
-            int tier;
-            switch (bandage)
-            {
-                case 10367: tier = 0; break;   // wool
-                case 10368: tier = 1; break;   // cotton
-                case 10369: tier = 2; break;   // silk
-                case 10370: tier = 3; break;   // jute
-                case 10443: tier = 4; break;   // flax
-                default: tier = 5; break;      // ramie
-            }
-            return 15 + 20 * tier + 3 * level;
-        }
-
+        /// <summary>Taunt: everything within 15 m (plus a metre per 6 Heavy armor levels) up to your Heavy armor level comes for you.</summary>
         private void TauntEnemies()
         {
             var player = LocalPlayer;
             if (world == null || player == null) return;
-            int level = Mathf.Max(SkillLevel(26), 1);
+            int level = SkillLevel(SkillHeavyArmor);
+            var target = world.GetNpc(targetUid);
+            if (target != null && !target.dead && CanFight(target)) Aggro(target);
             foreach (var n in world.npcs)
                 if (!n.dead && CanFight(n) && GameData.Npcs.TryGetValue(n.typeId, out var info) && info.level <= level
-                    && Vector3.Distance(NpcPosition(n), player.transform.position) <= 15f)
+                    && Vector3.Distance(NpcPosition(n), player.transform.position) < 15 + level / 6)
+                {
                     Aggro(n);
-        }
-
-        // ---- effects on NPCs -----------------------------------------------------------------
-
-        private void ApplyNpcEffects(NpcEntity npc, AbilityRule rule, int hit, int skill)
-        {
-            if (rule.stun > 0f && Time.time >= npc.stunImmuneUntil)
-            {
-                npc.stunnedUntil = Time.time + rule.stun;
-                npc.stunImmuneUntil = npc.stunnedUntil + CombatRules.StunImmunity;
-                PlayNpcEffect(npc, 21);
-            }
-            else if (rule.stun > 0f) Plugin.Log.LogInfo($"[ability] {npc.uid} is immune to stuns for {npc.stunImmuneUntil - Time.time:0.0}s");
-            if (rule.root > 0f) npc.rootedUntil = Mathf.Max(npc.rootedUntil, Time.time + rule.root);
-            if (rule.stun > 0f || rule.root > 0f) HoldNpc(npc);
-            if (rule.dot > 0f)
-            {
-                int ticks = Mathf.Max(1, Mathf.RoundToInt(rule.dot));
-                npc.dotDamage = Mathf.Max(1, (hit - hit / 2) / ticks);
-                npc.dotTicks = ticks;
-                npc.dotSkill = skill;
-                npc.nextDot = Time.time + 1f;
-            }
-        }
-
-        private void TickNpcEffects()
-        {
-            if (world == null) return;
-            foreach (var n in world.npcs)
-            {
-                if (n.dead || n.dotTicks <= 0 || Time.time < n.nextDot) continue;
-                n.dotTicks--;
-                n.nextDot = Time.time + 1f;
-                DealDamage(n, n.dotDamage, n.dotSkill);
-            }
+                    PlayNpcEffect(n, 93);
+                }
         }
     }
 }

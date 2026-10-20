@@ -20,7 +20,7 @@ namespace GSOOffline
     ///   6.5 m), and a storm of snowballs around him that grows as he's hurt (up to 15 every half second near death,
     ///   20-25% each, 3.3 m). From 60% health down, every 45 s, Snow Apostles appear around him and lob friendly
     ///   snowballs that heal him 1000 every 3 s for 90 s. With no one near he regains 5% every half second.
-    /// Blows given in the original's numbers are taken as the same share of the player's health (HurtByOriginal).
+    /// Blows given in the original's numbers are taken as they were, through the player's defences (HurtByOriginal).
     /// </summary>
     public partial class OfflineServer
     {
@@ -279,7 +279,8 @@ namespace GSOOffline
             {
                 if (Time.time < c.from || Vector3.Distance(c.pos, me) >= 3f) continue;
                 if (!HasBuff(BuffVenom)) Notice("You have been poisoned!", "red");
-                AddBuff(-BuffVenom, BuffVenom, 20f, new BuffEffect { healPercentPerSecond = -0.2f, poisonDamage = true });
+                // The original's venom: 20% of your health a second for 20 s, 35% less since update 137.
+                AddBuff(-BuffVenom, BuffVenom, 20f, new BuffEffect { healPercentPerSecond = -0.2f * 0.65f, poisonDamage = true });
                 return;
             }
         }

@@ -138,7 +138,7 @@ namespace GSOOffline
         }
 
         // Bosses the data doesn't flag: Argus ("New lvl 35 boss Argus", update 139). His damage value (8) is on
-        // the pets' scale, so unflagged he barely scratched you.
+        // another scale, so his blows use the boss formula (CombatRules.NpcMaxHit).
         private static readonly HashSet<int> UnflaggedBosses = new HashSet<int> { 358 };
 
         private static bool IsBoss(XmlNode n) => IntAttr(n, "boss") == 1 || UnflaggedBosses.Contains(IntAttr(n, "id"));
@@ -154,8 +154,9 @@ namespace GSOOffline
                     id = IntAttr(n, "id"),
                     name = Attr(n, "name"),
                     level = level,
-                    // Only a couple of entries carry explicit health; the rest was a server-side formula.
-                    health = IntAttr(n, "health", IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)),
+                    // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses get
+                    // the single-player share of theirs (CombatRules.BossHealthShare).
+                    health = IntAttr(n, "health", IsBoss(n) ? Mathf.Max(1, (int)(CombatRules.BossHealth(level) * CombatRules.BossHealthShare)) : CombatRules.NpcHealth(level)),
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
@@ -170,10 +171,10 @@ namespace GSOOffline
                     damage = IntAttr(n, "damage"),
                     boss = IsBoss(n),
                     ordinary = Attr(n, "respawntime") == null && !IsBoss(n),
-                    defence = IntAttr(n, "defence"),
+                    defence = IntAttr(n, "defence", level),   // the original: unset defence is the NPC's level
                     damageBlock = IntAttr(n, "damageblock"),
                     damageType = IntAttr(n, "damagetype"),
-                    accuracy = IntAttr(n, "accuracy", 50),
+                    accuracy = IntAttr(n, "accuracy"),   // against your block roll; unset is 0, as the original read it
                     resistance = DamageKinds.ReadResistances(n),
                     wandering = IntAttr(n, "wandering") == 1,
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),

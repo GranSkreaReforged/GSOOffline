@@ -537,8 +537,9 @@ namespace GSOOffline
         private static int BountyBlock(BountySave b) => BountyGearStat(b, "Damageblock");
 
         /// <summary>
-        /// The outlaw's numbers, from its gear by the player's formulas: max hit (gear damage plus level, times the
-        /// weapon's grade), resistances through the soft cap, health on top of a base for its level.
+        /// The outlaw's numbers, from its gear by the player's formulas: its blow is the original's weapon blow (10 x its
+        /// level + 10 x its weapon's level + its gear's damage), rolled 1 to 1.5 times that so it averages a player's,
+        /// times the weapon's grade; resistances through the soft cap; health on top of a base for its level.
         /// </summary>
         private NpcInfo BountyInfo(BountySave b)
         {
@@ -547,7 +548,8 @@ namespace GSOOffline
             foreach (var it in b.gear)
                 foreach (var s in it.stats)
                     if (s.key.EndsWith("Damage") || s.key == "DmgPoison") gearDamage += Graded(it, s.value);
-            int maxHit = Mathf.RoundToInt(CombatRules.PlayerMaxHit(gearDamage, b.level) * (weapon != null ? WeaponGradeMultiplier(weapon.grade) : 1f));
+            int blow = b.level * 10 + WeaponLevel(weapon) * 10 + gearDamage;
+            int maxHit = Mathf.RoundToInt(blow * 1.5f * (weapon != null ? WeaponGradeMultiplier(weapon.grade) : 1f));
             int projectile = WeaponProjectile(weapon);
             var info = new NpcInfo
             {
@@ -557,7 +559,7 @@ namespace GSOOffline
                 attackSpeed = WeaponSpeed(weapon), attackDelay = 0.5f, attackMissDistance = 2f,
                 attackDistance = projectile > 0 ? 3f : Mathf.Max(2.5f, WeaponRange(weapon) - 1f),
                 damage = Mathf.Max(1, maxHit), damageType = WeaponKind(weapon), accuracy = CombatRules.BountyAccuracy,
-                damageBlock = 0,   // the player-style block in RollPlayerHit (BountyBlockedHit)
+                damageBlock = 0, defence = 0,   // the player-style block in NpcDamageTaken (BountyBlockedHit)
                 resistance = new int[DamageKinds.Count],
                 projectile = projectile, projectileRate = projectile > 0 ? 100 : 0,
                 projectileDistance = projectile > 0 ? CombatRules.BountyShootDistance : 0f,
@@ -567,13 +569,16 @@ namespace GSOOffline
             return info;
         }
 
-        /// <summary>The player's blow on an outlaw: its damage block works as yours does against creatures.</summary>
-        private int BountyBlockedHit(NpcEntity npc, float damage)
+        /// <summary>
+        /// The player's blow on an outlaw: it blocks as you do (calculateResistances), its level against your accuracy,
+        /// up to its gear's damage block. -1 if the NPC isn't an outlaw.
+        /// </summary>
+        private int BountyBlockedHit(NpcEntity npc, int damage, int accuracy)
         {
             if (!bountyByUid.TryGetValue(npc.uid, out var a)) return -1;
             int block = BountyBlock(a.save);
-            damage *= 1f - CombatRules.BlockReduction(block, CombatLevel());
-            return Mathf.Max(1, Mathf.RoundToInt(damage - CombatRules.FlatBlock(block)));
+            if (block > 0 && Random.Range(0, a.save.level + 1) > Random.Range(0, accuracy + 1)) damage -= Random.Range(1, block + 1);
+            return Mathf.Max(0, damage);
         }
 
         /// <summary>

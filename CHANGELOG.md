@@ -4,6 +4,19 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Combat now uses the original game's numbers, taken from the original server, with the later patch notes on top (#101). Creatures have the health they had online (a level 25 bear 11,077, Zalranaz 468,800 before the single-player share below) and hit as hard as they did. Your base health is 100 per combat level, as in the live game, plus your gear's.
+- Every weapon hits with its own formula from the original: swords, daggers, maces, bows, crossbows, staffs, wands, lutes and fists each count your skill, the weapon's level and your gear's damage their own way, at the weapon's original attack speed. The damage kind of each attack (slash, pierce, fire, ice...) meets the target's resistance to it.
+- Every ability does what it did in the original game, with its own damage, area, stun, root, slow, burn or poison: Fire wall and landmines stay on the ground, Flame lance channels, Firestorm circles you, Slashing goes through its three blows in turn, Healing music heals each second of the song, and so on. Shatter, Frostburn, Ice hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma, the archery Landmine, Condensed psyche and ice, and the Halberd ice attack came after the original server's code, so they stay reconstructions.
+- Creatures and you block as in the original: a defence roll against the attacker's accuracy, which takes off up to the damage block. Blows always land; there is no flat miss chance any more, and stepping away mid-swing no longer dodges.
+- A kill's experience is the original's ((1.35 x level)^1.93 + 30, double for bosses), shared between the combat skills you used in the last 20 seconds (including your armor skill when you were hit), and less for a skill above the creature's level. Abilities and bandages no longer give experience on their own.
+- Health and mana regenerate every second, in combat too, as in the original. Your mana pool is the original's 100 plus your gear's; it no longer grows with Elemental grimoire.
+- The combat level counts the original's skills: the best three of Archery, Healing, the armor skills, Elemental grimoire, Swordsmanship and Wrestling, plus a quarter of the rest.
+- Item grades use the multipliers of update 138 (gear x0.88 to x1.72, weapons x0.94 to x1.36), matching the game client.
+- Pets hit with the original's formula (your damage and weapon level), the explosive potion and black candy deal the original's blast (and no longer hurt you), and bounty outlaws hit and block like players of their level.
+
+### Added
+- `Combat.BossHealthShare` in the config (default 0.25): bosses were made for groups, so alone you fight them with this share of their original health. Their damage is the original's. Set it to 1 for the original game's bosses.
 
 ## [1.7.2] - 2026-10-18
 ### Fixed
