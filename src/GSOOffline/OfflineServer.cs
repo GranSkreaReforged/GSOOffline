@@ -20,6 +20,8 @@ namespace GSOOffline
         // Yorkhill Monastery wayshrine, where the first quest begins.
         public const int StartScene = 1;
         public static readonly Vector3 StartPos = new Vector3(829.7f, 20f, 1599.2f);
+        // A new character wakes inside the monastery next to Alden, as on the original server (Scr_PlayerHandler.CreateNewCharacter).
+        public static readonly Vector3 NewCharacterPos = new Vector3(681.3f, 34.1f, 1490.4f);
 
         private delegate void Handler(object[] c);
 

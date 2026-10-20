@@ -104,6 +104,7 @@ namespace GSOOffline
                 return;
             }
             var ch = new CharacterSave { name = name, account = account.name };
+            ch.Position = NewCharacterPos;
             SaveSystem.SaveCharacter(ch);
             account.characters.Add(name);
             SaveSystem.SaveAccount(account);
