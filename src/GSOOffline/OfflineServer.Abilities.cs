@@ -58,6 +58,11 @@ namespace GSOOffline
         public bool peace;                 // NPCs up to the player's Healing level don't aggro
         public float craftTime = 1f, gatherTime = 1f;
         public float alchemyXp = 1f;
+        public int dot;                    // damage every dotEvery seconds (ignite, ooze, weak poison)
+        public float dotEvery = 1f;
+        public int dotKind;                // its damage kind
+        public bool dotTrue;               // true damage: no resistance
+        public int dotGfx;                 // effect on the player with each tick
     }
 
     public partial class OfflineServer
@@ -217,6 +222,8 @@ namespace GSOOffline
             public float multiplier = 1f;   // Hack and slash: the next blow's
             public Vector3 origin;    // where it was cast (Psychic glyph, Flame lance)
             public NpcEntity target;  // Flame lance: what it burns
+            public float nextDot;     // damage over time: the next tick
+            public int totalTenths;   // its whole length, for the icon's bar
         }
 
         private readonly List<ActiveBuff> buffs = new List<ActiveBuff>();
@@ -243,8 +250,10 @@ namespace GSOOffline
             if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();   // the wisp takes its fire out of your mana
             // 4/9: name, buff id, time left and total time in tenths of a second
             int tenths = Mathf.RoundToInt(seconds * 10f);
+            b.totalTenths = tenths;
             if (icon > 0) Send(4, 9, character.name, icon, tenths, tenths);
             Plugin.Log.LogInfo($"[buff] {source} on for {seconds}s (icon {icon}, amount {amount})");
+            BuffStatsChanged();
             return b;
         }
 
@@ -262,10 +271,11 @@ namespace GSOOffline
                 SendHealth();
             }
             if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();
-            if (source == AbilityCryostasis && !PlayerDead) Send(1, 4, character.name, true);   // free to move again
             // Energy blade: twice what it stored goes off around you (10 m), halved by update 137.
             if (b.ability == AbilityEnergyBlade && b.absorbed > 0 && expired) ReleaseAbsorbed(b.absorbed);
             Plugin.Log.LogInfo($"[buff] {source} {(expired ? "expired" : "removed")}");
+            BuffEnded(b, expired);   // free to move again after a stun, root or Cryostasis
+            BuffStatsChanged();
         }
 
         private void ClearBuffs()
@@ -276,6 +286,16 @@ namespace GSOOffline
                 return;
             }
             foreach (var b in buffs.ToArray()) RemoveBuff(b.ability, false);
+        }
+
+        /// <summary>
+        /// Death ends what the original's RemoveAllBuffs did: buffs XMLs/Buffs marks canberemoved (stuns, poisons,
+        /// combat buffs) and the iconless ability states. Food, potions, Drunk, Survivor and passives carry on.
+        /// </summary>
+        private void EndBuffsOnDeath()
+        {
+            foreach (var b in buffs.ToArray())
+                if (b.icon <= 0 || GameData.RemovableBuffs.Contains(b.icon)) RemoveBuff(b.ability, true);
         }
 
         private float BuffProduct(System.Func<BuffEffect, float> f)
@@ -331,6 +351,7 @@ namespace GSOOffline
             if (buffs.Count == 0 || character == null) return;
             for (int i = buffs.Count - 1; i >= 0; i--)
                 if (i < buffs.Count && Time.time >= buffs[i].until) RemoveBuff(buffs[i].ability, true);
+            TickDots();
 
             buffTick -= Time.deltaTime;
             if (buffTick > 0f) return;
@@ -370,7 +391,7 @@ namespace GSOOffline
         internal void LogBuffs()
         {
             foreach (var b in buffs)
-                Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: amount {b.amount} x{b.multiplier} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} absorbed {b.absorbed}");
+                Plugin.Log.LogInfo($"[dev] buff {b.ability} icon {b.icon} {b.until - Time.time:F1}s left: amount {b.amount} x{b.multiplier} taken x{b.effect.damageTaken} speed x{b.effect.attackSpeed} absorbed {b.absorbed} dot {b.effect.dot}/{b.effect.dotEvery}s");
             Plugin.Log.LogInfo($"[dev] {buffs.Count} buffs; health {character?.currentHealth}/{(character != null ? MaxHealth() : 0)}, mana {character?.currentMana}/{(character != null ? MaxMana() : 0)}, damage {(character != null ? StatDamage() : 0)}");
         }
 

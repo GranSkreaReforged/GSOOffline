@@ -43,7 +43,9 @@ namespace GSOOffline
         public float wanderDistance;
         public bool dropLootAtPlayer;  // loot bag at the killer's feet (NPCs that die out of reach, e.g. in water)
         // Ranged attacks: projectile id (XMLs/Projectiles), the share of attacks that use it (percent), and its reach.
+        // Some list several ("5,5,5,5,12": Poachers' arrows, one in five an ice arrow); each shot picks one.
         public int projectile, projectileRate;
+        public int[] projectiles = new int[0];
         public float projectileDistance;
         public int[] sfxAttack = new int[0], sfxTakeHit = new int[0], sfxDeath = new int[0];
         // Ids into the client's shared animation table (EasyAnimationHandler); defaults are the client's own.
@@ -77,6 +79,7 @@ namespace GSOOffline
             {
                 LoadWayshrines();
                 LoadNpcs();
+                LoadBuffs();
                 ItemData.Load();
                 DialogueData.Load();
                 SkillData.Load();
@@ -183,7 +186,7 @@ namespace GSOOffline
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
                     dropLootAtPlayer = IntAttr(n, "droplootatplayer") == 1,
-                    projectile = IntAttr(n, "projectile"),
+                    projectiles = IntListAttr(n, "projectile"),
                     projectileRate = IntAttr(n, "projectilerate"),
                     projectileDistance = IntAttr(n, "projectileattackdistance"),
                     sfxAttack = IntListAttr(n, "sfxattack"),
@@ -195,9 +198,19 @@ namespace GSOOffline
                     animDeath = IntAttr(n, "anim_death", NpcAnims.Death),
                 };
                 info.health = info.fullHealth;
+                if (info.projectiles.Length > 0) info.projectile = info.projectiles[0];
                 Npcs[info.id] = info;
             }
             ApplyBossHealthShare();
+        }
+
+        // Buff ids XMLs/Buffs marks canberemoved: the ones death ends (the original's RemoveAllBuffs).
+        public static readonly HashSet<int> RemovableBuffs = new HashSet<int>();
+
+        private static void LoadBuffs()
+        {
+            foreach (XmlNode n in LoadXml("XMLs/Buffs").DocumentElement.ChildNodes)
+                if (n.NodeType == XmlNodeType.Element && IntAttr(n, "canberemoved") == 1) RemovableBuffs.Add(IntAttr(n, "id"));
         }
 
         /// <summary>Bosses' health from CombatRules.BossHealthShare (the character's choice).</summary>

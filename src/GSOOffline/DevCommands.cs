@@ -822,6 +822,13 @@ namespace GSOOffline
         // buffs: the player's active buffs and what they do.
         private static void Buffs(string[] args) => OfflineServer.Instance.LogBuffs();
 
+        // shothit <projectile> [damage]: what an NPC's shot of that projectile leaves on you (29 Golem stun, 35 ooze...).
+        private static void ShotHit(string[] args) =>
+            OfflineServer.Instance.DevShotHit(args.Length > 1 ? int.Parse(args[1]) : 29, args.Length > 2 ? int.Parse(args[2]) : 100);
+
+        // root [seconds]: rooted, as a Poacher dungeon trap does.
+        private static void Root(string[] args) => OfflineServer.Instance.DevRoot(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 5f);
+
         // projectiles: the client's projectiles in flight (id, position, target).
         private static void Projectiles(string[] args)
         {

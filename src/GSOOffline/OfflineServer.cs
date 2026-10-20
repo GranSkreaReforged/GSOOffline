@@ -123,7 +123,7 @@ namespace GSOOffline
             TickCombat();
             TickHarpy();
             TickRegen();
-            TickWeight();
+            TickRunSpeed();
             TickLoot();
             TickImpacts();
             TickFerries();

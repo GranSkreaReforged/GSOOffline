@@ -83,11 +83,8 @@ namespace GSOOffline
             HoldNpc(n);
         }
 
-        private void Stun(float seconds)
-        {
-            Send(1, 4, character.name, false);
-            Later(seconds, () => { if (!PlayerDead && character != null) Send(1, 4, character.name, true); });
-        }
+        // A boss's stun: the stun buff, chained moves (a web, then the pull) not kept off by stun immunity.
+        private void Stun(float seconds) => StunPlayer(seconds, true);
 
         private NpcEntity SpawnBossMinion(NpcEntity boss, int type, Vector3 at, bool fights)
         {
@@ -246,6 +243,11 @@ namespace GSOOffline
                 if (p == null || PlayerDead || nirish.dead || world == null || world.sceneId != SceneSewers) return;
                 Vector3 to = NpcPosition(nirish);
                 if (Vector3.Distance(to, p.transform.position) >= 30f) return;
+                if (HasBuff(BuffShieldBlock))
+                {
+                    Notice("Your shield blocks the sticky spider web!", "white");
+                    return;
+                }
                 Send(32, 1, 50f, 0.5f, to);   // the client drags the player there
                 Plugin.Log.LogInfo("[boss] Nirish pulls the player in");
                 Stun(2f);

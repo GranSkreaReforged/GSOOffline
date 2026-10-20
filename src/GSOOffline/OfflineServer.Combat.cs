@@ -248,6 +248,12 @@ namespace GSOOffline
         private void UseAbility(int slot)
         {
             if (character == null || PlayerDead) return;
+            if (PlayerStunned)
+            {
+                Notice("You have been stunned!", "red");
+                return;
+            }
+            if (HasBuff(BuffTruce) || HasBuff(BuffTraverse)) return;   // the original's useAbility: neither lets you fight
             if (slot == 0)
             {
                 var npc = world?.GetNpc(targetUid);
@@ -336,7 +342,7 @@ namespace GSOOffline
         private void TickPlayerAttack(Vector3 playerPos)
         {
             MeasureSwing();
-            if (!autoAttacking || PlayerDead || Time.time < nextPlayerSwing) return;
+            if (!autoAttacking || PlayerDead || PlayerStunned || Time.time < nextPlayerSwing) return;
             var npc = world.GetNpc(targetUid);
             if (npc == null || npc.dead)
             {
@@ -968,7 +974,8 @@ namespace GSOOffline
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({npc.typeId}) {(shoot ? "shoots" : "swings")} from {Vector3.Distance(NpcPosition(npc), player.transform.position):0.0} m");
             if (shoot)
             {
-                int projectile = npc.blowProjectile > 0 ? npc.blowProjectile : info.projectile;
+                int projectile = npc.blowProjectile > 0 ? npc.blowProjectile
+                    : info.projectiles.Length > 1 ? info.projectiles[Random.Range(0, info.projectiles.Length)] : info.projectile;
                 NpcShoots(npc, projectile, () => { if (!PlayerDead && !npc.dead) NpcHitsPlayer(info, npc, projectile); });
                 return;
             }
@@ -994,6 +1001,7 @@ namespace GSOOffline
             int damage = PlayerDamageTaken(Mathf.RoundToInt(roll), type, attacker, info.accuracy);
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} of {roll:0} (health {character.currentHealth - damage}/{MaxHealth()})");
             HurtPlayer(damage, PlayerSplash(info));
+            if (projectile > 0) ShotEffects(projectile, Mathf.RoundToInt(roll));
         }
 
         /// <summary>Takes damage off the player (already reduced) with a hit splash; at 0 they die.</summary>
@@ -1034,7 +1042,7 @@ namespace GSOOffline
         {
             ApplyDeathToll(LocalPlayer != null ? LocalPlayer.transform.position : character.Position);
             StopAttacking();
-            ClearBuffs();
+            EndBuffsOnDeath();
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
             Send(1, 4, character.name, false);   // the client only stops movement when told: WASD dragged the body along the floor

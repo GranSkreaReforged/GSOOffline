@@ -188,9 +188,7 @@ namespace GSOOffline
                     break;
                 case BossMoveKind.Stun:
                     if (!PlayerWithin(bossPos, m.radius)) break;
-                    PlayPlayerEffect(21);
-                    Send(1, 4, character.name, false);   // the client lets the player move again on true
-                    Later(m.duration, () => { if (!PlayerDead && character != null) Send(1, 4, character.name, true); });
+                    if (StunPlayer(m.duration)) PlayPlayerEffect(21);
                     break;
             }
         }

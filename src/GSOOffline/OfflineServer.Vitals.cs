@@ -115,19 +115,21 @@ namespace GSOOffline
         /// <summary>16/5 for every gear bonus the stats window shows; it only knew health and mana before.</summary>
         private void SendGearStats()
         {
-            foreach (var kv in GearBonusStats) Send(16, 5, kv.Value, GearStat(kv.Key));
+            foreach (var kv in GearBonusStats) Send(16, 5, kv.Value, kv.Key == "Damage" ? StatDamage() : GearStat(kv.Key));
             SendEffectiveResistances();
             SendCombatLevel();
         }
 
-        /// <summary>Every second, in combat or not, as the original: HealthRegen() and ManaRegen().</summary>
+        /// <summary>Every second, in combat or not, as the original: HealthRegen() (and food's) and ManaRegen().</summary>
         private void TickRegen()
         {
             if (character == null || !sceneReady || PlayerDead) return;
             regenTimer -= Time.deltaTime;
             if (regenTimer > 0f) return;
             regenTimer = 1f;
-            if (character.currentHealth < MaxHealth()) Heal(HealthRegen());
+            // Food: 1-1.5% of your health on top while it lasts.
+            int food = HasBuff(BuffFood) ? (int)(MaxHealth() * Random.Range(0.01f, 0.015f)) : 0;
+            if (character.currentHealth < MaxHealth()) Heal(HealthRegen() + food);
             if (character.currentMana < MaxMana())
             {
                 character.currentMana = Mathf.Min(MaxMana(), character.currentMana + ManaRegen());

@@ -83,6 +83,8 @@ namespace GSOOffline
                 if (flyingShownFor == item.id) return;
                 flyingShownFor = item.id;
                 Send(7, 41, $"{FlyingFollowerUid}_{flying}_{character.name}_{ItemData.Get(item.typeId)?.name}");
+                // Its damage bonus is FlyingPetDamage; the icon shows it (a passive: the client hides its time).
+                if (!HasBuff(BuffFlyingFollower)) AddBuff(-BuffFlyingFollower, BuffFlyingFollower, PassiveSeconds, null);
                 return;
             }
             if (!PetNpcs().TryGetValue(item.typeId, out int npcType)) return;
@@ -168,6 +170,7 @@ namespace GSOOffline
                 Send(25, 22, FlyingFollowerUid);
                 flyingShownFor = 0;
             }
+            RemoveBuff(-BuffFlyingFollower, false);
         }
 
         /// <summary>/parrotsay: the parrot repeats the line over the player's shoulder.</summary>
