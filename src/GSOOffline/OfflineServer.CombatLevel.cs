@@ -34,8 +34,10 @@ namespace GSOOffline
 
         private void SendEffectiveResistances()
         {
-            foreach (var kv in EffectiveResistanceStats)
-                Send(16, 5, kv.Value, Mathf.RoundToInt(CombatRules.EffectiveResistance(GearStat(kv.Key))));
+            for (int kind = 1; kind < DamageKinds.Count; kind++)
+                foreach (var kv in EffectiveResistanceStats)
+                    if (kv.Key == DamageKinds.ResistanceStat(kind))
+                        Send(16, 5, kv.Value, Mathf.RoundToInt(CombatRules.EffectiveResistance(StatResistance(kind))));
         }
 
         private Alignment WornAlignment()

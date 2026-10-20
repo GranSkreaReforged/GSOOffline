@@ -187,6 +187,8 @@ namespace GSOOffline
             SendDeathToll();
             SendCowardMark();
             RefreshAlignment(true);
+            ResendBuffIcons();
+            UpdateWhiskerSickness(QuestRatsTail);
             SendSceneLoot();
             SendBoats();
 

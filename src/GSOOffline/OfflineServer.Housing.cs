@@ -579,8 +579,9 @@ namespace GSOOffline
                 Notice("You must have a house to use this teleport.", "white");
                 return true;
             }
-            if (PlayerDead) return true;
+            if (PlayerDead || TeleportCoolingDown()) return true;
             TakeItems(typeId, 1);
+            StartTeleportCooldown();
             var player = LocalPlayer;
             if (player != null) PlayEffect(GfxTeleport, player.transform.position);
             arrivalGfx = GfxTeleportLand;

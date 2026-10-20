@@ -258,8 +258,9 @@ namespace GSOOffline
                     CountXp(SkillElementalGrim);
                     PlayPlayerEffect(58);
                     AddBuff(a.id, 0, 10f, null);
+                    StunPlayer(10f);   // and the original's stun with it: no abilities or items either
                     StopAttacking();
-                    Send(1, 4, character.name, false);
+                    UpdateCanMove();
                     return true;
                 case 127:   // Icy touch
                 case 128:   // Glacial spike: 55 + 0.6 x (Damage + IceDamage) + 2.5 x Elemental grimoire (fire, as the original), and a freezing stack

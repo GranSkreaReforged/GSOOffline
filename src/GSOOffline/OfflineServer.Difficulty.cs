@@ -79,7 +79,7 @@ namespace GSOOffline
             planning = planPaid = false;
             if (!heldByBroker) return;
             heldByBroker = false;
-            if (character != null && !PlayerDead) Send(1, 4, character.name, true);
+            if (character != null && !PlayerDead) UpdateCanMove();
         }
 
         private string DifficultyNodeVar(int nodeId)

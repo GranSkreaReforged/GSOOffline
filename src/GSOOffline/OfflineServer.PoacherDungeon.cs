@@ -206,8 +206,7 @@ namespace GSOOffline
         {
             int hit = HurtByOriginal(Random.Range(2000, 2501), DamageKinds.Piercing);
             Plugin.Log.LogInfo($"[dungeon] trap at {SceneWorld.Vec(t.pos)} sprung: {hit} damage, rooted, 10 arrows");
-            Send(1, 4, character.name, false);
-            Later(5f, () => { if (!PlayerDead && character != null) Send(1, 4, character.name, true); });
+            RootPlayer(5f);
             for (int i = 0; i < 10; i++)
             {
                 Vector3 from = t.arrows[Random.Range(0, t.arrows.Length)];
@@ -387,7 +386,7 @@ namespace GSOOffline
                 Notice("You touch the stone... ");
                 PlayPlayerEffect(82);
                 PlaySound(66, me, 40);
-                AddBuff(-33, 33, 60f, new BuffEffect());   // the client's quickness buff (movement speed isn't modelled)
+                AddBuff(-33, 33, 60f, new BuffEffect());   // Swiftness: +5 run speed
                 return true;
             }
             return false;

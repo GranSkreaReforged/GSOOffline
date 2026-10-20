@@ -109,8 +109,8 @@ namespace GSOOffline
             return null;
         }
 
-        /// <summary>Damage: gear, Psychic glyph (7.5 x 20 while you stay on it).</summary>
-        private int StatDamage() => GearStat("Damage") + (GlyphActive() ? GlyphDamage : 0);
+        /// <summary>Damage: gear, Psychic glyph (7.5 x 20 while you stay on it), and food (twice its value).</summary>
+        private int StatDamage() => GearStat("Damage") + (GlyphActive() ? GlyphDamage : 0) + IconAmount(BuffFood);
 
         /// <summary>A kind's damage stat (SlashDamage, FireDamage...): gear plus Strength, Immolate, Fire wisp and the glyph.</summary>
         private int StatDamageOf(int kind)
@@ -123,11 +123,12 @@ namespace GSOOffline
             return v;
         }
 
-        /// <summary>A kind's resistance before the soft cap: gear plus Flame barrier, Ice barrier, Immolate and the glyph.</summary>
+        /// <summary>A kind's resistance before the soft cap: gear plus Flame barrier, Ice barrier, Immolate, the glyph,
+        /// resistance potions and Weakness.</summary>
         private int StatResistance(int kind)
         {
             if (kind <= 0 || kind >= DamageKinds.Count) return 0;
-            int v = GearStat(DamageKinds.ResistanceStat(kind));
+            int v = GearStat(DamageKinds.ResistanceStat(kind)) + BuffResistance(kind);
             if (HasBuffFrom(AbilityFlameBarrier) && (kind == DamageKinds.Fire || kind == DamageKinds.Ice || kind == DamageKinds.Earth || kind == DamageKinds.Wind)) v += 15;
             if (HasBuffFrom(AbilityIceBarrier) && IsPhysical(kind)) v += 30;
             if (HasBuffFrom(AbilityImmolate)) v += kind == DamageKinds.Fire ? 10 : kind == DamageKinds.Ice ? -10 : 0;
@@ -533,6 +534,11 @@ namespace GSOOffline
                 foreach (var b in buffs)
                     if (b.ability == AbilityEnergyBlade) b.absorbed += damage;   // released when it ends
             if (alignment == Alignment.Heavy) damage = (int)(damage * CombatRules.HeavyAlignmentTaken);
+            if (character.scene == SceneKeshk && type == DamageKinds.Poison && HasBuff(BuffSnakebite))
+            {
+                PlayPlayerEffect(109);
+                damage *= 3;
+            }
             if (attacker != null && !attacker.dead && IsPhysical(type) && HasBuffFrom(AbilityFlameBarrier))
                 DealDamage(attacker, NpcDamageTaken(attacker, (int)(damage * 0.5f), type, false), WeaponSkill(EquippedWeapon()));
             if (HasBuffFrom(AbilityDisperse) && LocalPlayer != null)
@@ -569,6 +575,11 @@ namespace GSOOffline
             }
             if (damage <= 0) return 0;
 
+            if (type == DamageKinds.Fire && HasBuff(BuffSmolder))   // Smolderfish: fire heals you
+            {
+                Heal(Random.Range(140, 200));
+                PlayPlayerEffect(153);
+            }
             if (HasBuffFrom(AbilityStability))
             {
                 damage = (int)(damage * 0.5f);
