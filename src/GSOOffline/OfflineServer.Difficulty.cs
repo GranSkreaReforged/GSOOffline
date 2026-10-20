@@ -193,37 +193,63 @@ namespace GSOOffline
 
         // ---- the corner line ----------------------------------------------------------------
 
-        private static readonly Color DifficultyColor = new Color(0.55f, 0.85f, 1f, 0.9f);
-        private static readonly Color DifficultyShadow = new Color(0f, 0f, 0f, 0.6f);
-        private GUIStyle difficultyStyle;
+        private static readonly Color FateTextColor = new Color(0.62f, 0.88f, 1f, 1f);
+        private static readonly Color FateBackdrop = new Color(0f, 0f, 0f, 0.55f);
 
-        /// <summary>"2x experience, bosses 25% health - change at a fate broker in 23h 41m", under the version lines, while either is set.</summary>
+        /// <summary>
+        /// "Fate: 2x experience, bosses 25% health - settled for 23h 41m" just above the health bar, while either
+        /// modifier is set, in the HUD's own outlined font on a tinted backdrop. Shown when the game draws its bar.
+        /// </summary>
         private void OnGUI()
         {
             if (Event.current.type != EventType.Repaint || character == null || !sceneReady) return;
             if (character.xpRatePercent == 100 && character.bossHealthPercent == 100) return;
             var mc = Menucontroller.instance;
-            if (mc != null && !mc.showGUI) return;   // the game's hide-interface mode (screenshots)
+            var options = Scr_Options.instance;
+            if (mc == null || options == null || !mc.showGUI) return;   // showGUI off: the game's hide-interface mode
+            if (Scr_DialogueHandler.instance != null && Scr_DialogueHandler.instance.dialogueActive) return;
+            if (CameraController.instance != null && CameraController.instance.cinematicMode) return;
 
             var parts = new List<string>();
             if (character.xpRatePercent != 100) parts.Add(Rate(character.xpRatePercent) + " experience");
             if (character.bossHealthPercent != 100) parts.Add("bosses " + character.bossHealthPercent + "% health");
             long wait = character.difficultyLockedUntil - UnixNow;
-            string text = string.Join(", ", parts.ToArray()) + " - " +
-                          (wait > 0 ? $"change at a fate broker in {wait / 3600}h {wait % 3600 / 60:00}m" : "a fate broker can change it now");
+            string text = "Fate: " + string.Join(", ", parts.ToArray()) + " - " +
+                          (wait > 0 ? $"settled for {wait / 3600}h {wait % 3600 / 60:00}m" : "a fate broker can change it");
 
-            float scale = Mathf.Max(1f, Screen.height / 1080f);
-            if (difficultyStyle == null) difficultyStyle = new GUIStyle(GUI.skin.label) { wordWrap = false, richText = false };
-            difficultyStyle.fontSize = Mathf.RoundToInt(12f * scale);
-            GUI.matrix = Matrix4x4.identity;
+            // The HUD's layout space. The game places the bar at (layout width / 2 - 125, layout height - 128): its
+            // own pixels unscaled, a smaller "virtual" screen under GSO HD Textures' UI scale (drawn scaled up by
+            // the same factor), or with the game's /scalegui its matrix. The newer LUI HUD has no IMGUI bar; there
+            // the line goes where the classic one would be.
+            Vector2 bar;
+            if (options.scaleGUI)
+            {
+                GUI.matrix = Matrix4x4.Scale(new Vector3(Screen.width / options.nativeSize.x, Screen.height / options.nativeSize.y, 1f));
+                bar = mc.guiPositions.healthBarPosition;
+            }
+            else if (!options.useLUI && mc.guiPositions.healthBarPosition.x > 0f)
+            {
+                bar = mc.guiPositions.healthBarPosition;
+                float factor = Screen.width / (2f * (bar.x + 125f));
+                GUI.matrix = Matrix4x4.Scale(new Vector3(factor, factor, 1f));
+            }
+            else
+            {
+                GUI.matrix = Matrix4x4.identity;
+                bar = new Vector2(Screen.width / 2 - 125, Screen.height - 128);
+            }
             GUI.depth = -1000;
-            var content = new GUIContent(text);
-            var size = difficultyStyle.CalcSize(content);
-            float x = 6f * scale, y = (4f + 2 * 16f) * scale;   // the third line: the mods' versions are above (UpdateOverlay)
-            difficultyStyle.normal.textColor = DifficultyShadow;
-            GUI.Label(new Rect(x + 1f, y + 1f, size.x, size.y), content, difficultyStyle);
-            difficultyStyle.normal.textColor = DifficultyColor;
-            GUI.Label(new Rect(x, y, size.x, size.y), content, difficultyStyle);
+            var skin = GUI.skin;
+            GUI.skin = mc.skin;
+            var style = mc.skin.GetStyle("WhiteTextCenter");
+            float width = style.CalcSize(new GUIContent(text)).x + 16f;
+            float x = bar.x + 125f - width / 2f, y = bar.y - 22f;   // the bar is drawn from bar.y + 2, 20 high
+            GUI.color = FateBackdrop;
+            GUI.DrawTexture(new Rect(x, y, width, 20f), Texture2D.whiteTexture);
+            GUI.color = Color.white;
+            mc.drawGUITextWhiteCenter(x, y, text, FateTextColor, (int)width, 20);   // black outline, as the HUD's numbers
+            GUI.skin = skin;
+            GUI.matrix = Matrix4x4.identity;
         }
 
         // ---- the dialogue -------------------------------------------------------------------
