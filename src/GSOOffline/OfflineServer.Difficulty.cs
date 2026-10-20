@@ -10,7 +10,7 @@ namespace GSOOffline
     /// having been made for groups of players. Asked of an NPC, not the config, and settled for a day once chosen
     /// (or for a fortune, sooner), so they are a choice rather than a switch. The brokers are the original's
     /// insurance advisors (type 160; item insurance has no use alone). Saved with the character
-    /// (CharacterSave.xpRatePercent, bossHealthPercent, difficultyLockedUntil); shown in the top-left corner.
+    /// (CharacterSave.xpRatePercent, bossHealthPercent, difficultyLockedUntil); shown above the health bar.
     ///
     /// One sitting sets both: the player drafts the two choices, nothing changes (and nothing is paid) until they
     /// confirm, and confirming settles both for 24 hours. The player stands still for the whole conversation, so
@@ -191,9 +191,34 @@ namespace GSOOffline
             }
         }
 
-        // ---- the corner line ----------------------------------------------------------------
+        private float nextFateCheck;
 
-        private static readonly Color FateTextColor = new Color(0.62f, 0.88f, 1f, 1f);
+        /// <summary>Dev: the fate settles for this many more seconds (bridge command fatelock).</summary>
+        internal void DevFateLock(int seconds)
+        {
+            character.difficultyLockedUntil = UnixNow + seconds;
+            Plugin.Log.LogInfo($"[dev] fate settled for {seconds}s");
+        }
+
+        /// <summary>
+        /// The day is up: say so once in chat, as it happens or at the next login if it passed while away.
+        /// difficultyLockedUntil then goes to 0, which marks it told (and still unlocked).
+        /// </summary>
+        private void TickFate()
+        {
+            if (character == null || !sceneReady || Time.time < nextFateCheck) return;
+            nextFateCheck = Time.time + 1f;
+            if (character.difficultyLockedUntil == 0 || character.difficultyLockedUntil > UnixNow) return;
+            character.difficultyLockedUntil = 0;
+            SaveCurrentCharacter();
+            Notice("Your fate is unsettled: a fate broker can change how quickly you learn and how sturdy bosses are again.");
+            Plugin.Log.LogInfo("[difficulty] the 24 hours are up");
+        }
+
+        // ---- the fate line ------------------------------------------------------------------
+
+        private static readonly Color FateTextColor = new Color(0.62f, 0.88f, 1f, 1f);       // settled
+        private static readonly Color FateUnsettledColor = new Color(1f, 0.82f, 0.3f, 1f);   // a broker can change it
         private static readonly Color FateBackdrop = new Color(0f, 0f, 0f, 0.55f);
 
         /// <summary>
@@ -215,7 +240,7 @@ namespace GSOOffline
             if (character.bossHealthPercent != 100) parts.Add("bosses " + character.bossHealthPercent + "% health");
             long wait = character.difficultyLockedUntil - UnixNow;
             string text = "Fate: " + string.Join(", ", parts.ToArray()) + " - " +
-                          (wait > 0 ? $"settled for {wait / 3600}h {wait % 3600 / 60:00}m" : "a fate broker can change it");
+                          (wait > 0 ? $"settled for {wait / 3600}h {wait % 3600 / 60:00}m" : "unsettled: a fate broker can change it");
 
             // The HUD's layout space. The game places the bar at (layout width / 2 - 125, layout height - 128): its
             // own pixels unscaled, a smaller "virtual" screen under GSO HD Textures' UI scale (drawn scaled up by
@@ -247,7 +272,7 @@ namespace GSOOffline
             GUI.color = FateBackdrop;
             GUI.DrawTexture(new Rect(x, y, width, 20f), Texture2D.whiteTexture);
             GUI.color = Color.white;
-            mc.drawGUITextWhiteCenter(x, y, text, FateTextColor, (int)width, 20);   // black outline, as the HUD's numbers
+            mc.drawGUITextWhiteCenter(x, y, text, wait > 0 ? FateTextColor : FateUnsettledColor, (int)width, 20);   // black outline, as the HUD's numbers
             GUI.skin = skin;
             GUI.matrix = Matrix4x4.identity;
         }
