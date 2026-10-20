@@ -57,6 +57,7 @@ namespace GSOOffline
                 dialogueNode = null;
                 Send(2, 3, character.name, "-");
             }
+            EndDifficultyTalk();
             ResetCombat();
         }
 

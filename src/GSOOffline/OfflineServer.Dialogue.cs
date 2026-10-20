@@ -126,7 +126,8 @@ namespace GSOOffline
         private string NodeVar(int nodeId)
         {
             if (nodeId == HarpyGossipNode) return HarpyGossip();
-            if (nodeId == NodeDifficulty) return DifficultyStatus();
+            var fate = DifficultyNodeVar(nodeId);   // the fate brokers' (and their hold on the player)
+            if (fate != null) return fate;
             return character.name;
         }
 
