@@ -153,6 +153,7 @@ namespace GSOOffline
             var it = new ItemSave { id = character.nextItemId++, typeId = t.typeId, amount = amount, grade = t.Stacks ? t.baseGrade : RollNewItemGrade(t.baseGrade, announceGrade) };
             foreach (var r in t.stats)
                 it.stats.Add(new ItemStat { key = r.key, value = Random.Range(Mathf.Min(r.min, r.max), Mathf.Max(r.min, r.max) + 1) });
+            if (!t.Stacks) it.abilities = RollAbilities(t.typeId);
             return it;
         }
 
@@ -343,6 +344,22 @@ namespace GSOOffline
             }
             it.equipped = true;
             Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
+            // A two-handed weapon and the shield slot exclude each other: the other one goes back in the bag.
+            // Gathering tools are two-handed too; a shield they push off comes back with a one-handed weapon.
+            var hand = t.slot == "Weapon" ? it : EquippedWeapon();
+            var offhand = EquippedInSlot("Shield");
+            if (t.slot == "Shield" || t.slot == "Weapon" && IsTwoHanded(it.typeId) && !IsAnyTool(it.typeId)) shieldOffForTool = 0;
+            if (hand != null && offhand != null && IsTwoHanded(hand.typeId))
+            {
+                if (t.slot == "Weapon" && IsAnyTool(it.typeId)) shieldOffForTool = offhand.id;
+                Unequip(t.slot == "Weapon" ? offhand.id : hand.id);
+            }
+            else if (t.slot == "Weapon" && offhand == null && shieldOffForTool != 0 && !IsTwoHanded(it.typeId))
+            {
+                var shield = FindItem(shieldOffForTool);
+                shieldOffForTool = 0;
+                if (shield != null && !shield.equipped) Equip(shield.id);
+            }
             GearChanged();
 
             // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the
@@ -372,14 +389,6 @@ namespace GSOOffline
             if (character == null) return;
             character.secondaryWeaponId = it != null ? it.id : 0;
             Send(8, 19, character.name, character.secondaryWeaponId, it != null ? it.typeId : 0);
-        }
-
-        /// <summary>6/5 "Switch weapon": the back weapon goes in hand, the one in hand (if any) on the back.</summary>
-        private void SwitchWeapon()
-        {
-            var back = character != null ? SecondaryWeapon() : null;
-            if (back == null) return;
-            Equip(back.id);
         }
 
         private void Unequip(int itemId)

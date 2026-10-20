@@ -37,6 +37,7 @@ namespace GSOOffline
         public int grade;
         public bool equipped;
         public List<ItemStat> stats = new List<ItemStat>();
+        public int[] abilities;   // Ability1..4, rolled when the item is made; null in saves from before them
     }
 
     [Serializable]
