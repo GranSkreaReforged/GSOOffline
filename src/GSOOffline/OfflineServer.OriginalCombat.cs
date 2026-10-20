@@ -285,12 +285,21 @@ namespace GSOOffline
         private float WeaponSpeed(ItemSave weapon)
         {
             var ih = Scr_ItemHandler.instance;
+            if (weapon != null && ih.isCrossBow(weapon.typeId) && HasBuffFrom(AbilityFocus)) return 0.5f;
+            if (weapon != null && ih.isDagger(weapon.typeId) && HasBuffFrom(AbilityFrenzy)) return 0.8f;
+            return BaseWeaponSpeed(weapon);
+        }
+
+        /// <summary>The interval without your buffs: an outlaw's weapon swings at this.</summary>
+        private static float BaseWeaponSpeed(ItemSave weapon)
+        {
+            var ih = Scr_ItemHandler.instance;
             if (weapon == null) return 1.3f;
             int id = weapon.typeId;
             if (ih.isBow(id)) return 1.66f;
-            if (ih.isCrossBow(id)) return HasBuffFrom(AbilityFocus) ? 0.5f : 3.32f;
+            if (ih.isCrossBow(id)) return 3.32f;
             if (ih.isMace(id)) return 1.3f;
-            if (ih.isDagger(id)) return HasBuffFrom(AbilityFrenzy) ? 0.8f : 1f;
+            if (ih.isDagger(id)) return 1f;
             if (ih.isHalberd(id) || ih.isGreatsword(id) || ih.isStaff(id) || ih.isWand(id)) return 1.66f;
             if (ih.isBroadsword(id)) return 1.3f;
             if (ih.isInstrument(id) || id == 395) return 3f;   // lutes, the wooden pillar
@@ -364,7 +373,7 @@ namespace GSOOffline
                 if (weapon != null && (options & HitNoWeaponGrade) == 0) damage = (int)(damage * WeaponGradeMultiplier(weapon.grade));
             }
             int accuracy = byPlayer ? PlayerAccuracy() : 100;
-            int outlaw = (options & HitNoDefence) != 0 ? -1 : BountyBlockedHit(npc, damage, accuracy);   // outlaws block as you do
+            int outlaw = (options & HitNoDefence) != 0 ? -1 : BountyBlockedHit(npc, damage, type, accuracy);   // outlaws block as you do
             if (outlaw >= 0) damage = outlaw;
             int defence = (options & HitNoDefence) != 0 || outlaw >= 0 ? 0 : info.defence > 0 ? info.defence : info.level;
             if (Random.Range(0, defence) > Random.Range(0, accuracy + 1))
