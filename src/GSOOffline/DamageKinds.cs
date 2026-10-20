@@ -34,12 +34,6 @@ namespace GSOOffline
         }
 
         /// <summary>
-        /// How much of a blow of this kind gets through a resistance: 100% minus the percentage, so a weakness
-        /// (negative) adds damage and 100 or more (Snowmen, Phraustie: 1000) stops it.
-        /// </summary>
-        public static float Through(int resistancePercent) => Mathf.Max(0f, 1f - resistancePercent / 100f);
-
-        /// <summary>
         /// The element an ability deals, from its name, or None for a plain blow with the weapon. The data names
         /// no ability elements; the names do (Fire ball, Ice bash, Rockslide...).
         /// </summary>

@@ -5,7 +5,8 @@ namespace GSOOffline
 {
     public partial class OfflineServer
     {
-        // Base "Health" stat plus Health rolled on equipped items, as the client's stats window computes it.
+        // Base "Health" stat (100 per combat level, as the original: BaseHealth) plus Health rolled on equipped items,
+        // as the client's stats window computes it.
         private int MaxHealth()
         {
             int max = character.health;
@@ -35,15 +36,31 @@ namespace GSOOffline
             SendHealth();
         }
 
-        private int MaxMana() => Mathf.Max(0, character.mana + ManaPerGrimoireLevel * SkillLevel(SkillElementalGrim) + GearStat("Mana"));
+        // The original's mana: the base 100 and the gear's, less what a Fire wisp burns.
+        private int MaxMana() => Mathf.Max(0, character.mana + GearStat("Mana") - BuffAmount(AbilityFireWisp) - BuffAmount(AbilityFireWisp2));
 
-        // Reconstructed: the pool grows with Elemental grimoire, or its dearest spells (Fire wall 185, Flame barrier
-        // 120) could never be cast on the starting 100. The original server's rule is lost.
-        private const int ManaPerGrimoireLevel = 5, SkillElementalGrim = 20;
+        private const int SkillElementalGrim = 20;
 
-        // Mana regained per regeneration tick: 2, plus Manaregen rolled on equipped items.
-        private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen"));
-        private const int BaseManaRegen = 2;
+        // Mana regained each second (Scr_PlayerHandler.HealthManaRegen): 1, plus Manaregen on your gear and Mana surge's.
+        private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen") + BuffAmount(AbilityManaSurge));
+        private const int BaseManaRegen = 1;
+
+        /// <summary>
+        /// The base health follows the combat level (update 136): set at login and on every level up, and sent as the
+        /// client's base Health stat (16/5 type 1), as the original's levelUp did.
+        /// </summary>
+        private void UpdateBaseHealth()
+        {
+            if (character == null || devBaseHealth > 0) return;
+            int baseHealth = CombatRules.BaseHealth(CombatLevel());
+            if (baseHealth == character.health) return;
+            character.health = baseHealth;
+            Send(16, 5, StatHealth, character.health);
+            HealthStatsChanged();
+        }
+
+        private const int StatHealth = 1;
+        private int devBaseHealth;   // dev: devhealth pins the base health
 
         private int GearStat(string key)
         {
@@ -75,7 +92,7 @@ namespace GSOOffline
 
         private float regenTimer;
 
-        // Health regained per out-of-combat tick: 1, plus Healthregen rolled on equipped items.
+        // Health regained each second: 1, plus Healthregen rolled on equipped items.
         private int HealthRegen() => Mathf.Max(0, 1 + GearStat("Healthregen"));
 
         // Gear stat key -> the client's bonus StatType (base type + 35), for the stats window. Health and mana go with
@@ -103,15 +120,14 @@ namespace GSOOffline
             SendCombatLevel();
         }
 
-        /// <summary>Out of combat: HealthRegen() per 3 s; mana always ManaRegen() per 3 s.</summary>
+        /// <summary>Every second, in combat or not, as the original: HealthRegen() and ManaRegen().</summary>
         private void TickRegen()
         {
             if (character == null || !sceneReady || PlayerDead) return;
             regenTimer -= Time.deltaTime;
             if (regenTimer > 0f) return;
-            regenTimer = 3f;
-            bool inCombat = autoAttacking || (world != null && world.npcs.Exists(n => n.aggro));
-            if (!inCombat && character.currentHealth < MaxHealth()) Heal(HealthRegen());
+            regenTimer = 1f;
+            if (character.currentHealth < MaxHealth()) Heal(HealthRegen());
             if (character.currentMana < MaxMana())
             {
                 character.currentMana = Mathf.Min(MaxMana(), character.currentMana + ManaRegen());

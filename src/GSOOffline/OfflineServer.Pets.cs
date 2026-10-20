@@ -54,7 +54,7 @@ namespace GSOOffline
             return null;
         }
 
-        /// <summary>Flying follower's damage bonus (update 136): 8.5% for a Damaged one to 19% for a Mythic one.</summary>
+        /// <summary>Flying follower's damage bonus: a tenth of its grade's multiplier (8.8% Damaged to 17.2% Mythic).</summary>
         private float FlyingPetDamage()
         {
             if (character == null) return 1f;
@@ -137,16 +137,21 @@ namespace GSOOffline
             return t != null && !t.dead && CanFight(t) && NpcShown(t) ? t : null;
         }
 
+        /// <summary>
+        /// The original's pet blow (Scr_PlayerPets.AttackHit): 10 + your Damage and damage of the pet's kind + 15 x your
+        /// weapon's level (or Wrestling without one), 60-100% of it, times the pet's grade. It goes through the target's
+        /// defences as yours do, but not your weapon's grade (update 139).
+        /// </summary>
         private void PetHits(NpcEntity target, int grade)
         {
             if (pet == null || target.dead || PlayerDead) return;
             var weapon = EquippedWeapon();
-            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(WeaponSkill(weapon)));
-            float damage = Random.Range(max / 2, max + 1) * CombatRules.PetDamageShare * CombatRules.PetGradeMultiplier(grade);
-            int block = GameData.Npcs.TryGetValue(target.typeId, out var info) ? info.damageBlock / 10 : 0;
-            int hit = Mathf.Max(1, Mathf.RoundToInt(damage) - block);
+            int kind = GameData.Npcs.TryGetValue(pet.typeId, out var petInfo) ? petInfo.damageType : 0;
+            int max = 10 + StatDamageOf(kind) + StatDamage() + (weapon != null ? WeaponLevel(weapon) * 15 : SkillLevel(SkillWrestling) * 15);
+            int damage = (int)(Random.Range(max * 0.6f, max) * WeaponGradeMultiplier(grade));
             Aggro(target);
-            Plugin.Log.LogInfo($"[pet] hits {target.uid} for {hit} (owner's max hit {max}, grade {grade})");
+            int hit = NpcDamageTaken(target, damage, kind, true, HitNoWeaponGrade);
+            Plugin.Log.LogInfo($"[pet] hits {target.uid} for {hit} of {damage} (max {max}, grade {grade})");
             DealDamage(target, hit, WeaponSkill(weapon));
         }
 

@@ -138,11 +138,12 @@ Working:
 - Bank
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
+- Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (bosses with a single-player share of their health, `Combat.BossHealthShare`)
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
 - Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)
-- Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
-- Light and heavy armor XP, shared from kills made shortly after being hit
+- Abilities as the original server had them: attacks, area attacks, ground effects, stuns, roots and slows, damage over time, heals, bandages and buffs with their icons (a few later abilities are reconstructions)
+- Combat experience shared between the skills used in the last 20 seconds, armor skills included
 - Potions, food, experience scrolls, teleport scrolls and gear crates
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything. Dropping an item (Shift+click, the item window's Drop, or dragging it out of the windows) puts it in a bag at your feet, and the item window's Destroy gets rid of it for good. Every bag is saved and lasts 20 minutes of play
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds

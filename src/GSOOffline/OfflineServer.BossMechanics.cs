@@ -14,7 +14,7 @@ namespace GSOOffline
     }
 
     /// <summary>One timed move of a boss fight. Numbers are reconstructions: the patch notes name the moves but
-    /// rarely their values. Damage shares are of the boss's own maximum hit (CombatRules.NpcMaxHit).</summary>
+    /// rarely their values. Damage shares are of the boss's own maximum hit (CombatRules.NpcMaxHit, the original's formula).</summary>
     internal class BossMove
     {
         public BossMoveKind kind;
@@ -213,7 +213,7 @@ namespace GSOOffline
         /// <summary>A blow landed on an absorbing boss: it hurts the player instead, through the usual caps.</summary>
         private void ReflectAbsorbed(NpcEntity boss, int damage)
         {
-            int hit = Mathf.Min(ApplyDefensiveBuffs(damage, null), Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
+            int hit = PlayerDamageTaken(damage, DamageKinds.None, null, 100);
             Plugin.Log.LogInfo($"[boss] {boss.uid} absorbs {damage} and reflects {hit}");
             HurtPlayer(hit, SplashPlain);
         }
@@ -227,14 +227,11 @@ namespace GSOOffline
             return d.magnitude <= radius;
         }
 
-        /// <summary>A hazard's damage: a share of the boss's maximum hit, through the player's resistance and buffs.</summary>
+        /// <summary>A hazard's damage: a share of the boss's maximum hit, through the player's defences.</summary>
         private void HazardHit(NpcInfo info, BossMove m, string what)
         {
             float dmg = CombatRules.NpcMaxHit(info) * m.share * Random.Range(0.8f, 1f);
-            if (m.damageKind > 0) dmg *= 1f - CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(m.damageKind)));
-            int hit = ApplyDefensiveBuffs(Mathf.RoundToInt(dmg), null);
-            hit = Mathf.Min(hit, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
-            lastHitTaken = Time.time;
+            int hit = PlayerDamageTaken(Mathf.RoundToInt(dmg), m.damageKind, null, info.accuracy);
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) {what} hits you for {hit}");
             HurtPlayer(hit, m.damageKind == DamageKinds.Poison ? SplashPoisoned : SplashPlain);
         }
