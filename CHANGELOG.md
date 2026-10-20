@@ -18,6 +18,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Added
 - Fate brokers (every insurance advisor, such as the one in Grimwall, is now one) set your fate (#103): learn every skill at 1x, 1.5x, 2x or 3x the usual pace, and give bosses 100%, 75%, 50% or 25% of their health, since they were made for groups. Both start at the original (1x, 100%). In one sitting you choose both, and nothing changes until you confirm; confirming settles both for 24 hours. Sooner, the broker reopens your fate for 75,000 silver, paid once for both and only when you confirm. You stand still while talking to a broker, so the conversation can't close by accident. While either is set, a line just above your health bar shows them and when you can change them again. Your choices stay after the 24 hours; the line then turns gold ("unsettled"), and a chat message says a broker can change them again, as it happens or at your next login. Item insurance, which has no use alone, is gone.
 
+### Fixed
+- A new character is created inside Yorkhill Monastery, in the room with Alden, where the original game started you (#104), so the first quest is right there. It used to start outside, at the monastery wayshrine.
+
 ## [1.7.2] - 2026-10-18
 ### Fixed
 - Yorkhill's south and south-east gates lead out to East Athagos, and East Athagos' gates lead back in. They used to drop you at the edge of West Athagos, in the wrong zone.
