@@ -802,6 +802,9 @@ namespace GSOOffline
         // route now, hit deals her damage (default 1) as the player (in the air: she dives at you).
         private static void Harpy(string[] args) => OfflineServer.Instance.DevHarpy(args);
 
+        // fatelock <seconds>: the fate brokers' lock ends in that many seconds (negative: already over, told at the next check).
+        private static void FateLock(string[] args) => OfflineServer.Instance.DevFateLock(int.Parse(args[1]));
+
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
 

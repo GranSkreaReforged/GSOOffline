@@ -5,7 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Changed
-- Combat now uses the original game's numbers, taken from the original server, with the later patch notes on top (#101). Creatures have the health they had online (a level 25 bear 11,077, Zalranaz 468,800 before the single-player share below) and hit as hard as they did. Your base health is 100 per combat level, as in the live game, plus your gear's.
+- Combat now uses the original game's numbers, taken from the original server, with the later patch notes on top (#101). Creatures have the health they had online (a level 25 bear 11,077, Zalranaz 468,800) and hit as hard as they did. Your base health is 100 per combat level, as in the live game, plus your gear's.
 - Every weapon hits with its own formula from the original: swords, daggers, maces, bows, crossbows, staffs, wands, lutes and fists each count your skill, the weapon's level and your gear's damage their own way, at the weapon's original attack speed. The damage kind of each attack (slash, pierce, fire, ice...) meets the target's resistance to it.
 - Every ability does what it did in the original game, with its own damage, area, stun, root, slow, burn or poison: Fire wall and landmines stay on the ground, Flame lance channels, Firestorm circles you, Slashing goes through its three blows in turn, Healing music heals each second of the song, and so on. Shatter, Frostburn, Ice hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma, the archery Landmine, Condensed psyche and ice, and the Halberd ice attack came after the original server's code, so they stay reconstructions.
 - Creatures and you block as in the original: a defence roll against the attacker's accuracy, which takes off up to the damage block. Blows always land; there is no flat miss chance any more, and stepping away mid-swing no longer dodges.
@@ -16,7 +16,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Pets hit with the original's formula (your damage and weapon level), the explosive potion and black candy deal the original's blast (and no longer hurt you), and bounty outlaws hit and block like players of their level.
 
 ### Added
-- `Combat.BossHealthShare` in the config (default 0.25): bosses were made for groups, so alone you fight them with this share of their original health. Their damage is the original's. Set it to 1 for the original game's bosses.
+- Fate brokers (every insurance advisor, such as the one in Grimwall, is now one) set your fate (#103): learn every skill at 1x, 1.5x, 2x or 3x the usual pace, and give bosses 100%, 75%, 50% or 25% of their health, since they were made for groups. Both start at the original (1x, 100%). In one sitting you choose both, and nothing changes until you confirm; confirming settles both for 24 hours. Sooner, the broker reopens your fate for 75,000 silver, paid once for both and only when you confirm. You stand still while talking to a broker, so the conversation can't close by accident. While either is set, a line just above your health bar shows them and when you can change them again. Your choices stay after the 24 hours; the line then turns gold ("unsettled"), and a chat message says a broker can change them again, as it happens or at your next login. Item insurance, which has no use alone, is gone.
 
 ## [1.7.2] - 2026-10-18
 ### Fixed

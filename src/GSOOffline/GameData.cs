@@ -20,6 +20,8 @@ namespace GSOOffline
         public string name;
         public int level;
         public int health;
+        public int fullHealth;         // a boss's original health, before the character's share (CombatRules.BossHealthShare)
+        public bool sharedHealth;      // a boss without explicit health: health = fullHealth x the share
         public bool canFight;
         public int respawnTime;
         public bool ordinary;          // no respawntime in the data and not a boss: a plain creature (CombatRules tunes these)
@@ -155,8 +157,9 @@ namespace GSOOffline
                     name = Attr(n, "name"),
                     level = level,
                     // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses get
-                    // the single-player share of theirs (CombatRules.BossHealthShare).
-                    health = IntAttr(n, "health", IsBoss(n) ? Mathf.Max(1, (int)(CombatRules.BossHealth(level) * CombatRules.BossHealthShare)) : CombatRules.NpcHealth(level)),
+                    // the character's share of theirs (ApplyBossHealthShare).
+                    fullHealth = IntAttr(n, "health", IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)),
+                    sharedHealth = IsBoss(n) && Attr(n, "health") == null,
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
@@ -191,8 +194,17 @@ namespace GSOOffline
                     animAttack = IntAttr(n, "anim_attack", NpcAnims.Attack),
                     animDeath = IntAttr(n, "anim_death", NpcAnims.Death),
                 };
+                info.health = info.fullHealth;
                 Npcs[info.id] = info;
             }
+            ApplyBossHealthShare();
+        }
+
+        /// <summary>Bosses' health from CombatRules.BossHealthShare (the character's choice).</summary>
+        public static void ApplyBossHealthShare()
+        {
+            foreach (var info in Npcs.Values)
+                if (info.sharedHealth) info.health = Mathf.Max(1, (int)(info.fullHealth * CombatRules.BossHealthShare));
         }
     }
 }

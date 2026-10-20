@@ -189,6 +189,9 @@ namespace GSOOffline
         public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
         public long bountyRefreshAt;      // unix seconds: the board fills up again then
         public int nextBountyId;
+        public int xpRatePercent = 100;       // the insurance advisor's modifiers (OfflineServer.Difficulty.cs)
+        public int bossHealthPercent = 100;
+        public long difficultyLockedUntil;    // unix seconds: no change before then
 
         public int GetKills(int npc)
         {
