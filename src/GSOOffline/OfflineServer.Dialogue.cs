@@ -29,6 +29,7 @@ namespace GSOOffline
             if (LakhmuInteractNpc(npc)) return;
             if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll
             dialogueNpc = npc;
+            EndDifficultyTalk();
             Send(3, 10, character.name, uid);
 
             int node = PickEntryNode(npc.typeId);
@@ -85,11 +86,13 @@ namespace GSOOffline
             if (o.questReq != null && !o.questReq.Test(character.GetQuestPhase(o.questReq.quest))) return false;
             if (o.itemReq != null && CountItem(o.itemReq[0]) < (o.itemReq.Length > 1 ? o.itemReq[1] : 1)) return false;
             if (o.questVarReq != null && GetQuestVar(o.questVarReq[0], o.questVarReq[1]) != o.questVarReq[2]) return false;
+            if (o.shownIf != null && !o.shownIf()) return false;
             return true;
         }
 
         private void EnterNode(int id)
         {
+            AddDifficultyDialogue();   // the fate brokers' nodes, before the lookup
             if (!DialogueData.Nodes.TryGetValue(id, out var n))
             {
                 CloseDialogue();
@@ -123,6 +126,7 @@ namespace GSOOffline
         private string NodeVar(int nodeId)
         {
             if (nodeId == HarpyGossipNode) return HarpyGossip();
+            if (nodeId == NodeDifficulty) return DifficultyStatus();
             return character.name;
         }
 
@@ -164,6 +168,7 @@ namespace GSOOffline
         private void CloseDialogue()
         {
             dialogueNode = null;
+            EndDifficultyTalk();
             if (character != null) Send(2, 3, character.name, "-");
             var move = pendingDialogueTeleport;
             pendingDialogueTeleport = null;

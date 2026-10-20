@@ -138,6 +138,7 @@ namespace GSOOffline
             character.scene = current.id;
 
             GameData.EnsureLoaded();
+            ApplyDifficulty();
             MarkCleanser();
             world = SceneWorld.Build(current.id, current.sceneName);
             AddHarpyToWorld();
@@ -224,6 +225,7 @@ namespace GSOOffline
 
             SendQuestObjects();
             SendVisibleHouses();
+            RenameBrokers();
             string npcs = world.BuildVisibleNpcList(p, Plugin.NpcViewDistance.Value, n => NpcShown(n) && !bountyByUid.ContainsKey(n.uid));
             SendVisibleBounties(p);
             if (npcs != lastNpcList)

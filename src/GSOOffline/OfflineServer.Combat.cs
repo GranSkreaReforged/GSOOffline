@@ -16,9 +16,9 @@ namespace GSOOffline
         public static int NpcHealth(int level) => (int)((100 + 5f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * CreatureHealthPatches);
         public static int BossHealth(int level) => (int)((100 + 10f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * BossHealthPatches);
 
-        // Single player: bosses were made for groups, so they have this share of their health (config
-        // Combat.BossHealthShare, 1 = the original's). Their damage is the original's.
-        public static float BossHealthShare => Mathf.Clamp(Plugin.BossHealthShare?.Value ?? 0.25f, 0.05f, 1f);
+        // Single player: bosses were made for groups, so the character may give them this share of their health
+        // (the insurance advisor, OfflineServer.Difficulty.cs; 1 = the original's). Their damage is the original's.
+        public static float BossHealthShare = 1f;
 
         // Creature damage: 10 + 0.65 x level^2; bosses 10 + 0.8 x level^2, then +25% (update 137) and -12.5% (139).
         // A blow rolls 1 to one less than this (Random.Range(1, damage)). The data's own damage replaces it, except the

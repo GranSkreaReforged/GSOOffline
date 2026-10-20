@@ -479,7 +479,7 @@ namespace GSOOffline
         public void AddXp(int skillId, int amount)
         {
             if (character == null || amount <= 0 || !SkillById.TryGetValue(skillId, out var key)) return;
-            amount = Mathf.Max(1, Mathf.RoundToInt(amount * ExperienceKept()));
+            amount = Mathf.Max(1, Mathf.RoundToInt(amount * ExperienceKept() * XpRate));
             int before = LevelFromXp(character.GetXp(key));
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);
