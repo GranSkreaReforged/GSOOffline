@@ -137,6 +137,7 @@ namespace GSOOffline
                 return;
             }
             character.scene = current.id;
+            KeepPersistentAnimationHandler();
 
             GameData.EnsureLoaded();
             ApplyDifficulty();
@@ -153,6 +154,25 @@ namespace GSOOffline
                 return;
             }
             FinishSceneLoad();
+        }
+
+        /// <summary>
+        /// The Mages Guild scene (21) carries its own copy of the client's AnimationHandler, whose Awake takes over the
+        /// static EasyAnimationHandler.instance every NPC gets its animator from. Once that scene unloads the instance
+        /// is destroyed, and every NPC set up afterwards throws (no animations, broken bears) until the game restarts.
+        /// Point it back at the persistent one (DontDestroyOnLoad) on every scene load.
+        /// </summary>
+        private static void KeepPersistentAnimationHandler()
+        {
+            var current = EasyAnimationHandler.instance;
+            if (current != null && current.gameObject.scene.name == "DontDestroyOnLoad") return;
+            foreach (var h in Resources.FindObjectsOfTypeAll<EasyAnimationHandler>())
+            {
+                if (h == null || h.gameObject.scene.name != "DontDestroyOnLoad") continue;
+                EasyAnimationHandler.instance = h;
+                Plugin.Log.LogInfo($"Animation handler: restored the persistent one (the scene's copy {(current == null ? "was destroyed" : "had taken over")}).");
+                return;
+            }
         }
 
         private void FinishSceneLoad()

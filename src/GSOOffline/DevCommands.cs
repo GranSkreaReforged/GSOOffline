@@ -532,6 +532,20 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] probe done ({hits.Length} hits)");
         }
 
+        // animhandlers: every EasyAnimationHandler (the client's shared NPC animator source) and which one is current.
+        private static void AnimHandlers(string[] args)
+        {
+            var current = EasyAnimationHandler.instance;
+            Plugin.Log.LogInfo($"[dev] instance: {(current == null ? (ReferenceEquals(current, null) ? "none" : "destroyed") : current.name + " in " + current.gameObject.scene.name)}");
+            var animField = typeof(EasyAnimationHandler).GetField("anim", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            foreach (var h in UnityEngine.Resources.FindObjectsOfTypeAll<EasyAnimationHandler>())
+            {
+                var anim = animField.GetValue(h) as UnityEngine.Animator;
+                string animState = anim == null ? (ReferenceEquals(anim, null) ? "none" : "destroyed") : $"'{anim.name}' controller={(anim.runtimeAnimatorController == null ? "null" : anim.runtimeAnimatorController.name)}";
+                Plugin.Log.LogInfo($"[dev] handler '{h.name}' scene='{h.gameObject.scene.name}' clips={h.animations?.Length} current={ReferenceEquals(h, current)} anim={animState}");
+            }
+        }
+
         // clearspot x y z: runs the door arrival search at a point, logging why each candidate is rejected.
         private static void ClearSpot(string[] args)
         {
