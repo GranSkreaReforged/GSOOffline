@@ -5,11 +5,9 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+### Changed
 - Bounty outlaws fight like players with the original's weapons: each weapon's own basic blow, damage kind and speed, and the abilities its weapon and shield rolled (original formulas and cooldowns: stuns, roots, burns, shield block, Flame barrier, fire walls, landmines) instead of made-up ones.
 - Outlaw health capped at 4x a player's base health of its level (gear health on top): high-level outlaws took 120+ blows.
-- Outlaw attacks play the right animations (the client was sent animation ids where it expects attack ids).
-- Dev: `setlevel` lands on the exact level whatever Death's toll, Coward's mark or the XP rate.
-### Changed
 - Combat now uses the original game's numbers, taken from the original server, with the later patch notes on top (#101). Creatures have the health they had online (a level 25 bear 11,077, Zalranaz 468,800) and hit as hard as they did. Your base health is 100 per combat level, as in the live game, plus your gear's.
 - Every weapon hits with its own formula from the original: swords, daggers, maces, bows, crossbows, staffs, wands, lutes and fists each count your skill, the weapon's level and your gear's damage their own way, at the weapon's original attack speed. The damage kind of each attack (slash, pierce, fire, ice...) meets the target's resistance to it.
 - Every ability does what it did in the original game, with its own damage, area, stun, root, slow, burn or poison: Fire wall and landmines stay on the ground, Flame lance channels, Firestorm circles you, Slashing goes through its three blows in turn, Healing music heals each second of the song, and so on. Shatter, Frostburn, Ice hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma, the archery Landmine, Condensed psyche and ice, and the Halberd ice attack came after the original server's code, so they stay reconstructions.
@@ -24,6 +22,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Fate brokers (every insurance advisor, such as the one in Grimwall, is now one) set your fate (#103): learn every skill at 1x, 1.5x, 2x or 3x the usual pace, and give bosses 100%, 75%, 50% or 25% of their health, since they were made for groups. Both start at the original (1x, 100%). In one sitting you choose both, and nothing changes until you confirm; confirming settles both for 24 hours. Sooner, the broker reopens your fate for 75,000 silver, paid once for both and only when you confirm. You stand still while talking to a broker, so the conversation can't close by accident. While either is set, a line just above your health bar shows them and when you can change them again. Your choices stay after the 24 hours; the line then turns gold ("unsettled"), and a chat message says a broker can change them again, as it happens or at your next login. Item insurance, which has no use alone, is gone.
 
 ### Fixed
+- Outlaw attacks play the right animations (the client was sent animation ids where it expects attack ids).
+- Dev: `setlevel` lands on the exact level whatever Death's toll, Coward's mark or the XP rate.
 - The Mages Guild can be reached on foot (#98). The giant gate on East Athagos' west ridge, where Arthos sends you in A Magical Journey, now opens onto the guild, and the guild's gate leads back out to it, even if you came by wayshrine. Before, the gate was locked and only the wayshrine got you in.
 - Visiting the Mages Guild no longer breaks creatures for the rest of the session. That scene has its own copy of the game's animation handler, and once you left, every creature that came into view afterwards (bears first) failed to load its animations, with an error each time, until you restarted the game.
 - The Mages Guild's trapdoor goes down to the guild dungeon. It sent you to your home wayshrine.
