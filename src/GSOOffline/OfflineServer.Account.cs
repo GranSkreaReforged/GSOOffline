@@ -104,6 +104,7 @@ namespace GSOOffline
                 return;
             }
             var ch = new CharacterSave { name = name, account = account.name };
+            ch.Position = NewCharacterPos;
             SaveSystem.SaveCharacter(ch);
             account.characters.Add(name);
             SaveSystem.SaveAccount(account);
@@ -165,8 +166,12 @@ namespace GSOOffline
             character = ch;
             LoadLootBags();   // first: any save from here on writes this character's bags
             LoadHuntTimers();
-            if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             FixStatKeys(ch);
+            FixTwoHandedWithShield(ch);
+            ResetWeaponSlots();
+            devBaseHealth = 0;
+            ch.health = CombatRules.BaseHealth(CombatLevel());   // 100 per combat level, before BuildPlayerData sends it
+            if (ch.currentHealth <= 0) ch.currentHealth = ch.health;   // saved while dead
             StowBoat("login", notify: false);   // boats don't outlast a session; SendInventory below shows it
             ResetWorldState();
             startTimeSent = false;   // zone changes reset the world state too, but keep the clock

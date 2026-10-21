@@ -57,6 +57,7 @@ namespace GSOOffline
         public QuestRef questUpdate;
         public int[] questVarReq;   // quest, var, value
         public int[] itemReq;       // typeId, amount
+        public System.Func<bool> shownIf;   // nodes the server adds (OfflineServer.Difficulty.cs); null = always
     }
 
     public class DialogueNode

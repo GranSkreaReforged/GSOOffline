@@ -217,7 +217,7 @@ namespace GSOOffline
                 harpyNpc.flying = true;
                 harpyNpc.health = harpyNpc.maxHealth;
                 harpyNpc.stunnedUntil = harpyNpc.rootedUntil = 0f;
-                harpyNpc.dotTicks = 0;
+                harpyNpc.dots.Clear();
                 if (HarpyInWorld) Send(12, 0, harpyNpc.uid, harpyNpc.health, harpyNpc.maxHealth, 0);
             }
             Plugin.Log.LogInfo($"[harpy] taking off from {SceneWorld.Vec(harpyPos)} back to the {HarpyRouteNames[harpyRoute]} route");

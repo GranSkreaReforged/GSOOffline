@@ -122,6 +122,7 @@ namespace GSOOffline
         {
             foreach (var t in Content.Triggers.ToArray())
                 if (t.quest == quest && TriggerReady(t, "quest") && InTriggerArea(t)) FireTrigger(t);
+            UpdateWhiskerSickness(quest);
         }
 
         /// <summary>Puts NPCs next to the player for this visit to the scene (summoned ghosts, ambushes).</summary>

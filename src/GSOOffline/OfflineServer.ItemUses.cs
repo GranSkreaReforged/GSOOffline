@@ -141,8 +141,8 @@ namespace GSOOffline
 
         /// <summary>
         /// The explosive (the landmine prop, spawned object 2) goes off after 3 seconds: fire within 6 m, as in the
-        /// original. Creatures take a blow of the player's alchemy (<see cref="CombatRules.ExplosionHitPower"/>) and
-        /// turn on them; the player, if still standing there, a share of their health.
+        /// original: (1000 + 2 x (Damage + FireDamage) + 40 x Alchemy) x 0.8-1 to every creature there, which turns
+        /// on you. The original's blast only hurt players in PvP, so it spares you.
         /// </summary>
         private void PlaceExplosive(Vector3 pos)
         {
@@ -156,24 +156,9 @@ namespace GSOOffline
             Send(25, 10, uid);
             PlayEffect(GfxExplosion, pos);
             PlaySound(SfxExplosion, pos, 40);
-            int max = CombatRules.PlayerMaxHit(GearDamage(), SkillLevel(AlchemySkill));
-            int hits = 0;
-            if (world != null)
-                foreach (var n in world.npcs.ToArray())
-                {
-                    if (n.dead || !CanFight(n) || Vector3.Distance(NpcPosition(n), pos) > CombatRules.ExplosionRadius) continue;
-                    int damage = Mathf.Max(1, Mathf.RoundToInt(max * CombatRules.ExplosionHitPower * UnityEngine.Random.Range(0.8f, 1f) * DamageDealtMultiplier()));
-                    Aggro(n);
-                    DealDamage(n, damage, WeaponSkill(EquippedWeapon()));
-                    hits++;
-                }
-            var player = LocalPlayer;
-            if (player != null && Vector3.Distance(player.transform.position, pos) <= CombatRules.ExplosionRadius)
-            {
-                float res = CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Fire)));
-                HurtPlayer(Mathf.RoundToInt(MaxHealth() * CombatRules.ExplosionSelfShare * (1f - res)), SplashPlain);
-            }
-            Plugin.Log.LogInfo($"[item] explosion at {SceneWorld.Vec(pos)}: {hits} creatures hit (max {max} x {CombatRules.ExplosionHitPower})");
+            int damage = (int)((1000 + (StatDamage() + StatDamageOf(DamageKinds.Fire)) * 2f + SkillLevel(AlchemySkill) * 40f) * UnityEngine.Random.Range(0.8f, 1f));
+            int hits = AoeDamage(pos, damage, DamageKinds.Fire, CombatRules.ExplosionRadius);
+            Plugin.Log.LogInfo($"[item] explosion at {SceneWorld.Vec(pos)}: {hits} creatures hit for {damage} before their defences");
         }
 
         /// <summary>Kombra's book on the library shelf and the Bal Sardan treasure chest. True if handled here.</summary>

@@ -5,7 +5,8 @@ namespace GSOOffline
     /// <summary>
     /// Item grades, as the original server had them (Scr_ItemHandler, Scr_PlayerInventory): 1 Damaged, 2 Normal,
     /// 3 Unusual, 4 Rare, 5 Unique, 6 Epic, 7 Legendary, 8 Mythic.
-    /// - A grade scales every stat of worn gear (x0.85 to x1.9) and a weapon's hits (x0.925 to x1.45).
+    /// - A grade scales every stat of worn gear (x0.88 to x1.72) and a weapon's hits (x0.94 to x1.36), update 138's
+    ///   multipliers (the original server had update 136's: x0.85-1.9 and x0.925-1.45).
     /// - Every new piece of gear rolls its grade around the item's base grade (a drop, a craft, a purchase).
     /// - Upgrading (used on an item, 198/11): another of the same item or an upgrade stone of the same grade is a
     ///   gamble: half the time the material is lost, otherwise the grade goes up by 1 (45%), 2 (4%) or 3 (1%).
@@ -23,13 +24,13 @@ namespace GSOOffline
         public static float GradeMultiplier(int grade)
         {
             if (grade < 1 || grade > MaxGrade) return 1f;
-            return 0.85f + 0.15f * (grade - 1);
+            return 0.88f + 0.12f * (grade - 1);
         }
 
         public static float WeaponGradeMultiplier(int grade)
         {
             if (grade < 1 || grade > MaxGrade) return 1f;
-            return 0.925f + 0.075f * (grade - 1);
+            return 0.94f + 0.06f * (grade - 1);
         }
 
         /// <summary>A worn item's stat after its grade, cut to a whole number as the original did.</summary>

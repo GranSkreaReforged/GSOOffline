@@ -138,11 +138,13 @@ Working:
 - Bank
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
+- Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and give bosses less health)
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
 - Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)
-- Abilities: attacks, area attacks, stuns and roots, damage over time, heals, bandages and buffs with their icons (effect numbers are reconstructions)
-- Light and heavy armor XP, shared from kills made shortly after being hit
+- Weapon abilities as the original server had them: each weapon rolls its own when it's made, two-handed weapons fill keys 2-5, others share them with the shield, and boss uniques have theirs
+- Abilities as the original server had them: attacks, area attacks, ground effects, stuns, roots and slows, damage over time, heals, bandages and buffs with their icons (a few later abilities are reconstructions)
+- Combat experience shared between the skills used in the last 20 seconds, armor skills included
 - Potions, food, experience scrolls, teleport scrolls and gear crates
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything. Dropping an item (Shift+click, the item window's Drop, or dragging it out of the windows) puts it in a bag at your feet, and the item window's Destroy gets rid of it for good. Every bag is saved and lasts 20 minutes of play
 - Particles and sounds: arrows, bolts and spells fly and land; ranged NPCs shoot back; ability, hit, death, harvesting, tree-felling, level-up and teleport effects and sounds
@@ -159,7 +161,6 @@ Partially working:
 - Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman, Sightseeing, Lakhmu's basement, A Fishy Request, Powder Monkey, Mantle of St. Jakob, A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`. Left out: The Breaching Light and Wand of Ke'yars Eketosh, hidden in the game data and never finished by the original server.
 
 Not yet implemented:
-- Movement speed buffs and resistance/stamina potions (the icon shows, but the effect isn't modelled)
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 
 Loot comes from the original server's drop tables (`Loot.xml`, sent by the game's developer, from about update 136), turned into `src/GSOOffline/Data/droptables.json` by GSODevTools' `gen_droptables.py` and rolled as the original rolled them: each drop on its own, 1 in its rate. Every creature can also drop an upgrade or grade stone and a gear crate for its level, by the original's formulas. Creatures added after that snapshot (Bruno, Betsy, Lakhar, Lydia, Jotnar, Argus, the Elder Ent...) and the boss uniques and pets of updates 137-140 come from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA) and the official patch notes on Steam, in `src/GSOOffline/Data/loot.json` (`gen_loot.py`); the wiki names how rare drops were but not the rates, so those are reconstructed chances, and such a creature without a wiki entry drops silver by level.

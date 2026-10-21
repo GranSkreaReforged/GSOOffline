@@ -61,8 +61,7 @@ namespace GSOOffline
             if (!bridgeCollidersShown) return;
             // The bridge gives way: stunned for 2 s while it drops out from under you, back 2 s later.
             Notice("The bridge collapses under your weight!", "red");
-            Send(1, 4, character.name, false);
-            Later(2f, () => { if (!PlayerDead && character != null) Send(1, 4, character.name, true); });
+            StunPlayer(2f);
             bridgeCollidersShown = false;
             bridgeBackAt = Time.time + 2f;
             PlaySound(411, SewerBridge, 60);
@@ -196,12 +195,13 @@ namespace GSOOffline
                 if (!waveActive[i] || Vector3.Distance(wavePos[i], me) >= 8f) continue;
                 // Caught: knocked down for 3 s, then washed back to the entrance, 30% of your health gone.
                 washedAway = true;
-                Send(1, 4, character.name, false);
+                StunPlayer(3f);
+                UpdateCanMove();   // held even if stun immunity keeps the stun off
                 Later(3f, () =>
                 {
                     washedAway = false;
                     if (character == null || PlayerDead || world == null || world.sceneId != SceneCoral) return;
-                    Send(1, 4, character.name, true);
+                    UpdateCanMove();
                     Teleport(SceneCoral, CoralEntrance);
                     Notice("A massive wave knocks you unconscious!", "red");
                     HurtPlayer(Mathf.RoundToInt(character.currentHealth * 0.3f), SplashPlain);

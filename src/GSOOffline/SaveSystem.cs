@@ -37,6 +37,7 @@ namespace GSOOffline
         public int grade;
         public bool equipped;
         public List<ItemStat> stats = new List<ItemStat>();
+        public int[] abilities;   // Ability1..4, rolled when the item is made; null in saves from before them
     }
 
     [Serializable]
@@ -189,6 +190,9 @@ namespace GSOOffline
         public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
         public long bountyRefreshAt;      // unix seconds: the board fills up again then
         public int nextBountyId;
+        public int xpRatePercent = 100;       // the insurance advisor's modifiers (OfflineServer.Difficulty.cs)
+        public int bossHealthPercent = 100;
+        public long difficultyLockedUntil;    // unix seconds: no change before then
 
         public int GetKills(int npc)
         {

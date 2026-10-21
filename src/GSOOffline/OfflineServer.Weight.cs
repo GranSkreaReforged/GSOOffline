@@ -3,15 +3,19 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// Carrying more than your capacity slows you down (CombatRules.OverweightSpeed). The client only shows the
-    /// weight ("Weight: x/150" and a warning icon in the inventory) and never enforces it. The server sets the client's
-    /// run speed directly: the stat message for it (16/5, stat 5) only takes whole numbers, too coarse for a curve.
+    /// The player's run speed: the original's base plus what buffs and gear add (RunSpeedBonus: Swiftness, Charge,
+    /// Windwalking, Traverse, Slow, Stability), then the overweight slowdown. Carrying more than your capacity slows
+    /// you down (CombatRules.OverweightSpeed) unless a stamina potion is carrying it. The client only shows the weight
+    /// ("Weight: x/150" and a warning icon in the inventory) and never enforces it. The server sets the client's run
+    /// speed directly: the stat messages for it (16/5, stats 5 and 40) only take whole numbers, too coarse for the
+    /// weight curve.
     /// </summary>
     public partial class OfflineServer
     {
         private Scr_Player weightPlayer;      // the player object the base speeds were read from
-        private float baseForward, baseBackwards, baseSideways;   // its speeds before any slowdown (8, 3, 5)
+        private float baseForward, baseBackwards, baseSideways;   // its speeds before any change (8, 3, 5)
         private float appliedSpeed = 1f;      // the share of it in use now
+        private bool overburdened;
         private float weightTimer;
 
         /// <summary>What the inventory window counts: everything you have, equipped gear too, each stack rounded down.</summary>
@@ -28,7 +32,7 @@ namespace GSOOffline
 
         internal int CarryingCapacity() => CombatRules.BaseCarryingCapacity + GearStat("Carryingcap");
 
-        private void TickWeight()
+        private void TickRunSpeed()
         {
             if (character == null || !sceneReady) return;
             weightTimer -= Time.deltaTime;
@@ -48,16 +52,21 @@ namespace GSOOffline
             }
 
             int weight = CarriedWeight(), capacity = CarryingCapacity();
-            float speed = CombatRules.OverweightSpeed(weight, capacity);
+            float load = HasBuff(BuffStamina) ? 1f : CombatRules.OverweightSpeed(weight, capacity);
+            if (load < 1f != overburdened)
+            {
+                overburdened = load < 1f;
+                Notice(overburdened ? "You are carrying too much and move more slowly." : "You are no longer overburdened.", "gray");
+            }
+            int run = Mathf.Max(1, BaseRunSpeed + RunSpeedBonus());
+            float speed = load * run / BaseRunSpeed;
             if (Mathf.Abs(speed - appliedSpeed) < 0.005f) return;
-            if (appliedSpeed >= 1f) Notice("You are carrying too much and move more slowly.", "gray");
-            else if (speed >= 1f) Notice("You are no longer overburdened.", "gray");
             appliedSpeed = speed;
             var mv = player.characterMovement.movement;
             mv.maxForwardSpeed = baseForward * speed;
             mv.maxBackwardsSpeed = baseBackwards * speed;
             mv.maxSidewaysSpeed = baseSideways * speed;
-            Plugin.Log.LogInfo($"[weight] {weight}/{capacity}: run speed {speed * 100f:0}% ({mv.maxForwardSpeed:0.00})");
+            Plugin.Log.LogInfo($"[speed] run {run}/{BaseRunSpeed}, weight {weight}/{capacity} x{load:0.00}: {speed * 100f:0}% ({mv.maxForwardSpeed:0.00})");
         }
     }
 }

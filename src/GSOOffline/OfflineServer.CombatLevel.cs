@@ -27,20 +27,17 @@ namespace GSOOffline
         {
             var levels = new List<int>();
             foreach (int s in CombatRules.CombatSkills) levels.Add(SkillLevel(s));
-            levels.Sort((a, b) => b.CompareTo(a));
-            int best = 0, rest = 0;
-            for (int i = 0; i < levels.Count; i++)
-                if (i < 3) best += levels[i];
-                else rest += levels[i];
-            return Mathf.Max(1, best / 3 + rest / 12);
+            return Mathf.Max(1, CombatRules.CombatLevel(levels));
         }
 
         private void SendCombatLevel() => Send(16, 5, StatCombatLevel, CombatLevel());
 
         private void SendEffectiveResistances()
         {
-            foreach (var kv in EffectiveResistanceStats)
-                Send(16, 5, kv.Value, Mathf.RoundToInt(CombatRules.EffectiveResistance(GearStat(kv.Key))));
+            for (int kind = 1; kind < DamageKinds.Count; kind++)
+                foreach (var kv in EffectiveResistanceStats)
+                    if (kv.Key == DamageKinds.ResistanceStat(kind))
+                        Send(16, 5, kv.Value, Mathf.RoundToInt(CombatRules.EffectiveResistance(StatResistance(kind))));
         }
 
         private Alignment WornAlignment()

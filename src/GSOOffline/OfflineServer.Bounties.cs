@@ -13,7 +13,7 @@ namespace GSOOffline
     /// it as one (2/8 visible players, 5/2 positions, 7/22 animation packets), it wears real gear rolled like loot,
     /// and its numbers come from that gear by the player's own formulas (damage, resistances with the soft cap,
     /// damage block, health). Its weapon decides how it fights: up close, or keeping its distance and shooting or
-    /// casting, with a stronger attack every few swings.
+    /// casting, with the abilities its weapon and shield rolled (OfflineServer.OutlawAbilities.cs).
     ///
     /// Server side it is an NPC: the creature AI, the player's attacks and abilities, aggro and death all run
     /// unchanged on an NpcEntity with a made-up NpcInfo. Send() turns the NPC messages about it into the matching
@@ -96,12 +96,17 @@ namespace GSOOffline
             public BountySave save;
             public NpcEntity npc;
             public int lastHp;
-            public int attackAnim;        // the client's animation id for the weapon (getAnimationdIdFromAttackId)
+            public int weaponType;        // what it holds, for the client's animation of each attack
+            public int attackId;          // this swing's: 0 the basic attack, else the ability's id
             public bool ranged, combat;
             public int swings;
             public float nextKiteAt;      // backing off has a cooldown: in between it stands and fights
             public Vector3 lastClear;     // where it last stood with nothing through its body
             public int lastAbility = -1;
+            public OutlawBlow pending;    // the ability blow of the swing under way (OfflineServer.OutlawAbilities.cs)
+            public readonly Dictionary<int, float> readyAt = new Dictionary<int, float>();   // ability cooldowns
+            public int slashingStage;
+            public float shieldBlockUntil, thickSkinUntil, flameBarrierUntil, focusUntil;
             public int unstickTries;      // moves back in a row that left it still inside something
             public float removeAt = -1f;  // dead: the body goes after a while
         }
@@ -508,7 +513,7 @@ namespace GSOOffline
                 bountyByUid[uid] = new BountyActor
                 {
                     save = b, npc = npc, lastHp = npc.health,
-                    attackAnim = weapon != null && Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.getAnimationdIdFromAttackId(0, weapon.typeId, null, null) : 2,
+                    weaponType = weapon?.typeId ?? 0,
                     ranged = info.projectile > 0,
                 };
                 Plugin.Log.LogInfo($"[bounty] {b.name} waits at {SceneWorld.Vec(pos)}: {info.health} health, hits up to {info.damage} {DamageKinds.Name(info.damageType)}, block {BountyBlock(b)}");
@@ -537,27 +542,25 @@ namespace GSOOffline
         private static int BountyBlock(BountySave b) => BountyGearStat(b, "Damageblock");
 
         /// <summary>
-        /// The outlaw's numbers, from its gear by the player's formulas: max hit (gear damage plus level, times the
-        /// weapon's grade), resistances through the soft cap, health on top of a base for its level.
+        /// The outlaw's numbers, from its gear by the player's formulas: its hits up to the top of its weapon's basic
+        /// blow (<see cref="OutlawBasicRange"/>) times the weapon's grade, at the weapon's own speed; resistances
+        /// through the soft cap; health on top of a base for its level.
         /// </summary>
         private NpcInfo BountyInfo(BountySave b)
         {
-            var weapon = b.gear.Find(i => ItemData.Get(i.typeId)?.slot == "Weapon");
-            int gearDamage = 0;
-            foreach (var it in b.gear)
-                foreach (var s in it.stats)
-                    if (s.key.EndsWith("Damage") || s.key == "DmgPoison") gearDamage += Graded(it, s.value);
-            int maxHit = Mathf.RoundToInt(CombatRules.PlayerMaxHit(gearDamage, b.level) * (weapon != null ? WeaponGradeMultiplier(weapon.grade) : 1f));
+            var weapon = OutlawWeapon(b);
+            OutlawBasicRange(b, out float blow, out _, out float hi, out int kind);
+            int maxHit = Mathf.RoundToInt(blow * hi * (weapon != null ? WeaponGradeMultiplier(weapon.grade) : 1f));
             int projectile = WeaponProjectile(weapon);
             var info = new NpcInfo
             {
                 id = BountyTypeBase + b.id, name = b.name, level = b.level,
                 health = CombatRules.BountyHealth(b.level) + BountyGearStat(b, "Health"),
                 canFight = true, aggressive = true, aggroDistance = CombatRules.BountyAggroDistance,
-                attackSpeed = WeaponSpeed(weapon), attackDelay = 0.5f, attackMissDistance = 2f,
+                attackSpeed = BaseWeaponSpeed(weapon), attackDelay = 0.5f, attackMissDistance = 2f,
                 attackDistance = projectile > 0 ? 3f : Mathf.Max(2.5f, WeaponRange(weapon) - 1f),
-                damage = Mathf.Max(1, maxHit), damageType = WeaponKind(weapon), accuracy = CombatRules.BountyAccuracy,
-                damageBlock = 0,   // the player-style block in RollPlayerHit (BountyBlockedHit)
+                damage = Mathf.Max(1, maxHit), damageType = kind, accuracy = CombatRules.BountyAccuracy,
+                damageBlock = 0, defence = 0,   // the player-style block in NpcDamageTaken (BountyBlockedHit)
                 resistance = new int[DamageKinds.Count],
                 projectile = projectile, projectileRate = projectile > 0 ? 100 : 0,
                 projectileDistance = projectile > 0 ? CombatRules.BountyShootDistance : 0f,
@@ -567,13 +570,39 @@ namespace GSOOffline
             return info;
         }
 
-        /// <summary>The player's blow on an outlaw: its damage block works as yours does against creatures.</summary>
-        private int BountyBlockedHit(NpcEntity npc, float damage)
+        /// <summary>
+        /// The player's blow on an outlaw: it blocks as you do (calculateResistances), its level against your accuracy,
+        /// up to its gear's damage block, more behind Heavy shield block (every blow, 8 x the shield's level) and Thick
+        /// skin (7 x its level). Flame barrier adds 15 fire, ice, earth and wind resistance and sends half of a
+        /// physical blow back at you. -1 if the NPC isn't an outlaw.
+        /// </summary>
+        private int BountyBlockedHit(NpcEntity npc, int damage, int type, int accuracy)
         {
             if (!bountyByUid.TryGetValue(npc.uid, out var a)) return -1;
-            int block = BountyBlock(a.save);
-            damage *= 1f - CombatRules.BlockReduction(block, CombatLevel());
-            return Mathf.Max(1, Mathf.RoundToInt(damage - CombatRules.FlatBlock(block)));
+            var b = a.save;
+            if (Time.time < a.flameBarrierUntil)
+            {
+                if (IsPhysical(type))
+                    HurtPlayer(PlayerDamageTaken((int)(damage * 0.5f), type, null, 100), SplashPlain);
+                else if ((type == DamageKinds.Fire || type == DamageKinds.Ice || type == DamageKinds.Earth || type == DamageKinds.Wind)
+                    && GameData.Npcs.TryGetValue(npc.typeId, out var info))
+                {
+                    int res = info.resistance[type];
+                    damage = (int)(damage * (100f - res - 15f) / Mathf.Max(1f, 100f - res));
+                }
+            }
+            int guaranteed = 0, extra = 0;
+            if (Time.time < a.shieldBlockUntil)
+            {
+                guaranteed = 1000;
+                var shield = OutlawShield(b);
+                var weapon = OutlawWeapon(b);
+                extra += shield != null ? WeaponLevel(shield) * 8 : weapon != null ? WeaponLevel(weapon) * 8 : b.level * 7;
+            }
+            if (Time.time < a.thickSkinUntil) extra += b.level * 7;
+            int block = BountyBlock(b) + extra;
+            if (block > 0 && Random.Range(guaranteed, b.level + guaranteed + 1) > Random.Range(0, accuracy + 1)) damage -= Random.Range(1, block + 1);
+            return Mathf.Max(0, damage);
         }
 
         /// <summary>
@@ -594,29 +623,6 @@ namespace GSOOffline
             return true;
         }
 
-        /// <summary>An outlaw ability: a blow this much stronger, maybe with its own projectile and an effect on you.</summary>
-        private class OutlawAbility
-        {
-            public string name;
-            public float power;
-            public int projectile, gfx;
-
-            public OutlawAbility(string name, float power, int projectile = 0, int gfx = 0)
-            {
-                this.name = name; this.power = power; this.projectile = projectile; this.gfx = gfx;
-            }
-        }
-
-        // Per style, after the player abilities they're named for (projectiles from XMLs/Projectiles).
-        private static readonly OutlawAbility[][] StyleAbilities =
-        {
-            new[] { new OutlawAbility("Brutal slash", 1.8f, gfx: 18), new OutlawAbility("Lunge", 1.5f), new OutlawAbility("Cripple", 1.4f) },   // swordsman
-            new[] { new OutlawAbility("Crushing blow", 2f, gfx: 18), new OutlawAbility("Whirlwind", 1.6f), new OutlawAbility("Sunder", 1.7f) },  // two-hander
-            new[] { new OutlawAbility("Piercing shot", 1.8f, 20), new OutlawAbility("Flame arrow", 1.6f, 11), new OutlawAbility("Venom arrow", 1.5f, 46) },   // archer
-            new[] { new OutlawAbility("Wounding shot", 1.8f, 56), new OutlawAbility("Explosive bolt", 1.9f, 10), new OutlawAbility("Piercing shot", 1.7f, 20) },   // crossbowman
-            new[] { new OutlawAbility("Fire ball", 2f, 1), new OutlawAbility("Flame lance", 1.8f, 27), new OutlawAbility("Fire arrows", 1.5f, 41) },   // fire mage
-        };
-
         /// <summary>
         /// Each outlaw fights its own way: how often it reaches for an ability, and (shooters) how close it lets you
         /// come before backing off.
@@ -625,28 +631,6 @@ namespace GSOOffline
         {
             b.abilityChance = Random.Range(CombatRules.BountyAbilityChanceMin, CombatRules.BountyAbilityChanceMax + 1);
             b.kiteDistance = Random.Range(CombatRules.BountyKiteMin, CombatRules.BountyKiteMax);
-        }
-
-        /// <summary>
-        /// Before each swing: maybe an ability (its own chance per swing), any of its style's but never the same one
-        /// twice running. Sets the swing's power and projectile; the hit uses them (NpcEntity.blowPower).
-        /// </summary>
-        private void BountyPrepareSwing(NpcEntity npc)
-        {
-            if (!bountyByUid.TryGetValue(npc.uid, out var a)) return;
-            npc.blowPower = 1f;
-            npc.blowProjectile = 0;
-            int chance = a.save.abilityChance > 0 ? a.save.abilityChance : 25;
-            if (++a.swings < 2 || Random.Range(0, 100) >= chance) return;   // never on the opening swing
-            var pool = StyleAbilities[Mathf.Clamp(a.save.style, 0, StyleAbilities.Length - 1)];
-            int pick = Random.Range(0, pool.Length);
-            if (pick == a.lastAbility && pool.Length > 1) pick = (pick + Random.Range(1, pool.Length)) % pool.Length;
-            a.lastAbility = pick;
-            var ability = pool[pick];
-            npc.blowPower = ability.power;
-            npc.blowProjectile = a.ranged ? ability.projectile : 0;
-            Notice($"{a.save.name} uses {ability.name}!", "orange");
-            if (ability.gfx > 0) Later(0.5f, () => PlayPlayerEffect(ability.gfx));
         }
 
         // ---- 2/8 and the message translation -------------------------------------------------
@@ -863,11 +847,15 @@ namespace GSOOffline
             string json = JsonUtility.ToJson(new Scr_Animator.AnimationPacket
             {
                 b1 = combat, b3 = dead, f6 = combat ? 1f : 0f, f10 = combat ? 1f : 0f, f8 = 1f,
-                i4 = attack ? a.attackAnim : combat ? a.attackAnim : -1,
+                i4 = combat ? AttackAnimation(a) : -1,
             });
             Send(7, 22, a.save.name + "," + json);
-            if (attack) Send(3, 20, a.save.name, a.attackAnim);
+            if (attack) Send(3, 20, a.save.name, a.attackId);   // setPlayerAttackId: an attack id, which the client animates
         }
+
+        /// <summary>The animation of the outlaw's current attack with its weapon (getAnimationdIdFromAttackId).</summary>
+        private static int AttackAnimation(BountyActor a) =>
+            Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.getAnimationdIdFromAttackId(a.attackId, a.weaponType, null, null) : 2;
 
         /// <summary>2/9: the player clicked an outlaw (or nobody).</summary>
         private void SelectBountyTarget(string name)
@@ -931,6 +919,7 @@ namespace GSOOffline
                 UnstickOutlaws();
             }
             TickHuntTimers();
+            TickOutlawAreas();
             bountyTickTimer -= Time.deltaTime;
             if (bountyTickTimer > 0f) return;
             bountyTickTimer = 60f;
@@ -981,6 +970,7 @@ namespace GSOOffline
             foreach (var a in bountyByUid.Values) GameData.Npcs.Remove(a.npc.typeId);
             bountyByUid.Clear();
             lastBountyList = null;
+            ResetOutlawAreas();
         }
     }
 }

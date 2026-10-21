@@ -475,6 +475,9 @@ namespace GSOOffline
         private static void Workbench(string[] args) =>
             Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
 
+        // closewindows: closes every open window (the login's Active bounties hides the view in screenshots).
+        private static void CloseWindows(string[] args) => Script_WindowController.instance.closeAllWindows();
+
         // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
         private static void Windows(string[] args)
         {
@@ -527,6 +530,20 @@ namespace GSOOffline
             foreach (var c in UnityEngine.Physics.OverlapSphere(p, 4f, ~0, UnityEngine.QueryTriggerInteraction.Collide))
                 Plugin.Log.LogInfo($"[dev] near '{c.name}' at {c.transform.position} trigger={c.isTrigger} bounds={c.bounds.min}..{c.bounds.max}");
             Plugin.Log.LogInfo($"[dev] probe done ({hits.Length} hits)");
+        }
+
+        // animhandlers: every EasyAnimationHandler (the client's shared NPC animator source) and which one is current.
+        private static void AnimHandlers(string[] args)
+        {
+            var current = EasyAnimationHandler.instance;
+            Plugin.Log.LogInfo($"[dev] instance: {(current == null ? (ReferenceEquals(current, null) ? "none" : "destroyed") : current.name + " in " + current.gameObject.scene.name)}");
+            var animField = typeof(EasyAnimationHandler).GetField("anim", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            foreach (var h in UnityEngine.Resources.FindObjectsOfTypeAll<EasyAnimationHandler>())
+            {
+                var anim = animField.GetValue(h) as UnityEngine.Animator;
+                string animState = anim == null ? (ReferenceEquals(anim, null) ? "none" : "destroyed") : $"'{anim.name}' controller={(anim.runtimeAnimatorController == null ? "null" : anim.runtimeAnimatorController.name)}";
+                Plugin.Log.LogInfo($"[dev] handler '{h.name}' scene='{h.gameObject.scene.name}' clips={h.animations?.Length} current={ReferenceEquals(h, current)} anim={animState}");
+            }
         }
 
         // clearspot x y z: runs the door arrival search at a point, logging why each candidate is rejected.
@@ -802,8 +819,14 @@ namespace GSOOffline
         // route now, hit deals her damage (default 1) as the player (in the air: she dives at you).
         private static void Harpy(string[] args) => OfflineServer.Instance.DevHarpy(args);
 
+        // fatelock <seconds>: the fate brokers' lock ends in that many seconds (negative: already over, told at the next check).
+        private static void FateLock(string[] args) => OfflineServer.Instance.DevFateLock(int.Parse(args[1]));
+
         // setlevel <skillId> <level>: raises a skill to that level (Scr_SkillsHandler ids), for testing abilities.
         private static void SetLevel(string[] args) => OfflineServer.Instance.DevSetLevel(int.Parse(args[1]), int.Parse(args[2]));
+
+        // weaponbar: what's in hand, on the back and in the shield slot, each item's Ability1..4, and bar slots 1-4.
+        private static void WeaponBar(string[] args) => OfflineServer.Instance.DevWeaponBar();
 
         // worldnpcs [type...]: the server's NPCs of those types in this scene (all if none), including hidden quest copies.
         private static void WorldNpcs(string[] args)
@@ -815,6 +838,13 @@ namespace GSOOffline
 
         // buffs: the player's active buffs and what they do.
         private static void Buffs(string[] args) => OfflineServer.Instance.LogBuffs();
+
+        // shothit <projectile> [damage]: what an NPC's shot of that projectile leaves on you (29 Golem stun, 35 ooze...).
+        private static void ShotHit(string[] args) =>
+            OfflineServer.Instance.DevShotHit(args.Length > 1 ? int.Parse(args[1]) : 29, args.Length > 2 ? int.Parse(args[2]) : 100);
+
+        // root [seconds]: rooted, as a Poacher dungeon trap does.
+        private static void Root(string[] args) => OfflineServer.Instance.DevRoot(args.Length > 1 ? float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture) : 5f);
 
         // projectiles: the client's projectiles in flight (id, position, target).
         private static void Projectiles(string[] args)
