@@ -5,6 +5,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-21
 ### Changed
 - Bounty outlaws fight like players with the original's weapons: each weapon's own basic blow, damage kind and speed, and the abilities its weapon and shield rolled (original formulas and cooldowns: stuns, roots, burns, shield block, Flame barrier, fire walls, landmines) instead of made-up ones.
 - Outlaw health capped at 4x a player's base health of its level (gear health on top): high-level outlaws took 120+ blows.
