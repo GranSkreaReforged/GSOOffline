@@ -485,10 +485,12 @@ namespace GSOOffline
             Send(3, 16, character.name, character.silver);
         }
 
-        public void AddXp(int skillId, int amount)
+        /// <param name="exact">Exactly this much, without Death's toll, Coward's mark or the XP rate: experience
+        /// that sets a level (the starter kit, the setlevel bridge command), not experience earned.</param>
+        public void AddXp(int skillId, int amount, bool exact = false)
         {
             if (character == null || amount <= 0 || !SkillById.TryGetValue(skillId, out var key)) return;
-            amount = Mathf.Max(1, Mathf.RoundToInt(amount * ExperienceKept() * XpRate));
+            if (!exact) amount = Mathf.Max(1, Mathf.RoundToInt(amount * ExperienceKept() * XpRate));
             int before = LevelFromXp(character.GetXp(key));
             character.SetXp(key, character.GetXp(key) + amount);
             Send(8, 1, character.name, skillId, amount);
@@ -528,7 +530,7 @@ namespace GSOOffline
             if (ProfessionSkill.TryGetValue(character.profession, out int skill))
             {
                 string key = SkillById[skill];
-                AddXp(skill, XpForLevel(5) - character.GetXp(key));
+                AddXp(skill, XpForLevel(5) - character.GetXp(key), exact: true);
             }
         }
     }

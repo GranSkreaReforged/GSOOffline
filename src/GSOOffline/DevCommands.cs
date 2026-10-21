@@ -475,6 +475,9 @@ namespace GSOOffline
         private static void Workbench(string[] args) =>
             Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
 
+        // closewindows: closes every open window (the login's Active bounties hides the view in screenshots).
+        private static void CloseWindows(string[] args) => Script_WindowController.instance.closeAllWindows();
+
         // windows: the client's open windows (types as in Script_WindowController: 2 inventory, 7 shop, 14 bank...).
         private static void Windows(string[] args)
         {

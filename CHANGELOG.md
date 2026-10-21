@@ -4,6 +4,11 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+- Bounty outlaws fight like players with the original's weapons: each weapon's own basic blow, damage kind and speed, and the abilities its weapon and shield rolled (original formulas and cooldowns: stuns, roots, burns, shield block, Flame barrier, fire walls, landmines) instead of made-up ones.
+- Outlaw health capped at 4x a player's base health of its level (gear health on top): high-level outlaws took 120+ blows.
+- Outlaw attacks play the right animations (the client was sent animation ids where it expects attack ids).
+- Dev: `setlevel` lands on the exact level whatever Death's toll, Coward's mark or the XP rate.
 ### Changed
 - Combat now uses the original game's numbers, taken from the original server, with the later patch notes on top (#101). Creatures have the health they had online (a level 25 bear 11,077, Zalranaz 468,800) and hit as hard as they did. Your base health is 100 per combat level, as in the live game, plus your gear's.
 - Every weapon hits with its own formula from the original: swords, daggers, maces, bows, crossbows, staffs, wands, lutes and fists each count your skill, the weapon's level and your gear's damage their own way, at the weapon's original attack speed. The damage kind of each attack (slash, pierce, fire, ice...) meets the target's resistance to it.

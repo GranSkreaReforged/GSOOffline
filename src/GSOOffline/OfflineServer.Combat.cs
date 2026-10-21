@@ -91,8 +91,12 @@ namespace GSOOffline
         public const float BountyKiteMin = 5f, BountyKiteMax = 10f;
         public const float BountyStep = 2.5f;   // metres per half-second waypoint: a running player
         public const float BountyKiteCooldown = 8f;   // a shooter backs off at most this often
-        // Reconstruction (the original had no outlaws): half again a creature of its level, its gear's health on top.
-        public static int BountyHealth(int level) => NpcHealth(level) * 3 / 2;
+        // Reconstruction (the original had no outlaws): half again a creature of its level, but at most 4 times a
+        // player's base health at its level, its gear's health on top. A creature's health grows with level^2.3 and
+        // your blows with level, so uncapped a level 60 outlaw took 120-odd blows; capped (from about level 17) a
+        // fight is some 24 average blows at any level, as the outlaw's blows against your health are.
+        public const int BountyHealthPlayers = 4;
+        public static int BountyHealth(int level) => Mathf.Min(NpcHealth(level) * 3 / 2, BountyHealthPlayers * BaseHealth(level));
         // 50 per level plus 8 x level^1.5 (about 900 at 10, 4,900 at 40, 8,300 at 60), 5% more per level above yours.
         public static int BountySilver(int level, int combatLevel) =>
             Mathf.RoundToInt((50f * level + 8f * Mathf.Pow(level, 1.5f)) * (1f + 0.05f * Mathf.Max(0, level - combatLevel)));
@@ -551,21 +555,6 @@ namespace GSOOffline
             });
         }
 
-        /// <summary>The kind of the weapon's blows: its largest damage stat; slash for a sword, blunt for fists.</summary>
-        private static int WeaponKind(ItemSave weapon)
-        {
-            int best = DamageKinds.Blunt, bestValue = 0;
-            if (weapon == null) return best;
-            for (int k = 1; k < DamageKinds.Count; k++)
-                foreach (var s in weapon.stats)
-                    if (s.key == DamageKinds.DamageStat(k) && s.value > bestValue)
-                    {
-                        best = k;
-                        bestValue = s.value;
-                    }
-            return best;
-        }
-
         /// <param name="reflectable">The player's own blow or ability: while the target absorbs, it comes back at
         /// them. Other damage (pets, damage over time, reflections) is just soaked up.</param>
         /// <param name="dev">Dev kills ignore Absorb.</param>
@@ -953,11 +942,12 @@ namespace GSOOffline
                 if (Time.time < npc.nextSwing) continue;
                 npc.nextSwing = Time.time + info.attackSpeed * (Time.time < npc.chilledUntil ? 1.25f : 1f);   // chilled: a quarter slower
                 Send(198, 28, npc.uid, playerPos);
+                bool cast = BountyPrepareSwing(npc);   // an outlaw picks its ability first: the swing animates it
                 SetAnim(npc, info.animAttack, true);
                 npc.attackAnimUntil = Time.time + Mathf.Min(info.attackSpeed, AnimLength(info.animAttack));
                 NpcSound(npc, info.sfxAttack);
-                BountyPrepareSwing(npc);
-                bool shoot = ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate);
+                if (cast) continue;   // the swing was an outlaw's buff or spell, not a blow
+                bool shoot = npc.blowProjectile > 0 || ranged && (dist > info.attackDistance || Random.Range(0, 100) < info.projectileRate);
                 var attacker = npc;
                 var attackerInfo = info;
                 // The blow lands attackdelay into the swing, in time with the animation.
@@ -989,9 +979,9 @@ namespace GSOOffline
         /// </summary>
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker, int projectile = 0)
         {
+            if (OutlawHitsPlayer(attacker, projectile)) return;   // an outlaw rolls its blows as a player does
             int max = CombatRules.NpcMaxHit(info);
             float roll = projectile > 0 ? NpcShotDamage(projectile, max) : Random.Range(1, Mathf.Max(2, max));
-            roll *= attacker != null ? attacker.blowPower : 1f;
             int type = projectile > 0 && ProjectileType(projectile) > 0 ? ProjectileType(projectile) : info.damageType;
             if (projectile == 45 && character.currentMana > 0)   // Diminish takes mana too
             {

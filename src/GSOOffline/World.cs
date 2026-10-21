@@ -40,8 +40,7 @@ namespace GSOOffline
         public bool flying;       // in the air: its script moves and animates it, the ground AI leaves it alone
         public bool ownRespawn;   // its script brings it back, not the respawn timer
 
-        // the next blow of a bounty outlaw's ability (OfflineServer.Bounties.cs)
-        public float blowPower = 1f;
+        // the projectile of a bounty outlaw's next blow, if it shoots one (OfflineServer.OutlawAbilities.cs)
         public int blowProjectile;
     }
 

@@ -383,7 +383,7 @@ namespace GSOOffline
         internal void DevSetLevel(int skill, int level)
         {
             if (character == null || !SkillById.TryGetValue(skill, out var key)) return;
-            AddXp(skill, XpForLevel(level) - character.GetXp(key));
+            AddXp(skill, XpForLevel(level) - character.GetXp(key), exact: true);
             Plugin.Log.LogInfo($"[dev] {key} is level {SkillLevel(skill)}");
         }
 
