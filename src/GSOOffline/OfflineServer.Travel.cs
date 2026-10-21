@@ -149,7 +149,8 @@ namespace GSOOffline
 
                 case DoorInteriorExit:
                     var clicked = NearestInteractable(typeId);
-                    if (clicked != null && clicked.interactableName == "To Dungeon")
+                    // The Mages Guild's trapdoor: interactable name "Trapdoor", object name "To Dungeon".
+                    if (clicked != null && clicked.name == "To Dungeon")
                     {
                         var dungeon = Doors.interiorSpawns.Find(s => s.scene == 24);
                         if (dungeon == null) return false;

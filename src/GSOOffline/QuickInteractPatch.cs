@@ -65,7 +65,11 @@ namespace GSOOffline
             Component target = hovered;
             if (target == null || !Usable(kind, target, player, p))
                 Nearest(player, p, out kind, out target);
-            if (target == null) return;
+            if (target == null)
+            {
+                devPress = false;   // like the key: a press with nothing in reach does nothing, rather than firing later
+                return;
+            }
 
             mc.quickInteractText = Text(kind, target);
             if (Scr_KeyboardInputs.instance.GetKeyDown("Interact") || devPress)

@@ -690,6 +690,38 @@
   },
   {
    "type": 37,
+   "scene": 13,
+   "pos": [
+    830.92,
+    13.86,
+    1045.73
+   ],
+   "toScene": 21,
+   "toPos": [
+    223.8,
+    10.5,
+    114.0
+   ],
+   "note": "Mages Guild gate"
+  },
+  {
+   "type": 28,
+   "scene": 21,
+   "pos": [
+    226.81,
+    10.25,
+    114.01
+   ],
+   "toScene": 13,
+   "toPos": [
+    834.0,
+    14.36,
+    1045.73
+   ],
+   "note": "Mages Guild gate (out)"
+  },
+  {
+   "type": 37,
    "scene": 8,
    "pos": [
     939.15,
