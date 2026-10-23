@@ -20,8 +20,8 @@ namespace GSOOffline
         public string name;
         public int level;
         public int health;
-        public int fullHealth;         // a boss's original health, before the character's share (CombatRules.BossHealthShare)
-        public bool sharedHealth;      // a boss without explicit health: health = fullHealth x the share
+        public int fullHealth;         // original health, before the character's share (CombatRules.WorldShare)
+        public bool sharedHealth;      // a boss or creature without explicit health: health = fullHealth x the share
         public bool canFight;
         public int respawnTime;
         public bool ordinary;          // no respawntime in the data and not a boss: a plain creature (CombatRules tunes these)
@@ -158,10 +158,10 @@ namespace GSOOffline
                     id = IntAttr(n, "id"),
                     name = Attr(n, "name"),
                     level = level,
-                    // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses get
-                    // the character's share of theirs (ApplyBossHealthShare).
+                    // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses and
+                    // creatures get the character's share of theirs (ApplyWorldShare).
                     fullHealth = IntAttr(n, "health", (int)((IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)) * (IntAttr(n, "id") == ElderEnt ? 1.3f : 1f))),
-                    sharedHealth = IsBoss(n) && Attr(n, "health") == null,
+                    sharedHealth = (IsBoss(n) || IntAttr(n, "canfight") == 1) && Attr(n, "health") == null,
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
@@ -201,7 +201,7 @@ namespace GSOOffline
                 if (info.projectiles.Length > 0) info.projectile = info.projectiles[0];
                 Npcs[info.id] = info;
             }
-            ApplyBossHealthShare();
+            ApplyWorldShare();
         }
 
         // Buff ids XMLs/Buffs marks canberemoved: the ones death ends (the original's RemoveAllBuffs).
@@ -213,11 +213,11 @@ namespace GSOOffline
                 if (n.NodeType == XmlNodeType.Element && IntAttr(n, "canberemoved") == 1) RemovableBuffs.Add(IntAttr(n, "id"));
         }
 
-        /// <summary>Bosses' health from CombatRules.BossHealthShare (the character's choice).</summary>
-        public static void ApplyBossHealthShare()
+        /// <summary>Bosses' and creatures' health from CombatRules.WorldShare (the character's choice).</summary>
+        public static void ApplyWorldShare()
         {
             foreach (var info in Npcs.Values)
-                if (info.sharedHealth) info.health = Mathf.Max(1, (int)(info.fullHealth * CombatRules.BossHealthShare));
+                if (info.sharedHealth) info.health = Mathf.Max(1, (int)(info.fullHealth * CombatRules.WorldShare(info)));
         }
     }
 }

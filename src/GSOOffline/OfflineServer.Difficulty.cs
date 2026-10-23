@@ -6,11 +6,12 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// The fate brokers' modifiers: a character can learn faster and give bosses part of their health, the world
-    /// having been made for groups of players. Asked of an NPC, not the config, and settled for a day once chosen
-    /// (or for a fortune, sooner), so they are a choice rather than a switch. The brokers are the original's
-    /// insurance advisors (type 160; item insurance has no use alone). Saved with the character
-    /// (CharacterSave.xpRatePercent, bossHealthPercent, difficultyLockedUntil); shown above the health bar.
+    /// The fate brokers' modifiers: a character can learn faster and soften the world, which was made for groups of
+    /// players: one choice gives bosses and creatures a share of their health and their damage, bosses always losing
+    /// more (issue #118). Asked of an NPC, not the config, and settled for a day once chosen (or for a fortune, sooner),
+    /// so they are a choice rather than a switch. The brokers are the original's insurance advisors (type 160; item
+    /// insurance has no use alone). Saved with the character (CharacterSave.xpRatePercent, bossHealthPercent = the
+    /// bosses' share, which picks the tier, difficultyLockedUntil); shown above the health bar.
     ///
     /// One sitting sets both: the player drafts the two choices, nothing changes (and nothing is paid) until they
     /// confirm, and confirming settles both for 24 hours. The player stands still for the whole conversation, so
@@ -21,24 +22,29 @@ namespace GSOOffline
         private const int BrokerType = 160;
         private const string BrokerName = "Fate broker";
         private const int NodeDifficulty = 1000;   // the advisors' default dialogue, now the broker's greeting
-        private const int NodeFatePlan = 90000, NodeXpRate = 90001, NodeBossHealth = 90002;
-        private const int ActionXpRate = 9000, ActionBossHealth = 9010;   // + the choice's index
+        private const int NodeFatePlan = 90000, NodeXpRate = 90001, NodeWorld = 90002;
+        private const int ActionXpRate = 9000, ActionWorld = 9010;   // + the choice's index
         private const int ActionStartPlan = 9020, ActionStartPaidPlan = 9021, ActionConfirmFate = 9022;
         private const long DifficultyLockSeconds = 24 * 60 * 60;
         private const int EarlyChangeSilver = 75000;
 
         private static readonly int[] XpRates = { 100, 150, 200, 300 };          // percent
-        private static readonly int[] BossHealths = { 100, 75, 50, 25 };         // percent of their original health
+        // The world's tiers: bosses' and creatures' share of their original health and damage, in percent.
+        private static readonly int[] BossShares = { 100, 85, 75, 50, 25 };
+        private static readonly int[] CreatureShares = { 100, 90, 85, 75, 65 };
 
         private float XpRate => character != null ? character.xpRatePercent / 100f : 1f;
 
-        /// <summary>At every scene load: bosses get the character's share of their health.</summary>
+        private static int CreatureShareOf(int bossShare) => CreatureShares[Math.Max(0, Array.IndexOf(BossShares, bossShare))];
+
+        /// <summary>At every scene load: bosses and creatures get the character's share of their health and damage.</summary>
         private void ApplyDifficulty()
         {
             if (Array.IndexOf(XpRates, character.xpRatePercent) < 0) character.xpRatePercent = 100;
-            if (Array.IndexOf(BossHealths, character.bossHealthPercent) < 0) character.bossHealthPercent = 100;
-            CombatRules.BossHealthShare = character.bossHealthPercent / 100f;
-            GameData.ApplyBossHealthShare();
+            if (Array.IndexOf(BossShares, character.bossHealthPercent) < 0) character.bossHealthPercent = 100;
+            CombatRules.BossShare = character.bossHealthPercent / 100f;
+            CombatRules.CreatureShare = CreatureShareOf(character.bossHealthPercent) / 100f;
+            GameData.ApplyWorldShare();
         }
 
         // Before each NPC list goes out: spawned NPCs copy their name (and minimap label) from the client's template,
@@ -96,8 +102,8 @@ namespace GSOOffline
         private string DifficultyStatus()
         {
             string s = "I broker fate. These lands were tamed by bands of adventurers, and one alone may want the odds evened: " +
-                       "I can let you learn faster, or have the great beasts spare you some of their strength. " +
-                       $"You learn at {Rate(character.xpRatePercent)} the usual pace, and bosses have {character.bossHealthPercent}% of their health.";
+                       "I can let you learn faster, or have the world spare you some of its strength. " +
+                       $"You learn at {Rate(character.xpRatePercent)} the usual pace, and {World(character.bossHealthPercent)}.";
             long wait = character.difficultyLockedUntil - UnixNow;
             if (wait > 0)
                 return s + $" Your fate is settled for {Hours(wait)}. For {EarlyChangeSilver:N0} silver, paid once, I can reopen it now, and you may set both again.";
@@ -106,12 +112,16 @@ namespace GSOOffline
 
         private string PlanStatus()
         {
-            string s = $"You would learn at {Rate(planXp)} the usual pace, and bosses would have {planBoss}% of their health. ";
+            string s = $"You would learn at {Rate(planXp)} the usual pace, and {World(planBoss)}. ";
             if (!PlanChanged) return s + "That is your fate as it stands. Change one or both, then confirm.";
             return s + (planPaid
                 ? $"Confirming costs {EarlyChangeSilver:N0} silver, once, for both, and settles them for 24 hours."
                 : "Confirming settles both for 24 hours.") + " Nothing changes until you confirm.";
         }
+
+        private static string World(int bossShare) => bossShare == 100
+            ? "the world is as strong as it was made"
+            : $"bosses keep {bossShare}% of their health and strength, creatures {CreatureShareOf(bossShare)}%";
 
         private static string Rate(int percent) => (percent / 100f).ToString("0.#", CultureInfo.InvariantCulture) + "x";
 
@@ -136,15 +146,15 @@ namespace GSOOffline
                 ConfirmFate();
                 return true;
             }
-            int xp = id - ActionXpRate, boss = id - ActionBossHealth;
+            int xp = id - ActionXpRate, boss = id - ActionWorld;
             if (xp >= 0 && xp < XpRates.Length)
             {
                 if (planning) planXp = XpRates[xp];
                 return true;
             }
-            if (boss >= 0 && boss < BossHealths.Length)
+            if (boss >= 0 && boss < BossShares.Length)
             {
-                if (planning) planBoss = BossHealths[boss];
+                if (planning) planBoss = BossShares[boss];
                 return true;
             }
             return false;
@@ -173,14 +183,16 @@ namespace GSOOffline
             if (bossChanged)
             {
                 ApplyDifficulty();
-                RescaleBosses();
+                RescaleNpcs();
             }
-            Notice($"Your fate is settled for 24 hours: you learn at {Rate(planXp)} the usual pace, and bosses have {planBoss}% of their health.");
-            Plugin.Log.LogInfo($"[difficulty] experience {planXp}%, boss health {planBoss}%");
+            Notice($"Your fate is settled for 24 hours: you learn at {Rate(planXp)} the usual pace, and {World(planBoss)}.");
+            if (bossChanged && planBoss < 100)
+                Notice("The world will feel easier: bosses and creatures alike have less health and their blows land softer.");
+            Plugin.Log.LogInfo($"[difficulty] experience {planXp}%, bosses {planBoss}%, creatures {CreatureShareOf(planBoss)}%");
         }
 
-        /// <summary>The bosses already in the scene take the new share, wounds and all.</summary>
-        private void RescaleBosses()
+        /// <summary>The bosses and creatures already in the scene take the new share, wounds and all.</summary>
+        private void RescaleNpcs()
         {
             if (world == null) return;
             foreach (var n in world.npcs)
@@ -188,6 +200,7 @@ namespace GSOOffline
                 if (!GameData.Npcs.TryGetValue(n.typeId, out var info) || !info.sharedHealth || n.maxHealth == info.health) continue;
                 n.health = Mathf.Clamp(Mathf.RoundToInt(n.health * (float)info.health / Mathf.Max(1, n.maxHealth)), n.dead ? 0 : 1, info.health);
                 n.maxHealth = info.health;
+                if (!n.dead) Send(12, 0, n.uid, n.health, n.maxHealth, 0);   // their health bars too
             }
         }
 
@@ -211,7 +224,7 @@ namespace GSOOffline
             if (character.difficultyLockedUntil == 0 || character.difficultyLockedUntil > UnixNow) return;
             character.difficultyLockedUntil = 0;
             SaveCurrentCharacter();
-            Notice("Your fate is unsettled: a fate broker can change how quickly you learn and how sturdy bosses are again.");
+            Notice("Your fate is unsettled: a fate broker can change how quickly you learn and how strong the world is again.");
             Plugin.Log.LogInfo("[difficulty] the 24 hours are up");
         }
 
@@ -222,7 +235,7 @@ namespace GSOOffline
         private static readonly Color FateBackdrop = new Color(0f, 0f, 0f, 0.55f);
 
         /// <summary>
-        /// "Fate: 2x experience, bosses 25% health - settled for 23h 41m" just above the health bar, while either
+        /// "Fate: 2x experience, bosses 25%, creatures 65% - settled for 23h 41m" just above the health bar, while either
         /// modifier is set, in the HUD's own outlined font on a tinted backdrop. Shown when the game draws its bar.
         /// </summary>
         private void OnGUI()
@@ -237,7 +250,8 @@ namespace GSOOffline
 
             var parts = new List<string>();
             if (character.xpRatePercent != 100) parts.Add(Rate(character.xpRatePercent) + " experience");
-            if (character.bossHealthPercent != 100) parts.Add("bosses " + character.bossHealthPercent + "% health");
+            if (character.bossHealthPercent != 100)
+                parts.Add("bosses " + character.bossHealthPercent + "%, creatures " + CreatureShareOf(character.bossHealthPercent) + "%");
             long wait = character.difficultyLockedUntil - UnixNow;
             string text = "Fate: " + string.Join(", ", parts.ToArray()) + " - " +
                           (wait > 0 ? $"settled for {wait / 3600}h {wait % 3600 / 60:00}m" : "unsettled: a fate broker can change it");
@@ -337,7 +351,7 @@ namespace GSOOffline
 
             var plan = new AddedNode { id = NodeFatePlan, text = "$1" };
             plan.options.Add(new AddedOption { id = 1, next = NodeXpRate, text = "Change how quickly I learn." });
-            plan.options.Add(new AddedOption { id = 2, next = NodeBossHealth, text = "Change how sturdy bosses are." });
+            plan.options.Add(new AddedOption { id = 2, next = NodeWorld, text = "Change how strong the world is." });
             plan.options.Add(new AddedOption { id = 3, next = NodeDifficulty, action = ActionConfirmFate,
                 text = "Confirm both: settled for 24 hours.", shownIf = () => PlanChanged && !planPaid });
             plan.options.Add(new AddedOption { id = 4, next = NodeDifficulty, action = ActionConfirmFate,
@@ -355,14 +369,17 @@ namespace GSOOffline
             xp.options.Add(new AddedOption { id = XpRates.Length + 1, next = NodeFatePlan, text = "Back" });
             nodes.Add(xp);
 
-            var boss = new AddedNode { id = NodeBossHealth, text = "How much of their health should bosses keep? All of it is how they were made: for a group of adventurers." };
-            for (int i = 0; i < BossHealths.Length; i++)
+            var boss = new AddedNode { id = NodeWorld, text = "How much of their strength should the world keep? Bosses and creatures alike " +
+                "lose health and hit softer, the bosses (made for a group of adventurers) always the most. The world will feel easier. " +
+                "All of it is how it was made." };
+            for (int i = 0; i < BossShares.Length; i++)
             {
-                int share = BossHealths[i];
-                boss.options.Add(new AddedOption { id = i + 1, next = NodeFatePlan, action = ActionBossHealth + i,
-                    text = share + "%" + (share == 100 ? " (the original)" : ""), shownIf = () => planBoss != share });
+                int share = BossShares[i];
+                boss.options.Add(new AddedOption { id = i + 1, next = NodeFatePlan, action = ActionWorld + i,
+                    text = share == 100 ? "All of it (the original)" : $"Bosses {share}%, creatures {CreatureShares[i]}%: health and damage",
+                    shownIf = () => planBoss != share });
             }
-            boss.options.Add(new AddedOption { id = BossHealths.Length + 1, next = NodeFatePlan, text = "Back" });
+            boss.options.Add(new AddedOption { id = BossShares.Length + 1, next = NodeFatePlan, text = "Back" });
             nodes.Add(boss);
             return nodes;
         }

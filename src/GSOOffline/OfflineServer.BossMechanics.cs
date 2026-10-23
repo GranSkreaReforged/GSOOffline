@@ -151,7 +151,7 @@ namespace GSOOffline
                         Later(s, () =>
                         {
                             if (boss.dead || !boss.aggro || PlayerDead || !PlayerWithin(spot, m.radius)) return;
-                            int dmg = Mathf.Max(1, Mathf.RoundToInt(MaxHealth() * m.healthPerSecond));
+                            int dmg = Mathf.Max(1, Mathf.RoundToInt(MaxHealth() * m.healthPerSecond * CombatRules.WorldShare(info)));
                             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) {m.note} hurts you for {dmg}");
                             HurtPlayer(dmg, SplashPlain);
                         });
@@ -228,7 +228,7 @@ namespace GSOOffline
         /// <summary>A hazard's damage: a share of the boss's maximum hit, through the player's defences.</summary>
         private void HazardHit(NpcInfo info, BossMove m, string what)
         {
-            float dmg = CombatRules.NpcMaxHit(info) * m.share * Random.Range(0.8f, 1f);
+            float dmg = CombatRules.NpcMaxHit(info) * m.share * Random.Range(0.8f, 1f) * CombatRules.WorldShare(info);
             int hit = PlayerDamageTaken(Mathf.RoundToInt(dmg), m.damageKind, null, info.accuracy);
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) {what} hits you for {hit}");
             HurtPlayer(hit, m.damageKind == DamageKinds.Poison ? SplashPoisoned : SplashPlain);

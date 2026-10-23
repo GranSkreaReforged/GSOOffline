@@ -655,7 +655,7 @@ namespace GSOOffline
             for (int k = 1; k < DamageKinds.Count; k++)
                 if (info.resistance[k] != 0) res.Add(DamageKinds.Name(k) + " " + info.resistance[k]);
             var blow = BasicBlow(weapon);
-            Plugin.Log.LogInfo($"[dev] {info.name} ({typeId}) level {info.level}{(info.boss ? " boss" : "")}: health {info.health}, hits 1-{CombatRules.NpcMaxHit(info) - 1} " +
+            Plugin.Log.LogInfo($"[dev] {info.name} ({typeId}) level {info.level}{(info.boss ? " boss" : "")}: health {info.health}, hits 1-{(int)((CombatRules.NpcMaxHit(info) - 1) * CombatRules.WorldShare(info))} (fate {CombatRules.WorldShare(info):P0}) " +
                 $"{DamageKinds.Name(info.damageType)}, defence {(info.defence > 0 ? info.defence : info.level)}, block {info.damageBlock}, accuracy {info.accuracy}; " +
                 $"resistances [{string.Join(", ", res.ToArray())}]. Your basic blow now: {blow.damage} {DamageKinds.Name(blow.type)}" +
                 $"{(blow.projectile > 0 ? " (shot " + blow.projectile + ")" : "")} every {WeaponSpeed(weapon):0.00}s; health {MaxHealth()} (combat level {CombatLevel()}); ability {abilityId}");

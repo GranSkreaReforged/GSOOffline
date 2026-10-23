@@ -171,6 +171,9 @@ namespace GSOOffline
             }
         }
 
+        /// <summary>A scripted boss attack's damage, at the fate broker's share.</summary>
+        private static int BossScaled(int damage) => Mathf.RoundToInt(damage * CombatRules.BossShare);
+
         /// <summary>A snowball thrown at a spot (marked), bursting there: a share of the player's health if they're within reach.</summary>
         private void Snowball(int projectile, Vector3 from, Vector3 spot, float marker, float reach, int percent)
         {
@@ -181,7 +184,7 @@ namespace GSOOffline
                 if (world == null || world.sceneId != ScenePhraustie) return;
                 PlayEffect(165, spot);
                 if (PlayerDead || !PlayerWithin(spot, reach)) return;
-                HurtPlayer(Mathf.RoundToInt(MaxHealth() * percent / 100f), SplashPlain);
+                HurtPlayer(Mathf.RoundToInt(MaxHealth() * percent / 100f * CombatRules.BossShare), SplashPlain);
                 Plugin.Log.LogInfo($"[boss] a {(projectile == 57 ? "big snowball" : "snowball")} hits the player ({percent}%)");
             });
         }
@@ -362,7 +365,7 @@ namespace GSOOffline
                 {
                     if (world == null || world.sceneId != ScenePoacher) return;
                     PlayEffect(146, spot);
-                    if (!PlayerDead && PlayerWithin(spot, 4f)) HurtByOriginal(Random.Range(8000, 11001), DamageKinds.Fire);
+                    if (!PlayerDead && PlayerWithin(spot, 4f)) HurtByOriginal(BossScaled(Random.Range(8000, 11001)), DamageKinds.Fire);
                 });
             }
         }
@@ -407,7 +410,7 @@ namespace GSOOffline
                         if (world == null || world.sceneId != ScenePoacher) return;
                         PlaySound(434, spot, 50);
                         PlayEffect(156, spot);
-                        if (!PlayerDead && PlayerWithin(spot, 5f)) HurtByOriginal(Random.Range(15000, 22501), DamageKinds.Fire);
+                        if (!PlayerDead && PlayerWithin(spot, 5f)) HurtByOriginal(BossScaled(Random.Range(15000, 22501)), DamageKinds.Fire);
                     });
                 }
             }
@@ -508,7 +511,7 @@ namespace GSOOffline
                         PlayPlayerEffect(plague ? 152 : 148);
                         PlaySound(429, p.transform.position, 70);
                         float res = CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Psychic)));
-                        HurtPlayer(Mathf.RoundToInt(MaxHealth() * 0.3f * (1f - res)), SplashPlain);
+                        HurtPlayer(Mathf.RoundToInt(MaxHealth() * 0.3f * (1f - res) * CombatRules.BossShare), SplashPlain);
                         Plugin.Log.LogInfo($"[boss] Sepitus's {(plague ? "plague " : "")}bolt hits the player");
                         if (plague) AddBuff(-BuffPlague, BuffPlague, 10f, new BuffEffect { plague = true });
                     });
