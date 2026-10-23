@@ -48,22 +48,19 @@ namespace GSOOffline
 
         private const int ZalranazCleaver = 463, SerpentsFang = 468, LydiasStaff = 473, RokesStaff = 274, StorageGuardsCrossbow = 459;
 
-        // Unique items from after the server snapshot (updates 137-139), whose patch notes name their skills:
-        // the cleaver "offers a unique skill Condensed psyche" and boosts the Broadsword electric attack, the
-        // Fang "a new unique skill Condensed Ice", Lydia's and Roke's staffs a summoning skill each, and the
-        // Storage guard's crossbow "a unique skillset" (its set boosts Landmine and Explosive arrow; 172 is
-        // the archery Landmine). The skills are theirs; which slots they took is a reconstruction.
-        private static readonly Dictionary<int, int[]> LaterUniqueAbilities = new Dictionary<int, int[]>
+        // Unique weapons with fixed abilities (the original's getDefaultAbility1..4 special cases). Saved copies are
+        // brought in line when loaded: these slots used to be reconstructions.
+        private static readonly Dictionary<int, int[]> FixedUniqueAbilities = new Dictionary<int, int[]>
         {
             { ZalranazCleaver, new[] { 52, 173, 0, 0 } },          // Broadsword electric attack, Condensed psyche
-            { SerpentsFang, new[] { 175, 89, 88, 174 } },          // Halberd ice attack, Stun, Cripple, Condensed ice
-            { StorageGuardsCrossbow, new[] { 65, 172, 61, 26 } },  // Explosive arrow, Landmine, Focus, Heavy shield block
+            { SerpentsFang, new[] { 175, 174, 88, 26 } },          // Halberd ice attack, Condensed ice, Cripple, Heavy shield block
+            { StorageGuardsCrossbow, new[] { 65, 90, 61, 172 } },  // Explosive arrow, Hunting net, Barrage, Landmine
         };
 
         /// <summary>A new item's Ability1..4 (0 for none).</summary>
         internal static int[] RollAbilities(int typeId)
         {
-            if (LaterUniqueAbilities.TryGetValue(typeId, out var fixedList)) return (int[])fixedList.Clone();
+            if (FixedUniqueAbilities.TryGetValue(typeId, out var fixedList)) return (int[])fixedList.Clone();
             var list = new[] { DefaultAbility1(typeId), DefaultAbility2(typeId), DefaultAbility3(typeId), DefaultAbility4(typeId) };
             if (typeId == LydiasStaff) list[1] = 176;   // Summon skeletal berserk
             if (typeId == RokesStaff) list[1] = 177;    // Summon skeleton
@@ -135,8 +132,17 @@ namespace GSOOffline
         /// <summary>The item's own abilities, rolled now if it predates them (saves from before this).</summary>
         private static int[] ItemAbilities(ItemSave it)
         {
-            if (it.abilities == null || it.abilities.Length != WeaponAbilitySlots) it.abilities = RollAbilities(it.typeId);
+            if (it.abilities == null || it.abilities.Length != WeaponAbilitySlots
+                || FixedUniqueAbilities.TryGetValue(it.typeId, out var fixedList) && !SameAbilities(it.abilities, fixedList))
+                it.abilities = RollAbilities(it.typeId);
             return it.abilities;
+        }
+
+        private static bool SameAbilities(int[] a, int[] b)
+        {
+            for (int i = 0; i < WeaponAbilitySlots; i++)
+                if (a[i] != b[i]) return false;
+            return true;
         }
 
         /// <summary>Ability1..4 lines for an item's data string; the item window lists them.</summary>

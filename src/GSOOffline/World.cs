@@ -28,6 +28,8 @@ namespace GSOOffline
         public float stunnedUntil, rootedUntil;
         public float stunImmuneUntil;
         public NpcEntity master;
+        public bool dropsLoot;          // a minion that drops loot all the same (Argus's Argo, Argo's Argi)
+        public float attackSpeedMultiplier = 1f;   // x its time between swings (George's focus)
         public float absorbUntil;       // a boss's Absorb (aura on) until then
         public float reflectFrom;       // ...and from then the player's hits come back at them        // a boss's summoned minion: no loot, no respawn, gone with its boss   // a fresh stun can't land before this (CombatRules.StunImmunity)
         public readonly List<NpcDot> dots = new List<NpcDot>();   // damage over time (OfflineServer.OriginalCombat.cs)

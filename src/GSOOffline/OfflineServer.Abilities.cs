@@ -20,11 +20,10 @@ namespace GSOOffline
 
     /// <summary>
     /// What one ability does. The game data only names abilities and gives level, mana, range and cooldown; the
-    /// effects were server code. Abilities the original server had (update 136) run its code
-    /// (OfflineServer.OriginalAbilities.cs) and use this only for the kind of target they need. The later ones
-    /// it had no code for (Shatter, Frostburn, Ice hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma,
-    /// the archery landmine, Condensed psyche and ice, Halberd ice attack) are reconstructions: power x the
-    /// original's basic blow for the weapon, or the effect described.
+    /// effects were server code. Abilities the original server had run its code (OfflineServer.OriginalAbilities.cs)
+    /// and use this only for the kind of target they need. The few it never had code for (Shatter, Frostburn, Ice
+    /// hail, Frozen barrage, Inner frost, Iceblock, Thoracic trauma) are reconstructions: power x the original's
+    /// basic blow for the weapon, or the effect described.
     /// </summary>
     internal class AbilityRule
     {
@@ -84,6 +83,7 @@ namespace GSOOffline
             AbilityFirestorm = 121, AbilityIceBarrier = 125, AbilityCryostasis = 126, AbilityEnergyBlade = 139, AbilityHackAndSlash = 140,
             AbilityStability = 142, AbilityTruce = 143, AbilityGlyph = 149, AbilityFireArrows = 150, AbilityManaSurge = 168,
             AbilityEmbraceThePain = 169, AbilityTraverse = 170;
+        private const int BuffManaSurge = 92, BuffLifeSurge = 103;   // Mana surge, and in Jotnar's chaps Life surge: regeneration
 
         // Ability id -> rule. Targeted abilities missing here are plain strikes; untargeted ones are utilities.
         private static readonly Dictionary<int, AbilityRule> AbilityRules = new Dictionary<int, AbilityRule>
@@ -118,7 +118,7 @@ namespace GSOOffline
             { 131, Sweep(6f, 1.6f) },     // Frostburn
             { 132, Sweep(8f, 2f) },       // Ice hail
             { 133, Sweep(8f, 2.2f) },     // Frozen barrage
-            { 172, Sweep(2f, 2f) },       // Landmine (archery): 35 s, 2 m blast, as its description says
+            { 172, Sweep(6f) },           // Landmine (archery, the Storage guard's crossbow)
 
             // Area attacks around the target
             { 1, Splash(2f) },            // Fire ball
@@ -130,11 +130,11 @@ namespace GSOOffline
 
             // Strikes (stuns, roots and damage over time come with the original's code)
             { 91, Strike() },             // Piercing shot
-            { 101, Strike() },            // Tritone (update 137: no longer spends mana, twice the damage)
+            { 101, Strike() },            // Tritone
             { 171, Strike(1.6f) },        // Thoracic trauma (reconstruction)
-            { 175, Strike(1.6f) },        // Halberd ice attack (reconstruction)
-            { 173, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 400 } },   // Condensed psyche (reconstruction)
-            { 174, new AbilityRule { kind = AbilityKind.ManaBurst, manaCap = 300 } },   // Condensed ice (reconstruction)
+            { 175, Strike() },            // Halberd ice attack
+            { 173, Of(AbilityKind.ManaBurst) },   // Condensed psyche
+            { 174, Of(AbilityKind.ManaBurst) },   // Condensed ice
             { 141, Of(AbilityKind.Taunt) },
 
             // Buffs (durations and effects: OriginalAbilities)
@@ -145,6 +145,7 @@ namespace GSOOffline
             { 137, Of(AbilityKind.Buff) }, { 139, Of(AbilityKind.Buff) }, { 140, Of(AbilityKind.Buff) }, { 142, Of(AbilityKind.Buff) },
             { 143, Of(AbilityKind.Buff) }, { 146, Of(AbilityKind.Buff) }, { 150, Of(AbilityKind.Buff) }, { 167, Of(AbilityKind.Buff) },
             { 168, Of(AbilityKind.Buff) }, { 169, Of(AbilityKind.Buff) }, { 170, Of(AbilityKind.Buff) },
+            { 176, Of(AbilityKind.Buff) }, { 177, Of(AbilityKind.Buff) },   // summons (OfflineServer.Summons.cs)
             // Reconstructions of the ice spells with no original code.
             { 130, Buff(0, 5f, new BuffEffect { damageTaken = 0f }) },       // Iceblock
             { 134, Buff(0, 20f, new BuffEffect { damageDealt = 1.2f }) },    // Inner frost
@@ -160,7 +161,6 @@ namespace GSOOffline
             { 147, Of(AbilityKind.Unavailable) },   // Drop
             { 153, Of(AbilityKind.Unavailable) },   // Snowfall
             { 157, Of(AbilityKind.Unavailable) },   // Transfusion: moves your health to another player
-            { 176, Of(AbilityKind.Unavailable) }, { 177, Of(AbilityKind.Unavailable) },   // summons
         };
 
         private static AbilityRule Of(AbilityKind kind) => AbilityRule.Of(kind);
@@ -176,7 +176,7 @@ namespace GSOOffline
         /// </summary>
         private string MissingEquipmentFor(AbilityInfo a, AbilityRule rule)
         {
-            if (a.id == 165 && EquippedWeapon()?.typeId != HuntersBow) return "the hunter's bow in hand";   // Wounding shot
+            if (a.id == 165 && !Wears("huntersBow")) return "the hunter's bow in hand";   // Wounding shot
             if ((a.id == 66) && CountItem(PoisonForArrows) == 0) return "poison for the arrows";
             if ((a.id == 151 || a.id == 152) && CountItem(ItemSnowball) == 0) return "a snowball";
             if (a.weaponSkill || AnyWeaponAbilities.Contains(a.id) || rule.kind == AbilityKind.Bandage) return null;
@@ -189,8 +189,8 @@ namespace GSOOffline
                     return w != null && (ih.isStaff(t) || ih.isWand(t)) ? null : "a staff or wand in hand";
                 case "healing":
                     return w != null && ih.isInstrument(t) ? null : "a lute in hand";
-                case "swordsmanship":
-                    return w != null && (ih.isBroadsword(t) || ih.isGreatsword(t) || ih.isHalberd(t)) ? null
+                case "swordsmanship":   // or bare fists in Jin
+                    return w != null && (ih.isBroadsword(t) || ih.isGreatsword(t) || ih.isHalberd(t)) || w == null && Wears("jin") ? null
                         : "a broadsword, greatsword or halberd in hand";
                 case "archery":
                     return w != null && (ih.isBow(t) || ih.isCrossBow(t)) ? null : "a bow or crossbow in hand";
@@ -247,7 +247,7 @@ namespace GSOOffline
                 SendHealth();
             }
             else buffs.Add(b);
-            if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();   // the wisp takes its fire out of your mana
+            if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();   // the wisp takes its fire out of your mana (summons do it in Summon)
             // 4/9: name, buff id, time left and total time in tenths of a second
             int tenths = Mathf.RoundToInt(seconds * 10f);
             b.totalTenths = tenths;
@@ -270,9 +270,9 @@ namespace GSOOffline
                 character.currentHealth = Mathf.Min(character.currentHealth, MaxHealth());
                 SendHealth();
             }
-            if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();
-            // Energy blade: twice what it stored goes off around you (10 m), halved by update 137.
-            if (b.ability == AbilityEnergyBlade && b.absorbed > 0 && expired) ReleaseAbsorbed(b.absorbed);
+            if (source == AbilityFireWisp || source == AbilityFireWisp2 || source == -BuffSkeletalBerserk || source == -BuffSkeleton) ManaStatsChanged();
+            // Energy blade: what it stored goes off around you (10 m), at most 1000 x Swordsmanship.
+            if (b.ability == AbilityEnergyBlade && b.absorbed > 0 && expired) ReleaseAbsorbed(Mathf.Min(b.absorbed, SkillLevel(SkillSwords) * 1000));
             Plugin.Log.LogInfo($"[buff] {source} {(expired ? "expired" : "removed")}");
             BuffEnded(b, expired);   // free to move again after a stun, root or Cryostasis
             BuffStatsChanged();
@@ -558,11 +558,6 @@ namespace GSOOffline
                 power = 1f + burst / 100;   // the original Tritone's mana multiplier
             }
             int damage = Mathf.RoundToInt(blow.damage * power);
-            if (a.id == 172)
-            {
-                PlaceMine(center, damage, 35f, rule.radius);
-                return null;
-            }
             bool aroundPlayer = rule.kind == AbilityKind.Sweep;
             return () =>
             {

@@ -11,13 +11,13 @@ namespace GSOOffline
     ///   clouds whose venom eats 20% of your health a second for 20 s. Below 35% a spiderling crawls to him from a
     ///   corner of the hall and heals him by a third if it gets there.
     /// - George: every 6 s he throws dynamite around the room, more the more he's hurt (none at full health, 30 near
-    ///   death); each stick bursts 4 m wide.
+    ///   death); each stick bursts 4 m wide. Every 30 s he focuses: 6 s of swings three times as fast, no throws.
     /// - Sytrax: 15 s on the ground, then he takes off, hovers and spits fire around you for 5 s, and lands.
     /// - Sepitus: a 3 s charge at you, then a bolt that takes 30% of your health; 10 s of fighting; a second charge
     ///   whose bolt also plagues you for 10 s (heals hurt instead); then, if he and Sytrax are far apart in health, a
     ///   healing bird from the healthier one evens them up. Below half health he calls three lava hounds every 30 s.
     /// - Phraustie (Scr_Snowman): he never walks or swings. Every 3 s a big snowball at you (40-50% of your health,
-    ///   6.5 m), and a storm of snowballs around him that grows as he's hurt (up to 15 every half second near death,
+    ///   6.5 m), and a storm of snowballs around him that grows as he's hurt (up to 10 every half second near death,
     ///   20-25% each, 3.3 m). From 60% health down, every 45 s, Snow Apostles appear around him and lob friendly
     ///   snowballs that heal him 1000 every 3 s for 90 s. With no one near he regains 5% every half second.
     /// Blows given in the original's numbers are taken as they were, through the player's defences (HurtByOriginal).
@@ -139,7 +139,7 @@ namespace GSOOffline
             if (Time.time >= phraustieStormAt)
             {
                 phraustieStormAt = Time.time + 0.5f;
-                int count = (int)(hurt * 15f);
+                int count = (int)(hurt * 10f);
                 for (int i = 0; i < count; i++)
                     Snowball(42, hand, new Vector3(at.x + Random.Range(-40, 40), at.y, at.z + Random.Range(-40, 40)), 4f, 3.3f, Random.Range(20, 26));
             }
@@ -267,7 +267,8 @@ namespace GSOOffline
                     var pos = new Vector3(at.x + i, 57f, at.z + j);
                     if (wide && Vector3.Distance(at, pos) <= 5f) continue;
                     PlayEffect(116, pos);
-                    poisonClouds.Add(new PoisonCloud { pos = pos, from = Time.time + 3f, until = Time.time + 11f });
+                    float warmup = wide ? 4.5f : 5f;   // then poisonous for 14 s
+                    poisonClouds.Add(new PoisonCloud { pos = pos, from = Time.time + warmup, until = Time.time + warmup + 14f });
                 }
             Plugin.Log.LogInfo($"[boss] Nirish scatters {poisonClouds.Count - before} poison clouds ({(wide ? "wide" : "close")})");
         }
@@ -326,12 +327,24 @@ namespace GSOOffline
 
         // ---- George, the Storage Guard -------------------------------------------------------------
 
-        private float georgeThrowAt;
+        private float georgeThrowAt, georgeFocusAt, georgeFocusUntil;
 
         private void TickGeorge(Vector3 me)
         {
             var george = Boss(George);
-            if (george == null || george.dead || PlayerDead || Vector3.Distance(NpcPosition(george), me) > 50f || Time.time < georgeThrowAt) return;
+            if (george == null || george.dead || PlayerDead || Vector3.Distance(NpcPosition(george), me) > 50f) return;
+            // Focus: every 30 s he swings three times as fast for 6 s, and throws nothing meanwhile.
+            bool focused = Time.time < georgeFocusUntil;
+            if (!focused && Time.time >= georgeFocusAt)
+            {
+                georgeFocusUntil = Time.time + 6f;
+                georgeFocusAt = Time.time + 30f;
+                george.attackSpeedMultiplier = 0.33f;
+                Plugin.Log.LogInfo("[boss] George focuses");
+                return;
+            }
+            if (!focused) george.attackSpeedMultiplier = 1f;
+            if (focused || Time.time < georgeThrowAt) return;
             georgeThrowAt = Time.time + 6f;
             int sticks = (int)((1f - HealthShare(george)) * 30f);
             if (sticks <= 0) return;
