@@ -18,6 +18,7 @@ namespace GSOOffline
         private const int MaxGrade = 8;
         private const int SmallUpgradeStone = 437, MediumUpgradeStone = 438, LargeUpgradeStone = 439;
         private const int SmallGradeStone = 440, MediumGradeStone = 441, LargeGradeStone = 442, BadGradeStone = 443;
+        private const int SmallGradeStoneUntradeable = 460;   // Commander Grant's reward (quest 34): a small grade stone
 
         private static readonly string[] GradeNames = { "", "damaged", "normal", "unusual", "rare", "unique", "epic", "legendary", "mythic" };
 
@@ -89,7 +90,7 @@ namespace GSOOffline
                 }
                 return true;
             }
-            if (m == SmallGradeStone && level <= 25 || m == MediumGradeStone && level <= 50 || m == LargeGradeStone && level <= 75)
+            if ((m == SmallGradeStone || m == SmallGradeStoneUntradeable) && level <= 25 || m == MediumGradeStone && level <= 50 || m == LargeGradeStone && level <= 75)
             {
                 if (CopyGrade(item, material)) RemoveFromStack(material, 1);
                 return true;

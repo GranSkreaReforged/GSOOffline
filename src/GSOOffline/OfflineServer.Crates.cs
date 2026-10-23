@@ -22,7 +22,7 @@ namespace GSOOffline
         private static readonly Dictionary<int, GearCrate> GearCrates = new Dictionary<int, GearCrate>
         {
             {   // Iron: iron plate and weapons, cow leather, wool robes, spruce bow, lute, crossbow and fire staff
-                10668, new GearCrate { guardOneIn = 30000, gear = new[] {
+                10668, new GearCrate { guardOneIn = 35000, gear = new[] {
                     60, 61, 62, 81, 83, 183, 191, 294, 296, 297, 167, 168, 19, 46, 3, 6, 1, 80, 50, 199 } }
             },
             {   // Steel, crawler leather, cotton, oak
@@ -30,11 +30,11 @@ namespace GSOOffline
                     63, 64, 65, 82, 71, 187, 192, 295, 299, 298, 108, 107, 201, 16, 218, 9, 74, 370, 75, 268 } }
             },
             {   // Verum, moose leather, silk, evark
-                10670, new GearCrate { guardOneIn = 11000, gear = new[] {
+                10670, new GearCrate { guardOneIn = 14000, gear = new[] {
                     231, 252, 259, 260, 261, 150, 97, 188, 204, 286, 287, 285, 169, 170, 202, 195, 219, 194, 114, 371, 121, 271 } }
             },
             {   // Stranite, bear leather, jute, pertica
-                10671, new GearCrate { guardOneIn = 9000, gear = new[] {
+                10671, new GearCrate { guardOneIn = 10000, gear = new[] {
                     300, 302, 303, 304, 305, 190, 184, 189, 306, 282, 283, 284, 110, 109, 203, 344, 345, 343, 334, 372, 337, 340 } }
             },
             {   // Shadow, troll leather, flax, deadwood
