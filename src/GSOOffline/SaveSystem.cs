@@ -171,7 +171,7 @@ namespace GSOOffline
         public int nextItemId = 1;
         public int secondaryWeaponId;   // weapon carried on the back (item id in items, not equipped); 0 = none
         public int offhandRestoreId;    // shield a two-handed weapon or tool pushed off, back on with a one-handed weapon; 0 = none
-        public float offhandCooldown3, offhandCooldown4;   // its slot 3-4 cooldowns (seconds left), frozen while it's off
+        public long offhandReadyAt3, offhandReadyAt4;      // UTC ms (DateTime ticks / 10000): when its slot 3-4 abilities are ready again
 
         public List<QuestState> quests = new List<QuestState>();
         public List<QuestVar> questVars = new List<QuestVar>();
