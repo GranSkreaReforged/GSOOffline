@@ -13,7 +13,7 @@ namespace GSOOffline
 
         private void RegisterDialogueHandlers()
         {
-            On(3, 8, c => InteractNpc((int)c[2]));
+            On(3, 8, c => InteractNpc((int)c[2], clicked: true));
             On(3, 9, c => ChooseOption((int)c[2]));
             On(8, 8, c => BuyFromShop((int)c[2], (int)c[3]));
             On(4, 5, c => SellToShop((int)c[2], (int)c[3], (int)c[4]));
@@ -21,10 +21,20 @@ namespace GSOOffline
 
         // ---- dialogue ------------------------------------------------------------------------
 
-        private void InteractNpc(int uid)
+        private const float NpcTalkReach = 10f;
+
+        private void InteractNpc(int uid, bool clicked = false)
         {
             var npc = world?.GetNpc(uid);
             if (character == null || npc == null || npc.dead || !NpcShown(npc)) return;
+            // The client sends a click on an NPC from any distance; the original (Scr_NpcHandler.attemptInteract) only
+            // answered within 10 m, so the bank or a ferryman couldn't be used from across the map (#115).
+            var player = LocalPlayer;
+            if (clicked && (player == null || Vector3.Distance(NpcPosition(npc), player.transform.position) >= NpcTalkReach))
+            {
+                Notice("That's too far away.", "gray");
+                return;
+            }
             if (ResumeSightseeing(npc)) return;
             if (LakhmuInteractNpc(npc)) return;
             if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll
