@@ -298,9 +298,9 @@ namespace GSOOffline
         {
             openShop = ShopData.Get(shopId);
             string list = ShopList();
-            // currency type 0 = silver; the refresh that follows carries the merchant's own silver,
-            // which caps what the client will let you sell.
-            Send(0, 2, character.name, openShop.name, "0>" + list);
+            // The currency type (0 = silver, else the item the shop takes); the refresh that follows carries the
+            // merchant's own silver, which caps what the client will let you sell.
+            Send(0, 2, character.name, openShop.name, openShop.currency + ">" + list);
             Send(2, 37, openShop.name, openShop.merchantSilver + ">" + list);
             WindowOpened(WindowShop);
         }
@@ -360,6 +360,23 @@ namespace GSOOffline
             }
             int price = entry.price;
             int cost = price * amount;
+            if (openShop.currency != 0)
+            {
+                // Paid in an item (the Hunters Guild's tokens). The original took only one item's price however many
+                // were bought; this takes the whole cost it had checked for.
+                string currencyName = ItemData.Get(openShop.currency)?.name ?? "token";
+                if (CountItem(openShop.currency) < cost)
+                {
+                    Send(2, 41, "You don't have enough " + currencyName + "s to do that.");
+                    return;
+                }
+                TakeItems(openShop.currency, cost);
+                if (entry.Limited) entry.stock -= amount;
+                GiveItem(typeId, amount);
+                Send(2, 41, amount + " x " + ItemData.Get(typeId)?.name + " bought for " + cost + " " + currencyName + "s");
+                RefreshShop();
+                return;
+            }
             if (character.silver < cost)
             {
                 Send(2, 41, "You don't have enough silver.");
@@ -376,6 +393,7 @@ namespace GSOOffline
         private void SellToShop(int typeId, int itemId, int amount)
         {
             if (character == null || openShop == null) return;
+            if (openShop.currency != 0) return;   // token shops buy nothing (the client hides selling there too)
             var t = ItemData.Get(typeId);
             var it = t?.Stacks == true ? FindStack(typeId) : FindItem(itemId);
             if (t == null || it == null) return;

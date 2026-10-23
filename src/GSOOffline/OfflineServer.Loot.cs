@@ -84,7 +84,7 @@ namespace GSOOffline
                     if (d.typeId == 0) bag.silver = Random.Range(d.min, d.max + 1);
                     else AddToBag(bag, d.typeId, Random.Range(d.min, d.max + 1));
                 }
-                // The uniques and pets patch notes added after that snapshot (updates 137-140).
+                // Uniques and pets the patch notes added (updates 137-140) that the tables lack.
                 if (table != null)
                     foreach (var d in table.drops)
                         if (LaterPatch(d) && !original.Exists(o => o.typeId == d.typeId) && Random.value < d.chance)
@@ -112,7 +112,9 @@ namespace GSOOffline
         // Unity's Random.Range(0, n) is 0 for any n <= 1, as on the original server.
         private static bool OneIn(int n) => Random.Range(0, n) == 0;
 
-        // Snapshot of the original server's Loot.xml: about update 136.
+        // Patch-note drops newer than this go on top of the original's tables when the tables lack them. The tables
+        // now come from the original's develop branch, which has most of them; a few never reached Loot.xml (Argus's
+        // and George's pets, Serpent's Fang, Roke's ring on his other copies).
         private const int OriginalLootUpdate = 136;
 
         private static bool LaterPatch(LootDrop d)

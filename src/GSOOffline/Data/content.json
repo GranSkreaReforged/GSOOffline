@@ -333,6 +333,7 @@
     { "type": 315, "note": "Q33: the expedition's navigator, camped on the Dead Lake's south-east shore in Goldon", "scene": 18, "spawn": ["726,7.6,630"] },
     { "type": 316, "note": "Q33: an expedition hunter", "scene": 18, "spawn": ["731,7.8,634"] },
     { "type": 317, "note": "Q33: an expedition hunter", "scene": 18, "spawn": ["722,8.8,626"] },
+    { "type": 314, "note": "Q33: the Artisans guild master tailor (no marker, and the original's last npcData_20 dropped him, but quest 33 still needs him; its earlier spawn point)", "scene": 20, "spawn": ["493.0,100.13,-303.2"] },
     { "type": 181, "note": "Q21: the troll the soloman fish attracted (original server spawn point)", "quest": 21, "phases": [4], "scene": 13, "spawn": ["1398,8.5,942.7"] },
     { "type": 231, "quest": 23, "phases": [ 9, -1 ], "note": "Q23: Lakhmu at home once he is out of the caves" },
     { "type": 8,  "note": "Alden at the start of Q1", "quest": 1, "phases": [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ] },
