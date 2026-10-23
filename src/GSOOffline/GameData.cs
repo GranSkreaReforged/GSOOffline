@@ -20,8 +20,8 @@ namespace GSOOffline
         public string name;
         public int level;
         public int health;
-        public int fullHealth;         // a boss's original health, before the character's share (CombatRules.BossHealthShare)
-        public bool sharedHealth;      // a boss without explicit health: health = fullHealth x the share
+        public int fullHealth;         // original health, before the character's share (CombatRules.WorldShare)
+        public bool sharedHealth;      // a boss or creature without explicit health: health = fullHealth x the share
         public bool canFight;
         public int respawnTime;
         public bool ordinary;          // no respawntime in the data and not a boss: a plain creature (CombatRules tunes these)
@@ -32,6 +32,7 @@ namespace GSOOffline
         public float attackDelay;      // seconds into a swing before the blow lands
         public float attackMissDistance;   // a melee blow misses if the player got this much beyond reach
         public int damage;             // explicit damage (rare); 0 = derive from level
+        public int aiBehaviour;        // the original's AICycles behaviour: 0 melee, 1 slowing blows, 2 patrols, 3 a share of your health
         public bool boss;              // boss="1": double experience
         public int defence;
         public int damageBlock;
@@ -142,11 +143,9 @@ namespace GSOOffline
             }
         }
 
-        // Bosses the data doesn't flag: Argus ("New lvl 35 boss Argus", update 139). His damage value (8) is on
-        // another scale, so his blows use the boss formula (CombatRules.NpcMaxHit).
-        private static readonly HashSet<int> UnflaggedBosses = new HashSet<int> { 358 };
+        private static bool IsBoss(XmlNode n) => IntAttr(n, "boss") == 1;
 
-        private static bool IsBoss(XmlNode n) => IntAttr(n, "boss") == 1 || UnflaggedBosses.Contains(IntAttr(n, "id"));
+        private const int ElderEnt = 376;   // the original gave it 30% more than its level's health
 
         private static void LoadNpcs()
         {
@@ -159,10 +158,10 @@ namespace GSOOffline
                     id = IntAttr(n, "id"),
                     name = Attr(n, "name"),
                     level = level,
-                    // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses get
-                    // the character's share of theirs (ApplyBossHealthShare).
-                    fullHealth = IntAttr(n, "health", IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)),
-                    sharedHealth = IsBoss(n) && Attr(n, "health") == null,
+                    // Only a couple of entries carry explicit health; the rest was a server-side formula. Bosses and
+                    // creatures get the character's share of theirs (ApplyWorldShare).
+                    fullHealth = IntAttr(n, "health", (int)((IsBoss(n) ? CombatRules.BossHealth(level) : CombatRules.NpcHealth(level)) * (IntAttr(n, "id") == ElderEnt ? 1.3f : 1f))),
+                    sharedHealth = (IsBoss(n) || IntAttr(n, "canfight") == 1) && Attr(n, "health") == null,
                     canFight = IntAttr(n, "canfight") == 1,
                     // In seconds. The data's respawntime is in minutes (Aellope's 60 is the wiki's "60 minutes") and
                     // only bosses and quest NPCs have one; the wiki gives ordinary creatures 2 minutes.
@@ -175,6 +174,7 @@ namespace GSOOffline
                     attackDelay = IntAttr(n, "attackdelay", 600) / 1000f,
                     attackMissDistance = IntAttr(n, "attackmissdistance", 1),
                     damage = IntAttr(n, "damage"),
+                    aiBehaviour = IntAttr(n, "aibehaviour"),
                     boss = IsBoss(n),
                     ordinary = Attr(n, "respawntime") == null && !IsBoss(n),
                     defence = IntAttr(n, "defence", level),   // the original: unset defence is the NPC's level
@@ -201,7 +201,7 @@ namespace GSOOffline
                 if (info.projectiles.Length > 0) info.projectile = info.projectiles[0];
                 Npcs[info.id] = info;
             }
-            ApplyBossHealthShare();
+            ApplyWorldShare();
         }
 
         // Buff ids XMLs/Buffs marks canberemoved: the ones death ends (the original's RemoveAllBuffs).
@@ -213,11 +213,11 @@ namespace GSOOffline
                 if (n.NodeType == XmlNodeType.Element && IntAttr(n, "canberemoved") == 1) RemovableBuffs.Add(IntAttr(n, "id"));
         }
 
-        /// <summary>Bosses' health from CombatRules.BossHealthShare (the character's choice).</summary>
-        public static void ApplyBossHealthShare()
+        /// <summary>Bosses' and creatures' health from CombatRules.WorldShare (the character's choice).</summary>
+        public static void ApplyWorldShare()
         {
             foreach (var info in Npcs.Values)
-                if (info.sharedHealth) info.health = Mathf.Max(1, (int)(info.fullHealth * CombatRules.BossHealthShare));
+                if (info.sharedHealth) info.health = Mathf.Max(1, (int)(info.fullHealth * CombatRules.WorldShare(info)));
         }
     }
 }

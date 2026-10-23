@@ -132,7 +132,7 @@ namespace GSOOffline
             var tmpl = ItemData.Get(t);
             var flags = tmpl?.flags;
             string name = (tmpl?.name ?? string.Empty).ToLowerInvariant();
-            if (t == 274) return 23;                         // Roke's staff: skull spell
+            if (t == 274 || t == 473) return 23;             // Roke's and Lydia's staffs: skull spell
             if (ih.isCrossBow(t)) return 6;
             if (ih.isBow(t)) return 5;
             if (flags != null && flags.Contains("isIceStaff")) return 28;

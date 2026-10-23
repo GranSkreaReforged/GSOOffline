@@ -5,6 +5,54 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-10-24
+### Changed
+- Fate brokers can now soften the whole world, not only bosses' health (#117, #118). One choice sets bosses' and creatures' health and damage together, bosses always losing more: bosses 85% and creatures 90%, 75% and 85%, 50% and 75%, or 25% and 65% (all at 100% is the original). It covers creatures' blows and shots, Argus, Argo and Argi, and the bosses' own attacks (hazards, novas, poison fields, Phraustie's snowballs, George's dynamite, Sytrax's fire and Sepitus's bolts). Traps, lava and other hazards of the land, guards and bounty outlaws are unchanged. A character who gave bosses 75%, 50% or 25% of their health keeps that setting, now with the matching creature share and lighter boss blows. Creatures already in the scene take the new health at once, their health bars too, and the broker says the world will feel easier.
+- The menu's "Report a bug or give feedback" button opens GSO Offline's GitHub page for a new bug report. It opened a feedback form that sent to the shut-down server.
+- Item windows no longer have a Wiki button: the game's wiki is gone, so it opened a dead page.
+- Seasonal events: each event crate that drops is the 2019 or the 2020 one at random, so both years' pets, outfits and furniture can still be found (the crate drop rate is unchanged).
+- Creature drops, shop stock, house plots and extra spawns now come from a later snapshot of the original server, one with everything the final game client has. Drops double (1049 instead of 487): ten bosses get their real tables instead of wiki guesses (Bruno, Betsy, Argi, Lydia, Lakhar, Sarah, Jotnar, the Elder Ent, Ents and the Aggravated Ice Elemental), and 39 creatures' drops changed, such as the Supreme Sea Serpent's scales, fangs, Shadow armor and teleport scrolls. Creatures the original knew but gave no table drop nothing from one.
+- Shops follow the final stock lists: the Tools vendor sells a shovel, a knife and a mortar, with smaller tool stocks; the General store sells The fundamentals of upgrading; light armor shops add Troll leather quivers and dragon leather.
+- The pet guard is rarer in iron, verum and stranite gear crates (1 in 35,000, 14,000 and 10,000).
+- Gear crates from creatures below level 20 drop half as often, and from levels 30-39 a third less often, as in the final server.
+- The few NPCs the final server no longer spawned are gone (six old-style Argi in Bal Sardan, Wynford, the logger, Ferrarius and the travelling axe seller in East Athagos, and Joannia in Yorkhill). The Artisans guild master tailor stays, as quest 33 needs him.
+- Combat uses the original server's last numbers instead of the patch notes' estimates: creatures have 100 + 6.75 x level^2.3 health and bosses 100 + 15 x level^2.3 (the Elder Ent 30% more), creatures hit up to 10 + 0.67 x level^2 and bosses 10 + 0.8 x level^2.
+- Abilities follow the original's last formulas: Flames, Dragon flames, Blast, Eruption and its Combustion, Combustion, Firestorm, Landmine, Explosive arrow, Tritone, Healing music and Healing aura, the venom and thorny vines arrows (half again on creatures), Fire arrows and the bow's fire arrow burn. Energy blade lets off everything it stored, up to 1,000 x Swordsmanship.
+- Condensed psyche, Condensed ice, the Halberd ice attack and the archery Landmine run the original's code instead of reconstructions, and Serpent's Fang and the Storage guard's crossbow carry the original's abilities (Fang: Halberd ice attack, Condensed ice, Cripple, Heavy shield block; crossbow: Explosive arrow, Hunting net, Barrage, Landmine). Ones you already have are updated.
+- Argus, Argo and Argi hit for a share of your health (8%, 4% and 2%, halved once you're hurt) that goes past your armor, and Argus is no longer a boss. Bruno slows you with each blow.
+- George focuses every 30 seconds, swinging three times as fast for 6 seconds; Nirish's poison clouds take longer to turn poisonous but last longer; Phraustie's snowball storm is smaller; the Coral dungeon's explosions burst around the Red crab, more and harder the more it's hurt, and stop when it dies.
+- Flying followers add 1% damage per grade.
+- A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild follow the original server's last code instead of reconstructions:
+  - A Magical Journey: casting Flame Lance passes Kromwell's test, Arthos sends you on with a word once he's had his beer, Horatius greets passers-by, and finishing gives 500 Elemental grimoire experience.
+  - Commander Grant's Gloves: he hands over his two gloves; combining them fails and destroys the spare pair, and he gives you his upgrade stone to use on the gloves instead. He takes back whatever is left of his things when he pays you.
+  - Joining the Hunters Guild: the guild in Trout has its door again. Show the Porter your insignia and the door opens; without it, he stops you. If you lose the insignia he sends you after the bear again for a new one.
+- Nimuel Reyes recognises any of the three pieces of St. Jakob's mantle, and his words when he makes you a new Ring of the Monastery are the original's.
+- During the Halloween and Christmas events creatures drop the 2020 crates, as the original's last version did: the Halloween 2020 crate has the Reaper's robes and scythe and the Headless Reaper pet, the Christmas 2020 crate the Snowman pet, each with its own untradeable pet that comes within 500 crates. 2019 crates you already have still open.
+
+### Added
+- A Quick deposit button in the bank window puts every stack in your bag that the bank already has a stack of into the bank in one click (#114). Items on your item hotbar and equipped items stay in the bag, and nothing new goes into the bank.
+- A shield taken off by a two-handed weapon, bow or gathering tool goes back on with the next one-handed weapon, whether you switch weapons or equip one from the bag (#124). Its ability cooldowns keep running while it's off, and it's remembered across a logout. Equipping a shield yourself, or no longer carrying it, ends that.
+- 19 house plots around East Athagos (29 there instead of 10).
+- The South Athagos and Bal Amana teleport scrolls take you there.
+- Commander Grant's untradeable small grade stone grades items like a small grade stone.
+- Each oyster you catch can bring up a Sardanian weapon crate (1 in 200) or Ancient Sardanian Alloy (1 in 5,000).
+- Shops can take an item instead of silver, as the original's could. The Hunters Guild's shops took its tokens, which only its monster bounties paid; with no way to earn them offline, they keep selling for silver as before.
+- The staffs' summons: Lydia's staff calls a skeletal berserk and Roke's a skeleton for 118 seconds. They fight what you fight, hold part of your mana while they last and hit harder the more they took.
+- Unique gear effects: the Storage guard's set (explosive arrows and landmines), the Dark Tamer's set (pets and summons hit harder, summoning costs less), Nature's blessing (less healing received), Jotnar's body and chaps (Embrace the pain becomes Survivor, Mana surge becomes Life surge, and together they count your light armor as heavy for its passive), the Hunter's body and legs (longer Windwalking), Berserker's helmet and amulet (longer Strength and Charge), Bruno's bracers and boots (harder, slowing punches), Jin and Li (Swordsmanship punches, slashing punches), the Barrage (longer, lighter volleys), the Thorn (harder piercing shots), the Venomous quiver (a longer Ooze poison), Lydia's earrings and Roke's ring (stronger summons), Zalranaz's cleaver (a bigger electric splash) and the Tomb guardian's amulet (stronger Condensed psyche).
+- Argus falls apart into three Argo when killed, and each Argo into four Argi.
+- The fundamentals of upgrading (Commander Grant's reward and in the General store) can be read.
+- The Mages guild's initiates, apprentices and scribes and Glacies have their lines.
+
+### Fixed
+- Changing weapons no longer leaves the old ability's cooldown on the new one's key (it showed, and blocked the key, until it ran out). Each weapon ability keeps its own cooldown, which keeps running while that weapon is on your back, so switching back no longer seems to reset it.
+- Healing music and Healing aura no longer show the Life surge icon.
+- Truce and Traverse protect you from all damage again, as in the original: lava, Sepitus's bolts, Phraustie's snowballs, the Coral dungeon's wave, boss hazards, poisons and bleeds as well as blows (#120).
+- NPCs only talk to you within 10 m, as in the original: clicking one from far away (the bank, a ferryman) says it's too far away instead of opening the conversation (#115).
+- High-grade gear keeps its sparkles after going through a gate or door into another area (#123).
+- The Poacher dungeon's level 70 ghosts drop their loot (fluorite, poisons, the Amulet of Frost...): the original server filed their table under the Elder Cave Dragon, so the dragons dropped it and the ghosts nothing (#116).
+- Sytrax and Viper drop loot. The original gave them none, so their tables are made up from their neighbours': Sytrax drops dragon materials, shadow armour and his tooth (1 in 25), Viper serpent meat and scales, poisons, the venomous ring and amulet and, rarely, the Snakeling pet; both drop silver, teleports and potions like other bosses (#116).
+- Lydia, the Tamer's Apprentice, is back where players remember her: on the hillside with the standing stones in the mountains of southern East Athagos, instead of further east among the skeletons (#122).
+
 ## [1.8.0] - 2026-10-21
 ### Changed
 - Bounty outlaws fight like players with the original's weapons: each weapon's own basic blow, damage kind and speed, and the abilities its weapon and shield rolled (original formulas and cooldowns: stuns, roots, burns, shield block, Flame barrier, fire walls, landmines) instead of made-up ones.

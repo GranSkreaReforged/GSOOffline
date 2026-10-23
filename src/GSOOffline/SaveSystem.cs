@@ -170,6 +170,8 @@ namespace GSOOffline
         public List<ItemSave> items = new List<ItemSave>();
         public int nextItemId = 1;
         public int secondaryWeaponId;   // weapon carried on the back (item id in items, not equipped); 0 = none
+        public int offhandRestoreId;    // shield a two-handed weapon or tool pushed off, back on with a one-handed weapon; 0 = none
+        public long offhandReadyAt3, offhandReadyAt4;      // UTC ms (DateTime ticks / 10000): when its slot 3-4 abilities are ready again
 
         public List<QuestState> quests = new List<QuestState>();
         public List<QuestVar> questVars = new List<QuestVar>();
@@ -179,6 +181,8 @@ namespace GSOOffline
         public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
         public int christmasPetCounter;   // Christmas 2019 crates opened without the untradeable Reindeer; -1 = got it
         public int halloweenPetCounter;   // Halloween 2019 crates opened without the untradeable Bat; -1 = got it
+        public int halloween2020PetCounter;   // Halloween 2020 crates opened without the untradeable Headless Reaper; -1 = got it
+        public int christmas2020PetCounter;   // Christmas 2020 crates opened without the untradeable Snowman; -1 = got it
         public HouseSave house;           // null = no house
         public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
         public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)

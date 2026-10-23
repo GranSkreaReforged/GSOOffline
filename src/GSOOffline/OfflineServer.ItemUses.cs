@@ -19,8 +19,8 @@ namespace GSOOffline
         private const int GfxExplosion = 73, SfxExplosion = 219, GfxPartyBlower = 154, SfxPartyBlower = 430, SfxPageTurn = 406;
         private const int AlchemySkill = 8;
 
-        // Books (the item data's Book stat) and their pages, from the original Scr_Books. Book 2 was a test book and
-        // book 4 (The fundamentals of upgrading) came after the archived server, so neither has text.
+        // Books (the item data's Book stat) and their pages, from the original Scr_Books. Book 2 was a test book with
+        // no text.
         private class Book
         {
             public string title;
@@ -34,6 +34,13 @@ namespace GSOOffline
                 "The best quality and fastest growing time from seed to fully grown plant of roughly 36 hours was achieved by using an 8-phase treatment plan.\n\nEach phase lasted for roughly 4.5 hours and consisted of different treatments such as watering and using different fertilizers. The best technique is described here, details of the other experiments can be found in Appendix 9.\n\nFailing to treat the plant according to the plan resulted in noticeable decline in the plant's health.",
                 "Fibervine\n\n\n\nPhase 1. Water (3 buckets)\nPhase 2. Water (1 bucket)\nPhase 3. Red Fertilizer (2 buckets)\nPhase 4. -\nPhase 5. Red Fertilizer (2 buckets)\nPhase 6. Block sunlight (optional)\nPhase 7. -\nPhase 8. Water (1 bucket)",
                 "Required fertilizer: Red fertilizer\n\nCan be produced using an alchemists' workbench. \n- 10 tomatoes\n- 5 carrots\n- 25 redberries",
+            } } },
+            { 10731, new Book { title = "The fundamentals of upgrading", pages = new[] {
+                "Combining:\nIt is possible to upgrade an item by combining 2 indentical items that have the same grade in your inventory\nRemember to select your material FIRST and the item you want to upgrade SECOND.\nTo this day there is no known way to restore materials that were consumed in the upgrade process. So be careful about what you combine.",
+                "Upgrade stones:\nUpgrade stones can replace any item inside the specified level range as an upgrade material. Their grade and the grade of the item you are upgrading have to be identical.\n\nList of known upgrade stones:\n o  \u2800Small: Works on items up to item level 25\n o\u2800  Medium: Works on items up to item level 50\n o\u2800  Large: Works on items up to item level 75",
+                "Grade stones:\nGrade stones can be combined with an item in the specified level range to instantly upgrade said item to their grade. This process is really easy to do so even an idiot can do it without failure.\n\nList of known grade stones:\n o\u2800  Small: Works on items up to item level 25\n o  \u2800Medium: Works on items up to item level 50\n o\u2800  Large: Works on items up to item level 75",
+                "Multipliers:\nHolding a grade will apply a multiplier to all stats and the value of an item.\n Multipliers to item stats:\n o\u2800  Damaged: 88%\n o\u2800  Normal: 100%\n o\u2800  Unusual: 112%\n o\u2800  Rare: 124%\n o\u2800  Unique: 136%\n o  \u2800Epic: 148%\n o\u2800  Legendary: 160%\n o\u2800  Mythic: 172%",
+                "Weapons and Pets gain an addional multiplier to their damage output based on their grade:\n o  \u2800Damaged: -6%\n o  \u2800Normal: +0%\n o  \u2800Unusual: +6%\n o\u2800  Rare: +12%\n o\u2800  Unique: +18%\n o\u2800  Epic: +24%\n o\u2800  Legendary: +30%\n o\u2800  Mythic: +36%",
             } } },
             { 10654, new Book { title = "Goldon Chronicle", pages = new[] {
                 "Goldon 1100,\n\nPalian government had reformed the wild island Goldon, and turned it to an exiled land where they banished all the criminals to. The government wanted to maintain the perfect image of a peaceful and wealthy empire, but they also need to prepare for war. With the strict hierarchy they have set their country, they didn’t have enough labor force to work in remote and dangerous areas for rare resources.\nThus, Goldon was created. \n",

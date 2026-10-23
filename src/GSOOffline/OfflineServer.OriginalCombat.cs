@@ -227,6 +227,7 @@ namespace GSOOffline
                 CountXp(SkillArchery);
                 float r = ih.isBow(t) ? Random.Range(0.4f, 0.9f) : Random.Range(0.6f, 1.3f);
                 b.damage = (int)((SkillLevel(SkillArchery) * 10f + wl * 10 + D + StatDamageOf(DamageKinds.Piercing)) * r);
+                if (ih.isCrossBow(t) && Wears("barrage") && HasBuffFrom(AbilityFocus)) b.damage = (int)(b.damage * 0.85f);   // the Barrage's faster shots
                 b.projectile = ih.isBow(t) ? (HasBuffFrom(AbilityFireArrows) ? 41 : 5) : 6;
                 b.type = DamageKinds.Piercing;
             }
@@ -244,9 +245,9 @@ namespace GSOOffline
                 b.projectile = WeaponProjectile(weapon);
                 if (t == 380)   // Bal Sardan wand
                     b.damage = (int)((1 + (D + StatDamageOf(DamageKinds.Fire)) * 1.3f + ele * 5f + SkillLevel(SkillHealing) * 5f) * Random.Range(0.7f, 1f));
-                else if (t == 274 || ih.isWand(t))
+                else if (t == 274 || t == 473 || ih.isWand(t))
                 {
-                    // Roke's staff and the wands shoot their projectile's own damage.
+                    // Roke's and Lydia's staffs and the wands shoot their projectile's own damage.
                     if (!ProjectileDamages.ContainsKey(b.projectile)) b.projectile = 7;
                     b.explicitDamage = false;
                 }
@@ -259,10 +260,15 @@ namespace GSOOffline
             }
             else
             {
-                // Fists, tools and anything else: a punch, which stuns at most every 10 seconds.
-                CountXp(SkillWrestling);
-                b.damage = Mathf.RoundToInt(Random.Range(1f, 1 + (wl * 10 + SkillLevel(SkillWrestling) * 10) * 0.3f + StatDamageOf(DamageKinds.Blunt))) + D;
-                b.type = DamageKinds.Blunt;
+                // Fists, tools and anything else: a punch, which stuns at most every 10 seconds. In Jin it counts
+                // Swordsmanship (and Hack and slash builds it up), in Li it slashes, and Bruno's bracers add half.
+                bool jin = Wears("jin"), li = Wears("li");
+                int skill = jin ? SkillSwords : SkillWrestling;
+                b.type = li ? DamageKinds.Slash : DamageKinds.Blunt;
+                CountXp(skill);
+                b.damage = Mathf.RoundToInt(Random.Range(1f, 1 + (wl * 10 + SkillLevel(skill) * 10) * 0.3f + StatDamageOf(b.type))) + D;
+                if (jin) b.damage = HackAndSlash(b.damage);
+                if (Wears("brunosBracers")) b.damage = (int)(b.damage * 1.5f);
             }
             return b;
         }
@@ -519,6 +525,7 @@ namespace GSOOffline
                     d.nextAt += d.interval;
                     int amount = d.amount;
                     if (d.id == DotBleeding) amount = Mathf.Min(CombatRules.NpcBleedCap, (int)(n.maxHealth * CombatRules.NpcBleedShare));
+                    else if (d.id == DotSpiderVenom) amount = (int)(amount * 1.5f);   // the venom bow's poison ticks half again
                     if (d.id == DotCombustion || d.id >= 87 && d.id <= 89) PlaySound(265, NpcPosition(n), 30);
                     if (d.id == DotOoze) PlayEffect(38, NpcPosition(n));
                     else if (d.id == DotSpiderVenom || d.id == DotWeakPoison) PlayEffect(110, NpcPosition(n));
@@ -648,7 +655,7 @@ namespace GSOOffline
             for (int k = 1; k < DamageKinds.Count; k++)
                 if (info.resistance[k] != 0) res.Add(DamageKinds.Name(k) + " " + info.resistance[k]);
             var blow = BasicBlow(weapon);
-            Plugin.Log.LogInfo($"[dev] {info.name} ({typeId}) level {info.level}{(info.boss ? " boss" : "")}: health {info.health}, hits 1-{CombatRules.NpcMaxHit(info) - 1} " +
+            Plugin.Log.LogInfo($"[dev] {info.name} ({typeId}) level {info.level}{(info.boss ? " boss" : "")}: health {info.health}, hits 1-{(int)((CombatRules.NpcMaxHit(info) - 1) * CombatRules.WorldShare(info))} (fate {CombatRules.WorldShare(info):P0}) " +
                 $"{DamageKinds.Name(info.damageType)}, defence {(info.defence > 0 ? info.defence : info.level)}, block {info.damageBlock}, accuracy {info.accuracy}; " +
                 $"resistances [{string.Join(", ", res.ToArray())}]. Your basic blow now: {blow.damage} {DamageKinds.Name(blow.type)}" +
                 $"{(blow.projectile > 0 ? " (shot " + blow.projectile + ")" : "")} every {WeaponSpeed(weapon):0.00}s; health {MaxHealth()} (combat level {CombatLevel()}); ability {abilityId}");

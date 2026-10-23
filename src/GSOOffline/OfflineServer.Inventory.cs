@@ -345,21 +345,18 @@ namespace GSOOffline
             it.equipped = true;
             Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
             // A two-handed weapon and the shield slot exclude each other: the other one goes back in the bag.
-            // Gathering tools are two-handed too; a shield they push off comes back with a one-handed weapon.
+            // Gathering tools are two-handed too. A shield a two-handed weapon or tool pushes off comes back with
+            // the next one-handed weapon (RememberOffhand); equipping a shield yourself drops that.
             var hand = t.slot == "Weapon" ? it : EquippedWeapon();
             var offhand = EquippedInSlot("Shield");
-            if (t.slot == "Shield" || t.slot == "Weapon" && IsTwoHanded(it.typeId) && !IsAnyTool(it.typeId)) shieldOffForTool = 0;
+            if (t.slot == "Shield") ForgetOffhand();
             if (hand != null && offhand != null && IsTwoHanded(hand.typeId))
             {
-                if (t.slot == "Weapon" && IsAnyTool(it.typeId)) shieldOffForTool = offhand.id;
+                if (t.slot == "Weapon") RememberOffhand(offhand);
                 Unequip(t.slot == "Weapon" ? offhand.id : hand.id);
             }
-            else if (t.slot == "Weapon" && offhand == null && shieldOffForTool != 0 && !IsTwoHanded(it.typeId))
-            {
-                var shield = FindItem(shieldOffForTool);
-                shieldOffForTool = 0;
-                if (shield != null && !shield.equipped) Equip(shield.id);
-            }
+            else if (t.slot == "Weapon" && offhand == null && character.offhandRestoreId != 0 && !IsTwoHanded(it.typeId))
+                RestoreOffhand();
             GearChanged();
 
             // A weapon replaced in hand goes on the back (the client's secondary weapon, swapped with the

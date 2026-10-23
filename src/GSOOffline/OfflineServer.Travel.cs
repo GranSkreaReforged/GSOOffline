@@ -189,6 +189,7 @@ namespace GSOOffline
             var entrance = Doors.buildings.Find(b => b.scene == character.scene && Vector3.Distance(V(b.pos), at) < 3f);
             if (entrance != null)
             {
+                if (HuntersGuildDoorShut(entrance)) return true;
                 PushReturnPoint(player);
                 TeleportNear(entrance.toScene, V(entrance.toPos));
                 return true;

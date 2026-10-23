@@ -686,6 +686,36 @@ namespace GSOOffline
         // devbank: opens the bank window as a banker does.
         private static void DevBank(string[] args) => OfflineServer.Instance.DevOpenBank();
 
+        // quickdeposit: the bank window's "Quick deposit" button.
+        private static void QuickDeposit(string[] args) => GSOOffline.QuickDeposit.Deposit(Script_WindowController.instance);
+
+        // hotkeyitem <slot 0-9> <typeId>: puts the bag's item of that type on the item hotbar, as dragging it there does.
+        private static void HotkeyItem(string[] args)
+        {
+            int slot = int.Parse(args[1]), type = int.Parse(args[2]);
+            var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
+            if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }
+            var hotkeys = Script_WindowController.instance.window_itemHotkeys.items;
+            while (hotkeys.Count <= slot) hotkeys.Add(null);
+            hotkeys[slot] = stack.item;
+            Scr_RPCSender.instance.setItemHotkeySlot(stack.item.itemID, type, slot);
+        }
+
+        // iteminfo <typeId> [basic]: the bag item's info window, as right-clicking it does; with "basic", the
+        // shop/recipe info window for that item type instead.
+        private static void ItemInfo(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var wc = Script_WindowController.instance;
+            if (args.Length > 2 && args[2] == "basic") { wc.createBasicItemInfo(Scr_ItemHandler.instance.GetItemTemplate(type)); return; }
+            var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
+            if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }
+            wc.createItemInfo(stack.item);
+        }
+
+        // menubutton <windowType>: a menu bar button (22 = report a bug), as clicking it does.
+        private static void MenuButton(string[] args) => Script_WindowController.instance.ToggleWindowType(int.Parse(args[1]));
+
         // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
         private static void SortInv(string[] args)
         {
@@ -779,7 +809,7 @@ namespace GSOOffline
         // lootage <seconds>: ages every bag on the ground by that much playing time (bags go at 0).
         private static void LootAge(string[] args) => OfflineServer.Instance.DevAgeLoot(float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture));
 
-        // lootroll <npcType> [n]: rolls that NPC type's drop table n times (default 1000) and logs the totals.
+        // lootroll <npcType> [n]: rolls that NPC type's drop table (and any event crates) n times (default 1000) and logs the totals.
         private static void LootRoll(string[] args) =>
             OfflineServer.LogLootRolls(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 1000);
 

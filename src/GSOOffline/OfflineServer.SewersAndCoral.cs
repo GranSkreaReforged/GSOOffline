@@ -11,7 +11,8 @@ namespace GSOOffline
     /// Coral dungeon (scenes 27 and 28, Scr_CoralDungeon): the caves are flooded (the water is a spawned object), and
     /// three tidal waves sweep through them at 15 m/s; one that catches you stuns you and 3 s later washes you back to
     /// the entrance, 30% of your health lost. When all three have passed the water settles, and they come again
-    /// 30-60 s later. In the second part, explosions burst around the hall every 4 s.
+    /// 30-60 s later. In the second part, while the Red crab lives, explosions burst around it every 4 s (2 s below a
+    /// quarter of its health), more the more it's hurt.
     /// </summary>
     public partial class OfflineServer
     {
@@ -60,7 +61,7 @@ namespace GSOOffline
             if (supported || PlayerDead || !(me.z < 231.5f && me.z > 220.5f && me.x > 142f && me.x < 148f && me.y > 59.5f)) return;
             if (!bridgeCollidersShown) return;
             // The bridge gives way: stunned for 2 s while it drops out from under you, back 2 s later.
-            Notice("The bridge collapses under your weight!", "red");
+            Notice("The bridge collapses under your weight! Maybe you can place something underneath it for support, like a beam", "red");
             StunPlayer(2f);
             bridgeCollidersShown = false;
             bridgeBackAt = Time.time + 2f;
@@ -203,7 +204,7 @@ namespace GSOOffline
                     if (character == null || PlayerDead || world == null || world.sceneId != SceneCoral) return;
                     UpdateCanMove();
                     Teleport(SceneCoral, CoralEntrance);
-                    Notice("A massive wave knocks you unconscious!", "red");
+                    Notice("A massive wave knocks you unconscious! You notice the path of the wave has swept away all the vegetation.", "red");
                     HurtPlayer(Mathf.RoundToInt(character.currentHealth * 0.3f), SplashPlain);
                 });
                 break;
@@ -212,23 +213,32 @@ namespace GSOOffline
 
         private static int CoralUid(int i) => CoralUidBase + i;
 
-        /// <summary>The hall: 7 warning swirls every 4 s around its middle, bursting 2-3 s later (6 m).</summary>
+        private const int RedCrab = 164;
+
+        /// <summary>
+        /// The hall, while the Red crab lives: every 4 s (2 s below a quarter of its health) 13 warning swirls, up to 26
+        /// as it's hurt, within 55 m of it, each bursting 2-3 s later (6 m, 1500-2250).
+        /// </summary>
         private void TickCoralExplosions(Vector3 me)
         {
-            if (Time.time < coralExplodeAt) return;
-            coralExplodeAt = Time.time + 4f;
-            for (int i = 0; i < 7; i++)
+            var crab = world?.npcs.Find(n => n.typeId == RedCrab && n.master == null);
+            if (crab == null || crab.dead || Time.time < coralExplodeAt) return;
+            float ratio = (float)crab.health / Mathf.Max(1, crab.maxHealth);
+            coralExplodeAt = Time.time + (ratio < 0.25f ? 2f : 4f);
+            Vector3 at = NpcPosition(crab);
+            int count = (int)(13 * (1 + (1 - ratio)));
+            for (int i = 0; i < count; i++)
             {
-                var pos = new Vector3(123f - Random.Range(-55, 55), 160.5f, 131f + Random.Range(-55, 55));
+                var pos = new Vector3(at.x + Random.Range(-55, 55), at.y, at.z + Random.Range(-55, 55));
                 PlayEffect(75, pos);
                 Later(Random.Range(2f, 3f), () =>
                 {
-                    if (world == null || world.sceneId != SceneCoralHall) return;
+                    if (world == null || world.sceneId != SceneCoralHall || crab.dead) return;
                     PlayEffect(76, pos);
                     PlaySound(359, pos, 60);
                     var p = LocalPlayer;
                     if (p != null && !PlayerDead && Vector3.Distance(pos, p.transform.position) < 6f)
-                        Plugin.Log.LogInfo($"[dungeon] coral explosion hits the player for {HurtByOriginal(Random.Range(1000, 1501), DamageKinds.Blunt)}");
+                        Plugin.Log.LogInfo($"[dungeon] coral explosion hits the player for {HurtByOriginal(Random.Range(1500, 2251), DamageKinds.Blunt)}");
                 });
             }
         }

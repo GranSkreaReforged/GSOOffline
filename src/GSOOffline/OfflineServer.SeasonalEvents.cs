@@ -9,12 +9,15 @@ namespace GSOOffline
     /// The Halloween and Christmas events, as the original server ran them (Scr_HalloweenEvent, Scr_ChristmasEvent,
     /// Scr_NpcHandler.dropLoot): while one is on, every creature can drop that event's crate, more likely the higher
     /// its level. During Halloween one group of creatures (crabs, wolves, skeletons...) drops them twice as often,
-    /// a different group each hour; the talking pumpkin tells you which. The original's staff switched the events on
-    /// and off by hand; offline they follow the calendar (<see cref="Plugin.SeasonalEvents"/>).
+    /// a different group each hour; the talking pumpkin tells you which. The original's last version dropped only the
+    /// 2020 crates; offline each crate that drops is from 2019 or 2020 at random, so every year's items stay obtainable
+    /// (the crate rate is the original's). The original's staff switched the events on and off by hand; offline they
+    /// follow the calendar (<see cref="Plugin.SeasonalEvents"/>).
     /// </summary>
     public partial class OfflineServer
     {
         private const int HalloweenCrate = 10667, BatUntradeable = 444;
+        private const int HalloweenCrate2020 = 10757, ReaperUntradeable = 512, ChristmasCrate2020 = 10770, SnowmanUntradeable = 514;
 
         // The original's dates aren't recorded; these frame the holidays.
         private static bool HalloweenSeason(DateTime d) => (d.Month == 10 && d.Day >= 15) || (d.Month == 11 && d.Day <= 7);
@@ -89,15 +92,79 @@ namespace GSOOffline
             {
                 int oneIn = EventCrateOneIn(info.level);
                 if (Array.IndexOf(HalloweenGroup(), info.id) >= 0) oneIn /= 2;
-                if (OneIn(Mathf.Max(1, oneIn))) AddToBag(bag, HalloweenCrate, 1);
+                if (OneIn(Mathf.Max(1, oneIn))) AddToBag(bag, AnyYear(HalloweenCrates), 1);
             }
             if (ChristmasActive && OneIn(Mathf.Max(1, EventCrateOneIn(info.level))))
-                AddToBag(bag, ChristmasCrate, 1);
+                AddToBag(bag, AnyYear(ChristmasCrates), 1);
         }
+
+        // Each event's crates, one per year; a dropped crate is any of them, equally likely.
+        private static readonly int[] HalloweenCrates = { HalloweenCrate, HalloweenCrate2020 };
+        private static readonly int[] ChristmasCrates = { ChristmasCrate, ChristmasCrate2020 };
+
+        private static int AnyYear(int[] crates) => crates[Random.Range(0, crates.Length)];
 
         // 1 in 29 at level 1 down to 1 in 10 at level 50, then 1 in 9 at 55... and every kill from level 95.
         private static int EventCrateOneIn(int level) =>
             level > 50 ? (int)(10 - (level - 50) * 0.2) : (int)(30 - level * 0.4);
+
+        // The 2020 crate's extras (Scr_HalloweenEvent.AddDefaultItems and the crate's own): the 2019 furniture less the
+        // pumpkin decoration, the Reaper's robes and scythe, and the tradeable Headless Reaper.
+        private static readonly int[][] Halloween2020Extras =
+        {
+            new[] { 10700, 40 }, new[] { 10686, 350 }, new[] { 10687, 40 }, new[] { 10688, 150 }, new[] { 10689, 75 },
+            new[] { 10690, 1000 }, new[] { 10691, 50 }, new[] { 10692, 350 }, new[] { 10693, 40 }, new[] { 10694, 40 },
+            new[] { 10695, 50 }, new[] { 10697, 250 }, new[] { 10698, 300 }, new[] { 10699, 150 },
+            new[] { 504, 150 }, new[] { 505, 150 }, new[] { 507, 150 }, new[] { 506, 250 }, new[] { 511, 1000 },
+        };
+
+        /// <summary>The Halloween 2020 crate: candy (again 1 in 3), the extras, and the untradeable Headless Reaper once.</summary>
+        private bool TryOpenHalloween2020Crate(int typeId)
+        {
+            if (typeId != HalloweenCrate2020) return false;
+            if (PlayerDead) return true;
+            TakeItems(typeId, 1);
+            var player = LocalPlayer;
+            if (player != null) PlaySound(CrateSound, player.transform.position, 20);
+            Plugin.Log.LogInfo($"[item] opening {ItemData.Get(typeId)?.name}");
+            do GiveFromCrate(Weighted(HalloweenCandy));
+            while (OneIn(3));
+            foreach (var e in Halloween2020Extras)
+                if (OneIn(e[1])) GiveFromCrate(e[0]);
+            character.halloween2020PetCounter = PityPet(character.halloween2020PetCounter, ReaperUntradeable);
+            return true;
+        }
+
+        /// <summary>The Christmas 2020 crate: Christmas food (again 1 in 3), the untradeable Snowman once, the extras
+        /// (as 2019's, with the tradeable Snowman instead of the Reindeer).</summary>
+        private bool TryOpenChristmas2020Crate(int typeId)
+        {
+            if (typeId != ChristmasCrate2020) return false;
+            if (PlayerDead) return true;
+            TakeItems(typeId, 1);
+            var player = LocalPlayer;
+            if (player != null) PlaySound(CrateSound, player.transform.position, 20);
+            Plugin.Log.LogInfo($"[item] opening {ItemData.Get(typeId)?.name}");
+            do GiveFromCrate(Weighted(ChristmasFood));
+            while (OneIn(3));
+            character.christmas2020PetCounter = PityPet(character.christmas2020PetCounter, SnowmanUntradeable);
+            foreach (var e in ChristmasExtras)
+                if (OneIn(e[1])) GiveFromCrate(e[0] == 447 ? 513 : e[0]);   // the tradeable Snowman instead of the Reindeer
+            return true;
+        }
+
+        /// <summary>An untradeable event pet: 1 in 500 with the first crate, 1 in 499 with the next..., then never
+        /// again (counter -1). Returns the new counter.</summary>
+        private int PityPet(int counter, int pet)
+        {
+            if (counter < 0) return counter;
+            if (OneIn(500 - counter))
+            {
+                GiveFromCrate(pet);
+                return -1;
+            }
+            return counter + 1;
+        }
 
         /// <summary>The Halloween 2019 crate: candy (again 1 in 3), the untradeable Bat once, and the extras.</summary>
         private bool TryOpenHalloweenCrate(int typeId)

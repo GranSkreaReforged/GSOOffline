@@ -84,6 +84,13 @@ namespace GSOOffline
             { 10739, 11 },   // Deepheart
         };
 
+        // Teleport scrolls to a spot rather than a wayshrine (the original's Scr_PlayerInventory positions).
+        private static readonly Dictionary<int, KeyValuePair<int, Vector3>> TeleportSpots = new Dictionary<int, KeyValuePair<int, Vector3>>
+        {
+            { 10531, new KeyValuePair<int, Vector3>(13, new Vector3(831f, 12f, 596f)) },   // South Athagos
+            { 10538, new KeyValuePair<int, Vector3>(7, new Vector3(469f, 5f, 98f)) },      // Bal Amana
+        };
+
         // Experience scrolls (16/3 after the client's skill picker): community wiki amounts; Small isn't recorded.
         private static readonly Dictionary<int, int> ExperienceScrolls = new Dictionary<int, int>
         {
@@ -102,8 +109,10 @@ namespace GSOOffline
             else if (Alcohol.TryGetValue(typeId, out float drunk)) DrinkAlcohol(typeId, drunk);
             else if (t != null && t.food > 0) EatFood(typeId, t);
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
+            else if (TeleportSpots.TryGetValue(typeId, out var spot)) ReadTeleportScroll(typeId, spot.Key, spot.Value);
             else if (ReadHouseTeleport(typeId)) { }
-            else if (TryOpenCrate(typeId) || TryOpenHalloweenCrate(typeId) || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
+            else if (TryOpenCrate(typeId) || TryOpenHalloweenCrate(typeId) || TryOpenHalloween2020Crate(typeId) || TryOpenChristmas2020Crate(typeId)
+                     || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 
@@ -210,14 +219,20 @@ namespace GSOOffline
                 Notice("That teleport leads nowhere offline.", "gray");
                 return;
             }
-            if (TeleportCoolingDown()) return;
+            Plugin.Log.LogInfo($"[item] {ItemData.Get(typeId)?.name} -> wayshrine {w.id} {w.name}");
+            ReadTeleportScroll(typeId, w.scene, w.pos);
+        }
+
+        private void ReadTeleportScroll(int typeId, int scene, Vector3 pos)
+        {
+            if (PlayerDead || TeleportCoolingDown()) return;
             TakeItems(typeId, 1);
             StartTeleportCooldown();
-            Plugin.Log.LogInfo($"[item] {ItemData.Get(typeId)?.name} -> wayshrine {w.id} {w.name}");
+            Plugin.Log.LogInfo($"[item] {ItemData.Get(typeId)?.name} -> scene {scene} {pos}");
             var player = LocalPlayer;
             if (player != null) PlayEffect(GfxTeleport, player.transform.position);
             arrivalGfx = GfxTeleportLand;
-            Teleport(w.scene, w.pos);
+            Teleport(scene, pos);
         }
 
         /// <summary>16/3 from the experience scroll window: skill id, scroll type id.</summary>
