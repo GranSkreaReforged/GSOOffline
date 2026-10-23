@@ -41,6 +41,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Truce and Traverse protect you from all damage again, as in the original: lava, Sepitus's bolts, Phraustie's snowballs, the Coral dungeon's wave, boss hazards, poisons and bleeds as well as blows (#120).
 - NPCs only talk to you within 10 m, as in the original: clicking one from far away (the bank, a ferryman) says it's too far away instead of opening the conversation (#115).
 - High-grade gear keeps its sparkles after going through a gate or door into another area (#123).
+- The Poacher dungeon's level 70 ghosts drop their loot (fluorite, poisons, the Amulet of Frost...): the original server filed their table under the Elder Cave Dragon, so the dragons dropped it and the ghosts nothing (#116).
+- Sytrax and Viper drop loot. The original gave them none, so their tables are made up from their neighbours': Sytrax drops dragon materials, shadow armour and his tooth (1 in 25), Viper serpent meat and scales, poisons, the venomous ring and amulet and, rarely, the Snakeling pet; both drop silver, teleports and potions like other bosses (#116).
 
 ## [1.8.0] - 2026-10-21
 ### Changed
