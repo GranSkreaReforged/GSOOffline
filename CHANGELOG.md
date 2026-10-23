@@ -16,6 +16,11 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - Argus, Argo and Argi hit for a share of your health (8%, 4% and 2%, halved once you're hurt) that goes past your armor, and Argus is no longer a boss. Bruno slows you with each blow.
 - George focuses every 30 seconds, swinging three times as fast for 6 seconds; Nirish's poison clouds take longer to turn poisonous but last longer; Phraustie's snowball storm is smaller; the Coral dungeon's explosions burst around the Red crab, more and harder the more it's hurt, and stop when it dies.
 - Flying followers add 1% damage per grade.
+- A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild follow the original server's last code instead of reconstructions:
+  - A Magical Journey: casting Flame Lance passes Kromwell's test, Arthos sends you on with a word once he's had his beer, Horatius greets passers-by, and finishing gives 500 Elemental grimoire experience.
+  - Commander Grant's Gloves: he hands over his two gloves; combining them fails and destroys the spare pair, and he gives you his upgrade stone to use on the gloves instead. He takes back whatever is left of his things when he pays you.
+  - Joining the Hunters Guild: the guild in Trout has its door again. Show the Porter your insignia and the door opens; without it, he stops you. If you lose the insignia he sends you after the bear again for a new one.
+- Nimuel Reyes recognises any of the three pieces of St. Jakob's mantle, and his words when he makes you a new Ring of the Monastery are the original's.
 
 ### Added
 - 19 house plots around East Athagos (29 there instead of 10).
@@ -26,6 +31,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - The staffs' summons: Lydia's staff calls a skeletal berserk and Roke's a skeleton for 118 seconds. They fight what you fight, hold part of your mana while they last and hit harder the more they took.
 - Unique gear effects: the Storage guard's set (explosive arrows and landmines), the Dark Tamer's set (pets and summons hit harder, summoning costs less), Nature's blessing (less healing received), Jotnar's body and chaps (Embrace the pain becomes Survivor, Mana surge becomes Life surge, and together they count your light armor as heavy for its passive), the Hunter's body and legs (longer Windwalking), Berserker's helmet and amulet (longer Strength and Charge), Bruno's bracers and boots (harder, slowing punches), Jin and Li (Swordsmanship punches, slashing punches), the Barrage (longer, lighter volleys), the Thorn (harder piercing shots), the Venomous quiver (a longer Ooze poison), Lydia's earrings and Roke's ring (stronger summons), Zalranaz's cleaver (a bigger electric splash) and the Tomb guardian's amulet (stronger Condensed psyche).
 - Argus falls apart into three Argo when killed, and each Argo into four Argi.
+- The fundamentals of upgrading (Commander Grant's reward and in the General store) can be read.
+- The Mages guild's initiates, apprentices and scribes and Glacies have their lines.
 
 ### Fixed
 - Healing music and Healing aura no longer show the Life surge icon.

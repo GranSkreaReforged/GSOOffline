@@ -117,7 +117,6 @@ namespace GSOOffline
             TickSewers();
             TickCoral();
             TickOriginalBosses();
-            TickHuntersGuildDoor();
             TickPet();
             TickSummons();
             TickRespawns();
