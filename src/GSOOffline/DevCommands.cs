@@ -779,7 +779,7 @@ namespace GSOOffline
         // lootage <seconds>: ages every bag on the ground by that much playing time (bags go at 0).
         private static void LootAge(string[] args) => OfflineServer.Instance.DevAgeLoot(float.Parse(args[1], System.Globalization.CultureInfo.InvariantCulture));
 
-        // lootroll <npcType> [n]: rolls that NPC type's drop table n times (default 1000) and logs the totals.
+        // lootroll <npcType> [n]: rolls that NPC type's drop table (and any event crates) n times (default 1000) and logs the totals.
         private static void LootRoll(string[] args) =>
             OfflineServer.LogLootRolls(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 1000);
 

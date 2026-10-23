@@ -9,9 +9,10 @@ namespace GSOOffline
     /// The Halloween and Christmas events, as the original server ran them (Scr_HalloweenEvent, Scr_ChristmasEvent,
     /// Scr_NpcHandler.dropLoot): while one is on, every creature can drop that event's crate, more likely the higher
     /// its level. During Halloween one group of creatures (crabs, wolves, skeletons...) drops them twice as often,
-    /// a different group each hour; the talking pumpkin tells you which. Creatures drop the 2020 crates, as the original's
-    /// last version did; the 2019 crates still open. The original's staff switched the events on and off by hand; offline
-    /// they follow the calendar (<see cref="Plugin.SeasonalEvents"/>).
+    /// a different group each hour; the talking pumpkin tells you which. The original's last version dropped only the
+    /// 2020 crates; offline each crate that drops is from 2019 or 2020 at random, so every year's items stay obtainable
+    /// (the crate rate is the original's). The original's staff switched the events on and off by hand; offline they
+    /// follow the calendar (<see cref="Plugin.SeasonalEvents"/>).
     /// </summary>
     public partial class OfflineServer
     {
@@ -91,11 +92,17 @@ namespace GSOOffline
             {
                 int oneIn = EventCrateOneIn(info.level);
                 if (Array.IndexOf(HalloweenGroup(), info.id) >= 0) oneIn /= 2;
-                if (OneIn(Mathf.Max(1, oneIn))) AddToBag(bag, HalloweenCrate2020, 1);
+                if (OneIn(Mathf.Max(1, oneIn))) AddToBag(bag, AnyYear(HalloweenCrates), 1);
             }
             if (ChristmasActive && OneIn(Mathf.Max(1, EventCrateOneIn(info.level))))
-                AddToBag(bag, ChristmasCrate2020, 1);
+                AddToBag(bag, AnyYear(ChristmasCrates), 1);
         }
+
+        // Each event's crates, one per year; a dropped crate is any of them, equally likely.
+        private static readonly int[] HalloweenCrates = { HalloweenCrate, HalloweenCrate2020 };
+        private static readonly int[] ChristmasCrates = { ChristmasCrate, ChristmasCrate2020 };
+
+        private static int AnyYear(int[] crates) => crates[Random.Range(0, crates.Length)];
 
         // 1 in 29 at level 1 down to 1 in 10 at level 50, then 1 in 9 at 55... and every kill from level 95.
         private static int EventCrateOneIn(int level) =>
