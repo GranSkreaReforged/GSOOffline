@@ -9,7 +9,8 @@ namespace GSOOffline
     /// Dropping and destroying items from the inventory (#79):
     /// - Dragging an inventory item out of the windows and letting go over the world drops it, after the client's
     ///   own "Are you sure you want to drop ...? How many?" confirmation (the same as Shift+click).
-    /// - The item window gets a Destroy button next to Drop, with the same kind of confirmation. Confirming sends
+    /// - The item window gets a Destroy button next to Drop, in place of the dead Wiki link (see MenuLinksPatch),
+    ///   with the same kind of confirmation. Confirming sends
     ///   the client's own destroy message (4/4), which the server always handled; nothing in the client used it.
     /// </summary>
     internal static class ItemDrop
@@ -43,8 +44,8 @@ namespace GSOOffline
             infoWindow = id >= 0 && id < list.Count ? list[id] : null;
         }
 
-        /// <summary>Stands in for the item window's Wiki button: Destroy first, for an item in the bag, then Wiki.</summary>
-        public static bool DestroyThenWiki(string text, GUILayoutOption[] options)
+        /// <summary>Stands in for the item window's Wiki button: Destroy, for an item in the bag; the Wiki button is gone.</summary>
+        public static bool DestroyInsteadOfWiki(string text, GUILayoutOption[] options)
         {
             var wc = Script_WindowController.instance;
             var item = infoWindow?.windowItem;
@@ -55,7 +56,7 @@ namespace GSOOffline
                 wc.createAmountConfirmation(DestroyConfirmation, "Confirmation",
                     "Are you sure you want to destroy " + item.itemName + "? It will be gone for good.\nHow many?", 1, amount, amount);
             }
-            return GUILayout.Button(text, options);
+            return false;
         }
 
         private static bool InBag(Item item, out int amount)
@@ -89,7 +90,7 @@ namespace GSOOffline
                 for (int j = i + 1; j < code.Count && j <= i + 6; j++)
                 {
                     if (!code[j].Calls(button)) continue;
-                    code[j] = new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ItemDrop), nameof(DestroyThenWiki))).MoveLabelsFrom(code[j]);
+                    code[j] = new CodeInstruction(OpCodes.Call, AccessTools.Method(typeof(ItemDrop), nameof(DestroyInsteadOfWiki))).MoveLabelsFrom(code[j]);
                     replaced++;
                     break;
                 }
