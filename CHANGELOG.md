@@ -4,6 +4,19 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Changed
+- Creature drops, shop stock, house plots and extra spawns now come from a later snapshot of the original server, one with everything the final game client has. Drops double (1049 instead of 487): ten bosses get their real tables instead of wiki guesses (Bruno, Betsy, Argi, Lydia, Lakhar, Sarah, Jotnar, the Elder Ent, Ents and the Aggravated Ice Elemental), and 39 creatures' drops changed, such as the Supreme Sea Serpent's scales, fangs, Shadow armor and teleport scrolls. Creatures the original knew but gave no table drop nothing from one.
+- Shops follow the final stock lists: the Tools vendor sells a shovel, a knife and a mortar, with smaller tool stocks; the General store sells The fundamentals of upgrading; light armor shops add Troll leather quivers and dragon leather.
+- The pet guard is rarer in iron, verum and stranite gear crates (1 in 35,000, 14,000 and 10,000).
+- Gear crates from creatures below level 20 drop half as often, and from levels 30-39 a third less often, as in the final server.
+- The few NPCs the final server no longer spawned are gone (six old-style Argi in Bal Sardan, Wynford, the logger, Ferrarius and the travelling axe seller in East Athagos, and Joannia in Yorkhill). The Artisans guild master tailor stays, as quest 33 needs him.
+
+### Added
+- 19 house plots around East Athagos (29 there instead of 10).
+- The South Athagos and Bal Amana teleport scrolls take you there.
+- Commander Grant's untradeable small grade stone grades items like a small grade stone.
+- Each oyster you catch can bring up a Sardanian weapon crate (1 in 200) or Ancient Sardanian Alloy (1 in 5,000).
+- Shops can take an item instead of silver, as the original's could. The Hunters Guild's shops took its tokens, which only its monster bounties paid; with no way to earn them offline, they keep selling for silver as before.
 
 ## [1.8.0] - 2026-10-21
 ### Changed

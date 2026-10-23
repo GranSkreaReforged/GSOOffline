@@ -20,6 +20,7 @@ namespace GSOOffline
     {
         public int id;
         public string name;
+        public int currency;   // item type the shop takes instead of silver (0 = silver)
         public List<ShopFileItem> items = new List<ShopFileItem>();
     }
 
@@ -32,6 +33,7 @@ namespace GSOOffline
     public class ShopStock
     {
         public string name;
+        public int currency;   // item type paid instead of silver (0 = silver); such shops buy nothing
         public int merchantSilver = 5000;
         public List<ShopEntry> items = new List<ShopEntry>();
     }
@@ -84,6 +86,7 @@ namespace GSOOffline
             }
         }
         private static readonly Dictionary<int, ShopStock> cache = new Dictionary<int, ShopStock>();
+        private static readonly HashSet<int> UnearnableCurrencies = new HashSet<int> { 10725 };   // Hunters Guild token
 
         private static bool Has(ItemTemplate t, params string[] flags) => flags.Any(f => t.flags.Contains(f));
         private static bool Named(ItemTemplate t, params string[] words) =>
@@ -148,9 +151,11 @@ namespace GSOOffline
         public static ShopStock Get(int shopId)
         {
             if (cache.TryGetValue(shopId, out var stock)) return stock;
-            if (Original.TryGetValue(shopId, out var real))
+            // The Hunters Guild's shops take its tokens, which only its monster bounties paid out; with no way to earn
+            // them offline, those shops keep their silver rules (below) and the token lists wait in shops.json.
+            if (Original.TryGetValue(shopId, out var real) && !UnearnableCurrencies.Contains(real.currency))
             {
-                stock = new ShopStock { name = real.name };
+                stock = new ShopStock { name = real.name, currency = real.currency };
                 foreach (var it in real.items)
                 {
                     var t = ItemData.Get(it.typeId);

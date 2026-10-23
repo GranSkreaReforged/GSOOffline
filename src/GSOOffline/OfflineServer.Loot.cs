@@ -84,7 +84,7 @@ namespace GSOOffline
                     if (d.typeId == 0) bag.silver = Random.Range(d.min, d.max + 1);
                     else AddToBag(bag, d.typeId, Random.Range(d.min, d.max + 1));
                 }
-                // The uniques and pets patch notes added after that snapshot (updates 137-140).
+                // Uniques and pets the patch notes added (updates 137-140) that the tables lack.
                 if (table != null)
                     foreach (var d in table.drops)
                         if (LaterPatch(d) && !original.Exists(o => o.typeId == d.typeId) && Random.value < d.chance)
@@ -112,7 +112,9 @@ namespace GSOOffline
         // Unity's Random.Range(0, n) is 0 for any n <= 1, as on the original server.
         private static bool OneIn(int n) => Random.Range(0, n) == 0;
 
-        // Snapshot of the original server's Loot.xml: about update 136.
+        // Patch-note drops newer than this go on top of the original's tables when the tables lack them. The tables
+        // now come from the original's develop branch, which has most of them; a few never reached Loot.xml (Argus's
+        // and George's pets, Serpent's Fang, Roke's ring on his other copies).
         private const int OriginalLootUpdate = 136;
 
         private static bool LaterPatch(LootDrop d)
@@ -133,10 +135,10 @@ namespace GSOOffline
             else if (level >= 25 && level < 50 && OneIn(75 - level)) AddToBag(bag, OneIn(15) ? 441 : 438, 1);
             else if (level >= 50 && OneIn(100 - level)) AddToBag(bag, OneIn(15) ? 442 : 439, 1);
 
-            if (level >= 1 && level < 10 && OneIn(50 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 1 : IronCrate, 1);
-            else if (level >= 10 && level < 20 && OneIn(60 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 2 : IronCrate + 1, 1);
+            if (level >= 1 && level < 10 && OneIn(2 * (50 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 1 : IronCrate, 1);
+            else if (level >= 10 && level < 20 && OneIn(2 * (60 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 2 : IronCrate + 1, 1);
             else if (level >= 20 && level < 30 && OneIn(2 * (70 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 3 : IronCrate + 2, 1);
-            else if (level >= 30 && level < 40 && OneIn(2 * (80 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 4 : IronCrate + 3, 1);
+            else if (level >= 30 && level < 40 && OneIn(3 * (80 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 4 : IronCrate + 3, 1);
             else if (level >= 40 && level < 50 && OneIn(3 * (90 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 5 : IronCrate + 4, 1);
             else if (level >= 50 && OneIn(3 * (100 - level))) AddToBag(bag, IronCrate + 5, 1);
         }

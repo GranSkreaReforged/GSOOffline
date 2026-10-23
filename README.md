@@ -137,7 +137,7 @@ Working:
 - Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
 - Bank
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
-- Houses: build one on any of the original game's 116 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
+- Houses: build one on any of the original game's 135 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and give bosses less health)
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
@@ -163,9 +163,9 @@ Partially working:
 Not yet implemented:
 - Effects for abilities the data doesn't link to an effect or projectile (most are mapped by name; see `OfflineServer.Effects.cs`)
 
-Loot comes from the original server's drop tables (`Loot.xml`, sent by the game's developer, from about update 136), turned into `src/GSOOffline/Data/droptables.json` by GSODevTools' `gen_droptables.py` and rolled as the original rolled them: each drop on its own, 1 in its rate. Every creature can also drop an upgrade or grade stone and a gear crate for its level, by the original's formulas. Creatures added after that snapshot (Bruno, Betsy, Lakhar, Lydia, Jotnar, Argus, the Elder Ent...) and the boss uniques and pets of updates 137-140 come from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA) and the official patch notes on Steam, in `src/GSOOffline/Data/loot.json` (`gen_loot.py`); the wiki names how rare drops were but not the rates, so those are reconstructed chances, and such a creature without a wiki entry drops silver by level.
+Loot comes from the original server's drop tables (`Loot.xml`, sent by the game's developer, from its develop branch, which has everything the final client has), turned into `src/GSOOffline/Data/droptables.json` by GSODevTools' `gen_droptables.py` and rolled as the original rolled them: each drop on its own, 1 in its rate. Every creature can also drop an upgrade or grade stone and a gear crate for its level, by the original's formulas. A few boss uniques and pets from the official patch notes that never reached the tables (Argus's and George's pets, Serpent's Fang) come from the [Gran Skrea Online community wiki](https://gran-skrea-online.fandom.com) (CC BY-SA) and the patch notes, in `src/GSOOffline/Data/loot.json` (`gen_loot.py`), with reconstructed chances; so do creatures the original never knew, and such a creature without a wiki entry drops silver by level.
 
-Shop stock is a reconstruction, because the original lists were lost with the server. Shopkeepers were identified from the dialogue trees, and each shop sells thematically matching items at their listed prices.
+Shop stock is the original server's (`Shops.xml`, turned into `src/GSOOffline/Data/shops.json` by GSODevTools' `gen_shops.py`). Shops it had no list for, and the Hunters Guild's (they took tokens that can't be earned offline), sell thematically matching items at their listed prices.
 
 Unimplemented client events are logged to `BepInEx/LogOutput.log` as `Unhandled client event X/Y`.
 

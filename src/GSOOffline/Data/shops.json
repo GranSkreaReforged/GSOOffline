@@ -51,39 +51,52 @@
    "name": "Tools",
    "items": [
     {
-     "typeId": 40,
-     "name": "Sickle",
-     "max": 10
-    },
-    {
-     "typeId": 58,
-     "name": "Hatchet",
-     "max": 10
-    },
-    {
-     "typeId": 59,
-     "name": "Pickaxe",
-     "max": 10
-    },
-    {
-     "typeId": 126,
-     "name": "Scythe",
-     "max": 10
-    },
-    {
-     "typeId": 90,
-     "name": "Fishing rod",
-     "max": 10
-    },
-    {
      "typeId": 10333,
      "name": "Mortar and pestle",
-     "max": 10
+     "max": 10,
+     "restock": 60
     },
     {
      "typeId": 10099,
      "name": "Knife",
-     "max": 10
+     "max": 10,
+     "restock": 60
+    },
+    {
+     "typeId": 40,
+     "name": "Sickle",
+     "max": 5,
+     "restock": 30
+    },
+    {
+     "typeId": 58,
+     "name": "Hatchet",
+     "max": 5,
+     "restock": 30
+    },
+    {
+     "typeId": 59,
+     "name": "Pickaxe",
+     "max": 5,
+     "restock": 30
+    },
+    {
+     "typeId": 126,
+     "name": "Scythe",
+     "max": 5,
+     "restock": 30
+    },
+    {
+     "typeId": 90,
+     "name": "Fishing rod",
+     "max": 5,
+     "restock": 30
+    },
+    {
+     "typeId": 37,
+     "name": "Shovel",
+     "max": 5,
+     "restock": 30
     }
    ]
   },
@@ -441,6 +454,10 @@
      "typeId": 10099,
      "name": "Knife",
      "max": 10
+    },
+    {
+     "typeId": 10731,
+     "name": "The fundamentals of upgrading"
     }
    ]
   },
@@ -954,61 +971,61 @@
     {
      "typeId": 263,
      "name": "Powerful amulet of wisdom",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 265,
      "name": "Ring of wisdom",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 272,
      "name": "Amulet of Frost",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 358,
      "name": "Amulet of fire",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 359,
      "name": "Amulet of ice",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 360,
      "name": "Amulet of electricity",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 361,
      "name": "Amulet of psychic",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 362,
      "name": "Amulet of wind",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 363,
      "name": "Amulet of earth",
-     "max": 1,
+     "max": 5,
      "restock": 60
     },
     {
      "typeId": 366,
      "name": "Uplifting ring",
-     "max": 1,
+     "max": 5,
      "restock": 60
     }
    ]
@@ -1477,6 +1494,12 @@
     {
      "typeId": 280,
      "name": "Troll leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 281,
+     "name": "Troll leather quiver",
      "stock": 0,
      "restock": -1
     },
@@ -2274,6 +2297,12 @@
     {
      "typeId": 10532,
      "name": "Arena teleport",
+     "max": 1000,
+     "restock": 1
+    },
+    {
+     "typeId": 10739,
+     "name": "Deepheart teleport",
      "max": 1000,
      "restock": 1
     },
@@ -3346,6 +3375,12 @@
      "restock": 1
     },
     {
+     "typeId": 10770,
+     "name": "Christmas 2020 crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
      "typeId": 437,
      "name": "Small upgrade stone",
      "max": 5000,
@@ -3378,12 +3413,6 @@
     {
      "typeId": 442,
      "name": "Large grade stone",
-     "max": 5000,
-     "restock": 1
-    },
-    {
-     "typeId": 443,
-     "name": "Tester's grade stone",
      "max": 5000,
      "restock": 1
     },
@@ -3444,6 +3473,372 @@
     {
      "typeId": 10722,
      "name": "Golden candy cane",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10724,
+     "name": "Tester's experience scroll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10732,
+     "name": "Cleansing meat platter",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10731,
+     "name": "The fundamentals of upgrading",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 451,
+     "name": "Bruno's bracers",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 452,
+     "name": "Bruno's boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 453,
+     "name": "Storage guard's body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 454,
+     "name": "Storage guard's chaps",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 455,
+     "name": "Storage guard's hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 456,
+     "name": "Storage guard's boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 457,
+     "name": "Storage guard's bracelet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 458,
+     "name": "Storage guard's quiver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 459,
+     "name": "Storage guard's crossbow",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 463,
+     "name": "Zalranaz's cleaver",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 465,
+     "name": "Tomb guardian's amulet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 450,
+     "name": "Bear",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 464,
+     "name": "Poacher",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10725,
+     "name": "Hunters Guild token",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 461,
+     "name": "Hunter's body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 462,
+     "name": "Hunter's legs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 468,
+     "name": "Serpent's Fang",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 469,
+     "name": "Snakeling",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 475,
+     "name": "Roke's ring",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 471,
+     "name": "Berserker's helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 472,
+     "name": "Berserker's amulet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 481,
+     "name": "Li",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 482,
+     "name": "Jin",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 473,
+     "name": "Lydia's staff",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 474,
+     "name": "Lydia's earrings",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 476,
+     "name": "Reinforced Sardanian spear",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 477,
+     "name": "Reinforced Sardanian buckler shield",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 478,
+     "name": "Reinforced Sardanian axe",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 479,
+     "name": "Reinforced Lizard backpack",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 484,
+     "name": "Barrage",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 485,
+     "name": "Thorn",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 486,
+     "name": "Jotnar's body",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 487,
+     "name": "Jotnar's chaps",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 470,
+     "name": "Young Ghit",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 483,
+     "name": "Skeletal scout",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 480,
+     "name": "Lizard warrior",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 488,
+     "name": "Troll",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 489,
+     "name": "Uncommon Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 490,
+     "name": "Rare Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 491,
+     "name": "Unique Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 492,
+     "name": "Epic Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 493,
+     "name": "Legendary Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 494,
+     "name": "Mythic Tester's grade stone",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 495,
+     "name": "Argo",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 496,
+     "name": "Argus",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 497,
+     "name": "Nature's blessing helmet",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 498,
+     "name": "Nature's blessing platebody",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 499,
+     "name": "Nature's blessing platelegs",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 500,
+     "name": "Nature's blessing boots",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 501,
+     "name": "Nature's blessing gloves",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 502,
+     "name": "Nature's embrace",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 503,
+     "name": "Ent",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 504,
+     "name": "Reaper robe bottom",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 505,
+     "name": "Reaper robe hood",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 506,
+     "name": "Reaper's scythe",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 507,
+     "name": "Reaper robe top",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 10757,
+     "name": "Halloween 2020 crate",
+     "max": 5000,
+     "restock": 1
+    },
+    {
+     "typeId": 511,
+     "name": "Headless Reaper",
      "max": 5000,
      "restock": 1
     }
@@ -3594,6 +3989,42 @@
     {
      "typeId": 281,
      "name": "Troll leather quiver",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 288,
+     "name": "Dragon leather body",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 289,
+     "name": "Dragon leather chaps",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 290,
+     "name": "Dragon leather hood",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 291,
+     "name": "Dragon leather boots",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 292,
+     "name": "Dragon leather bracelet",
+     "stock": 0,
+     "restock": -1
+    },
+    {
+     "typeId": 293,
+     "name": "Dragon leather quiver",
      "stock": 0,
      "restock": -1
     }
@@ -3940,6 +4371,475 @@
      "name": "Whitefish"
     }
    ]
+  },
+  {
+   "id": 44,
+   "name": "Hunters Guild Gear",
+   "items": [
+    {
+     "typeId": 432,
+     "name": "Hunter's bow",
+     "price": 4500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 461,
+     "name": "Hunter's body",
+     "price": 1600,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 462,
+     "name": "Hunter's legs",
+     "price": 1200,
+     "max": 1,
+     "restock": 10
+    }
+   ],
+   "currency": 10725
+  },
+  {
+   "id": 45,
+   "name": "Hunters Guild Crates",
+   "items": [
+    {
+     "typeId": 10668,
+     "name": "Iron gear crate",
+     "price": 35,
+     "max": 50,
+     "restock": 10
+    },
+    {
+     "typeId": 10669,
+     "name": "Steel gear crate",
+     "price": 50,
+     "max": 40,
+     "restock": 10
+    },
+    {
+     "typeId": 10670,
+     "name": "Verum gear crate",
+     "price": 90,
+     "max": 30,
+     "restock": 10
+    },
+    {
+     "typeId": 10671,
+     "name": "Stranite gear crate",
+     "price": 125,
+     "max": 20,
+     "restock": 10
+    },
+    {
+     "typeId": 10672,
+     "name": "Shadow gear crate",
+     "price": 180,
+     "max": 10,
+     "restock": 10
+    },
+    {
+     "typeId": 10673,
+     "name": "Iridium gear crate",
+     "price": 250,
+     "max": 5,
+     "restock": 10
+    }
+   ],
+   "currency": 10725
+  },
+  {
+   "id": 46,
+   "name": "Hunters Guild Raredrops",
+   "items": [
+    {
+     "typeId": 274,
+     "name": "Roke's staff",
+     "price": 2000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 475,
+     "name": "Roke's ring",
+     "price": 2000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 451,
+     "name": "Bruno's bracers",
+     "price": 3250,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 452,
+     "name": "Bruno's boots",
+     "price": 3250,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10737,
+     "name": "Raging Garnet Crystal",
+     "price": 3750,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10736,
+     "name": "Betsy's Horn",
+     "price": 2250,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10738,
+     "name": "Empowering Zircon Crystal",
+     "price": 4500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 481,
+     "name": "Li",
+     "price": 10500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 482,
+     "name": "Jin",
+     "price": 10500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 248,
+     "name": "Pirate hat",
+     "price": 800,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 246,
+     "name": "Pirate shirt",
+     "price": 1600,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 247,
+     "name": "Pirate pants",
+     "price": 1200,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 250,
+     "name": "Off-hand Iron Pistol",
+     "price": 1600,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 426,
+     "name": "Main-hand Iron Pistol",
+     "price": 1600,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 486,
+     "name": "Jotnar's body",
+     "price": 5400,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 487,
+     "name": "Jotnar's chaps",
+     "price": 5400,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10740,
+     "name": "Broken Staff",
+     "price": 7500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 474,
+     "name": "Lydia's earrings",
+     "price": 7500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10557,
+     "name": "Supreme Sea serpent scale",
+     "price": 1625,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10735,
+     "name": "Supreme Sea Serpent fang",
+     "price": 8125,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10741,
+     "name": "Ancient Sardanian Alloy",
+     "price": 9000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10645,
+     "name": "Piece of ancient cloth",
+     "price": 7500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 484,
+     "name": "Barrage",
+     "price": 11250,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 485,
+     "name": "Thorn",
+     "price": 11250,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 453,
+     "name": "Storage guard's body",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 454,
+     "name": "Storage guard's chaps",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 455,
+     "name": "Storage guard's hood",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 456,
+     "name": "Storage guard's boots",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 457,
+     "name": "Storage guard's bracelet",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 458,
+     "name": "Storage guard's quiver",
+     "price": 6000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 459,
+     "name": "Storage guard's crossbow",
+     "price": 9000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10555,
+     "name": "Zalranaz's fabric",
+     "price": 1800,
+     "max": 2,
+     "restock": 10
+    },
+    {
+     "typeId": 10556,
+     "name": "Zalranaz's trinket",
+     "price": 3600,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10733,
+     "name": "Ancient blade core",
+     "price": 13500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10746,
+     "name": "Heart of the Forest",
+     "price": 9000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10756,
+     "name": "Elder Root",
+     "price": 15000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10752,
+     "name": "Mark of the tamer",
+     "price": 9000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10753,
+     "name": "Sytrax's tooth",
+     "price": 15000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 405,
+     "name": "Venomous ring",
+     "price": 6750,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 406,
+     "name": "Venomous amulet",
+     "price": 7500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10622,
+     "name": "Nirish's skin",
+     "price": 13500,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 10614,
+     "name": "Nirish's poison fang",
+     "price": 35000,
+     "max": 1,
+     "restock": 10
+    }
+   ],
+   "currency": 10725
+  },
+  {
+   "id": 47,
+   "name": "Hunters Guild Pets",
+   "items": [
+    {
+     "typeId": 450,
+     "name": "Bear",
+     "price": 50000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 470,
+     "name": "Young Ghit",
+     "price": 50000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 433,
+     "name": "Crab",
+     "price": 50000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 488,
+     "name": "Troll",
+     "price": 50000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 483,
+     "name": "Skeletal scout",
+     "price": 50000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 469,
+     "name": "Snakeling",
+     "price": 55000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 480,
+     "name": "Lizard warrior",
+     "price": 60000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 464,
+     "name": "Poacher",
+     "price": 75000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 428,
+     "name": "Pet Wraith",
+     "price": 90000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 427,
+     "name": "Infernal Hound",
+     "price": 90000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 403,
+     "name": "Spiderling",
+     "price": 90000,
+     "max": 1,
+     "restock": 10
+    },
+    {
+     "typeId": 503,
+     "name": "Ent",
+     "price": 97000,
+     "max": 1,
+     "restock": 10
+    }
+   ],
+   "currency": 10725
   }
  ]
 }
