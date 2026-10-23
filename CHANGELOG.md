@@ -25,6 +25,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - During the Halloween and Christmas events creatures drop the 2020 crates, as the original's last version did: the Halloween 2020 crate has the Reaper's robes and scythe and the Headless Reaper pet, the Christmas 2020 crate the Snowman pet, each with its own untradeable pet that comes within 500 crates. 2019 crates you already have still open.
 
 ### Added
+- A shield taken off by a two-handed weapon, bow or gathering tool goes back on with the next one-handed weapon, whether you switch weapons or equip one from the bag (#124). Its ability cooldowns keep running while it's off, and it's remembered across a logout. Equipping a shield yourself, or no longer carrying it, ends that.
 - 19 house plots around East Athagos (29 there instead of 10).
 - The South Athagos and Bal Amana teleport scrolls take you there.
 - Commander Grant's untradeable small grade stone grades items like a small grade stone.
@@ -37,6 +38,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - The Mages guild's initiates, apprentices and scribes and Glacies have their lines.
 
 ### Fixed
+- Changing weapons no longer leaves the old ability's cooldown on the new one's key (it showed, and blocked the key, until it ran out). Each weapon ability keeps its own cooldown, which keeps running while that weapon is on your back, so switching back no longer seems to reset it.
 - Healing music and Healing aura no longer show the Life surge icon.
 - Truce and Traverse protect you from all damage again, as in the original: lava, Sepitus's bolts, Phraustie's snowballs, the Coral dungeon's wave, boss hazards, poisons and bleeds as well as blows (#120).
 - NPCs only talk to you within 10 m, as in the original: clicking one from far away (the bank, a ferryman) says it's too far away instead of opening the conversation (#115).

@@ -174,54 +174,48 @@ namespace GSOOffline
 
         private readonly int[] weaponSlotAbility = new int[WeaponAbilitySlots + 1];   // as last sent, by slot
 
-        // The weapon on the back keeps its slot abilities and their cooldowns (seconds left) for when it comes back
-        // (Scr_PlayerInventory.secondaryWeaponAbility/Cooldown1..4).
-        private readonly int[] backSlotAbility = new int[WeaponAbilitySlots + 1];
-        private readonly float[] backSlotCooldown = new float[WeaponAbilitySlots + 1];
-
-        private int shieldOffForTool;   // the shield a gathering tool pushed off, put back on with a one-handed weapon
+        // A weapon ability that leaves the bar (its weapon or shield swapped out) keeps cooling down, by ability
+        // id: when it's back on a slot, that slot shows what's really left. The original froze the back weapon's
+        // cooldowns instead, which looked like every swap reset them (#124).
+        private readonly Dictionary<int, float> abilityReadyAt = new Dictionary<int, float>();
 
         private void ResetWeaponSlots()
         {
-            shieldOffForTool = 0;
-            for (int s = 0; s <= WeaponAbilitySlots; s++)
-            {
-                weaponSlotAbility[s] = backSlotAbility[s] = 0;
-                backSlotCooldown[s] = 0f;
-            }
+            for (int s = 0; s <= WeaponAbilitySlots; s++) weaponSlotAbility[s] = 0;
+            abilityReadyAt.Clear();
         }
 
         private float SlotCooldownLeft(int slot) =>
             slotReadyAt.TryGetValue(slot, out float ready) ? Mathf.Max(0f, ready - Time.time) : 0f;
 
+        /// <summary>
+        /// The slot's cooldown, told to the client even when it's 0: the client keeps cooldowns by slot, so a slot
+        /// whose ability changed would otherwise go on showing (and blocking) the old ability's.
+        /// </summary>
         private void SetSlotCooldown(int slot, float seconds)
         {
+            seconds = Mathf.Max(0f, seconds);
             slotReadyAt[slot] = Time.time + seconds;
             int cs = Mathf.RoundToInt(seconds * 100f);
-            if (cs > 0) Send(4, 0, character.name, slot, cs, cs);
+            Send(4, 0, character.name, slot, cs, cs);
         }
 
         /// <summary>
-        /// 8/6 for slots 1-4: the weapon in hand's abilities on keys 2-5. An ability that moves keeps its cooldown,
-        /// from the slot it was on or from the back weapon (Scr_AbilitiesHandler.setAbilityToSlot).
+        /// 8/6 for slots 1-4: the weapon in hand's abilities on keys 2-5 (Scr_AbilitiesHandler.setAbilityToSlot).
+        /// A slot whose ability changed takes that ability's own cooldown (abilityReadyAt), or none.
         /// </summary>
         private void SendWeaponAbilities()
         {
             if (character == null) return;
-            var before = (int[])weaponSlotAbility.Clone();
-            var left = new float[WeaponAbilitySlots + 1];
-            for (int s = 1; s <= WeaponAbilitySlots; s++) left[s] = SlotCooldownLeft(s);
+            for (int s = 1; s <= WeaponAbilitySlots; s++)
+                if (weaponSlotAbility[s] != 0 && slotReadyAt.TryGetValue(s, out float ready) && ready > Time.time)
+                    abilityReadyAt[weaponSlotAbility[s]] = ready;
 
             for (int slot = 1; slot <= WeaponAbilitySlots; slot++)
             {
                 int ability = WeaponAbilityInSlot(slot);
-                if (ability != 0 && ability != before[slot])
-                {
-                    for (int s = 1; s <= WeaponAbilitySlots; s++)
-                        if (before[s] == ability) { SetSlotCooldown(slot, left[s]); break; }
-                    for (int s = 1; s <= WeaponAbilitySlots; s++)
-                        if (backSlotAbility[s] == ability) SetSlotCooldown(slot, backSlotCooldown[s]);
-                }
+                if (ability != weaponSlotAbility[slot])
+                    SetSlotCooldown(slot, ability != 0 && abilityReadyAt.TryGetValue(ability, out float ready) ? ready - Time.time : 0f);
                 weaponSlotAbility[slot] = ability;
                 Send(8, 6, character.name, slot, ability);
             }
@@ -229,28 +223,12 @@ namespace GSOOffline
 
         /// <summary>
         /// 6/5 "Switch weapon" (Scr_PlayerInventory.ChangeToSecondaryWeapon): the back weapon goes in hand, the one
-        /// in hand on the back, each taking its slot cooldowns along. Slots 3-4 are the hand weapon's own only when
-        /// it's two-handed or a shield is on; otherwise they stay with the shield.
+        /// in hand on the back. Each ability keeps its own cooldown (SendWeaponAbilities).
         /// </summary>
         private void SwitchWeapon()
         {
             var back = character != null ? SecondaryWeapon() : null;
-            if (back == null) return;
-            var hand = EquippedWeapon();
-            bool handOwnsAll = hand != null && IsTwoHanded(hand.typeId) || EquippedInSlot("Shield") != null;
-
-            var restore = (float[])backSlotCooldown.Clone();
-            for (int s = 1; s <= WeaponAbilitySlots; s++)
-            {
-                if (s > 2 && !handOwnsAll) continue;
-                backSlotAbility[s] = weaponSlotAbility[s];
-                backSlotCooldown[s] = SlotCooldownLeft(s);
-            }
-            Equip(back.id);
-            // The original restored slots 3-4 even when the shield fills them, so swapping reset its cooldowns.
-            bool backOwnsAll = IsTwoHanded(back.typeId);
-            for (int s = 1; s <= WeaponAbilitySlots; s++)
-                if (s <= 2 || backOwnsAll) SetSlotCooldown(s, restore[s]);
+            if (back != null) Equip(back.id);
         }
 
         /// <summary>Equipment changed: max health and mana and the weapon's abilities may have too.</summary>
@@ -272,17 +250,19 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] weaponbar hand: {Describe(EquippedWeapon())}");
             Plugin.Log.LogInfo($"[dev] weaponbar shield slot: {Describe(EquippedInSlot("Shield"))}");
             Plugin.Log.LogInfo($"[dev] weaponbar back: {Describe(SecondaryWeapon())}");
+            Plugin.Log.LogInfo($"[dev] weaponbar offhand to restore: {Describe(character.offhandRestoreId != 0 ? FindItem(character.offhandRestoreId) : null)}, cooldowns {Mathf.Max(0f, (character.offhandReadyAt3 - UtcMsNow) / 1000f):0.0} s, {Mathf.Max(0f, (character.offhandReadyAt4 - UtcMsNow) / 1000f):0.0} s");
             for (int s = 1; s <= WeaponAbilitySlots; s++)
             {
                 int a = weaponSlotAbility[s];
                 string name = SkillData.Abilities.TryGetValue(a, out var info) ? info.name : "-";
-                Plugin.Log.LogInfo($"[dev] weaponbar slot {s}: {a} {name}, cooldown {SlotCooldownLeft(s):0.0} s");
+                var shown = Scr_AbilityHandler.instance.getAbilitySlot(s);
+                Plugin.Log.LogInfo($"[dev] weaponbar slot {s}: {a} {name}, cooldown {SlotCooldownLeft(s):0.0} s (client {(shown != null ? shown.cooldownCurrent : 0f):0.0} s)");
             }
         }
 
         /// <summary>
         /// Login: a save from before two-handed weapons and the shield slot excluded each other may have both on;
-        /// the shield comes off, as equipping the weapon would have done.
+        /// the shield comes off, as equipping the weapon would have done, and back on with a one-handed weapon.
         /// </summary>
         private static void FixTwoHandedWithShield(CharacterSave ch)
         {
@@ -296,7 +276,43 @@ namespace GSOOffline
             }
             if (weapon == null || shield == null || !IsTwoHanded(weapon.typeId)) return;
             shield.equipped = false;
+            ch.offhandRestoreId = shield.id;
+            ch.offhandReadyAt3 = ch.offhandReadyAt4 = 0;
             Plugin.Log.LogInfo($"[inventory] {ItemData.Get(shield.typeId)?.name} unequipped: {ItemData.Get(weapon.typeId)?.name} is two-handed");
+        }
+
+        /// <summary>
+        /// A two-handed weapon or gathering tool pushed the shield off (#124). It goes back on with the next
+        /// one-handed weapon, and its slot 3-4 cooldowns keep running while it's off. Saved (cooldowns as real
+        /// time), so a logout in between doesn't lose either.
+        /// </summary>
+        private void RememberOffhand(ItemSave shield)
+        {
+            character.offhandRestoreId = shield.id;
+            character.offhandReadyAt3 = UtcMsNow + (long)(SlotCooldownLeft(3) * 1000f);
+            character.offhandReadyAt4 = UtcMsNow + (long)(SlotCooldownLeft(4) * 1000f);
+        }
+
+        private void ForgetOffhand()
+        {
+            character.offhandRestoreId = 0;
+            character.offhandReadyAt3 = character.offhandReadyAt4 = 0;
+        }
+
+        private static long UtcMsNow => System.DateTime.UtcNow.Ticks / System.TimeSpan.TicksPerMillisecond;
+
+        /// <summary>A one-handed weapon went in hand with no shield on: the shield pushed off goes back on, if it's still in the bag.</summary>
+        private void RestoreOffhand()
+        {
+            var shield = FindItem(character.offhandRestoreId);
+            float cooldown3 = (character.offhandReadyAt3 - UtcMsNow) / 1000f, cooldown4 = (character.offhandReadyAt4 - UtcMsNow) / 1000f;
+            ForgetOffhand();
+            if (shield == null || shield.equipped || ItemData.Get(shield.typeId)?.slot != "Shield") return;
+            Plugin.Log.LogInfo($"[inventory] {ItemData.Get(shield.typeId)?.name} back on (cooldowns {Mathf.Max(0f, cooldown3):F1}s, {Mathf.Max(0f, cooldown4):F1}s)");
+            Equip(shield.id);
+            // In a session abilityReadyAt already has these; after a logout only the save does.
+            if (cooldown3 > SlotCooldownLeft(3)) SetSlotCooldown(3, cooldown3);
+            if (cooldown4 > SlotCooldownLeft(4)) SetSlotCooldown(4, cooldown4);
         }
     }
 }
