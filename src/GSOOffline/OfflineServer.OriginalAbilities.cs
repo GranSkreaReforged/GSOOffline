@@ -4,16 +4,14 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// The original server's abilities (Scr_PlayerAttacksHandler.abilityAttack, Scr_PlayerBuffs, Scr_AbilitiesHandler,
-    /// update 136), one case each with its own formula, damage kind and effects, and the later patch notes' numbers
-    /// on top: Explosive arrow -27%, Energy blade -50%, Healing music and aura -15%, Tritone without its mana boost
-    /// but twice the damage (all update 137). "Max" below is the original's calculateWeaponDamage: 10 x the weapon's
-    /// level + 10 x the skill's. Fire wall and Firestorm keep the 136 numbers: update 140 lowered them by an amount
-    /// it didn't give.
+    /// The original server's abilities (Scr_PlayerAttacksHandler.abilityAttack, Scr_PlayerBuffs, Scr_AbilitiesHandler),
+    /// one case each with its own formula, damage kind and effects, as its last version (the develop branch) had them,
+    /// unique gear effects included (OfflineServer.UniqueItems.cs). "Max" below is the original's calculateWeaponDamage:
+    /// 10 x the weapon's level + 10 x the skill's.
     /// </summary>
     public partial class OfflineServer
     {
-        private const int PoisonForArrows = 10377, ItemSnowball = 10558, HuntersBow = 432;
+        private const int PoisonForArrows = 10377, ItemSnowball = 10558;
 
         private static float U(float min, float max) => Random.Range(min, max);
 
@@ -127,7 +125,8 @@ namespace GSOOffline
                 case 166:  // Dragon flames
                 {
                     CountXp(SkillElementalGrim);
-                    int dmg = (int)((25 + D + fire + ele * 25f) * (a.id == 97 ? U(0.7f, 1f) : U(1.2f, 1.5f)));
+                    int dmg = a.id == 97 ? (int)((25 + (D + fire) * 1.25f + ele * 30f) * U(0.7f, 1f))
+                                         : (int)((25 + (D + fire) * 1.3f + ele * 25f) * U(1.2f, 1.5f));
                     if (a.id == 97) PlayPlayerEffect(31);
                     PlaySound(a.id == 97 ? 309 : 439, me, 50);
                     release = () => { HitNpc(t, dmg, DamageKinds.Fire); if (a.id == 166) PlayNpcEffect(t, 158); };
@@ -141,10 +140,10 @@ namespace GSOOffline
                     AddBuff(second ? AbilityFireWisp2 : AbilityFireWisp, second ? 86 : 85, 27f, null, ele * 2);
                     return true;
                 }
-                case 112:   // Combustion: 15 + 0.6 x (Damage + FireDamage) + 2.5 x Elemental grimoire fire a second, 10 s
+                case 112:   // Combustion: 15 + 0.6 x (Damage + FireDamage) + 5 x Elemental grimoire fire a second, 10 s
                 {
                     CountXp(SkillElementalGrim);
-                    int dmg = (int)(15 + (D + fire) * 0.6f + ele * 2.5f);
+                    int dmg = (int)(15 + (D + fire) * 0.6f + ele * 5f);
                     release = () =>
                     {
                         AddDot(t, DotCombustion, dmg, DamageKinds.Fire, 1f, 10f);
@@ -157,7 +156,7 @@ namespace GSOOffline
                 case 113:   // Blast: fire 5 m around the clicked spot; sets off landmines there
                 {
                     CountXp(SkillElementalGrim);
-                    int dmg = (int)((35 + fire + D + ele * 35f) * U(0.7f, 1f));
+                    int dmg = (int)((35 + (fire + D) * 0.8f + ele * 35f) * U(0.7f, 1f));
                     release = () =>
                     {
                         PlayEffect(28, center);
@@ -203,8 +202,8 @@ namespace GSOOffline
                 case 120:   // Eruption: fire 5 m around the target; spreads its Combustion to everything hit
                 {
                     CountXp(SkillElementalGrim);
-                    int dmg = (int)((25 + fire + D + ele * 40f) * U(0.7f, 1f));
-                    int combustion = (int)(15 + (D + fire) * 0.6f + ele * 6f);
+                    int dmg = (int)((25 + (fire + D) * 1.5f + ele * 50f) * U(0.7f, 1f));
+                    int combustion = (int)(15 + (D + fire) * 0.5f + ele * 5f);
                     PlaySound(309, me, 50);
                     release = () =>
                     {
@@ -222,17 +221,19 @@ namespace GSOOffline
                     };
                     return true;
                 }
-                case 121:   // Firestorm: (0.8 x (Damage + FireDamage) + 10 x Elemental grimoire) a second 4 m around you, 8 s
+                case 121:   // Firestorm: (0.7 x (Damage + FireDamage) + 10 x Elemental grimoire) a second 4 m around you, 8 s
                 {
                     CountXp(SkillElementalGrim);
                     PlayPlayerEffect(53);
-                    AddBuff(a.id, 0, 8f, null, (int)(((D + fire) * 0.8f + ele * 10f) * U(0.7f, 1f)));
+                    AddBuff(a.id, 0, 8f, null, (int)(((D + fire) * 0.7f + ele * 10f) * U(0.7f, 1f)));
                     return true;
                 }
                 case 122:   // Landmine: armed after 3 s, goes off when something moves within 2.5 m (or after 90 s); 6 m of fire
+                case 172:   // the Storage guard's crossbow's landmine: the same mine, by Archery
                 {
-                    CountXp(SkillElementalGrim);
-                    int dmg = (int)((75 + (D + fire) * 2f + ele * 40f) * U(0.9f, 1f));
+                    int by = a.id == 172 ? SkillArchery : SkillElementalGrim;
+                    CountXp(by);
+                    int dmg = (int)((75 + (D + fire) * 1.8f + SkillLevel(by) * 40f) * U(0.9f, 1f) * StorageGuardSetMultiplier());
                     PlaceMine(center, dmg, 90f);
                     return true;
                 }
@@ -315,6 +316,7 @@ namespace GSOOffline
                     return true;
                 }
                 case 51:   // Broadsword ice attack: a 2 second stun
+                case 175:  // Halberd ice attack (Serpent's Fang): the same
                 {
                     CountXp(SkillSwords);
                     int dmg = Mathf.RoundToInt(U(1, 1 + WeaponMax(SkillSwords) * 1.2f + slash + ice)) + D;
@@ -327,7 +329,7 @@ namespace GSOOffline
                     int dmg = Mathf.RoundToInt(U(1, 1 + WeaponMax(SkillSwords) * 1.2f + slash + StatDamageOf(DamageKinds.Electric))) + D;
                     release = () =>
                     {
-                        AoeDamage(NpcPosition(t), (int)(dmg * 0.5f), DamageKinds.Electric, 3f);
+                        AoeDamage(NpcPosition(t), (int)(dmg * 0.5f) * (Wears("zalranazsCleaver") ? 2 : 1), DamageKinds.Electric, 3f);
                         HitNpc(t, dmg, DamageKinds.Electric);
                     };
                     return true;
@@ -457,10 +459,10 @@ namespace GSOOffline
                     };
                     return true;
                 }
-                case 100:   // Strength: 15 x Swordsmanship slash damage, 10 s
+                case 100:   // Strength: 15 x Swordsmanship slash damage, 10 s (+3 s per Berserker's piece)
                     PlayPlayerEffect(35);
                     PlaySound(65, me, 30);
-                    AddBuff(a.id, 7, 10f, null, sw * 15);
+                    AddBuff(a.id, 7, BerserkerDuration(10f, 3f), null, sw * 15);
                     return true;
                 case 103:   // Survivor: half your health again for 20 s, taken back when it ends
                     PlayPlayerEffect(35);
@@ -472,11 +474,11 @@ namespace GSOOffline
                     PlaySound(65, me, 30);
                     AddBuff(a.id, 11, 20f, null);
                     return true;
-                case 137:   // Charge
+                case 137:   // Charge: 7 s (+2 s per Berserker's piece)
                     CountXp(SkillSwords);
                     PlayPlayerEffect(82);
                     PlaySound(65, me, 30);
-                    AddBuff(a.id, 49, 7f, null);
+                    AddBuff(a.id, 49, BerserkerDuration(7f, 2f), null);
                     return true;
                 case 139:   // Energy blade: stores the magic damage you take for 5 s, then releases it 10 m around you
                     CountXp(SkillSwords);
@@ -535,22 +537,25 @@ namespace GSOOffline
                     };
                     return true;
                 }
-                case 167:   // Windwalking
+                case 167:   // Windwalking: 30 s, 8 more in the Hunter's body and 6 in the Hunter's legs
                     CountXp(SkillLightArmor);
                     PlayPlayerEffect(159);
                     PlaySound(66, me, 40);
-                    AddBuff(a.id, 91, 30f, null, 2);
+                    AddBuff(a.id, 91, 30f + (Wears("huntersBody") ? 8f : 0f) + (Wears("huntersLegs") ? 6f : 0f), null, 2);
                     return true;
-                case 168:   // Mana surge: 0.4 x Light armor more mana a second, 10 s
+                case 168:   // Mana surge: 0.4 x Light armor more mana a second, 10 s; in Jotnar's chaps Life surge, 5 x Light armor health
                     CountXp(SkillLightArmor);
                     PlaySound(440, me, 40);
-                    AddBuff(a.id, 92, 10f, null, (int)(SkillLevel(SkillLightArmor) * 0.4f));
+                    if (Wears("jotnarsChaps")) AddBuff(a.id, BuffLifeSurge, 10f, null, SkillLevel(SkillLightArmor) * 5);
+                    else AddBuff(a.id, 92, 10f, null, (int)(SkillLevel(SkillLightArmor) * 0.4f));
                     return true;
                 case 169:   // Embrace the pain: the share of your health a blow takes comes back as that share of your mana, 15 s
                     CountXp(SkillLightArmor);
                     PlayPlayerEffect(161);
                     PlaySound(441, me, 40);
-                    AddBuff(a.id, 93, 15f, null);
+                    // In Jotnar's body it's Survivor instead: half your health again for 58 s, taken back when it ends.
+                    if (Wears("jotnarsBody")) AddBuff(AbilitySurvivor, 10, 58f, new BuffEffect { payBackHealth = true }, (int)(MaxHealth() * 0.5f));
+                    else AddBuff(a.id, 93, 15f, null);
                     return true;
                 case 170:   // Traverse: immune for 4 s
                     CountXp(SkillLightArmor);
@@ -561,9 +566,9 @@ namespace GSOOffline
                     return true;
 
                 // ---- Archery ----
-                case 61:   // Focus: crossbow shots every half second, 3 s
+                case 61:   // Barrage (Focus): crossbow shots every half second, 3 s; 6 s with the Barrage crossbow
                     CountXp(SkillArchery);
-                    AddBuff(a.id, 79, 3f, null);
+                    AddBuff(a.id, 79, Wears("barrage") ? 6f : 3f, null);
                     return true;
                 case 62:   // Fire arrow: fire, and an ignite of a fifth of it a second for 5 s
                     CountXp(SkillArchery);
@@ -585,10 +590,10 @@ namespace GSOOffline
                         AoeDamage(NpcPosition(t), (int)(d * 0.5f), DamageKinds.Electric, 3f);
                     });
                     return true;
-                case 65:   // Explosive arrow: fire 5 m around where it lands, keeping Combustions there burning (update 137: 27% less)
+                case 65:   // Explosive arrow: fire 5 m around where it lands, keeping Combustions there burning
                 {
                     CountXp(SkillArchery);
-                    int dmg = (int)((ar * 10f + wl * 10 + D + pierce) * U(1.7f, 2f) * 0.73f);
+                    int dmg = (int)((int)((ar * 10f + wl * 10 + D + pierce) * U(1.2f, 1.5f)) * StorageGuardSetMultiplier());
                     release = () => Shoot(10, t, dmg, true, d =>
                     {
                         Vector3 at = NpcPosition(t);
@@ -623,7 +628,8 @@ namespace GSOOffline
                 {
                     CountXp(SkillArchery);
                     int dmg = (int)((ar * 10f + wl * 10 + D + pierce) * U(1.5f, 2f));
-                    release = () => Shoot(20, t, dmg, true, d => HitNpc(t, d, DamageKinds.Piercing, HitNoDefence));
+                    bool thorn = Wears("thorn");   // the Thorn bow: half as much again
+                    release = () => Shoot(20, t, dmg, true, d => HitNpc(t, thorn ? (int)(d * 1.5f) : d, DamageKinds.Piercing, HitNoDefence));
                     return true;
                 }
                 case 77: case 164:   // pistol shots (10 bullets a gun; the offhand pistol counts the shield slot's level)
@@ -669,8 +675,16 @@ namespace GSOOffline
                 {
                     CountXp(SkillArchery);
                     int dmg = (int)((ar * 10f + wl * 10 + D + poison) * U(0.7f, 1f));
+                    bool venomous = Wears("venomousQuiver");
                     release = () => Shoot(35, t, dmg, true, d =>
                     {
+                        // The Venomous quiver turns it into 15 s of poison, a quarter of the shot a second, without the blow.
+                        if (venomous)
+                        {
+                            AddDot(t, DotOoze, (int)(d * 0.25f), DamageKinds.Poison, 1f, 15f);
+                            Aggro(t);
+                            return;
+                        }
                         HitNpc(t, d, DamageKinds.None);
                         AddDot(t, DotOoze, (int)(d * 0.2f), DamageKinds.Poison, 1f, 5f);
                     });
@@ -686,21 +700,21 @@ namespace GSOOffline
                     CountXp(SkillArchery);
                     release = () => Shoot(42, t, 0, true, d => { });
                     return true;
-                case 152:   // Aggressive snowball: Snowmen take it without their ice resistance, the winter bosses 1000
+                case 152:   // Aggressive snowball: Snowmen take it without their ice resistance, the winter bosses 1500
                 {
                     TakeItems(ItemSnowball, 1);
                     CountXp(SkillArchery);
                     int dmg = (int)((ar * 10f + D + ice) * U(0.7f, 1f));
                     release = () => Shoot(43, t, dmg, true, d =>
                     {
-                        if (t.typeId == SnowBossType || t.typeId == SnowBossMinionType) HitNpc(t, 1000, DamageKinds.Ice, HitNoIceResistance);
+                        if (t.typeId == SnowBossType || t.typeId == SnowBossMinionType) HitNpc(t, 1500, DamageKinds.Ice, HitNoIceResistance);
                         else HitNpc(t, d, DamageKinds.Ice, t.typeId == SnowmanType ? HitNoIceResistance : 0);
                     });
                     return true;
                 }
                 case 154:   // Venom arrow: past poison resistance and block, then venom of a fifth of it a second for 5 s
                 {
-                    int dmg = (int)((ar * 20f + D + pierce + poison) * U(1.8f, 2f));
+                    int dmg = (int)((int)((ar * 20f + D + pierce + poison) * U(1.8f, 2f)) * 1.5f);   // half again on creatures
                     release = () => Shoot(46, t, dmg, true, d =>
                     {
                         HitNpc(t, d, DamageKinds.Poison, HitNoPoisonResistance | HitNoBlock);
@@ -710,7 +724,7 @@ namespace GSOOffline
                 }
                 case 155:   // Thorny vines: roots for 6 s
                 {
-                    int dmg = (int)((ar * 10f + D + pierce + poison) * U(1.8f, 2f));
+                    int dmg = (int)((int)((ar * 10f + D + pierce + poison) * U(1.8f, 2f)) * 1.5f);   // half again on creatures
                     release = () => Shoot(47, t, dmg, true, d => { HitNpc(t, d, DamageKinds.Poison); RootNpc(t, 6f); });
                     return true;
                 }
@@ -726,18 +740,40 @@ namespace GSOOffline
                     return true;
                 }
 
+                case 173:   // Condensed psyche (Zalranaz's cleaver): spends up to 400 mana, 1% more per mana point
+                case 174:   // Condensed ice (Serpent's Fang): up to 300 mana
+                {
+                    CountXp(SkillSwords);
+                    bool psyche = a.id == 173;
+                    int spent = Mathf.Min(character.currentMana, psyche ? 400 : 300);
+                    character.currentMana -= spent;
+                    SendMana();
+                    float per = psyche ? 10f : 14f;
+                    int kind = psyche ? DamageKinds.Psychic : DamageKinds.Ice;
+                    float raw = (sw * per + wl * per + 0.5f * (D + StatDamageOf(kind))) * (1 + spent * 0.01f) * U(0.8f, 1.2f);
+                    if (psyche && Wears("tombGuardiansAmulet")) raw *= 1.2f;
+                    int dmg = (int)raw;
+                    release = () => Shoot(psyche ? 31 : 18, t, dmg, true, d => HitNpc(t, d, kind));
+                    return true;
+                }
+                case 176:   // Summon skeletal berserk (Lydia's staff)
+                case 177:   // Summon skeleton (Roke's staff)
+                    CountXp(SkillElementalGrim);
+                    Summon(a.id == 176);
+                    return true;
+
                 // ---- Healing (the lute) ----
                 case 98:   // Healing music: heals you each second of the song
                 case 99:   // Healing aura: heals everyone within 6 m (offline: you)
                     CountXp(SkillHealing);
                     PlayPlayerEffect(a.id == 98 ? 32 : 33);
                     PlaySound(heal > 30 ? 312 : heal > 15 ? 311 : 310, me, 40);
-                    AddBuff(a.id, 103, Mathf.Max(1f, a.attackTime), null);
+                    AddBuff(a.id, 0, Mathf.Max(1f, a.attackTime), null);   // the song itself: no buff icon
                     return true;
-                case 101:   // Tritone: (10 x Healing + 10 x weapon level + half (Damage + PsychicDamage)) x 2 (update 137)
+                case 101:   // Tritone: (15 x Healing + 15 x weapon level + Damage + PsychicDamage) x 1.6-2.4
                 {
                     CountXp(SkillHealing);
-                    int dmg = (int)((heal * 10f + wl * 10 + 0.5f * (D + StatDamageOf(DamageKinds.Psychic))) * 2f * U(0.8f, 1.2f));
+                    int dmg = (int)((heal * 15f + wl * 15 + (D + StatDamageOf(DamageKinds.Psychic))) * U(1.6f, 2.4f));
                     release = () => Shoot(25, t, dmg, true, d => HitNpc(t, d, DamageKinds.Psychic));
                     return true;
                 }
@@ -810,9 +846,9 @@ namespace GSOOffline
                     case AbilityHealingAura:
                     {
                         if (character.currentHealth >= MaxHealth()) break;
-                        float stat = GearStat("Healing") * 3, skill = SkillLevel(SkillHealing) * (b.ability == AbilityHealingMusic ? 14f : 10f);
+                        float stat = GearStat("Healing") * 2.5f, skill = SkillLevel(SkillHealing) * 14f;
                         float amount = b.ability == AbilityHealingMusic ? U((skill + stat) * 0.7f, skill + stat) : U((skill + stat) * 0.6f, (skill + stat) * 0.8f);
-                        Heal((int)(amount * 0.85f));   // update 137: about 15% less
+                        Heal((int)amount);
                         break;
                     }
                     case AbilityCryostasis:

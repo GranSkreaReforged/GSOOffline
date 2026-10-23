@@ -4,33 +4,31 @@ using UnityEngine;
 namespace GSOOffline
 {
     /// <summary>
-    /// Combat numbers. Health, damage and experience are the original server's formulas (update 136,
-    /// Scr_NpcHandler and Scr_PlayerHandler) with the later patch notes' changes on top; the attacks' own formulas
-    /// are in OfflineServer.OriginalCombat.cs and OfflineServer.Abilities.cs. Single-player additions are marked.
+    /// Combat numbers. Health, damage and experience are the original server's formulas (Scr_NpcHandler and
+    /// Scr_PlayerHandler, its last version); the attacks' own formulas are in OfflineServer.OriginalCombat.cs and
+    /// OfflineServer.Abilities.cs. Single-player additions are marked.
     /// </summary>
     internal static class CombatRules
     {
-        // Creature health: 100 + 5 x level^2.3, then +50% (update 137) and -11.1% (139). Bosses: 100 + 10 x level^2.3,
-        // then +50% (137): Zalranaz at 90 has 468,800, as videos of the live game show.
-        public const float CreatureHealthPatches = 1.5f * (8f / 9f), BossHealthPatches = 1.5f;
-        public static int NpcHealth(int level) => (int)((100 + 5f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * CreatureHealthPatches);
-        public static int BossHealth(int level) => (int)((100 + 10f * Mathf.Pow(Mathf.Max(1, level), 2.3f)) * BossHealthPatches);
+        // Creature health: 100 + 6.75 x level^2.3; bosses 100 + 15 x level^2.3 (Zalranaz at 90: 468,750), and the
+        // Elder Ent 30% more (GameData).
+        public static int NpcHealth(int level) => (int)(100 + 6.75f * Mathf.Pow(Mathf.Max(1, level), 2.3f));
+        public static int BossHealth(int level) => (int)(100 + 15f * Mathf.Pow(Mathf.Max(1, level), 2.3f));
 
         // Single player: bosses were made for groups, so the character may give them this share of their health
         // (the insurance advisor, OfflineServer.Difficulty.cs; 1 = the original's). Their damage is the original's.
         public static float BossHealthShare = 1f;
 
-        // Creature damage: 10 + 0.65 x level^2; bosses 10 + 0.8 x level^2, then +25% (update 137) and -12.5% (139).
-        // A blow rolls 1 to one less than this (Random.Range(1, damage)). The data's own damage replaces it, except the
-        // few single-digit values (Argus, Argo, Argi), which are on another scale.
-        public const float BossDamagePatches = 1.25f * 0.875f;
+        // Creature damage: 10 + 0.67 x level^2; bosses 10 + 0.8 x level^2. A blow rolls 1 to one less than this
+        // (Random.Range(1, damage)). The data's own damage replaces it; for Argus, Argo and Argi (single digits) it's
+        // a share of your health (NpcAi.PiercingPercentage).
         public static int NpcDamage(int level, bool boss)
         {
             float l = Mathf.Max(1, level);
-            return boss ? (int)((10 + 0.8f * l * l) * BossDamagePatches) : (int)(10 + 0.65f * l * l);
+            return boss ? (int)(10 + 0.8f * l * l) : (int)(10 + 0.67f * l * l);
         }
 
-        public static int NpcMaxHit(NpcInfo n) => n.damage >= 10 ? n.damage : NpcDamage(n.level, n.boss);
+        public static int NpcMaxHit(NpcInfo n) => n.damage > 0 ? n.damage : NpcDamage(n.level, n.boss);
 
         // Your base health: 100 per combat level (update 136), gear on top.
         public static int BaseHealth(int combatLevel) => 100 * Mathf.Max(1, combatLevel);
@@ -105,9 +103,8 @@ namespace GSOOffline
         public const float ExplosiveFuse = 3f, ExplosionRadius = 6f;
         // After a stun wears off, the target can't be stunned again for this long (the original's buff 47).
         public const float StunImmunity = 5f;
-        // Flying followers add a tenth of their grade's multiplier to your damage (8.8% Damaged to 17.2% Mythic with
-        // update 138's grades; update 140 lowered it by an unrecorded amount).
-        public static float FlyingPetBonus(int grade) => OfflineServer.GradeMultiplier(Mathf.Clamp(grade, 1, 8)) * 0.1f;
+        // Flying followers add 1% of your damage per grade (1% Damaged to 8% Mythic).
+        public static float FlyingPetBonus(int grade) => Mathf.Clamp(grade, 1, 8) * 0.01f;
 
         // Bosses give double experience (update 137).
         public const int BossXpMultiplier = 2;
@@ -387,6 +384,7 @@ namespace GSOOffline
                     if (weapon != null && weapon.typeId == 380 && !npc.dead) BalSardanWandHit(npc, damage);
                     if (punch && Time.time >= punchStunReadyAt)
                     {
+                        if (Wears("brunosBoots")) SlowNpc(npc, 4f);
                         StunNpc(npc, 2f);
                         punchStunReadyAt = Time.time + 10f;
                     }
@@ -532,8 +530,8 @@ namespace GSOOffline
         {
             int fire = StatDamageOf(DamageKinds.Fire);
             HitNpc(npc, damage, DamageKinds.Piercing);
-            HitNpc(npc, (int)(damage * 0.2f) + fire, DamageKinds.Fire);
-            int burn = (int)(10 + (StatDamage() + fire) * 0.3f + SkillLevel(SkillArchery) * 2f);
+            HitNpc(npc, (int)((damage + fire) * 0.5f), DamageKinds.Fire);
+            int burn = (int)(10 + (StatDamage() + fire) * 0.3f + SkillLevel(SkillArchery) * 1.5f);
             for (int id = 87; id <= 89; id++)
                 if (!npc.dots.Exists(d => d.id == id))
                 {
@@ -617,9 +615,30 @@ namespace GSOOffline
             if (info != null) NpcSound(npc, info.sfxDeath);
 
             AwardKillXp(info);
-            if (npc.master == null) DropLoot(npc, info);   // summoned minions carry nothing
+            if (npc.master == null || npc.dropsLoot) DropLoot(npc, info);   // summoned minions carry nothing
             OnNpcKilled(npc.typeId);
             OnBossKilled(npc);
+            SplitOnDeath(npc);
+        }
+
+        private const int Argus = 358, Argo = 359, Argi = 360;
+
+        /// <summary>
+        /// Argus falls apart into 3 Argo, and each Argo into 4 Argi, 2-3 m around where it died (Scr_NpcHandler.onDeath).
+        /// They don't come back.
+        /// </summary>
+        private void SplitOnDeath(NpcEntity npc)
+        {
+            if (npc.typeId != Argus && npc.typeId != Argo) return;
+            int type = npc.typeId == Argus ? Argo : Argi, count = npc.typeId == Argus ? 3 : 4;
+            Vector3 at = NpcPosition(npc);
+            for (int i = 0; i < count; i++)
+            {
+                Vector2 dir = Random.insideUnitCircle.normalized * Random.Range(2f, 3f);
+                var part = SpawnBossMinion(npc, type, at + new Vector3(dir.x, 0f, dir.y), true);
+                part.dropsLoot = true;
+            }
+            Plugin.Log.LogInfo($"[combat] {npc.uid} ({npc.typeId}) splits into {count} of type {type}");
         }
 
         /// <summary>Stunned or rooted NPCs stop where they are (the client keeps walking to the last waypoint).</summary>
@@ -940,7 +959,7 @@ namespace GSOOffline
                     Send(198, 28, npc.uid, playerPos);   // turn to the player: the client only turns NPCs as they walk
                 }
                 if (Time.time < npc.nextSwing) continue;
-                npc.nextSwing = Time.time + info.attackSpeed * (Time.time < npc.chilledUntil ? 1.25f : 1f);   // chilled: a quarter slower
+                npc.nextSwing = Time.time + info.attackSpeed * npc.attackSpeedMultiplier * (Time.time < npc.chilledUntil ? 1.25f : 1f);   // chilled: a quarter slower
                 Send(198, 28, npc.uid, playerPos);
                 bool cast = BountyPrepareSwing(npc);   // an outlaw picks its ability first: the swing animates it
                 SetAnim(npc, info.animAttack, true);
@@ -980,6 +999,16 @@ namespace GSOOffline
         private void NpcHitsPlayer(NpcInfo info, NpcEntity attacker, int projectile = 0)
         {
             if (OutlawHitsPlayer(attacker, projectile)) return;   // an outlaw rolls its blows as a player does
+            if (projectile == 0 && info.aiBehaviour == AiPiercingPercentage)
+            {
+                PiercingPercentageHit(info);
+                return;
+            }
+            if (projectile == 0 && info.aiBehaviour == AiSlowingAttack)
+            {
+                if (!HasBuff(BuffSlow)) PlayPlayerEffect(20);
+                AddBuff(-BuffSlow, BuffSlow, 3f, null);
+            }
             int max = CombatRules.NpcMaxHit(info);
             float roll = projectile > 0 ? NpcShotDamage(projectile, max) : Random.Range(1, Mathf.Max(2, max));
             int type = projectile > 0 && ProjectileType(projectile) > 0 ? ProjectileType(projectile) : info.damageType;
@@ -992,6 +1021,33 @@ namespace GSOOffline
             if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {damage} of {roll:0} (health {character.currentHealth - damage}/{MaxHealth()})");
             HurtPlayer(damage, PlayerSplash(info));
             if (projectile > 0) ShotEffects(projectile, Mathf.RoundToInt(roll));
+        }
+
+        // The original's AICycles behaviours that change a blow (Scr_NPCAI.AttackHit).
+        private const int AiSlowingAttack = 1, AiPiercingPercentage = 3;
+
+        /// <summary>
+        /// Argus, Argo and Argi (AttackPiercingPercentage): their damage is a share of your health (of at most
+        /// 15,000), give or take a fifth, past your resistances and block. Only at full health does it land in full:
+        /// the original compared whole numbers (health / max health), so any wound halves it.
+        /// </summary>
+        private void PiercingPercentageHit(NpcInfo info)
+        {
+            int share = character.currentHealth >= MaxHealth() ? info.damage : (int)(info.damage * 0.5);
+            int damage = (int)(Mathf.Min(MaxHealth(), 15000) * share * 0.01);
+            int offset = (int)(damage * 0.2);
+            damage = Random.Range(damage - offset, damage + offset);
+            int taken = TrueDamageTaken(damage);
+            if (LogBlows) Plugin.Log.LogInfo($"[blow] {info.name} ({info.id}) hits you for {taken} ({share}% of your health, true damage)");
+            HurtPlayer(taken, PlayerSplash(info));
+        }
+
+        /// <summary>True damage (the original's takeTrueDamage): no resistance or block, but Truce and Traverse still
+        /// stop it and the 48% cap holds.</summary>
+        private int TrueDamageTaken(int damage)
+        {
+            if (damage <= 0 || PlayerDead || BuffProduct(e => e.damageTaken) <= 0f) return 0;
+            return Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
         }
 
         /// <summary>Takes damage off the player (already reduced) with a hit splash; at 0 they die.</summary>
@@ -1033,6 +1089,7 @@ namespace GSOOffline
             ApplyDeathToll(LocalPlayer != null ? LocalPlayer.transform.position : character.Position);
             StopAttacking();
             EndBuffsOnDeath();
+            DismissSummons();   // the mana they hold stays held until their buffs end
             respawnPlayerAt = Time.time + CombatRules.RespawnDelay;
             Send(1, 2, character.name, true);
             Send(1, 4, character.name, false);   // the client only stops movement when told: WASD dragged the body along the floor

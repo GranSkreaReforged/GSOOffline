@@ -141,7 +141,7 @@ namespace GSOOffline
 
         /// <summary>
         /// The original's pet blow (Scr_PlayerPets.AttackHit): 10 + your Damage and damage of the pet's kind + 15 x your
-        /// weapon's level (or Wrestling without one), 60-100% of it, times the pet's grade. It goes through the target's
+        /// weapon's level (or Wrestling without one), 60-100% of it, times the pet's grade and the Dark Tamer's set. It goes through the target's
         /// defences as yours do, but not your weapon's grade (update 139).
         /// </summary>
         private void PetHits(NpcEntity target, int grade)
@@ -150,7 +150,7 @@ namespace GSOOffline
             var weapon = EquippedWeapon();
             int kind = GameData.Npcs.TryGetValue(pet.typeId, out var petInfo) ? petInfo.damageType : 0;
             int max = 10 + StatDamageOf(kind) + StatDamage() + (weapon != null ? WeaponLevel(weapon) * 15 : SkillLevel(SkillWrestling) * 15);
-            int damage = (int)(Random.Range(max * 0.6f, max) * WeaponGradeMultiplier(grade));
+            int damage = (int)(Random.Range(max * 0.6f, max) * WeaponGradeMultiplier(grade) * DarkTamerPetMultiplier());
             Aggro(target);
             int hit = NpcDamageTaken(target, damage, kind, true, HitNoWeaponGrade);
             Plugin.Log.LogInfo($"[pet] hits {target.uid} for {hit} of {damage} (max {max}, grade {grade})");

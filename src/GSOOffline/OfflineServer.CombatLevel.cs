@@ -40,7 +40,8 @@ namespace GSOOffline
                         Send(16, 5, kv.Value, Mathf.RoundToInt(CombatRules.EffectiveResistance(StatResistance(kind))));
         }
 
-        private Alignment WornAlignment()
+        /// <param name="passive">For the alignment passive: Jotnar's body and chaps together count light armor as heavy.</param>
+        private Alignment WornAlignment(bool passive = false)
         {
             int light = 0, heavy = 0;
             foreach (var it in character.items)
@@ -51,6 +52,12 @@ namespace GSOOffline
                 int w = CombatRules.AlignmentWeight(t.slot);
                 if (t.flags.Contains("isLightArmor")) light += w;
                 if (t.flags.Contains("isHeavyArmor")) heavy += w;
+            }
+            if (passive && heavy < light && Wears("jotnarsBody") && Wears("jotnarsChaps"))
+            {
+                int swap = heavy;
+                heavy = light;
+                light = swap;
             }
             // 12 points in all, so only one type can reach 7.
             if (light >= CombatRules.AlignmentNeeded) return Alignment.Light;
@@ -65,7 +72,7 @@ namespace GSOOffline
         private void RefreshAlignment(bool resend = false)
         {
             if (character == null) return;
-            var now = WornAlignment();
+            var now = WornAlignment(passive: true);
             if (now == alignment && !resend) return;
             if (alignment != now && alignment != Alignment.None) Send(3, 35, character.name, AlignmentIcon(alignment));
             alignment = now;

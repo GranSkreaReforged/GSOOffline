@@ -37,12 +37,12 @@ namespace GSOOffline
         }
 
         // The original's mana: the base 100 and the gear's, less what a Fire wisp burns.
-        private int MaxMana() => Mathf.Max(0, character.mana + GearStat("Mana") - BuffAmount(AbilityFireWisp) - BuffAmount(AbilityFireWisp2));
+        private int MaxMana() => Mathf.Max(0, character.mana + GearStat("Mana") - BuffAmount(AbilityFireWisp) - BuffAmount(AbilityFireWisp2) - SummonManaHeld());
 
         private const int SkillElementalGrim = 20;
 
         // Mana regained each second (Scr_PlayerHandler.HealthManaRegen): 1, plus Manaregen on your gear and Mana surge's.
-        private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen") + BuffAmount(AbilityManaSurge));
+        private int ManaRegen() => Mathf.Max(0, BaseManaRegen + GearStat("Manaregen") + IconAmount(BuffManaSurge));
         private const int BaseManaRegen = 1;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace GSOOffline
         private float regenTimer;
 
         // Health regained each second: 1, plus Healthregen rolled on equipped items.
-        private int HealthRegen() => Mathf.Max(0, 1 + GearStat("Healthregen"));
+        private int HealthRegen() => Mathf.Max(0, 1 + GearStat("Healthregen") + IconAmount(BuffLifeSurge));
 
         // Gear stat key -> the client's bonus StatType (base type + 35), for the stats window. Health and mana go with
         // their own updates. Movementspeed is left out: the client sets your run speed to base + bonus, and the
@@ -129,7 +129,7 @@ namespace GSOOffline
             regenTimer = 1f;
             // Food: 1-1.5% of your health on top while it lasts.
             int food = HasBuff(BuffFood) ? (int)(MaxHealth() * Random.Range(0.01f, 0.015f)) : 0;
-            if (character.currentHealth < MaxHealth()) Heal(HealthRegen() + food);
+            if (character.currentHealth < MaxHealth()) Heal(HealthRegen() + food, regen: true);
             if (character.currentMana < MaxMana())
             {
                 character.currentMana = Mathf.Min(MaxMana(), character.currentMana + ManaRegen());
@@ -137,11 +137,13 @@ namespace GSOOffline
             }
         }
 
-        public void Heal(int amount)
+        /// <summary>Heals the player. Heals (not <paramref name="regen"/>eration) are lowered by Nature's blessing and turned by the plague.</summary>
+        public void Heal(int amount, bool regen = false)
         {
             if (character == null) return;
+            if (!regen) amount = (int)(amount * NaturesBlessingHealing());
             // Sepitus's plague, in his dungeon: a real heal (over 2% of your health) burns you for 2-3 times as much.
-            if (character.scene == ScenePoacher && amount > MaxHealth() * 0.02f && buffs.Exists(b => b.effect.plague))
+            if (!regen && character.scene == ScenePoacher && amount > MaxHealth() * 0.02f && buffs.Exists(b => b.effect.plague))
             {
                 PlayPlayerEffect(7);
                 float res = CombatRules.PlayerResistance(GearStat(DamageKinds.ResistanceStat(DamageKinds.Fire)));

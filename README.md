@@ -143,7 +143,8 @@ Working:
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
 - Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)
 - Weapon abilities as the original server had them: each weapon rolls its own when it's made, two-handed weapons fill keys 2-5, others share them with the shield, and boss uniques have theirs
-- Abilities as the original server had them: attacks, area attacks, ground effects, stuns, roots and slows, damage over time, heals, bandages and buffs with their icons (a few later abilities are reconstructions)
+- Abilities as the original server had them: attacks, area attacks, ground effects, stuns, roots and slows, damage over time, heals, bandages, buffs with their icons, and the staffs' summons (a few ice spells are reconstructions)
+- Unique gear effects from the original server: the Storage guard's, Dark Tamer's, Hunter's and Nature's blessing sets, Jotnar's armor, Bruno's bracers and boots, Jin and Li, the Barrage and Thorn, the Venomous quiver, Berserker's pieces, Lydia's earrings, Roke's ring, Zalranaz's cleaver and the Tomb guardian's amulet
 - Combat experience shared between the skills used in the last 20 seconds, armor skills included
 - Potions, food, experience scrolls, teleport scrolls and gear crates
 - Loot bags: kills drop a bag with the monster's loot; click it to take everything. Dropping an item (Shift+click, the item window's Drop, or dragging it out of the windows) puts it in a bag at your feet, and the item window's Destroy gets rid of it for good. Every bag is saved and lasts 20 minutes of play
@@ -153,7 +154,7 @@ Working:
 - Chat
 - Aellope, Goldon's flying world boss: patrols one of five routes over the island, dives when shot, fights on the ground, takes off again after 20 seconds without damage, feeds on a fallen player, and returns an hour after she's killed (the original server's behaviour)
 - Dungeon mechanics from the original server: Lakhmu's basement (lock puzzle, falling rocks), Ulan's dungeon (gate and key, lift, levers), the Poacher dungeon (vault, storage room and dynamite, lava room, traps, chests), the Yorkhill sewers' bridge, the Coral dungeon (a coral key to get in, water, tidal waves, explosions)
-- Boss mechanics from the original server: Nirish (webs, poison clouds, his healing spiderling), George (dynamite), Sytrax (flight and fire), Sepitus (bolts, plague, healing bird, lava hounds) and Phraustie (snowballs, Snow Apostles)
+- Boss mechanics from the original server: Nirish (webs, poison clouds, his healing spiderling), George (dynamite, focus), Sytrax (flight and fire), Sepitus (bolts, plague, healing bird, lava hounds), Phraustie (snowballs, Snow Apostles), Argus (splits into Argo, and they into Argi), Bruno (slowing blows) and the Coral dungeon's Red crab (explosions)
 - Reconstructed boss mechanics: fog fields, water and psychic explosions, stuns, ground slams and summoned minions (the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
 - Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)
 
