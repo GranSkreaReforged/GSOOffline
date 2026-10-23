@@ -179,11 +179,8 @@ namespace GSOOffline
         private readonly int[] backSlotAbility = new int[WeaponAbilitySlots + 1];
         private readonly float[] backSlotCooldown = new float[WeaponAbilitySlots + 1];
 
-        private int shieldOffForTool;   // the shield a gathering tool pushed off, put back on with a one-handed weapon
-
         private void ResetWeaponSlots()
         {
-            shieldOffForTool = 0;
             for (int s = 0; s <= WeaponAbilitySlots; s++)
             {
                 weaponSlotAbility[s] = backSlotAbility[s] = 0;
@@ -272,6 +269,7 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] weaponbar hand: {Describe(EquippedWeapon())}");
             Plugin.Log.LogInfo($"[dev] weaponbar shield slot: {Describe(EquippedInSlot("Shield"))}");
             Plugin.Log.LogInfo($"[dev] weaponbar back: {Describe(SecondaryWeapon())}");
+            Plugin.Log.LogInfo($"[dev] weaponbar offhand to restore: {Describe(character.offhandRestoreId != 0 ? FindItem(character.offhandRestoreId) : null)}, cooldowns {character.offhandCooldown3:0.0} s, {character.offhandCooldown4:0.0} s");
             for (int s = 1; s <= WeaponAbilitySlots; s++)
             {
                 int a = weaponSlotAbility[s];
@@ -282,7 +280,7 @@ namespace GSOOffline
 
         /// <summary>
         /// Login: a save from before two-handed weapons and the shield slot excluded each other may have both on;
-        /// the shield comes off, as equipping the weapon would have done.
+        /// the shield comes off, as equipping the weapon would have done, and back on with a one-handed weapon.
         /// </summary>
         private static void FixTwoHandedWithShield(CharacterSave ch)
         {
@@ -296,7 +294,40 @@ namespace GSOOffline
             }
             if (weapon == null || shield == null || !IsTwoHanded(weapon.typeId)) return;
             shield.equipped = false;
+            ch.offhandRestoreId = shield.id;
+            ch.offhandCooldown3 = ch.offhandCooldown4 = 0f;
             Plugin.Log.LogInfo($"[inventory] {ItemData.Get(shield.typeId)?.name} unequipped: {ItemData.Get(weapon.typeId)?.name} is two-handed");
+        }
+
+        /// <summary>
+        /// A two-handed weapon or gathering tool pushed the shield off (#124). It goes back on with the next
+        /// one-handed weapon, its slot 3-4 cooldowns as they were: they don't run while it's off, like the back
+        /// weapon's. Saved, so a logout in between doesn't lose it.
+        /// </summary>
+        private void RememberOffhand(ItemSave shield)
+        {
+            character.offhandRestoreId = shield.id;
+            character.offhandCooldown3 = SlotCooldownLeft(3);
+            character.offhandCooldown4 = SlotCooldownLeft(4);
+        }
+
+        private void ForgetOffhand()
+        {
+            character.offhandRestoreId = 0;
+            character.offhandCooldown3 = character.offhandCooldown4 = 0f;
+        }
+
+        /// <summary>A one-handed weapon went in hand with no shield on: the shield pushed off goes back on, if it's still in the bag.</summary>
+        private void RestoreOffhand()
+        {
+            var shield = FindItem(character.offhandRestoreId);
+            float cooldown3 = character.offhandCooldown3, cooldown4 = character.offhandCooldown4;
+            ForgetOffhand();
+            if (shield == null || shield.equipped || ItemData.Get(shield.typeId)?.slot != "Shield") return;
+            Plugin.Log.LogInfo($"[inventory] {ItemData.Get(shield.typeId)?.name} back on (cooldowns {cooldown3:F1}s, {cooldown4:F1}s)");
+            Equip(shield.id);
+            SetSlotCooldown(3, cooldown3);
+            SetSlotCooldown(4, cooldown4);
         }
     }
 }

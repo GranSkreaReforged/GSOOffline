@@ -25,6 +25,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - During the Halloween and Christmas events creatures drop the 2020 crates, as the original's last version did: the Halloween 2020 crate has the Reaper's robes and scythe and the Headless Reaper pet, the Christmas 2020 crate the Snowman pet, each with its own untradeable pet that comes within 500 crates. 2019 crates you already have still open.
 
 ### Added
+- A shield taken off by a two-handed weapon, bow or gathering tool goes back on with the next one-handed weapon, whether you switch weapons or equip one from the bag (#124). Its ability cooldowns are kept as they were (they don't run while it's off), and it's remembered across a logout. Equipping a shield yourself, or no longer carrying it, ends that.
 - 19 house plots around East Athagos (29 there instead of 10).
 - The South Athagos and Bal Amana teleport scrolls take you there.
 - Commander Grant's untradeable small grade stone grades items like a small grade stone.
