@@ -25,6 +25,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - During the Halloween and Christmas events creatures drop the 2020 crates, as the original's last version did: the Halloween 2020 crate has the Reaper's robes and scythe and the Headless Reaper pet, the Christmas 2020 crate the Snowman pet, each with its own untradeable pet that comes within 500 crates. 2019 crates you already have still open.
 
 ### Added
+- A Quick deposit button in the bank window puts every stack in your bag that the bank already has a stack of into the bank in one click (#114). Items on your item hotbar and equipped items stay in the bag, and nothing new goes into the bank.
 - A shield taken off by a two-handed weapon, bow or gathering tool goes back on with the next one-handed weapon, whether you switch weapons or equip one from the bag (#124). Its ability cooldowns keep running while it's off, and it's remembered across a logout. Equipping a shield yourself, or no longer carrying it, ends that.
 - 19 house plots around East Athagos (29 there instead of 10).
 - The South Athagos and Bal Amana teleport scrolls take you there.
