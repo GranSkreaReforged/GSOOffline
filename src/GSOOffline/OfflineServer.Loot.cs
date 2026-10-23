@@ -319,6 +319,7 @@ namespace GSOOffline
             for (int i = 0; i < n; i++)
             {
                 var bag = RollLoot(info);
+                Instance?.SeasonalDrops(bag, info);
                 if (bag.items.Count == 0 && bag.silver <= 0) empty++;
                 silver += bag.silver;
                 foreach (var it in bag.items)
