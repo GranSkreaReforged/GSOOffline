@@ -135,10 +135,10 @@ namespace GSOOffline
             else if (level >= 25 && level < 50 && OneIn(75 - level)) AddToBag(bag, OneIn(15) ? 441 : 438, 1);
             else if (level >= 50 && OneIn(100 - level)) AddToBag(bag, OneIn(15) ? 442 : 439, 1);
 
-            if (level >= 1 && level < 10 && OneIn(50 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 1 : IronCrate, 1);
-            else if (level >= 10 && level < 20 && OneIn(60 - level)) AddToBag(bag, OneIn(15) ? IronCrate + 2 : IronCrate + 1, 1);
+            if (level >= 1 && level < 10 && OneIn(2 * (50 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 1 : IronCrate, 1);
+            else if (level >= 10 && level < 20 && OneIn(2 * (60 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 2 : IronCrate + 1, 1);
             else if (level >= 20 && level < 30 && OneIn(2 * (70 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 3 : IronCrate + 2, 1);
-            else if (level >= 30 && level < 40 && OneIn(2 * (80 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 4 : IronCrate + 3, 1);
+            else if (level >= 30 && level < 40 && OneIn(3 * (80 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 4 : IronCrate + 3, 1);
             else if (level >= 40 && level < 50 && OneIn(3 * (90 - level))) AddToBag(bag, OneIn(15) ? IronCrate + 5 : IronCrate + 4, 1);
             else if (level >= 50 && OneIn(3 * (100 - level))) AddToBag(bag, IronCrate + 5, 1);
         }

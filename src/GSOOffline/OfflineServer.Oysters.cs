@@ -285,12 +285,17 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[oyster] netted oyster {caught.uid} {bestD:F1} m from the net");
         }
 
+        private const int SardanianCrate = 10701, AncientSardanianAlloy = 10741;
+
         private void LandNetHaul()
         {
             var o = netHaul;
             netHaul = null;
             RemoveOyster(o);
             GiveItem(OysterItem);
+            // The original's rare finds with each oyster (Scr_BalSardanOysterFishing.Reward).
+            if (Random.Range(0, 200) == 0) GiveItem(SardanianCrate);
+            if (Random.Range(0, 5000) == 0) GiveItem(AncientSardanianAlloy);
             AddXp(FishingSkill, SkillData.BaseXp(OysterFishingLevel));
             Notice("You caught an oyster!", "green");
         }
