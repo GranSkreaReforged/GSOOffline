@@ -1050,10 +1050,11 @@ namespace GSOOffline
             return Mathf.Min(damage, Mathf.CeilToInt(MaxHealth() * CombatRules.MaxHitShare));
         }
 
-        /// <summary>Takes damage off the player (already reduced) with a hit splash; at 0 they die.</summary>
+        /// <summary>Takes damage off the player (already reduced) with a hit splash; at 0 they die. Truce and Traverse
+        /// stop all of it, as the original's takeDamage did: lava, hazards, poisons and bleeds as well as blows (#120).</summary>
         private void HurtPlayer(int damage, int splash)
         {
-            if (PlayerDead) return;
+            if (PlayerDead || HasBuff(BuffTruce) || HasBuff(BuffTraverse)) return;
             character.currentHealth = Mathf.Max(0, character.currentHealth - damage);
             Send(8, 2, character.name, -damage, splash);
             SendHealth();

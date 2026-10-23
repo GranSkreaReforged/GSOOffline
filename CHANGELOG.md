@@ -38,6 +38,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ### Fixed
 - Healing music and Healing aura no longer show the Life surge icon.
+- Truce and Traverse protect you from all damage again, as in the original: lava, Sepitus's bolts, Phraustie's snowballs, the Coral dungeon's wave, boss hazards, poisons and bleeds as well as blows (#120).
 
 ## [1.8.0] - 2026-10-21
 ### Changed
