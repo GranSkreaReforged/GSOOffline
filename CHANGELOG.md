@@ -21,6 +21,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
   - Commander Grant's Gloves: he hands over his two gloves; combining them fails and destroys the spare pair, and he gives you his upgrade stone to use on the gloves instead. He takes back whatever is left of his things when he pays you.
   - Joining the Hunters Guild: the guild in Trout has its door again. Show the Porter your insignia and the door opens; without it, he stops you. If you lose the insignia he sends you after the bear again for a new one.
 - Nimuel Reyes recognises any of the three pieces of St. Jakob's mantle, and his words when he makes you a new Ring of the Monastery are the original's.
+- During the Halloween and Christmas events creatures drop the 2020 crates, as the original's last version did: the Halloween 2020 crate has the Reaper's robes and scythe and the Headless Reaper pet, the Christmas 2020 crate the Snowman pet, each with its own untradeable pet that comes within 500 crates. 2019 crates you already have still open.
 
 ### Added
 - 19 house plots around East Athagos (29 there instead of 10).
