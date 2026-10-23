@@ -138,7 +138,7 @@ Working:
 - Bank, with drag-to-deposit and a Quick deposit button that tops up the bank's existing stacks
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 135 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
-- Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and give bosses less health)
+- Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and soften bosses and creatures: less health and lighter blows)
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
 - Death's toll: dying costs experience for a while, more with each death in a row, and from the 4th some equipped gear can fall into a bag where you died; John Brech in Yorkhill lifts it for silver
 - Seasonal events: Halloween (15 October to 7 November) and Christmas (1 December to 6 January) crates drop from creatures, with their candy, treats, furniture and pets (`SeasonalEvents` in the config overrides the dates)

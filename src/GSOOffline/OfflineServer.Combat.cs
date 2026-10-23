@@ -15,9 +15,12 @@ namespace GSOOffline
         public static int NpcHealth(int level) => (int)(100 + 6.75f * Mathf.Pow(Mathf.Max(1, level), 2.3f));
         public static int BossHealth(int level) => (int)(100 + 15f * Mathf.Pow(Mathf.Max(1, level), 2.3f));
 
-        // Single player: bosses were made for groups, so the character may give them this share of their health
-        // (the insurance advisor, OfflineServer.Difficulty.cs; 1 = the original's). Their damage is the original's.
-        public static float BossHealthShare = 1f;
+        // Single player: the world was made for groups, so the character may give bosses and creatures this share of
+        // their health and their damage (the fate broker, OfflineServer.Difficulty.cs; 1 = the original's). Bosses
+        // always lose more than creatures. Guards and the like (explicit health in the data) keep theirs.
+        public static float BossShare = 1f, CreatureShare = 1f;
+
+        public static float WorldShare(NpcInfo n) => n.boss ? BossShare : CreatureShare;
 
         // Creature damage: 10 + 0.67 x level^2; bosses 10 + 0.8 x level^2. A blow rolls 1 to one less than this
         // (Random.Range(1, damage)). The data's own damage replaces it; for Argus, Argo and Argi (single digits) it's
@@ -1011,6 +1014,7 @@ namespace GSOOffline
             }
             int max = CombatRules.NpcMaxHit(info);
             float roll = projectile > 0 ? NpcShotDamage(projectile, max) : Random.Range(1, Mathf.Max(2, max));
+            roll *= CombatRules.WorldShare(info);   // the fate broker's share
             int type = projectile > 0 && ProjectileType(projectile) > 0 ? ProjectileType(projectile) : info.damageType;
             if (projectile == 45 && character.currentMana > 0)   // Diminish takes mana too
             {
@@ -1034,7 +1038,7 @@ namespace GSOOffline
         private void PiercingPercentageHit(NpcInfo info)
         {
             int share = character.currentHealth >= MaxHealth() ? info.damage : (int)(info.damage * 0.5);
-            int damage = (int)(Mathf.Min(MaxHealth(), 15000) * share * 0.01);
+            int damage = (int)(Mathf.Min(MaxHealth(), 15000) * share * 0.01 * CombatRules.WorldShare(info));
             int offset = (int)(damage * 0.2);
             damage = Random.Range(damage - offset, damage + offset);
             int taken = TrueDamageTaken(damage);
