@@ -41,25 +41,34 @@ namespace GSOOffline
             Notice($"You try to use {ItemData.Get(usedType)?.name} with {ItemData.Get(targetType)?.name}. Nothing interesting happens.");
         }
 
-        // Commander Grant's gloves (quest 34, a reconstruction): the upgrade tutorial. His two gloves combine into the
-        // upgraded pair; his upgrade stone is the one he later docks your pay for.
+        // Commander Grant's gloves (quest 34): the upgrade tutorial, as the original scripted it. Combining his two
+        // gloves always fails and destroys the spare pair, and he hands you his upgrade stone; the stone used on the
+        // gloves upgrades them.
         private const int GrantStone = 10726, GrantGloveA = 10727, GrantGloveB = 10728, GrantGloves = 10729;
 
         private bool GrantsGlovesCombo(int targetType, int usedType)
         {
             if (Pair(targetType, usedType, GrantGloveA, GrantGloveB))
             {
-                TakeItems(GrantGloveA, 1);
                 TakeItems(GrantGloveB, 1);
-                GiveItem(GrantGloves);
-                Notice("Upgrade successfull! Your item's grade has increased!", "green");
-                if (character.GetQuestPhase(QuestGrantsGloves) == 1) SetQuestPhase(QuestGrantsGloves, 2);
+                Notice("Upgrade failed, your material was destroyed.", "red");
+                Notice("Commander Grant: God damnit! You trample just destroyed my spare pair of gloves!", "orange");
+                Notice("Commander Grant: Did they not teach you to be careful when upgrading at blacksmithing school?", "orange");
+                Notice("Commander Grant: Here, take this VERY EXPENSIVE upgrade stone and try again.", "orange");
+                GiveItem(GrantStone);
                 return true;
             }
-            if (usedType == GrantStone && (targetType == GrantGloveA || targetType == GrantGloveB || targetType == GrantGloves))
+            if (targetType == GrantGloveA && usedType == GrantStone)
             {
                 TakeItems(GrantStone, 1);
-                Notice("Upgrade failed, your material was destroyed.", "red");
+                TakeItems(GrantGloveA, 1);
+                Notice("Upgrade successfull! Your item's grade has increased!", "green");
+                GiveItem(GrantGloves);
+                if (character.GetQuestPhase(QuestGrantsGloves) == 1)
+                {
+                    SetQuestPhase(QuestGrantsGloves, 2);
+                    Notice("Commander Grant: Excellent! Now give me back my gloves", "orange");
+                }
                 return true;
             }
             return false;

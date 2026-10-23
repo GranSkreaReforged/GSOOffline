@@ -28,6 +28,7 @@ namespace GSOOffline
             if (ResumeSightseeing(npc)) return;
             if (LakhmuInteractNpc(npc)) return;
             if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll
+            if (QuestNpcLine(npc)) return;        // a line over their head instead of a conversation
             dialogueNpc = npc;
             EndDifficultyTalk();
             Send(3, 10, character.name, uid);
@@ -222,7 +223,7 @@ namespace GSOOffline
         public void SetQuestPhase(int quest, int phase)
         {
             if (character == null || character.GetQuestPhase(quest) == phase) return;
-            if (character.GetQuestPhase(quest) == -1) return;   // completed quests stay completed
+            if (character.GetQuestPhase(quest) == -1 && !ReopenableQuests.Contains(quest)) return;   // completed quests stay completed
             character.SetQuestPhase(quest, phase);
             Plugin.Log.LogInfo($"Quest {quest} -> phase {phase}");
             Send(8, 9, character.name, quest, phase);
@@ -239,6 +240,7 @@ namespace GSOOffline
             if (!DialogueData.Quests.TryGetValue(quest, out var q)) return;
             foreach (var item in q.rewardItems) GiveItem(item[0], item.Length > 1 ? item[1] : 1);
             if (q.silver > 0) SetSilver(character.silver + q.silver);
+            if (QuestXpInCode.TryGetValue(quest, out var codeXp)) AddXp(codeXp.Key, codeXp.Value);
 
             // XP rewards only exist as prose ("You have gained 1000 XP in Blacksmithy, Cooking and Mining.").
             var m = q.completionText != null ? XpReward.Match(q.completionText) : Match.Empty;
