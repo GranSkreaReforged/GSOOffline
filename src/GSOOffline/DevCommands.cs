@@ -686,6 +686,21 @@ namespace GSOOffline
         // devbank: opens the bank window as a banker does.
         private static void DevBank(string[] args) => OfflineServer.Instance.DevOpenBank();
 
+        // quickdeposit: the bank window's "Quick deposit" button.
+        private static void QuickDeposit(string[] args) => GSOOffline.QuickDeposit.Deposit(Script_WindowController.instance);
+
+        // hotkeyitem <slot 0-9> <typeId>: puts the bag's item of that type on the item hotbar, as dragging it there does.
+        private static void HotkeyItem(string[] args)
+        {
+            int slot = int.Parse(args[1]), type = int.Parse(args[2]);
+            var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
+            if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }
+            var hotkeys = Script_WindowController.instance.window_itemHotkeys.items;
+            while (hotkeys.Count <= slot) hotkeys.Add(null);
+            hotkeys[slot] = stack.item;
+            Scr_RPCSender.instance.setItemHotkeySlot(stack.item.itemID, type, slot);
+        }
+
         // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
         private static void SortInv(string[] args)
         {

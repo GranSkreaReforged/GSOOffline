@@ -135,7 +135,7 @@ Working:
 - Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
-- Bank
+- Bank, with drag-to-deposit and a Quick deposit button that tops up the bank's existing stacks
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 135 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and give bosses less health)
