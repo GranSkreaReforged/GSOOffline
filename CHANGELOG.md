@@ -43,6 +43,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 - High-grade gear keeps its sparkles after going through a gate or door into another area (#123).
 - The Poacher dungeon's level 70 ghosts drop their loot (fluorite, poisons, the Amulet of Frost...): the original server filed their table under the Elder Cave Dragon, so the dragons dropped it and the ghosts nothing (#116).
 - Sytrax and Viper drop loot. The original gave them none, so their tables are made up from their neighbours': Sytrax drops dragon materials, shadow armour and his tooth (1 in 25), Viper serpent meat and scales, poisons, the venomous ring and amulet and, rarely, the Snakeling pet; both drop silver, teleports and potions like other bosses (#116).
+- Lydia, the Tamer's Apprentice, is back where players remember her: on the hillside with the standing stones in the mountains of southern East Athagos, instead of further east among the skeletons (#122).
 
 ## [1.8.0] - 2026-10-21
 ### Changed
