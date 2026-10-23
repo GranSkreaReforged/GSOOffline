@@ -179,6 +179,8 @@ namespace GSOOffline
         public ItemSave boat;   // boat on the water, out of the bag; null = none (returned to the bag on the next login)
         public int christmasPetCounter;   // Christmas 2019 crates opened without the untradeable Reindeer; -1 = got it
         public int halloweenPetCounter;   // Halloween 2019 crates opened without the untradeable Bat; -1 = got it
+        public int halloween2020PetCounter;   // Halloween 2020 crates opened without the untradeable Headless Reaper; -1 = got it
+        public int christmas2020PetCounter;   // Christmas 2020 crates opened without the untradeable Snowman; -1 = got it
         public HouseSave house;           // null = no house
         public List<KillCount> kills = new List<KillCount>();   // per NPC type, for the house trophies
         public int deathStacks;                 // Death's toll: deaths in a row while it lasted (0 = none)

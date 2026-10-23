@@ -111,7 +111,8 @@ namespace GSOOffline
             else if (TeleportScrolls.TryGetValue(typeId, out int shrine)) ReadTeleportScroll(typeId, shrine);
             else if (TeleportSpots.TryGetValue(typeId, out var spot)) ReadTeleportScroll(typeId, spot.Key, spot.Value);
             else if (ReadHouseTeleport(typeId)) { }
-            else if (TryOpenCrate(typeId) || TryOpenHalloweenCrate(typeId) || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
+            else if (TryOpenCrate(typeId) || TryOpenHalloweenCrate(typeId) || TryOpenHalloween2020Crate(typeId) || TryOpenChristmas2020Crate(typeId)
+                     || TryUseCuriosity(typeId) || TryLaunchBoat(typeId) || TryBoatTeleport(typeId)) { }
             Send(3, 24, character.name, typeId);   // client opens item-specific UI (recipe books, maps, experience scrolls...)
         }
 
