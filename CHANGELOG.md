@@ -5,6 +5,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 
 ## [Unreleased]
 ### Changed
+- The menu's "Report a bug or give feedback" button opens GSO Offline's GitHub page for a new bug report. It opened a feedback form that sent to the shut-down server.
+- Item windows no longer have a Wiki button: the game's wiki is gone, so it opened a dead page.
 - Seasonal events: each event crate that drops is the 2019 or the 2020 one at random, so both years' pets, outfits and furniture can still be found (the crate drop rate is unchanged).
 - Creature drops, shop stock, house plots and extra spawns now come from a later snapshot of the original server, one with everything the final game client has. Drops double (1049 instead of 487): ten bosses get their real tables instead of wiki guesses (Bruno, Betsy, Argi, Lydia, Lakhar, Sarah, Jotnar, the Elder Ent, Ents and the Aggravated Ice Elemental), and 39 creatures' drops changed, such as the Supreme Sea Serpent's scales, fangs, Shadow armor and teleport scrolls. Creatures the original knew but gave no table drop nothing from one.
 - Shops follow the final stock lists: the Tools vendor sells a shovel, a knife and a mortar, with smaller tool stocks; the General store sells The fundamentals of upgrading; light armor shops add Troll leather quivers and dragon leather.

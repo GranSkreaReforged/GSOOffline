@@ -701,6 +701,21 @@ namespace GSOOffline
             Scr_RPCSender.instance.setItemHotkeySlot(stack.item.itemID, type, slot);
         }
 
+        // iteminfo <typeId> [basic]: the bag item's info window, as right-clicking it does; with "basic", the
+        // shop/recipe info window for that item type instead.
+        private static void ItemInfo(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var wc = Script_WindowController.instance;
+            if (args.Length > 2 && args[2] == "basic") { wc.createBasicItemInfo(Scr_ItemHandler.instance.GetItemTemplate(type)); return; }
+            var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
+            if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }
+            wc.createItemInfo(stack.item);
+        }
+
+        // menubutton <windowType>: a menu bar button (22 = report a bug), as clicking it does.
+        private static void MenuButton(string[] args) => Script_WindowController.instance.ToggleWindowType(int.Parse(args[1]));
+
         // sortinv: the inventory window's "By name" button (sorts the client list, then sends 198/16).
         private static void SortInv(string[] args)
         {
