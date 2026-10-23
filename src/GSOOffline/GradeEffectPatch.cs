@@ -50,9 +50,7 @@ namespace GSOOffline
             color = Menucontroller.instance != null ? Menucontroller.instance.GetGradeColor(g) : Color.white;
             foreach (var r in GetComponentsInChildren<Renderer>(false))
                 if (r.enabled && (r is MeshRenderer || r is SkinnedMeshRenderer)) parts.Add(r);
-            if (parts.Count == 0 || !Shown(out Bounds b)) return;
-            systems.Add(Sparkles(b));
-            LateUpdate();
+            LateUpdate();   // makes the emitter
         }
 
         // One emitter per piece: a box that follows the bounds of the piece's parts (where it's drawn, animation and
@@ -76,7 +74,13 @@ namespace GSOOffline
 
         private void LateUpdate()
         {
-            if (systems.Count == 0 || systems[0] == null) return;
+            if (systems.Count == 0 || systems[0] == null)
+            {
+                // The emitter went (or was never made, the piece hidden): make it again once the piece shows.
+                systems.Clear();
+                if (parts.Count == 0 || !Shown(out Bounds fresh)) return;
+                systems.Add(Sparkles(fresh));
+            }
             var ps = systems[0];
             bool shown = Shown(out Bounds b);
             if (ps.gameObject.activeSelf != shown) ps.gameObject.SetActive(shown);
@@ -94,6 +98,9 @@ namespace GSOOffline
         private ParticleSystem Sparkles(Bounds bounds)
         {
             var go = new GameObject(Name);
+            // At the scene root a gate's scene load destroyed it while the gear (and this) carried on (#123).
+            // OnDestroy and Remove still take it away with the item.
+            DontDestroyOnLoad(go);
             go.layer = parts[0].gameObject.layer;
             var ps = go.AddComponent<ParticleSystem>();
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
