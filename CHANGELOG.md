@@ -7,6 +7,7 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 ### Fixed
 - Deepheart's houses open (#135): 15 doors in town, among them Lacmedle Bakery and Confections, Marcus Hale's house, the Clarke residence and the castle, lead into their rooms as on the original server, and back out where you came in. The two lone doors standing in the open by the harbour are gone; they were in no wall and only said the door was locked. The towers, lighthouses, tunnels and the Art Gallery stay locked: their tops have no floor, the cave behind the tunnels is empty, and the gallery has no room.
 - Walking or sailing out of a zone takes you into the next one again (#134). Only doors worked: the paths out of Grimwall farm (Redwin's) into East Athagos, the roads between West and East Athagos, and the sea crossings to the Blue Sea, Goldon and Bal Sardan led nowhere. The borders and arrival points are the original server's, and you arrive on open ground. Sailing over a border keeps you in your boat on the other side; walking or swimming over one stows a boat left on the water, as any zone change does.
+- Deepheart's townsfolk have their own names (#136). The game data gives the whole town one citizen, Striva Lightsilver, so all 19 were called that; one still is, and the others have made-up names, each kept by where they stand. The minimap labels them "Deepheart citizen".
 
 ## [1.9.0] - 2026-10-24
 ### Changed

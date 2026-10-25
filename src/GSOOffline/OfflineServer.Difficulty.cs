@@ -58,7 +58,11 @@ namespace GSOOffline
             brokersRenamedIn = handler;
             DialogueData.NpcNames[BrokerType] = BrokerName.ToLowerInvariant();
             foreach (var t in handler.npcTemplates)
+            {
                 if (t.npcId == BrokerType) t.npcName = BrokerName;
+                // Each Deepheart citizen gets their own name in the NPC list (World.cs); the template is the minimap's.
+                if (t.npcId == SceneWorld.DeepheartCitizen) t.npcName = SceneWorld.CitizenTemplateName;
+            }
         }
 
         // ---- the sitting --------------------------------------------------------------------
