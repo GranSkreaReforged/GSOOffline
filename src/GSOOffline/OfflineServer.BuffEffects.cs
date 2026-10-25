@@ -35,7 +35,7 @@ namespace GSOOffline
 
         // The original's run speed: stat Movementspeed, 8 for every character, plus statBonus_Movementspeed: +5
         // Swiftness and Charge, -5 Slow and Stability, Windwalking and Traverse their amount, and gear's
-        // Movementspeed. Each buff counts once, however many things gave it.
+        // Movementspeed, and riding a mount. Each buff counts once, however many things gave it.
         private const int BaseRunSpeed = 8;
 
         private int RunSpeedBonus()
@@ -45,6 +45,7 @@ namespace GSOOffline
             if (HasBuff(BuffCharge)) sum += 5;
             if (HasBuff(BuffSlow)) sum -= 5;
             if (HasBuff(BuffStability)) sum -= 5;
+            if (Mounted) sum += CombatRules.MountRunBonus;
             return sum + IconAmount(BuffWindwalking) + IconAmount(BuffTraverse);
         }
 

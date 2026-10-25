@@ -35,6 +35,7 @@ namespace GSOOffline
                 Notice("That's too far away.", "gray");
                 return;
             }
+            if (MountInteract(npc)) return;       // your own pony or turbobeetle: ride it
             if (ResumeSightseeing(npc)) return;
             if (LakhmuInteractNpc(npc)) return;
             if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll

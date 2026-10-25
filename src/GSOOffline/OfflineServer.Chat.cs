@@ -100,6 +100,12 @@ namespace GSOOffline
                     case "useportal":   // sent by the client when confirming the snowy portal
                         UsePortal();
                         break;
+                    case "mount":   // "/mount <n>" (with a space) is the client's own: the model, without the server
+                        ToggleMount();
+                        break;
+                    case "dismount":
+                        Dismount("got off");
+                        break;
                     case "parrotsay":
                         ParrotSay(string.Join(" ", a, 1, a.Length - 1));
                         break;

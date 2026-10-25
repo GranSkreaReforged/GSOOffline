@@ -108,6 +108,8 @@ namespace GSOOffline
         public const float StunImmunity = 5f;
         // Flying followers add 1% of your damage per grade (1% Damaged to 8% Mythic).
         public static float FlyingPetBonus(int grade) => Mathf.Clamp(grade, 1, 8) * 0.01f;
+        // Riding a mount adds this to the run speed (8): half as fast again. Mounts never went live, so it's a reconstruction.
+        public const int MountRunBonus = 4;
 
         // Bosses give double experience (update 137).
         public const int BossXpMultiplier = 2;
@@ -360,6 +362,7 @@ namespace GSOOffline
             // a swing every WeaponSpeed seconds (the original's attack time), and attack speed buffs add damage
             // rather than cut the animation short.
             float interval = swingLength.TryGetValue(weapon?.typeId ?? 0, out float len) ? len : WeaponSpeed(weapon);
+            Dismount("attacking");
             nextPlayerSwing = Time.time + interval;
             lastPlayerSwing = Time.time;
             ProfileSwingStarted(0);
