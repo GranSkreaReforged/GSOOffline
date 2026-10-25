@@ -193,7 +193,7 @@ namespace GSOOffline
         public List<ItemSave> items = new List<ItemSave>();
         public int nextItemId = 1;
         public int secondaryWeaponId;   // weapon carried on the back (item id in items, not equipped); 0 = none
-        public int offhandRestoreId;    // shield a two-handed weapon or tool pushed off, back on with a one-handed weapon; 0 = none
+        public int offhandRestoreId;    // shield a two-handed weapon or the shovel pushed off, back on with a one-handed weapon or tool; 0 = none
         public long offhandReadyAt3, offhandReadyAt4;      // UTC ms (DateTime ticks / 10000): when its slot 3-4 abilities are ready again
 
         public List<QuestState> quests = new List<QuestState>();

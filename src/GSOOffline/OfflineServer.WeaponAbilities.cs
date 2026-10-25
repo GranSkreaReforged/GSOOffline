@@ -38,10 +38,12 @@ namespace GSOOffline
         private static bool IsCrossBow(int id) => IsKind(id, "isCrossBow", 50, 75, 121);
         private static bool IsBow(int id) => IsKind(id, "isBow", 46, 74, 114);
 
-        /// <summary>The server's isTwoHanded. Unlike the client's, staffs are one-handed.</summary>
+        /// <summary>
+        /// The server's isTwoHanded. Unlike the client's, staffs are one-handed. Unlike the original's, so are the
+        /// gathering tools except the shovel: a torch stays on while mining a dark cave (#142).
+        /// </summary>
         internal static bool IsTwoHanded(int id) =>
-            IsGreatsword(id) || IsHalberd(id) || IsKind(id, "isScythe", 126) || IsKind(id, "isHatchet", 58, 166)
-            || IsKind(id, "isFishingRod", 90) || IsKind(id, "isPickaxe", 59) || IsBow(id) || IsCrossBow(id)
+            IsGreatsword(id) || IsHalberd(id) || IsKind(id, "isShovel") || IsBow(id) || IsCrossBow(id)
             || IsKind(id, "isTwoHanded");
 
         // ---- rolling an item's abilities ----------------------------------------------------------------------
@@ -282,7 +284,7 @@ namespace GSOOffline
         }
 
         /// <summary>
-        /// A two-handed weapon or gathering tool pushed the shield off (#124). It goes back on with the next
+        /// A two-handed weapon or the shovel pushed the shield off (#124). It goes back on with the next
         /// one-handed weapon, and its slot 3-4 cooldowns keep running while it's off. Saved (cooldowns as real
         /// time), so a logout in between doesn't lose either.
         /// </summary>

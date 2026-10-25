@@ -345,8 +345,8 @@ namespace GSOOffline
             it.equipped = true;
             Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
             // A two-handed weapon and the shield slot exclude each other: the other one goes back in the bag.
-            // Gathering tools are two-handed too. A shield a two-handed weapon or tool pushes off comes back with
-            // the next one-handed weapon (RememberOffhand); equipping a shield yourself drops that.
+            // Of the gathering tools only the shovel is. A shield a two-handed weapon or the shovel pushes off comes
+            // back with the next one-handed weapon or tool (RememberOffhand); equipping a shield yourself drops that.
             var hand = t.slot == "Weapon" ? it : EquippedWeapon();
             var offhand = EquippedInSlot("Shield");
             if (t.slot == "Shield") ForgetOffhand();
