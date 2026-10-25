@@ -80,6 +80,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 - **Auction house:** interactable 40 (a stand) -> 3/33 window 31, which GSOOffline draws itself (AuctionWindowPatch: two lists, no search or posting). The client then sends chat `/requestmyoffers` (the window opens on "My sell offers"), answered with 4/15 per sell offer (item data string, offerId, amount, price) and 7/40 per buy order (Scr_Packets.AHBuyOffer JSON: offerId, itemTypeId, amount, price). Buying: question 7 sends chat `/buyoffer id` (only for an offer in the client's `Scr_AuctionHouse.offers`), then `/requestoffers keyword`. Selling: question 20 sends 25/13 (offerId), then 3/55 (keyword, startIndex). 3/54 searched sell offers. Posting and removing your own offers (31/1, 25/11, 6/23, chat `/addoffer`, `/removeoffer`) and interactable 41 (the silver booth, chat `/collectsilver`) were player trading.
 - **Appearance:** 3/22 gender, 3/23 hair, 3/24 body type, 3/25 eyebrows, 3/26 body size, 4/6 hair colour (r, g, b); 8/9 fighting style and profession.
 - **Ignored offline** (heartbeats and telemetry): 7/0, 3/47, 6/27, 7/18, 7/21, 27/0, 198/2, 198/3.
+- **Message board:** interactable 26 (a town board) -> 3/33 window 27 ("Messages"). Opening it clears the list and sends 3/45 (name, int page 1-10); the reply is one 2/33 (name, Scr_GlobalMessageBoard.Message JSON: subject, message, playerName, date) per post, ten to a page (the original's paging). "+ New message" sends 0/5 (name, subject up to 30 characters, text up to 300), then 3/45 page 1. GSOOffline's board is read-only: it holds the developer's posts and answers 0/5 with a notice.
 
 ## Items, dialogue and shops (S→C)
 
@@ -152,6 +153,7 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 |---|---|
 | 1–8, 17, 18 | Workbenches: forge, anvil, stove, spinning wheel, loom, tailor, grinder, alchemy, carpentry, saw |
 | 21 | Wayshrine |
+| 26 | Message board (opens window 27) |
 | 27 | Campfire |
 | 43 | Bank chest and other chests, wanted board, levers |
 | 40, 41 | Auction house stand (opens window 31) and silver booth |
