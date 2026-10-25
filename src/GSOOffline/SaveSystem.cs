@@ -128,6 +128,29 @@ namespace GSOOffline
         public List<ItemSave> gear = new List<ItemSave>();   // worn, rolled like loot; dropped from these on its death
     }
 
+    /// <summary>A trader's buy order at the auction house (#88): they pay silver for items the player hands in.</summary>
+    [Serializable]
+    public class AuctionOrderSave
+    {
+        public int id;
+        public int typeId;
+        public int amount;
+        public int price;              // silver for the whole order
+        public int grade;              // gear: the lowest grade taken (0 for stacking items)
+        public int rarity;             // OfflineServer.AuctionRarity
+        public float secondsLeft;      // playing time until the trader gives up
+    }
+
+    /// <summary>A trader's sell offer at the auction house: the very item, rolled when it was listed.</summary>
+    [Serializable]
+    public class AuctionSaleSave
+    {
+        public int id;
+        public ItemSave item;          // amount = how many are sold together
+        public int price;              // silver for the lot
+        public float secondsLeft;
+    }
+
     [Serializable]
     public class KillCount
     {
@@ -194,6 +217,12 @@ namespace GSOOffline
         public List<BountySave> bounties = new List<BountySave>();         // the wanted boards' outlaws
         public long bountyRefreshAt;      // unix seconds: the board fills up again then
         public int nextBountyId;
+        public List<AuctionOrderSave> auctionOrders = new List<AuctionOrderSave>();   // the auction house's buy orders
+        public List<AuctionSaleSave> auctionSales = new List<AuctionSaleSave>();      // and its sell offers
+        public bool auctionStocked;           // the boards got their first orders and offers
+        public float auctionNextOrder;        // playing time until another buy order is posted
+        public float auctionNextSale;         // and another sell offer
+        public int nextAuctionId = 1;
         public int xpRatePercent = 100;       // the insurance advisor's modifiers (OfflineServer.Difficulty.cs)
         public int bossHealthPercent = 100;
         public long difficultyLockedUntil;    // unix seconds: no change before then

@@ -71,7 +71,7 @@ namespace GSOOffline
         private float nextItemUse;
 
         // Teleport scrolls -> wayshrine (0 = the home wayshrine); the house teleport is in Housing.cs. Scrolls to
-        // places that don't exist offline (guild halls, the auction house) aren't here and stay in the bag.
+        // places that don't exist offline (guild halls) aren't here and stay in the bag.
         private static readonly Dictionary<int, int> TeleportScrolls = new Dictionary<int, int>
         {
             { 10388, 1 },    // Yorkhill Monastery
@@ -89,6 +89,7 @@ namespace GSOOffline
         {
             { 10531, new KeyValuePair<int, Vector3>(13, new Vector3(831f, 12f, 596f)) },   // South Athagos
             { 10538, new KeyValuePair<int, Vector3>(7, new Vector3(469f, 5f, 98f)) },      // Bal Amana
+            { 10472, new KeyValuePair<int, Vector3>(20, new Vector3(868f, 98f, 1141f)) },  // Yorkhill's auction house (#88)
         };
 
         // Experience scrolls (16/3 after the client's skill picker): community wiki amounts; Small isn't recorded.

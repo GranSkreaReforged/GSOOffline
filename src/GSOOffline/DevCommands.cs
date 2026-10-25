@@ -209,6 +209,16 @@ namespace GSOOffline
         private static void BountyReset(string[] args) => OfflineServer.Instance.DevBountyReset();
         private static void Outlaws(string[] args) => OfflineServer.Instance.DevOutlaws();
 
+        // auction [orders|sales|expire|clear] [n]: list the auction boards, post n more, run the time limits down to a
+        // minute, or empty them. auction order <typeId>: a buy order for one of that item (gear: Unusual or better).
+        private static void Auction(string[] args) =>
+            OfflineServer.Instance.DevAuction(args.Length > 1 ? args[1] : "", args.Length > 2 ? int.Parse(args[2]) : 1);
+
+        // auctionclick <sale|order> <row> [no]: clicks that row of the auction window and answers its question Yes
+        // (or leaves it open with "no").
+        private static void AuctionClick(string[] args) =>
+            AuctionWindow.DevClick(args[1] == "sale", int.Parse(args[2]), args.Length < 4 || args[3] != "no");
+
         // riskinfo: what the risk-zone "?" button does (Menucontroller): the scroll notification with the risk zones
         // text, which RiskZoneInfoPatch turns into the active bounties.
         private static void RiskInfo(string[] args) =>
