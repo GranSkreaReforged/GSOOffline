@@ -34,6 +34,7 @@ namespace GSOOffline
         public List<InteriorDef> interiors = new List<InteriorDef>();
         public List<SpawnDef> interiorSpawns = new List<SpawnDef>();
         public SpawnDef portal;
+        public List<SpawnDef> hidden = new List<SpawnDef>();   // door objects standing alone in the open (#135)
     }
 
     [Serializable]
@@ -251,6 +252,23 @@ namespace GSOOffline
             }
             // Entered without a recorded door (e.g. by wayshrine): go home.
             if (GameData.Wayshrines.TryGetValue(character.homeWayshrine, out var w)) Teleport(w.scene, w.pos);
+        }
+
+        /// <summary>
+        /// Switches off the scene's stray doors: door objects in no wall and in no door table (Deepheart has two
+        /// by its harbour), which looked clickable and only ever said "The door is locked." Searched in the scene
+        /// rather than in Scr_Interactable.list, which an object joins only once it has started.
+        /// </summary>
+        private void HideStrayDoors(int sceneId)
+        {
+            if (!Doors.hidden.Exists(h => h.scene == sceneId)) return;
+            foreach (var i in UnityEngine.Object.FindObjectsOfType<Scr_Interactable>())
+            {
+                if (!Doors.hidden.Exists(h => h.scene == sceneId && Vector3.Distance(V(h.pos), i.transform.position) < 0.5f)) continue;
+                Plugin.Log.LogInfo($"[travel] hiding stray door '{i.name}' at {i.transform.position}");
+                Scr_Interactable.list.Remove(i);
+                i.gameObject.SetActive(false);
+            }
         }
 
         private void UsePortal()

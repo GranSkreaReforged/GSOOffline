@@ -456,6 +456,25 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] runtest {d:0.00} m in {seconds:0.0} s = {d / seconds:0.00} m/s (max {p.characterMovement.movement.maxForwardSpeed:0.00})");
         }
 
+        // dooranchor [typeId]: every door of that type (default 37) with the colliders around its frame other than its
+        // own and the ground. A door with none stands on its own, in no wall.
+        private static void DoorAnchor(string[] args)
+        {
+            int type = args.Length > 1 ? int.Parse(args[1]) : 37;
+            foreach (var i in Scr_Interactable.list)
+            {
+                if (i == null || i.typeId != type) continue;
+                var names = new System.Collections.Generic.List<string>();
+                foreach (var c in UnityEngine.Physics.OverlapSphere(i.transform.position + UnityEngine.Vector3.up * 1.2f, 1.5f))
+                {
+                    if (c.transform.IsChildOf(i.transform) || c.GetType().Name == "TerrainCollider") continue;
+                    if (c.transform.root == Scr_PlayerHandler.instance.player.transform.root) continue;
+                    if (!names.Contains(c.name)) names.Add(c.name);
+                }
+                Plugin.Log.LogInfo($"[dev] door '{i.name}' at {i.transform.position}: {(names.Count == 0 ? "FREESTANDING" : string.Join(", ", names.ToArray()))}");
+            }
+        }
+
         // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
         private static void Die(string[] args)
         {

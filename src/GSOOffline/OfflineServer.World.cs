@@ -146,6 +146,7 @@ namespace GSOOffline
             AddHarpyToWorld();
             SyncBountyActors();
             LoadFerries(current.id);
+            HideStrayDoors(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
             if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)

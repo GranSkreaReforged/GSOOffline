@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Deepheart's houses open (#135): 15 doors in town, among them Lacmedle Bakery and Confections, Marcus Hale's house, the Clarke residence and the castle, lead into their rooms as on the original server, and back out where you came in. The two lone doors standing in the open by the harbour are gone; they were in no wall and only said the door was locked. The towers, lighthouses, tunnels and the Art Gallery stay locked: their tops have no floor, the cave behind the tunnels is empty, and the gallery has no room.
 
 ## [1.9.0] - 2026-10-24
 ### Changed
