@@ -72,6 +72,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `boatprefabs` | The client's player-ship prefabs (`ab_PlayerShip_<n>`): name, seats, speed, crane and interactables |
 | `boatstate` | Whether the player swims or sits in a boat, and every boat object the client has |
 | `sail <seconds> [heading]` | Drives the player's boat forward like holding "move forward" (turning to a compass heading first), so the client's own sync and shore check run as in play |
+| `walkto x z [seconds]` | Faces the point and autoruns toward it (default 5 s), to walk over a zone border as a player would |
 | `ferries` | The server's ferry schedule next to the client's ferry objects, and whether the player is on a deck |
 | `ferryboard <id> [height]` | Drops the player onto a ferry's deck from that height above its origin (default 4 m) |
 | `routecheck` | Where this zone's ferry routes run over land or rocks |

@@ -37,6 +37,7 @@ namespace GSOOffline
             pendingSpawn = null;
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
+            borderArrival = false;
             pendingCrossing = null;
             ResetOysters();
             ResetLakhmusBasement();
@@ -83,7 +84,7 @@ namespace GSOOffline
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
-        private void ChangeScene(int sceneId, Vector3 spawn)
+        private void ChangeScene(int sceneId, Vector3 spawn, bool keepBoat = false)
         {
             if (character == null) return;
             bool known = false;
@@ -95,7 +96,7 @@ namespace GSOOffline
                 sceneId = StartScene;
                 spawn = StartPos;
             }
-            StowBoat("zone change");
+            if (!keepBoat) StowBoat("zone change");   // sailing over a zone border keeps it (ZoneBorders.cs)
             ResetWorldState();
             pendingSpawn = spawn;
             character.scene = sceneId;
@@ -237,6 +238,7 @@ namespace GSOOffline
             }
 
             if (!sceneReady || world == null) return;
+            if (TickZoneBorders()) return;   // zone change: this world is gone
             TickQuestTriggers();
             visibilityTimer -= Time.deltaTime;
             if (visibilityTimer > 0f) return;

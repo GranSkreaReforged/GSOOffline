@@ -36,11 +36,13 @@ namespace GSOOffline
         {
             if (arrivalDeadline < 0f) return;
             if (!pendingSpawn.HasValue) { arrivalDeadline = -1f; return; }
-            bool found = TryClearSpotNear(pendingSpawn.Value, false, out var spot);
+            Vector3 spot;
+            bool found = borderArrival ? TryBorderSpot(pendingSpawn.Value, out spot) : TryClearSpotNear(pendingSpawn.Value, false, out spot);
             if (!found && Time.time < arrivalDeadline) return;
             if (!found) Plugin.Log.LogWarning($"[travel] no clear spot near {pendingSpawn.Value} after {ArrivalWait} s; using it as is.");
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
+            borderArrival = false;
             pendingSpawn = spot;
             FinishSceneLoad();
         }
