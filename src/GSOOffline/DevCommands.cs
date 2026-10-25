@@ -745,11 +745,12 @@ namespace GSOOffline
         }
 
         // iteminfo <typeId> [basic]: the bag item's info window, as right-clicking it does; with "basic", the
-        // shop/recipe info window for that item type instead.
+        // shop/recipe info window for that item type instead. Logs the item's text (the client's template) too.
         private static void ItemInfo(string[] args)
         {
             int type = int.Parse(args[1]);
             var wc = Script_WindowController.instance;
+            Plugin.Log.LogInfo($"[dev] item {type} text: '{Scr_ItemHandler.instance.GetItemTemplate(type)?.itemDescription}'");
             if (args.Length > 2 && args[2] == "basic") { wc.createBasicItemInfo(Scr_ItemHandler.instance.GetItemTemplate(type)); return; }
             var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
             if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }

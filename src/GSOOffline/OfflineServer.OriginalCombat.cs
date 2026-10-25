@@ -374,7 +374,7 @@ namespace GSOOffline
                 if (alignment == Alignment.Light) damage = (int)(damage * CombatRules.LightAlignmentDamage);
                 foreach (var d in npc.dots)
                     if (d.id >= 87 && d.id <= 89) damage = (int)(damage * 1.05f);   // each Fire arrows burn
-                damage = (int)(damage * FlyingPetDamage());
+                damage = (int)(damage * FlyingPetDamage() * BuffProduct(e => e.hitDamage));
                 var weapon = EquippedWeapon();
                 if (weapon != null && (options & HitNoWeaponGrade) == 0) damage = (int)(damage * WeaponGradeMultiplier(weapon.grade));
             }

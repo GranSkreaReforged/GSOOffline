@@ -209,6 +209,7 @@ namespace GSOOffline
             SendGearStats();
             SendDeathToll();
             SendCowardMark();
+            RegisterHonorItems();
             RefreshAlignment(true);
             ResendBuffIcons();
             UpdateWhiskerSickness(QuestRatsTail);
