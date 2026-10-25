@@ -105,6 +105,7 @@ src/GSOOffline/
   OfflineServer.Chat.cs        chat and commands
   OfflineServer.Boats.cs       boats and sailing
   OfflineServer.Ferries.cs     ferries (transports) and zone crossings
+  OfflineServer.ZoneBorders.cs walking or sailing over a zone border
   OfflineServer.Oysters.cs     Bal Sardan oyster fishing
   OfflineServer.Housing.cs     houses on plots, furniture
   OfflineServer.Death.cs       Death's toll, death bags
@@ -135,6 +136,7 @@ Working:
 - Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
 - Doors, dungeon entrances and interiors (Yorkhill's shops and houses and Deepheart's houses, from the original server's door table)
+- Zone borders: walking or sailing into the neighbouring zone (Athagos, the Blue Sea, Goldon, Bal Sardan), on the original server's borders
 - Bank, with drag-to-deposit and a Quick deposit button that tops up the bank's existing stacks
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
 - Houses: build one on any of the original game's 135 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work

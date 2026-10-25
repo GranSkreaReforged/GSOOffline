@@ -475,6 +475,16 @@ namespace GSOOffline
             }
         }
 
+        // walkto x z [seconds]: faces the point and autoruns toward it (default 5 s), to walk over a zone border.
+        private static void WalkTo(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var p = Scr_PlayerHandler.instance.player;
+            var target = new UnityEngine.Vector3(float.Parse(args[1], inv), p.transform.position.y, float.Parse(args[2], inv));
+            p.transform.rotation = UnityEngine.Quaternion.LookRotation(target - p.transform.position);
+            OfflineServer.Instance.StartCoroutine(RunTestRoutine(args.Length > 3 ? float.Parse(args[3], inv) : 5f));
+        }
+
         // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
         private static void Die(string[] args)
         {
