@@ -85,6 +85,27 @@ namespace GSOOffline
                 return original;
             }
         }
+        private static Dictionary<int, int> cheapest;
+
+        /// <summary>The lowest silver price any original shop sells this item for, or -1 if no shop stocks it.</summary>
+        public static int CheapestPrice(int typeId)
+        {
+            if (cheapest == null)
+            {
+                cheapest = new Dictionary<int, int>();
+                foreach (var shop in Original.Values)
+                {
+                    if (shop.currency != 0) continue;
+                    foreach (var i in shop.items)
+                    {
+                        int price = i.price > 0 ? i.price : ItemData.Get(i.typeId)?.price ?? 0;
+                        if (price > 0 && (!cheapest.TryGetValue(i.typeId, out int p) || price < p)) cheapest[i.typeId] = price;
+                    }
+                }
+            }
+            return cheapest.TryGetValue(typeId, out int found) ? found : -1;
+        }
+
         private static readonly Dictionary<int, ShopStock> cache = new Dictionary<int, ShopStock>();
         private static readonly HashSet<int> UnearnableCurrencies = new HashSet<int> { 10725 };   // Hunters Guild token
 

@@ -52,6 +52,7 @@ namespace GSOOffline
                 if (RunBoatCommand(a[0].ToLowerInvariant(), a)) return;
                 if (RunHouseCommand(a[0].ToLowerInvariant(), a)) return;
                 if (RunBountyCommand(a[0].ToLowerInvariant(), a)) return;
+                if (RunAuctionCommand(a[0].ToLowerInvariant(), a)) return;
                 switch (a[0].ToLowerInvariant())
                 {
                     case "help":

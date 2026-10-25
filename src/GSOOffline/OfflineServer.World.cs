@@ -339,6 +339,7 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleBountyBoard(typeId)) return;   // a wanted board
+            if (HandleAuctionInteract(typeId)) return;   // the auction stand and the silver booth
             if (HandleSewerInteract(typeId)) return;     // the sewers' pillar
             if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
