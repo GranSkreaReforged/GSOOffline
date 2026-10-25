@@ -66,6 +66,7 @@ namespace GSOOffline
             RegisterHousingHandlers();
             RegisterBountyHandlers();
             RegisterAuctionHandlers();
+            RegisterMessageBoardHandlers();
             RegisterItemCombos();
         }
 
