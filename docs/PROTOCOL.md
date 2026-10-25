@@ -102,6 +102,7 @@ Payloads are listed after the sub-opcode. "name" means the player name.
 | 8/5 action started, 3/13 complete, 3/14 cancel | name, type, target / name, type / name, type. The client re-issues 8/4 for the next item in a crafting batch on 3/13. The gathering animation (from the node's tool type) only plays outside the attack stance, so send 7/2 first; the hand shows the equipped weapon, so equip the tool. |
 | 13/1 harvestable status | uid, depleted (bool) |
 
+| 198/33 mount | mount id (Prefab_Mount_N: 1 pony, 2 turbobeetle; 0 = get off), player name. Puts the local player on the mount (`Scr_PlayerMount.ActivateMount`); other players' mounts aren't drawn. Never send 0 while the client shows no mount: it throws. The client's own `/mount <n>` (with a space) does the same without telling the server. |
 | 198/34 add loot bags | `id_x,y,z_name_typeId` joined by `>`. The client only adds (sending a bag twice shows it twice) and loses bags with the scene, so resend a scene's bags once after it loads. `name` is the hover text (`-` = none); `typeId` picks the ground model (equipment with a model, else the default sack) and must be a real item. Also 2/6 (name, list). |
 | 198/35 remove loot bag | id. Also 25/14. |
 

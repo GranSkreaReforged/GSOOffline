@@ -43,6 +43,7 @@ namespace GSOOffline
         public float wanderFrequency;  // seconds between strolls
         public float wanderDistance;
         public bool dropLootAtPlayer;  // loot bag at the killer's feet (NPCs that die out of reach, e.g. in water)
+        public int mount;              // a pet you can ride: the client's Prefab_Mount_<n> (Pony 1, Turbobeetle 2)
         // Ranged attacks: projectile id (XMLs/Projectiles), the share of attacks that use it (percent), and its reach.
         // Some list several ("5,5,5,5,12": Poachers' arrows, one in five an ice arrow); each shot picks one.
         public int projectile, projectileRate;
@@ -186,6 +187,7 @@ namespace GSOOffline
                     wanderFrequency = Mathf.Max(2, IntAttr(n, "wanderingfrequency", 24)),
                     wanderDistance = IntAttr(n, "wanderingdistance", 10),
                     dropLootAtPlayer = IntAttr(n, "droplootatplayer") == 1,
+                    mount = IntAttr(n, "mount"),
                     projectiles = IntListAttr(n, "projectile"),
                     projectileRate = IntAttr(n, "projectilerate"),
                     projectileDistance = IntAttr(n, "projectileattackdistance"),

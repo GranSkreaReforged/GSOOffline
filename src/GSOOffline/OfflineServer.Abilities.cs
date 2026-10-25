@@ -477,6 +477,7 @@ namespace GSOOffline
 
             // Costs, cooldown and the cast itself
             character.currentMana -= a.manaCost;
+            Dismount("used an ability");
             if (a.manaCost > 0) SendMana();
             float cooldown = rule.kind == AbilityKind.Bandage ? Mathf.Max(a.cooldown, 3f) : a.cooldown;
             slotReadyAt[slot] = Time.time + cooldown;
