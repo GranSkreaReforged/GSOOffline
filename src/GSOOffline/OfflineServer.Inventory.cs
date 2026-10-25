@@ -301,8 +301,8 @@ namespace GSOOffline
         /// <summary>
         /// The original server's hasRequirementsToEquipItem: gear (type ids below 10000) asks for its item level in
         /// the skill the client's Scr_ItemHandler says it needs (the item tooltip shows the same), or in combat level.
-        /// Null when the item can be worn. The original's title and honor items (bishop's mitre, Yin and Yang...) are
-        /// left out: there are no titles or honor offline.
+        /// Null when the item can be worn. The original's title and honor checks (bishop's mitre, Yin and Yang...) are
+        /// left out: there are no titles or honor offline, so that gear is plain gear (HonorItems.cs).
         /// </summary>
         private string MissingEquipRequirement(int typeId)
         {

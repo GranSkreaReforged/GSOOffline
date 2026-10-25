@@ -44,6 +44,10 @@ namespace GSOOffline
             // Stamina: carry too much without slowing down (Weight.cs).
             { 10446, Timed(30, 10f) }, { 10447, Timed(30, 30f) }, { 10448, Timed(30, 60f) },
             { 10483, new Potion { buff = 33, seconds = 15f, effect = new BuffEffect(), gfx = 82, sfx = 66, once = true } },   // Movement speed potion: +5 run speed
+            // Salvation and Despair: 30 minute combat blessings instead of honor and darkness (HonorItems.cs).
+            { ItemPotionOfSalvation, HonorPotion(BuffSalvation, TyphonsBlessing()) },
+            { ItemSmallPotionOfSalvation, HonorPotion(BuffSmallSalvation, SmallSalvation()) },
+            { ItemPotionOfDespair, HonorPotion(BuffDespair, EosFavor()) },
             // Halloween candy and Christmas treats (the original's usePotion). Brown candy and gingerbread cookies are
             // plain food.
             { 10681, new Potion { health = 300, healthTo = 360, line = "... it restores some health." } },   // Red candy
