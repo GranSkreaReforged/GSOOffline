@@ -42,6 +42,7 @@ namespace GSOOffline
         private static readonly float[] SaleMarkup = { 2f, 2.5f, 3f, 3f };
         private const float GearSaleMarkup = 2.5f;
         private const float OrderShopCap = 0.8f, SaleShopFloor = 1.25f;
+        private const float MaxEffortValue = 4f;   // an item's value is at most 4 times its listed price
         private const int MinAuctionValue = 5;   // cheaper items (soft clay, carrots) made orders worth a few silver
 
         // Gear grades: an order's lowest grade taken, and the grade of gear for sale (never Epic or better).
@@ -59,6 +60,7 @@ namespace GSOOffline
             public ItemTemplate t;
             public int level;              // the easiest way to come by it: recipe, node or creature level
             public AuctionRarity rarity;
+            public float value;            // what it's worth to the traders (AuctionPool)
             public int shopPrice;          // the cheapest shop's price, or -1
             public bool Gear => t.slot != null && !t.Stacks;
         }
@@ -111,8 +113,11 @@ namespace GSOOffline
         /// <summary>
         /// Everything a trader may deal in: items with a way to come by them (a harvest, a recipe or a creature's
         /// drop), tradeable, and not pets or boats. Quest items have none of those, so they never appear.
-        /// Rarity: harvests and crafts are Common, or Uncommon from level 40; drops go by their best chance
-        /// (1 in 20, 100, 500), and drops only bosses have are Rare at least.
+        /// Rarity: crafts are Common, or Uncommon from level 40; anything else goes by its best chance from a harvest
+        /// or a creature that isn't a boss (1 in 20, 100, 500), and drops only bosses have are Rare at least. A boss's
+        /// drop doesn't make an item common: the Red crab drops a coral key 1 time in 6, but it's the last of its kin.
+        /// Value: a craft is worth its listed price; anything else at least what farming one takes (FarmEffort), up to
+        /// 4 times its listed price. The game lists a coral key at 25 silver, which takes some 35 crabs.
         /// </summary>
         private static List<AuctionItem> AuctionPool
         {
@@ -121,26 +126,31 @@ namespace GSOOffline
                 if (auctionPool != null) return auctionPool;
                 GameData.EnsureLoaded();
                 var level = new Dictionary<int, int>();
-                var made = new HashSet<int>();                       // harvested or crafted
-                var bestDrop = new Dictionary<int, float>();
-                var creatureDrop = new HashSet<int>();               // dropped by something that isn't a boss
-                void Source(int typeId, int lvl)
+                var crafted = new HashSet<int>();
+                var farmChance = new Dictionary<int, float>();   // best chance a harvest or a creature gives one
+                var farmEffort = new Dictionary<int, float>();   // least silver of effort one takes
+                var bossChance = new Dictionary<int, float>();
+                var bossEffort = new Dictionary<int, float>();
+                void Source(int typeId, int lvl, float chance, bool boss)
                 {
                     level[typeId] = level.TryGetValue(typeId, out int l) ? Mathf.Min(l, lvl) : lvl;
+                    var best = boss ? bossChance : farmChance;
+                    var least = boss ? bossEffort : farmEffort;
+                    best[typeId] = best.TryGetValue(typeId, out float c) ? Mathf.Max(c, chance) : chance;
+                    float effort = FarmEffort(lvl, chance, boss);
+                    least[typeId] = least.TryGetValue(typeId, out float e) ? Mathf.Min(e, effort) : effort;
                 }
                 foreach (var h in SkillData.Harvestables.Values)
                     foreach (var d in h.drops)
-                        if (d.dropRate >= 10) { Source(d.item, h.level); made.Add(d.item); }   // 1% or better
-                foreach (var r in SkillData.Recipes.Values) { Source(r.product, r.level); made.Add(r.product); }
+                        if (d.dropRate > 0) Source(d.item, h.level, d.dropRate / 1000f, false);
+                foreach (var r in SkillData.Recipes.Values)
+                {
+                    level[r.product] = level.TryGetValue(r.product, out int l) ? Mathf.Min(l, r.level) : r.level;
+                    crafted.Add(r.product);
+                }
                 foreach (var npc in GameData.Npcs.Values)
                     foreach (var d in LootData.OriginalDrops(npc.id))
-                    {
-                        if (d.typeId <= 0) continue;
-                        Source(d.typeId, npc.level);
-                        float chance = 1f / Mathf.Max(1, d.rate);
-                        bestDrop[d.typeId] = bestDrop.TryGetValue(d.typeId, out float c) ? Mathf.Max(c, chance) : chance;
-                        if (!npc.boss) creatureDrop.Add(d.typeId);
-                    }
+                        if (d.typeId > 0) Source(d.typeId, npc.level, 1f / Mathf.Max(1, d.rate), npc.boss);
 
                 auctionPool = new List<AuctionItem>();
                 foreach (var kv in level)
@@ -149,15 +159,20 @@ namespace GSOOffline
                     if (t == null || string.IsNullOrEmpty(t.name) || t.price < MinAuctionValue || t.unique || NotTraded.Contains(t.typeId)) continue;
                     if (t.flags.Contains("untradeable") || t.flags.Contains("untradeableOnAH") || t.flags.Contains("isPet") || t.flags.Contains("isBoat")) continue;
                     AuctionRarity rarity;
-                    if (made.Contains(t.typeId)) rarity = kv.Value < 40 ? AuctionRarity.Common : AuctionRarity.Uncommon;
+                    float value = t.price;
+                    if (crafted.Contains(t.typeId)) rarity = kv.Value < 40 ? AuctionRarity.Common : AuctionRarity.Uncommon;
+                    else if (farmChance.TryGetValue(t.typeId, out float best))
+                    {
+                        rarity = best >= 1f / 20 ? AuctionRarity.Common : best >= 1f / 100 ? AuctionRarity.Uncommon : best >= 1f / 500 ? AuctionRarity.Rare : AuctionRarity.VeryRare;
+                        value = Mathf.Clamp(farmEffort[t.typeId], t.price, t.price * MaxEffortValue);
+                    }
                     else
                     {
-                        float best = bestDrop[t.typeId];
-                        rarity = best >= 1f / 20 ? AuctionRarity.Common : best >= 1f / 100 ? AuctionRarity.Uncommon : best >= 1f / 500 ? AuctionRarity.Rare : AuctionRarity.VeryRare;
-                        if (!creatureDrop.Contains(t.typeId))
-                            rarity = (AuctionRarity)Mathf.Max((int)rarity, best >= 1f / 100 ? (int)AuctionRarity.Rare : (int)AuctionRarity.VeryRare);
+                        best = bossChance[t.typeId];
+                        rarity = best >= 1f / 100 ? AuctionRarity.Rare : AuctionRarity.VeryRare;
+                        value = Mathf.Clamp(bossEffort[t.typeId], t.price, t.price * MaxEffortValue);
                     }
-                    auctionPool.Add(new AuctionItem { t = t, level = kv.Value, rarity = rarity, shopPrice = ShopData.CheapestPrice(t.typeId) });
+                    auctionPool.Add(new AuctionItem { t = t, level = kv.Value, rarity = rarity, value = value, shopPrice = ShopData.CheapestPrice(t.typeId) });
                 }
                 var counts = new int[4];
                 foreach (var i in auctionPool) counts[(int)i.rarity]++;
@@ -165,6 +180,13 @@ namespace GSOOffline
                 return auctionPool;
             }
         }
+
+        /// <summary>
+        /// Silver of effort to come by one: a kill or a catch at level L is worth about 2 + L/2 silver (a boss's five
+        /// times that), over the chance it gives one. A reconstruction, like the rest of the numbers here.
+        /// </summary>
+        private static float FarmEffort(int level, float chance, bool boss) =>
+            (2f + 0.5f * level) * (boss ? 5f : 1f) / Mathf.Max(chance, 0.0001f);
 
         /// <summary>The player's best level, combat or any skill: what the traders deal around.</summary>
         private int AuctionLevel()
@@ -234,9 +256,11 @@ namespace GSOOffline
                 gradePrice = GradePrice(o2.grade);
                 if (o2.grade >= 5) o2.rarity = Mathf.Min(o2.rarity + 1, (int)AuctionRarity.VeryRare);   // fewer of those around
             }
-            float each = t.price * OrderPremium[(int)item.rarity] * Random.Range(0.85f, 1.15f) * gradePrice;
-            if (item.shopPrice > 0) each = Mathf.Min(each, item.shopPrice * OrderShopCap * gradePrice);
+            float each = item.value * OrderPremium[(int)item.rarity] * Random.Range(0.85f, 1.15f) * gradePrice;
+            // The lot goes by what the items are worth, before a shop's price caps it: a shop selling coral keys at 25
+            // keeps an order's price down, not its size up.
             if (t.Stacks) o2.amount = LotSize(each, OrderMaxLot[(int)item.rarity]);
+            if (item.shopPrice > 0) each = Mathf.Min(each, item.shopPrice * OrderShopCap * gradePrice);
             o2.price = Mathf.Max(1, Mathf.RoundToInt(each * o2.amount));
             var minutes = OrderMinutes[o2.rarity];
             o2.secondsLeft = Random.Range(minutes[0], minutes[1] + 1) * 60f;
@@ -267,12 +291,12 @@ namespace GSOOffline
                 s.item = NewItem(t, 1, announceGrade: false);   // the very item, stats and abilities rolled now
                 s.item.grade = WeightedGrade(SaleGrades, SaleGradeWeights);
                 float gradePrice = GradePrice(s.item.grade);
-                each = t.price * GearSaleMarkup * gradePrice * Random.Range(0.9f, 1.2f);
+                each = item.value * GearSaleMarkup * gradePrice * Random.Range(0.9f, 1.2f);
                 if (item.shopPrice > 0) each = Mathf.Max(each, item.shopPrice * SaleShopFloor * gradePrice);
             }
             else
             {
-                each = t.price * SaleMarkup[(int)item.rarity] * Random.Range(0.9f, 1.2f);
+                each = item.value * SaleMarkup[(int)item.rarity] * Random.Range(0.9f, 1.2f);
                 if (item.shopPrice > 0) each = Mathf.Max(each, item.shopPrice * SaleShopFloor);
                 s.item = new ItemSave { typeId = t.typeId, amount = LotSize(each, SaleMaxLot[(int)item.rarity]), grade = t.baseGrade };
             }
@@ -510,6 +534,13 @@ namespace GSOOffline
             {
                 case "orders": for (int i = 0; i < n; i++) PostAuctionOrder(); break;
                 case "sales": for (int i = 0; i < n; i++) PostAuctionSale(); break;
+                case "item":   // n = the item type: how the traders see it, and what an order for it pays per item
+                    var info = AuctionPool.Find(i => i.t.typeId == n);
+                    if (info == null) { Plugin.Log.LogInfo($"[dev] item {n}: not traded"); break; }
+                    float pays = info.value * OrderPremium[(int)info.rarity];
+                    Plugin.Log.LogInfo($"[dev] item {n} {info.t.name}: level {info.level}, {info.rarity}, listed {info.t.price}, value {info.value:F0}, shop {info.shopPrice}; " +
+                                       $"an order pays ~{(info.shopPrice > 0 ? Mathf.Min(pays, info.shopPrice * OrderShopCap) : pays):F0} each, lots of ~{(200f + 50f * AuctionLevel()) / pays:F1} (most {OrderMaxLot[(int)info.rarity]})");
+                    break;
                 case "order":   // n = the item type: one of it (gear: Unusual or better) for its value
                     var t = ItemData.Get(n);
                     if (t != null)
