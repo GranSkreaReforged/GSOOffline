@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Fixed
+- Walking or sailing out of a zone takes you into the next one again (#134). Only doors worked: the paths out of Grimwall farm (Redwin's) into East Athagos, the roads between West and East Athagos, and the sea crossings to the Blue Sea, Goldon and Bal Sardan led nowhere. The borders and arrival points are the original server's, and you arrive on open ground. Sailing over a border keeps you in your boat on the other side; walking or swimming over one stows a boat left on the water, as any zone change does.
 
 ## [1.9.0] - 2026-10-24
 ### Changed

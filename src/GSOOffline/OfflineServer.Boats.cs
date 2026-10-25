@@ -224,6 +224,8 @@ namespace GSOOffline
         private void SendBoats()
         {
             if (character == null) return;
+            // A boat sailed over a zone border leaves its destroyed copy from the previous zone in the client's list.
+            Scr_PlayerBoatHandler.instance?.boats.RemoveAll(b => b == null);
             string list = string.Empty;
             if (BoatOut && Boats.TryGetValue(character.boat.typeId, out var type))
             {
