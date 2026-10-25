@@ -135,7 +135,7 @@ Working:
 - Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
 - Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
-- Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
+- Doors, dungeon entrances and interiors (Yorkhill's shops and houses and Deepheart's houses, from the original server's door table)
 - Zone borders: walking or sailing into the neighbouring zone (Athagos, the Blue Sea, Goldon, Bal Sardan), on the original server's borders
 - Bank, with drag-to-deposit and a Quick deposit button that tops up the bank's existing stacks
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
