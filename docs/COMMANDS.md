@@ -76,6 +76,7 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `walkto x z [seconds]` | Faces the point and autoruns toward it (default 5 s), to walk over a zone border as a player would |
 | `ferries` | The server's ferry schedule next to the client's ferry objects, and whether the player is on a deck |
 | `ferryboard <id> [height]` | Drops the player onto a ferry's deck from that height above its origin (default 4 m) |
+| `ferrydock <id> [waypoint]` | Puts the ferry at that stop (default 0, its first) now, docked for at least 30 s: 3 and 5 at the lighthouse, 3 at Yorkhill with waypoint 13, 4 at Bal Sardan |
 | `routecheck` | Where this zone's ferry routes run over land or rocks |
 | `routeplan <name> <margin> <cell> x,z x,z ...` | The shortest water route through the points (6 m clearance), printed as waypoints, with a map in `<game>\GSODevTools\<name>.png` |
 | `watermap x1 z1 x2 z2 [cell]` | A water/land map of that rectangle in `<game>\GSODevTools\watermap.png` (north up) |

@@ -4,7 +4,15 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+### Added
+- Board a ferry by talking to the Sailor on its pier (#137). The lighthouse Sailor serves the Coral Lady to Yorkhill and the ferry to Bal Sardan, and new Sailors stand at the end of Yorkhill's pier and on the Bal Sardan jetty (the marsh-ride Sailor and his rowboat stay). When the ferry is in, he takes you aboard for 20 silver (50 from Bal Sardan, the original's boat-ride fares) and it waits while you talk to him; when it's out, he tells you when it's due back.
+
+### Changed
+- Ferries wait at least a minute at each dock, and set off a few seconds after you step aboard (#137). The docks' 5 to 20 second stops were too short to reach the deck. A ferry you arrived on waits for you to step off.
+- The big brig moored at the lighthouse jetty is gone (#137): it stood where the Coral Lady docks, so the pier always looked as if a ferry was in.
+
 ### Fixed
+- Crossing to Bal Sardan or back on a ferry no longer leaves you floating at sea when the zone loads slowly: the ferry on the other side waits until you're on its deck.
 - Deepheart's houses open (#135): 15 doors in town, among them Lacmedle Bakery and Confections, Marcus Hale's house, the Clarke residence and the castle, lead into their rooms as on the original server, and back out where you came in. The two lone doors standing in the open by the harbour are gone; they were in no wall and only said the door was locked. The towers, lighthouses, tunnels and the Art Gallery stay locked: their tops have no floor, the cave behind the tunnels is empty, and the gallery has no room.
 - Walking or sailing out of a zone takes you into the next one again (#134). Only doors worked: the paths out of Grimwall farm (Redwin's) into East Athagos, the roads between West and East Athagos, and the sea crossings to the Blue Sea, Goldon and Bal Sardan led nowhere. The borders and arrival points are the original server's, and you arrive on open ground. Sailing over a border keeps you in your boat on the other side; walking or swimming over one stows a boat left on the water, as any zone change does.
 - Deepheart's townsfolk have their own names (#136). The game data gives the whole town one citizen, Striva Lightsilver, so all 19 were called that; one still is, and the others have made-up names, each kept by where they stand. The minimap labels them "Deepheart citizen".

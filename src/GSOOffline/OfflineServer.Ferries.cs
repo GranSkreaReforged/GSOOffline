@@ -23,6 +23,7 @@ namespace GSOOffline
             public Vector3 pos;
             public bool moving;
             public float waitUntil;
+            public bool passengerOnArrival;   // the player was on deck when it docked: it waits until they step off
         }
 
         private class FerryCrossing
@@ -85,13 +86,31 @@ namespace GSOOffline
             new FerryCrossing { ferry = 4, waypoint = 6, toScene = 1, toFerry = 5, toWaypoint = 5 },   // Bal Sardan -> lighthouse
         };
 
+        // Ships built into the scenes at the ferry piers, hidden on load so a pier with no ferry looks empty (#137).
+        // The lighthouse brig is moored where the Coral Lady docks (she sailed into it); it has no colliders.
+        private class FerryProp
+        {
+            public int scene;
+            public string name;
+            public Vector3 pos;
+        }
+
+        private static readonly FerryProp[] FerryProps =
+        {
+            new FerryProp { scene = 1, name = "Boat_1800early_BrigSloop_LOD_0", pos = new Vector3(512.2f, 5f, 881.8f) },
+        };
+
         private const float FerrySyncInterval = 2f;
-        private const float FerryArrivalHold = 4f;
-        private const float FerryLeaveDistance = 8f;   // a passenger this far from their deck spot was moved off the ferry   // a ferry that just received passengers waits this long before sailing on
+        private const float FerryArrivalHold = 4f;     // a ferry that just received passengers waits this long before sailing on
+        private const float FerryLeaveDistance = 8f;   // a passenger this far from their deck spot was moved off the ferry
+        private const float FerryDockWait = 60f;       // the least a ferry waits at a dock (the data's 5-20 s were too short to board)
+        private const float FerryBoardedDelay = 3f;    // a docked ferry the player has boarded sails this soon
+        private const float FerryArrivalTimeout = 15f; // a crossing passenger who never reaches the deck: the ferry sails anyway
 
         private readonly List<Ferry> ferries = new List<Ferry>();
         private float ferrySyncTimer;
         private FerryCrossing pendingCrossing;   // set while the zone change of a crossing loads
+        private float crossingDeadline;           // > 0: a crossing passenger is being placed; the ferry waits for them
         private Vector3 crossingOffset;          // where the player stood, in the ferry's own frame
         private Scr_TransportsHandler transportsHandler;
 
@@ -101,10 +120,13 @@ namespace GSOOffline
         private int ridingId;          // server ferry id; 0 = not riding
         private Vector3 ridingOffset;  // in the ferry's own frame
 
+        private static float DockWait(float wait) => wait > 0f ? Mathf.Max(wait, FerryDockWait) : 0f;
+
         /// <summary>Ferries for a newly loaded scene, all at their first waypoint (or at a crossing's arrival point).</summary>
         private void LoadFerries(int sceneId)
         {
             ferries.Clear();
+            crossingDeadline = 0f;
             var ta = Resources.Load("XMLs/transportData_" + sceneId) as TextAsset;
             if (ta == null) return;
             var doc = new XmlDocument();
@@ -123,7 +145,7 @@ namespace GSOOffline
                     foreach (var r in route)
                     {
                         f.waypoints.Add(new Vector3(r.x, 3.15f, r.z));
-                        f.waits.Add(r.wait);
+                        f.waits.Add(DockWait(r.wait));
                     }
                 }
                 else
@@ -133,13 +155,13 @@ namespace GSOOffline
                         if (ph.NodeType != XmlNodeType.Element) continue;
                         var d = GameData.Attr(ph, "destination").Split(',');
                         f.waypoints.Add(new Vector3(F(d[0]), F(d[1]), F(d[2])));
-                        f.waits.Add(GameData.IntAttr(ph, "waitingtime"));
+                        f.waits.Add(DockWait(GameData.IntAttr(ph, "waitingtime")));
                     }
                 }
                 if (f.waypoints.Count == 0) continue;
                 f.pos = f.waypoints[0];
                 f.index = 0;
-                f.waitUntil = 0f;   // "arrived" at the first waypoint: the first tick sends it on its way
+                f.waitUntil = Time.time + f.waits[0];   // just arrived at its first stop
                 ferries.Add(f);
             }
 
@@ -156,6 +178,18 @@ namespace GSOOffline
                 }
             }
             Plugin.Log.LogInfo($"[ferry] scene {sceneId}: {ferries.Count} ferries");
+        }
+
+        private static void HideFerryProps(int sceneId)
+        {
+            foreach (var p in FerryProps)
+            {
+                if (p.scene != sceneId) continue;
+                var go = GameObject.Find(p.name);
+                if (go == null || Vector3.Distance(go.transform.position, p.pos) > 1f) continue;
+                go.SetActive(false);
+                Plugin.Log.LogInfo($"[ferry] hiding pier prop '{p.name}' at {go.transform.position}");
+            }
         }
 
         private void LateUpdate()
@@ -194,9 +228,23 @@ namespace GSOOffline
             var boat = ClientFerry(ridingId);
             if (boat == null) return;   // a crossing's ferry the client hasn't created yet
             var spot = boat.transform.position + boat.transform.rotation * ridingOffset;
+            if (crossingDeadline > 0f)
+            {
+                // The spawn on the deck (5/3) is applied a little after the zone loads: the ferry waits for it.
+                bool aboard = (player.transform.position - spot).sqrMagnitude <= FerryLeaveDistance * FerryLeaveDistance;
+                if (!aboard && Time.time < crossingDeadline) return;
+                crossingDeadline = 0f;
+                ferry.waitUntil = Time.time + FerryArrivalHold;
+                if (!aboard)
+                {
+                    Plugin.Log.LogInfo($"[ferry] crossing passenger never reached ferry {ferry.id}: it sails without them");
+                    ridingId = 0;
+                    return;
+                }
+            }
             if ((player.transform.position - spot).sqrMagnitude > FerryLeaveDistance * FerryLeaveDistance)
             {
-                Plugin.Log.LogInfo($"[ferry] passenger left ferry {ridingId} (moved {Vector3.Distance(player.transform.position, spot):F0} m away)");
+                Plugin.Log.LogInfo($"[ferry] passenger left ferry {ridingId} (moved {Vector3.Distance(player.transform.position, spot):F0} m away: at {SceneWorld.Vec(player.transform.position)}, deck spot {SceneWorld.Vec(spot)}, ferry {SceneWorld.Vec(ferry.pos)})");
                 ridingId = 0;   // teleported, respawned...: off the ferry
                 return;
             }
@@ -214,7 +262,8 @@ namespace GSOOffline
             if (c == null) return null;
             var f = ferries.Find(e => e.id == c.toFerry);
             if (f == null) return null;
-            f.waitUntil = Time.time + FerryArrivalHold;
+            f.waitUntil = float.MaxValue;   // until they stand on the deck (LateUpdate)
+            crossingDeadline = Time.time + FerryArrivalTimeout;
             ridingId = f.id;
             ridingOffset = crossingOffset;
             // The client creates ferries facing north, so the stored offset applies unrotated.
@@ -230,7 +279,8 @@ namespace GSOOffline
             {
                 if (!f.moving)
                 {
-                    if (Time.time < f.waitUntil) continue;
+                    BoardedAtDock(f);
+                    if (Time.time < f.waitUntil || HeldBySailor(f)) continue;
                     f.index = (f.index + 1) % f.waypoints.Count;   // parked at a waypoint: sail on to the next
                     f.moving = true;
                     Send(20, 2, f.id, f.index, true);
@@ -255,12 +305,37 @@ namespace GSOOffline
             {
                 f.moving = false;
                 f.waitUntil = Time.time + wait;
+                f.passengerOnArrival = PlayerOnDeck(f);
                 Send(20, 2, f.id, f.index, false);
+                if (HeldBySailor(f)) EnterNode(NodeFerrySailor);   // docked mid-conversation: now it can take them aboard
                 return false;
             }
             f.index = (f.index + 1) % f.waypoints.Count;
             Send(20, 2, f.id, f.index, true);
             return false;
+        }
+
+        private bool PlayerOnDeck(Ferry f)
+        {
+            var player = LocalPlayer;
+            var boat = ClientFerry(f.id);
+            return player != null && boat != null && !PlayerDead && StandingOn(player, boat);
+        }
+
+        // A player who steps aboard a docked ferry needn't wait out the dock: it sails a moment later. One who came in on
+        // it has to step off first.
+        private void BoardedAtDock(Ferry f)
+        {
+            if (f.waits[f.index] <= 0f || f.waitUntil <= Time.time + FerryBoardedDelay) return;
+            bool on = PlayerOnDeck(f);
+            if (f.passengerOnArrival)
+            {
+                if (!on) f.passengerOnArrival = false;
+                return;
+            }
+            if (!on) return;
+            f.waitUntil = Time.time + FerryBoardedDelay;
+            Plugin.Log.LogInfo($"[ferry] player boarded ferry {f.id} at waypoint {f.index}: sailing in {FerryBoardedDelay:0} s");
         }
 
         private bool TryCrossOnFerry(Ferry f, FerryCrossing c)
@@ -320,6 +395,26 @@ namespace GSOOffline
             if (c == null || player == null) { Plugin.Log.LogInfo($"[dev] no ferry {id} here"); return; }
             player.transform.position = c.transform.position + Vector3.up * up;
             Plugin.Log.LogInfo($"[dev] dropped onto ferry {id} from {SceneWorld.Vec(player.transform.position)}");
+        }
+
+        // Dev: the ferry jumps to a stop and waits there (the client's copy too: it would glide there over land).
+        internal void DevDockFerry(int id, int waypoint)
+        {
+            var f = ferries.Find(e => e.id == id);
+            if (f == null || waypoint < 0 || waypoint >= f.waypoints.Count) { Plugin.Log.LogInfo($"[dev] no ferry {id} waypoint {waypoint} here"); return; }
+            f.index = waypoint;
+            f.pos = f.waypoints[waypoint];
+            f.moving = false;
+            f.waitUntil = Time.time + Mathf.Max(f.waits[waypoint], 30f);
+            var c = ClientFerry(id);
+            if (c != null)
+            {
+                c.transform.position = f.pos;
+                c.syncTimer = 0f;
+            }
+            Send(20, 2, f.id, f.index, false);
+            SendFerries();
+            Plugin.Log.LogInfo($"[dev] ferry {id} docked at waypoint {waypoint} {SceneWorld.Vec(f.pos)}");
         }
 
         // Dev: walk every route segment of this zone's ferries in 1 m steps across a 4 m wide hull and report the

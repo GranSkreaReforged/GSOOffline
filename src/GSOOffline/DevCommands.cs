@@ -300,6 +300,10 @@ namespace GSOOffline
         private static void FerryBoard(string[] args) =>
             OfflineServer.Instance.DevBoardFerry(int.Parse(args[1]), args.Length > 2 ? float.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 4f);
 
+        // ferrydock <id> [waypoint]: the ferry is docked at that stop (default 0, its first) now, for at least 30 s.
+        private static void FerryDock(string[] args) =>
+            OfflineServer.Instance.DevDockFerry(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 0);
+
         // door <n>: goes through doors.json entry n exactly as clicking it would (arrival included). "door" alone lists them.
         private static void Door(string[] args)
         {

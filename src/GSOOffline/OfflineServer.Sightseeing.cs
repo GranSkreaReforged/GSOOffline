@@ -40,6 +40,7 @@ namespace GSOOffline
             if (RunLakhmuAction(id)) return true;
             if (RunQuestScriptAction(id)) return true;
             if (RunDifficultyAction(id)) return true;
+            if (RunFerryAction(id)) return true;
             if (id != ActionWereHere) return false;
             SightseeingArrived();
             return true;
