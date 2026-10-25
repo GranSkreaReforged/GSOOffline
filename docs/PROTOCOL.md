@@ -157,6 +157,7 @@ Unity's `JsonUtility` cannot serialize lists of classes defined in a plugin asse
 | 27 | Campfire |
 | 43 | Bank chest and other chests, wanted board, levers |
 | 40, 41 | Auction house stand (opens window 31) and silver booth |
+| 55 | The Arena's Sign-up board (1v1 and team fights; the server once answered 2/37, window 39). Offline: the artisans' hall's way down and up. Workbench furniture (ab_furniture_10396 etc.) carries interactables 1-6, 17, 18 and opens crafting windows 1-9 anywhere |
 | 9–16, 20, 22–25, 28, 29, 33–38, 42, 45 | Doors, gates, hatches and portals. The server mapped each to a destination; this has to be rebuilt by pairing doors across scenes (`GSODevTools/extracted/markers.json`). |
 | 37 | Generic doors (158 of them, mostly house and interior doors) |
 | 54 | Chairs |
