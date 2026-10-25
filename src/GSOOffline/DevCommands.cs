@@ -518,6 +518,36 @@ namespace GSOOffline
         private static void Workbench(string[] args) =>
             Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
 
+        // floorgrid x0 z0 x1 z1 [step]: the ground height down a grid (a ray from 300 m), one log line per row of z,
+        // to map a floor's levels and edges. "-" = nothing hit.
+        private static void FloorGrid(string[] args)
+        {
+            float x0 = float.Parse(args[1]), z0 = float.Parse(args[2]), x1 = float.Parse(args[3]), z1 = float.Parse(args[4]);
+            float step = args.Length > 5 ? float.Parse(args[5]) : 10f;
+            for (float z = z0; z <= z1; z += step)
+            {
+                var row = new System.Text.StringBuilder();
+                for (float x = x0; x <= x1; x += step)
+                    row.Append(UnityEngine.Physics.Raycast(new UnityEngine.Vector3(x, 300f, z), UnityEngine.Vector3.down, out var hit, 400f)
+                        ? hit.point.y.ToString("F1") : "-").Append(' ');
+                Plugin.Log.LogInfo($"[dev] floor z={z:F0} x={x0:F0}..{x1:F0}: {row}");
+            }
+        }
+
+        // spawnfurniture <itemType> x y z [rot]: puts a furniture prefab (ab_furniture_<type>) in the scene as a house would,
+        // and logs its interactables.
+        private static void SpawnFurniture(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var prefab = UnityEngine.Resources.Load("1LoadingAssets/Furniture/ab_furniture_" + type, typeof(UnityEngine.GameObject));
+            if (prefab == null) { Plugin.Log.LogInfo($"[dev] no furniture prefab {type}"); return; }
+            var go = UnityEngine.Object.Instantiate(prefab) as UnityEngine.GameObject;
+            go.transform.position = new UnityEngine.Vector3(float.Parse(args[2]), float.Parse(args[3]), float.Parse(args[4]));
+            go.transform.rotation = UnityEngine.Quaternion.Euler(0f, args.Length > 5 ? float.Parse(args[5]) : 0f, 0f);
+            foreach (var i in go.GetComponentsInChildren<Scr_Interactable>(true))
+                Plugin.Log.LogInfo($"[dev] furniture {type} '{go.name}' interactable {i.typeId} '{i.interactableName}' at {i.transform.position}");
+        }
+
         // closewindows: closes every open window (the login's Active bounties hides the view in screenshots).
         private static void CloseWindows(string[] args) => Script_WindowController.instance.closeAllWindows();
 

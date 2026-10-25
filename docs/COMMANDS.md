@@ -58,6 +58,8 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
 | `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
 | `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
+| `floorgrid x0 z0 x1 z1 [step]` | Ground height down a grid (rays from 300 m), a log line per row: maps floors, pits and walls |
+| `spawnfurniture <itemType> x y z [rot]` | Puts that furniture prefab in the scene as a house would and logs its interactables (try a workbench anywhere) |
 | `setlevel <skillId> <level>` | Raises a skill to that level (Scr_SkillsHandler ids, e.g. 15 Swordsmanship, 24 Healing) |
 | `buffs` | Lists the player's active buffs with their effects, health and mana |
 | `worldnpcs [type...]` | The server's NPCs in this scene (all, or those types), with position and whether quest rules show them |

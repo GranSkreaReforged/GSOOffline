@@ -149,6 +149,7 @@ namespace GSOOffline
             LoadFerries(current.id);
             HideStrayDoors(current.id);
             HideFerryProps(current.id);
+            SetUpArenaHub(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
             if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)
@@ -346,6 +347,7 @@ namespace GSOOffline
             if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
+            if (HandleArenaHubInteract(typeId)) return;  // the Arena's sign-up boards: the artisans' hall
             if (HandleTravelInteract(typeId)) return;
             if (HandleItemObjectInteract(typeId)) return;   // Kombra's book, the Argi blueprint chest
             if (HandleFurnitureInteract(typeId)) return;    // house doors and furniture
