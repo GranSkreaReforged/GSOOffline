@@ -331,6 +331,8 @@
   ],
 
   "npcs": [
+    { "type": 77, "note": "#137: a ferry Sailor at the end of Yorkhill's pier, for the Coral Lady (the lighthouse one is the scene's)", "scene": 1, "spawn": ["963,6.6,1549"] },
+    { "type": 77, "note": "#137: a ferry Sailor on the Bal Sardan jetty, past the marsh-ride Sailor and his rowboat", "scene": 7, "spawn": ["153.8,3.45,736"] },
     { "type": 315, "note": "Q33: the expedition's navigator, camped on the Dead Lake's south-east shore in Goldon", "scene": 18, "spawn": ["726,7.6,630"] },
     { "type": 316, "note": "Q33: an expedition hunter", "scene": 18, "spawn": ["731,7.8,634"] },
     { "type": 317, "note": "Q33: an expedition hunter", "scene": 18, "spawn": ["722,8.8,626"] },
