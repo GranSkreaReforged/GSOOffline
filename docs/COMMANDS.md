@@ -43,8 +43,9 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `npcbounds [n]` | The nearest *n* NPCs: rendered size, feet height above the ground, animation playing |
 | `animclips` | The client's animation clip table (the ids in NPC animation messages) |
 | `door [n]` | Lists doors.json, or goes through door *n* exactly as clicking it would (arrival included) |
-| `building [n]` | Lists doors.json's buildings (Yorkhill's and its harbour's shops and houses, Myra's hut), or goes into building *n* as clicking its door would; a door inside leads back out |
+| `building [n]` | Lists doors.json's buildings (Yorkhill's and its harbour's shops and houses, Myra's hut, Deepheart's houses), or goes into building *n* as clicking its door would; a door inside leads back out |
 | `doorsigns` | Every shop sign in the scene with the three nearest doors, to tell which building a door belongs to |
+| `dooranchor [typeId]` | Every door of that type (default 37) with the colliders around its frame; `FREESTANDING` = none, a door in no wall. Rough: big models without colliders (castles, lighthouses) also read freestanding, so look before hiding one |
 | `hover <npc uid>` / `hover obj <typeId>` / `hover off` | Acts as if the mouse cursor were over that NPC or the nearest object of that type, for the Interact key |
 | `interactprompt [press]` | What the Interact key (F) would use now, and the NPCs and objects within 8 m; `press` uses it as F would |
 | `useobj <typeId>` | Uses the nearest object of that type as a mouse click does (the client's reach checks and chair move included) |
@@ -57,6 +58,8 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `loot` | The loot bags the server holds in this scene, and the live bags the client shows |
 | `lootroll <npcType> [n]` | Rolls that NPC type's drop table *n* times (default 1000) and logs the totals |
 | `killnpc <uid>` | Kills a visible NPC as the player would: XP, loot bag, quest triggers |
+| `floorgrid x0 z0 x1 z1 [step]` | Ground height down a grid (rays from 300 m), a log line per row: maps floors, pits and walls |
+| `spawnfurniture <itemType> x y z [rot]` | Puts that furniture prefab in the scene as a house would and logs its interactables (try a workbench anywhere) |
 | `setlevel <skillId> <level>` | Raises a skill to that level (Scr_SkillsHandler ids, e.g. 15 Swordsmanship, 24 Healing) |
 | `buffs` | Lists the player's active buffs with their effects, health and mana |
 | `worldnpcs [type...]` | The server's NPCs in this scene (all, or those types), with position and whether quest rules show them |
@@ -72,8 +75,10 @@ This plugin adds these bridge commands through `src/GSOOffline/DevCommands.cs`:
 | `boatprefabs` | The client's player-ship prefabs (`ab_PlayerShip_<n>`): name, seats, speed, crane and interactables |
 | `boatstate` | Whether the player swims or sits in a boat, and every boat object the client has |
 | `sail <seconds> [heading]` | Drives the player's boat forward like holding "move forward" (turning to a compass heading first), so the client's own sync and shore check run as in play |
+| `walkto x z [seconds]` | Faces the point and autoruns toward it (default 5 s), to walk over a zone border as a player would |
 | `ferries` | The server's ferry schedule next to the client's ferry objects, and whether the player is on a deck |
 | `ferryboard <id> [height]` | Drops the player onto a ferry's deck from that height above its origin (default 4 m) |
+| `ferrydock <id> [waypoint]` | Puts the ferry at that stop (default 0, its first) now, docked for at least 30 s: 3 and 5 at the lighthouse, 3 at Yorkhill with waypoint 13, 4 at Bal Sardan |
 | `routecheck` | Where this zone's ferry routes run over land or rocks |
 | `routeplan <name> <margin> <cell> x,z x,z ...` | The shortest water route through the points (6 m clearance), printed as waypoints, with a map in `<game>\GSODevTools\<name>.png` |
 | `watermap x1 z1 x2 z2 [cell]` | A water/land map of that rectangle in `<game>\GSODevTools\watermap.png` (north up) |

@@ -44,6 +44,8 @@ namespace GSOOffline
 
         // the projectile of a bounty outlaw's next blow, if it shoots one (OfflineServer.OutlawAbilities.cs)
         public int blowProjectile;
+
+        public string customName;   // shown instead of the type's name (one of many citizens of a type)
     }
 
     public class HarvestableEntity
@@ -70,6 +72,33 @@ namespace GSOOffline
         private SceneWorld(int sceneId)
         {
             this.sceneId = sceneId;
+        }
+
+        // Deepheart has one citizen type for its whole town, all named "Striva Lightsilver" in NPCInfo (#136); the
+        // original server never named them apart. These names are made up. Each citizen keeps theirs by where they
+        // stand (sorted west to east, then south to north), and the first is Striva.
+        public const int DeepheartCitizen = 328;
+        public const string CitizenTemplateName = "Deepheart citizen";   // the minimap's label (OfflineServer.Difficulty.cs)
+        private static readonly Dictionary<int, string[]> CitizenNames = new Dictionary<int, string[]>
+        {
+            { DeepheartCitizen, new[]
+                {
+                    "Striva Lightsilver", "Edda Marlow", "Tomas Kettleby", "Ingrid Halvorsen", "Brannoc Weir",
+                    "Maren Sletnes", "Oswin Tarrow", "Hilde Brightwater", "Corwin Ashby", "Liesl Harrowgate",
+                    "Fenwick Dorr", "Agnes Thornbury", "Rurik Saltmarsh", "Wendeline Crabbe", "Halvard Pike",
+                    "Elspeth Morrow", "Gideon Fairweather", "Sigrun Tallow", "Percival Nettle", "Ysolde Gray",
+                    "Anselm Brook", "Tova Lindqvist",
+                } },
+        };
+
+        private static void NameCitizens(SceneWorld w)
+        {
+            foreach (var kv in CitizenNames)
+            {
+                var citizens = w.npcs.FindAll(n => n.typeId == kv.Key);
+                citizens.Sort((a, b) => a.spawnPos.x != b.spawnPos.x ? a.spawnPos.x.CompareTo(b.spawnPos.x) : a.spawnPos.z.CompareTo(b.spawnPos.z));
+                for (int c = 0; c < citizens.Count; c++) citizens[c].customName = kv.Value[c % kv.Value.Length];
+            }
         }
 
         public static SceneWorld Build(int sceneId, string unitySceneName)
@@ -99,6 +128,7 @@ namespace GSOOffline
                 int hp = GameData.Npcs.TryGetValue(kv.Key, out var info) ? info.health : 30;
                 w.npcs.Add(new NpcEntity { uid = sceneId * 10000 + i++, typeId = kv.Key, spawnPos = kv.Value, pos = kv.Value, health = hp, maxHealth = hp });
             }
+            NameCitizens(w);
             i = 0;
             foreach (var d in Resources.FindObjectsOfTypeAll<Scr_HarvestableDummy>())
             {
@@ -153,7 +183,7 @@ namespace GSOOffline
                 // uid_type_x,y,z_hp_maxhp_dead_customName_anim  (see Scr_NpcHandler.updateVisibleNpcs)
                 sb.Append(n.uid).Append('_').Append(n.typeId).Append('_').Append(Vec(n.pos)).Append('_')
                   .Append(n.health).Append('_').Append(n.maxHealth).Append('_').Append(n.dead ? 1 : 0)
-                  .Append("__").Append(anim);
+                  .Append('_').Append(n.customName).Append('_').Append(anim);
             }
             return sb.ToString();
         }

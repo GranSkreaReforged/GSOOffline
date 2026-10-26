@@ -301,8 +301,8 @@ namespace GSOOffline
         /// <summary>
         /// The original server's hasRequirementsToEquipItem: gear (type ids below 10000) asks for its item level in
         /// the skill the client's Scr_ItemHandler says it needs (the item tooltip shows the same), or in combat level.
-        /// Null when the item can be worn. The original's title and honor items (bishop's mitre, Yin and Yang...) are
-        /// left out: there are no titles or honor offline.
+        /// Null when the item can be worn. The original's title and honor checks (bishop's mitre, Yin and Yang...) are
+        /// left out: there are no titles or honor offline, so that gear is plain gear (HonorItems.cs).
         /// </summary>
         private string MissingEquipRequirement(int typeId)
         {
@@ -345,8 +345,8 @@ namespace GSOOffline
             it.equipped = true;
             Send(8, 0, character.name, it.id, replaced != null ? replaced.id : 0);
             // A two-handed weapon and the shield slot exclude each other: the other one goes back in the bag.
-            // Gathering tools are two-handed too. A shield a two-handed weapon or tool pushes off comes back with
-            // the next one-handed weapon (RememberOffhand); equipping a shield yourself drops that.
+            // Of the gathering tools only the shovel is. A shield a two-handed weapon or the shovel pushes off comes
+            // back with the next one-handed weapon or tool (RememberOffhand); equipping a shield yourself drops that.
             var hand = t.slot == "Weapon" ? it : EquippedWeapon();
             var offhand = EquippedInSlot("Shield");
             if (t.slot == "Shield") ForgetOffhand();

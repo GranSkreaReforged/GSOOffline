@@ -65,6 +65,8 @@ namespace GSOOffline
             RegisterOysterHandlers();
             RegisterHousingHandlers();
             RegisterBountyHandlers();
+            RegisterAuctionHandlers();
+            RegisterMessageBoardHandlers();
             RegisterItemCombos();
         }
 
@@ -132,6 +134,7 @@ namespace GSOOffline
             TickDeathToll();
             TickCowardMark();
             TickBounties();
+            TickAuction();
             TickHarpoons();
             TickAutoLogin();
         }

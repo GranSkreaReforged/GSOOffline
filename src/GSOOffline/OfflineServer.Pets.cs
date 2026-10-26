@@ -70,6 +70,7 @@ namespace GSOOffline
             petTick -= Time.deltaTime;
             if (petTick > 0f) return;
             petTick = 0.25f;
+            TickMount();
 
             var item = EquippedPet();
             int itemId = item != null ? item.id : 0;
@@ -77,6 +78,11 @@ namespace GSOOffline
                 DismissPet();   // changed, taken off, or left behind in another scene
             petItemId = itemId;
             if (item == null) return;
+            if (Mounted)
+            {
+                HidePetWhileRiding();
+                return;
+            }
 
             if (FlyingPetByItem.TryGetValue(item.typeId, out int flying))
             {

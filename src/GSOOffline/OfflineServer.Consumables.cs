@@ -44,6 +44,10 @@ namespace GSOOffline
             // Stamina: carry too much without slowing down (Weight.cs).
             { 10446, Timed(30, 10f) }, { 10447, Timed(30, 30f) }, { 10448, Timed(30, 60f) },
             { 10483, new Potion { buff = 33, seconds = 15f, effect = new BuffEffect(), gfx = 82, sfx = 66, once = true } },   // Movement speed potion: +5 run speed
+            // Salvation and Despair: 30 minute combat blessings instead of honor and darkness (HonorItems.cs).
+            { ItemPotionOfSalvation, HonorPotion(BuffSalvation, TyphonsBlessing()) },
+            { ItemSmallPotionOfSalvation, HonorPotion(BuffSmallSalvation, SmallSalvation()) },
+            { ItemPotionOfDespair, HonorPotion(BuffDespair, EosFavor()) },
             // Halloween candy and Christmas treats (the original's usePotion). Brown candy and gingerbread cookies are
             // plain food.
             { 10681, new Potion { health = 300, healthTo = 360, line = "... it restores some health." } },   // Red candy
@@ -71,7 +75,7 @@ namespace GSOOffline
         private float nextItemUse;
 
         // Teleport scrolls -> wayshrine (0 = the home wayshrine); the house teleport is in Housing.cs. Scrolls to
-        // places that don't exist offline (guild halls, the auction house) aren't here and stay in the bag.
+        // places that don't exist offline (guild halls) aren't here and stay in the bag.
         private static readonly Dictionary<int, int> TeleportScrolls = new Dictionary<int, int>
         {
             { 10388, 1 },    // Yorkhill Monastery
@@ -89,6 +93,7 @@ namespace GSOOffline
         {
             { 10531, new KeyValuePair<int, Vector3>(13, new Vector3(831f, 12f, 596f)) },   // South Athagos
             { 10538, new KeyValuePair<int, Vector3>(7, new Vector3(469f, 5f, 98f)) },      // Bal Amana
+            { 10472, new KeyValuePair<int, Vector3>(20, new Vector3(868f, 98f, 1141f)) },  // Yorkhill's auction house (#88)
         };
 
         // Experience scrolls (16/3 after the client's skill picker): community wiki amounts; Small isn't recorded.

@@ -105,11 +105,15 @@ src/GSOOffline/
   OfflineServer.Chat.cs        chat and commands
   OfflineServer.Boats.cs       boats and sailing
   OfflineServer.Ferries.cs     ferries (transports) and zone crossings
+  OfflineServer.ZoneBorders.cs walking or sailing over a zone border
   OfflineServer.Oysters.cs     Bal Sardan oyster fishing
   OfflineServer.Housing.cs     houses on plots, furniture
   OfflineServer.Death.cs       Death's toll, death bags
   OfflineServer.Bounties.cs    bounty board, outlaws drawn as players
   OfflineServer.Coward.cs      abandoning bounties, the hunt's hour, Coward's mark
+  OfflineServer.Auction.cs     auction house: traders' buy orders and sell offers
+  OfflineServer.MessageBoard.cs the town message boards: the developer's posts
+  OfflineServer.ArenaHub.cs    the artisans' hall in the Arena pit: skill gate, stations
   FerryRoutePlanner.cs         dev tool: water maps and water-only routes (routeplan, watermap)
   GameData.cs                  XML data loaders
   World.cs                     per-scene entities built from scene markers
@@ -134,9 +138,13 @@ Working:
 - Cart riders (15 silver to the Monastery, Lighthouse, Grimwall or the Farm) and boat rides (Bal Sardan north-south, the Monastery to the Coral beach)
 - Item grades (damaged to mythic): new gear rolls its grade, a grade scales the gear's stats and a weapon's hits, and gear upgrades by using another of the same item, an upgrade stone or a grade stone on it
 - Crafting at workbenches
-- Doors, dungeon entrances and interiors (Yorkhill's shops and houses from the original server's door table)
+- Doors, dungeon entrances and interiors (Yorkhill's shops and houses and Deepheart's houses, from the original server's door table)
+- Zone borders: walking or sailing into the neighbouring zone (Athagos, the Blue Sea, Goldon, Bal Sardan), on the original server's borders
 - Bank, with drag-to-deposit and a Quick deposit button that tops up the bank's existing stacks
 - Bounty board: outlaws drawn and fighting as players, with real gear, waiting in the wild. A hunt lasts an hour of play; giving it up or running out of time earns Coward's mark (less experience for a while)
+- Message boards: the developer's posts (thanks, a special thanks to Lukebox, how the offline server works, where to report bugs); read-only
+- The artisans' hall: the Arena's Team Arena pit as a crafting hub (stations, bank, skill shops), for Blacksmithy, Tailoring, Carpentry and Cooking 20
+- Auction house: traders post buy orders for items you farm, craft or loot (gear by grade) and sell gear and materials, each with its own time limit in playing time
 - Houses: build one on any of the original game's 135 plots with silver and materials, place and pick up furniture (much of it Carpentry crafts), rotate, buy furniture space, demolish; bank chests, teleporters, the Stone of Swiftness, trophies and the house teleport scroll work
 - Combat with the original game's numbers: creature health and damage, 100 health per combat level, each weapon's own hit and attack speed, resistances, defence and block rolls, kill experience (fate brokers let a character learn faster and soften bosses and creatures: less health and lighter blows)
 - Melee/ranged basic attacks, NPC aggro and chasing, death and respawn
@@ -157,6 +165,7 @@ Working:
 - Boss mechanics from the original server: Nirish (webs, poison clouds, his healing spiderling), George (dynamite, focus), Sytrax (flight and fire), Sepitus (bolts, plague, healing bird, lava hounds), Phraustie (snowballs, Snow Apostles), Argus (splits into Argo, and they into Argi), Bruno (slowing blows) and the Coral dungeon's Red crab (explosions)
 - Reconstructed boss mechanics: fog fields, water and psychic explosions, stuns, ground slams and summoned minions (the Supreme Sea Serpent, Zalranaz, the Tomb guardians, Lydia, Jotnar), and Absorb (Zalranaz, the Tomb guardians), which reflects your hits for a few seconds; timings and damage are reconstructions
 - Pets: the pet in the Pet slot walks with you and fights what you fight; the parrot and the bats ride on your shoulder (and the parrot talks with `/parrotsay`)
+- Mounts: click your pony or turbobeetle, or type `/mount`, to ride it (half as fast again); `/dismount`, attacking, gathering, sitting, swimming or dying gets you off
 
 Partially working:
 - Quests. Playable from start to finish: An Honest Day's Work, Flowerful Persuasions, A Deadly Investigation, Into the Depths, In the Eyes of a Child, A Life Experience, An Unfinished Affair, The Abandoned Mine, The Lone Hunter, Growing Pains, A Rat's Tail, Rum-Run, A Cook Book, No True Huntsman, Sightseeing, Lakhmu's basement, A Fishy Request, Powder Monkey, Mantle of St. Jakob, A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild. Each quest NPC appears only in its own phases, ambushes and bosses spawn when the story calls for them, and the quest steps (places, objects, items, kills, chat) are rebuilt in `src/GSOOffline/Data/content.json`, following the original server's code where it has them (A Magical Journey, Commander Grant's Gloves and Joining the Hunters Guild from its last version). Left out: The Breaching Light and Wand of Ke'yars Eketosh, hidden in the game data and never finished by the original server.

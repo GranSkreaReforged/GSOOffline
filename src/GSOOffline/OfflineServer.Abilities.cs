@@ -62,6 +62,9 @@ namespace GSOOffline
         public int dotKind;                // its damage kind
         public bool dotTrue;               // true damage: no resistance
         public int dotGfx;                 // effect on the player with each tick
+        public Dictionary<string, int> stats;   // + gear stats while it lasts (the Salvation and Despair potions)
+        public float hitDamage = 1f;       // x your hits on creatures, as the original's Eos's Favor
+        public float healingTaken = 1f;    // x heals you receive
     }
 
     public partial class OfflineServer
@@ -248,6 +251,7 @@ namespace GSOOffline
             }
             else buffs.Add(b);
             if (source == AbilityFireWisp || source == AbilityFireWisp2) ManaStatsChanged();   // the wisp takes its fire out of your mana (summons do it in Summon)
+            if (b.effect.stats != null) VitalStatsChanged();
             // 4/9: name, buff id, time left and total time in tenths of a second
             int tenths = Mathf.RoundToInt(seconds * 10f);
             b.totalTenths = tenths;
@@ -271,6 +275,7 @@ namespace GSOOffline
                 SendHealth();
             }
             if (source == AbilityFireWisp || source == AbilityFireWisp2 || source == -BuffSkeletalBerserk || source == -BuffSkeleton) ManaStatsChanged();
+            if (b.effect.stats != null) VitalStatsChanged();
             // Energy blade: what it stored goes off around you (10 m), at most 1000 x Swordsmanship.
             if (b.ability == AbilityEnergyBlade && b.absorbed > 0 && expired) ReleaseAbsorbed(Mathf.Min(b.absorbed, SkillLevel(SkillSwords) * 1000));
             Plugin.Log.LogInfo($"[buff] {source} {(expired ? "expired" : "removed")}");
@@ -472,6 +477,7 @@ namespace GSOOffline
 
             // Costs, cooldown and the cast itself
             character.currentMana -= a.manaCost;
+            Dismount("used an ability");
             if (a.manaCost > 0) SendMana();
             float cooldown = rule.kind == AbilityKind.Bandage ? Mathf.Max(a.cooldown, 3f) : a.cooldown;
             slotReadyAt[slot] = Time.time + cooldown;

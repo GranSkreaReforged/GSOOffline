@@ -52,6 +52,7 @@ namespace GSOOffline
                 if (RunBoatCommand(a[0].ToLowerInvariant(), a)) return;
                 if (RunHouseCommand(a[0].ToLowerInvariant(), a)) return;
                 if (RunBountyCommand(a[0].ToLowerInvariant(), a)) return;
+                if (RunAuctionCommand(a[0].ToLowerInvariant(), a)) return;
                 switch (a[0].ToLowerInvariant())
                 {
                     case "help":
@@ -98,6 +99,12 @@ namespace GSOOffline
                         break;
                     case "useportal":   // sent by the client when confirming the snowy portal
                         UsePortal();
+                        break;
+                    case "mount":   // "/mount <n>" (with a space) is the client's own: the model, without the server
+                        ToggleMount();
+                        break;
+                    case "dismount":
+                        Dismount("got off");
                         break;
                     case "parrotsay":
                         ParrotSay(string.Join(" ", a, 1, a.Length - 1));

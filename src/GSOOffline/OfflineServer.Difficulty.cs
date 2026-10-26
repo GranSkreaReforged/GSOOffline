@@ -58,7 +58,11 @@ namespace GSOOffline
             brokersRenamedIn = handler;
             DialogueData.NpcNames[BrokerType] = BrokerName.ToLowerInvariant();
             foreach (var t in handler.npcTemplates)
+            {
                 if (t.npcId == BrokerType) t.npcName = BrokerName;
+                // Each Deepheart citizen gets their own name in the NPC list (World.cs); the template is the minimap's.
+                if (t.npcId == SceneWorld.DeepheartCitizen) t.npcName = SceneWorld.CitizenTemplateName;
+            }
         }
 
         // ---- the sitting --------------------------------------------------------------------
@@ -303,7 +307,7 @@ namespace GSOOffline
             var handler = Scr_DialogueHandler.instance;
             if (handler == null || handler == difficultyAddedTo) return;
             difficultyAddedTo = handler;
-            foreach (var n in DifficultyNodes())
+            foreach (var n in AddedNodes())
             {
                 var c = new Scr_DialogueHandler.Node { noteId = n.id, nodeText = n.text };
                 foreach (var o in n.options) c.options.Add(new Scr_DialogueHandler.Option { optionId = o.id, optionText = o.text });
@@ -313,13 +317,21 @@ namespace GSOOffline
 
         private void AddServerDifficultyNodes()
         {
-            foreach (var n in DifficultyNodes())
+            foreach (var n in AddedNodes())
             {
                 var node = new DialogueNode { id = n.id, text = n.text };
                 foreach (var o in n.options)
                     node.options.Add(new DialogueOption { id = o.id, next = o.next, otherAction = o.action, shownIf = o.shownIf });
                 DialogueData.Nodes[n.id] = node;
             }
+        }
+
+        // Every node the server adds: the brokers' and the ferry Sailors'.
+        private List<AddedNode> AddedNodes()
+        {
+            var nodes = DifficultyNodes();
+            nodes.AddRange(FerryNodes());
+            return nodes;
         }
 
         private class AddedOption

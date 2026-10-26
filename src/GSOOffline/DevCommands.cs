@@ -209,6 +209,16 @@ namespace GSOOffline
         private static void BountyReset(string[] args) => OfflineServer.Instance.DevBountyReset();
         private static void Outlaws(string[] args) => OfflineServer.Instance.DevOutlaws();
 
+        // auction [orders|sales|expire|clear] [n]: list the auction boards, post n more, run the time limits down to a
+        // minute, or empty them. auction order <typeId>: a buy order for one of that item (gear: Unusual or better).
+        private static void Auction(string[] args) =>
+            OfflineServer.Instance.DevAuction(args.Length > 1 ? args[1] : "", args.Length > 2 ? int.Parse(args[2]) : 1);
+
+        // auctionclick <sale|order> <row> [no]: clicks that row of the auction window and answers its question Yes
+        // (or leaves it open with "no").
+        private static void AuctionClick(string[] args) =>
+            AuctionWindow.DevClick(args[1] == "sale", int.Parse(args[2]), args.Length < 4 || args[3] != "no");
+
         // riskinfo: what the risk-zone "?" button does (Menucontroller): the scroll notification with the risk zones
         // text, which RiskZoneInfoPatch turns into the active bounties.
         private static void RiskInfo(string[] args) =>
@@ -299,6 +309,10 @@ namespace GSOOffline
         // ferryboard <id> [height]: drops the player onto a ferry's deck from that height above its origin (default 4 m).
         private static void FerryBoard(string[] args) =>
             OfflineServer.Instance.DevBoardFerry(int.Parse(args[1]), args.Length > 2 ? float.Parse(args[2], System.Globalization.CultureInfo.InvariantCulture) : 4f);
+
+        // ferrydock <id> [waypoint]: the ferry is docked at that stop (default 0, its first) now, for at least 30 s.
+        private static void FerryDock(string[] args) =>
+            OfflineServer.Instance.DevDockFerry(int.Parse(args[1]), args.Length > 2 ? int.Parse(args[2]) : 0);
 
         // door <n>: goes through doors.json entry n exactly as clicking it would (arrival included). "door" alone lists them.
         private static void Door(string[] args)
@@ -456,6 +470,35 @@ namespace GSOOffline
             Plugin.Log.LogInfo($"[dev] runtest {d:0.00} m in {seconds:0.0} s = {d / seconds:0.00} m/s (max {p.characterMovement.movement.maxForwardSpeed:0.00})");
         }
 
+        // dooranchor [typeId]: every door of that type (default 37) with the colliders around its frame other than its
+        // own and the ground. A door with none stands on its own, in no wall.
+        private static void DoorAnchor(string[] args)
+        {
+            int type = args.Length > 1 ? int.Parse(args[1]) : 37;
+            foreach (var i in Scr_Interactable.list)
+            {
+                if (i == null || i.typeId != type) continue;
+                var names = new System.Collections.Generic.List<string>();
+                foreach (var c in UnityEngine.Physics.OverlapSphere(i.transform.position + UnityEngine.Vector3.up * 1.2f, 1.5f))
+                {
+                    if (c.transform.IsChildOf(i.transform) || c.GetType().Name == "TerrainCollider") continue;
+                    if (c.transform.root == Scr_PlayerHandler.instance.player.transform.root) continue;
+                    if (!names.Contains(c.name)) names.Add(c.name);
+                }
+                Plugin.Log.LogInfo($"[dev] door '{i.name}' at {i.transform.position}: {(names.Count == 0 ? "FREESTANDING" : string.Join(", ", names.ToArray()))}");
+            }
+        }
+
+        // walkto x z [seconds]: faces the point and autoruns toward it (default 5 s), to walk over a zone border.
+        private static void WalkTo(string[] args)
+        {
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            var p = Scr_PlayerHandler.instance.player;
+            var target = new UnityEngine.Vector3(float.Parse(args[1], inv), p.transform.position.y, float.Parse(args[2], inv));
+            p.transform.rotation = UnityEngine.Quaternion.LookRotation(target - p.transform.position);
+            OfflineServer.Instance.StartCoroutine(RunTestRoutine(args.Length > 3 ? float.Parse(args[3], inv) : 5f));
+        }
+
         // die: kills the player as a fatal hit would (wakes at the home wayshrine after the respawn delay).
         private static void Die(string[] args)
         {
@@ -474,6 +517,36 @@ namespace GSOOffline
         // workbench: the crafting window the client shows (0 = none) and whether a craft is in progress.
         private static void Workbench(string[] args) =>
             Plugin.Log.LogInfo($"[dev] workbench {Menucontroller.instance.showWorkbench} crafting={Menucontroller.instance.craftingInProgress}");
+
+        // floorgrid x0 z0 x1 z1 [step]: the ground height down a grid (a ray from 300 m), one log line per row of z,
+        // to map a floor's levels and edges. "-" = nothing hit.
+        private static void FloorGrid(string[] args)
+        {
+            float x0 = float.Parse(args[1]), z0 = float.Parse(args[2]), x1 = float.Parse(args[3]), z1 = float.Parse(args[4]);
+            float step = args.Length > 5 ? float.Parse(args[5]) : 10f;
+            for (float z = z0; z <= z1; z += step)
+            {
+                var row = new System.Text.StringBuilder();
+                for (float x = x0; x <= x1; x += step)
+                    row.Append(UnityEngine.Physics.Raycast(new UnityEngine.Vector3(x, 300f, z), UnityEngine.Vector3.down, out var hit, 400f)
+                        ? hit.point.y.ToString("F1") : "-").Append(' ');
+                Plugin.Log.LogInfo($"[dev] floor z={z:F0} x={x0:F0}..{x1:F0}: {row}");
+            }
+        }
+
+        // spawnfurniture <itemType> x y z [rot]: puts a furniture prefab (ab_furniture_<type>) in the scene as a house would,
+        // and logs its interactables.
+        private static void SpawnFurniture(string[] args)
+        {
+            int type = int.Parse(args[1]);
+            var prefab = UnityEngine.Resources.Load("1LoadingAssets/Furniture/ab_furniture_" + type, typeof(UnityEngine.GameObject));
+            if (prefab == null) { Plugin.Log.LogInfo($"[dev] no furniture prefab {type}"); return; }
+            var go = UnityEngine.Object.Instantiate(prefab) as UnityEngine.GameObject;
+            go.transform.position = new UnityEngine.Vector3(float.Parse(args[2]), float.Parse(args[3]), float.Parse(args[4]));
+            go.transform.rotation = UnityEngine.Quaternion.Euler(0f, args.Length > 5 ? float.Parse(args[5]) : 0f, 0f);
+            foreach (var i in go.GetComponentsInChildren<Scr_Interactable>(true))
+                Plugin.Log.LogInfo($"[dev] furniture {type} '{go.name}' interactable {i.typeId} '{i.interactableName}' at {i.transform.position}");
+        }
 
         // closewindows: closes every open window (the login's Active bounties hides the view in screenshots).
         private static void CloseWindows(string[] args) => Script_WindowController.instance.closeAllWindows();
@@ -702,11 +775,12 @@ namespace GSOOffline
         }
 
         // iteminfo <typeId> [basic]: the bag item's info window, as right-clicking it does; with "basic", the
-        // shop/recipe info window for that item type instead.
+        // shop/recipe info window for that item type instead. Logs the item's text (the client's template) too.
         private static void ItemInfo(string[] args)
         {
             int type = int.Parse(args[1]);
             var wc = Script_WindowController.instance;
+            Plugin.Log.LogInfo($"[dev] item {type} text: '{Scr_ItemHandler.instance.GetItemTemplate(type)?.itemDescription}'");
             if (args.Length > 2 && args[2] == "basic") { wc.createBasicItemInfo(Scr_ItemHandler.instance.GetItemTemplate(type)); return; }
             var stack = Inventory.instance.items.Find(s => s.item != null && s.item.itemTypeID == type);
             if (stack == null) { Plugin.Log.LogInfo($"[dev] no item of type {type} in the bag"); return; }

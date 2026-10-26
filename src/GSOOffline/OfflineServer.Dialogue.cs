@@ -35,6 +35,7 @@ namespace GSOOffline
                 Notice("That's too far away.", "gray");
                 return;
             }
+            if (MountInteract(npc)) return;       // your own pony or turbobeetle: ride it
             if (ResumeSightseeing(npc)) return;
             if (LakhmuInteractNpc(npc)) return;
             if (CleanserInteract(npc)) return;   // John Brech lifts Death's toll
@@ -43,7 +44,7 @@ namespace GSOOffline
             EndDifficultyTalk();
             Send(3, 10, character.name, uid);
 
-            int node = PickEntryNode(npc.typeId);
+            int node = FerrySailorNode(npc, PickEntryNode(npc.typeId));
             if (node > 0)
                 EnterNode(node);
             else if (ShopkeepersWithoutDialogue.TryGetValue(npc.typeId, out int shop))
@@ -103,7 +104,7 @@ namespace GSOOffline
 
         private void EnterNode(int id)
         {
-            AddDifficultyDialogue();   // the fate brokers' nodes, before the lookup
+            AddDifficultyDialogue();   // the server's own nodes (fate brokers, ferry Sailors), before the lookup
             if (!DialogueData.Nodes.TryGetValue(id, out var n))
             {
                 CloseDialogue();
@@ -139,6 +140,8 @@ namespace GSOOffline
             if (nodeId == HarpyGossipNode) return HarpyGossip();
             var fate = DifficultyNodeVar(nodeId);   // the fate brokers' (and their hold on the player)
             if (fate != null) return fate;
+            var ferry = FerryNodeVar(nodeId);   // the ferry Sailors' timetable
+            if (ferry != null) return ferry;
             return character.name;
         }
 

@@ -37,6 +37,7 @@ namespace GSOOffline
             pendingSpawn = null;
             arrivalDeadline = -1f;
             pendingSpawnNeedsClearing = false;
+            borderArrival = false;
             pendingCrossing = null;
             ResetOysters();
             ResetLakhmusBasement();
@@ -83,7 +84,7 @@ namespace GSOOffline
 
         private Scr_Player LocalPlayer => Scr_PlayerHandler.instance != null ? Scr_PlayerHandler.instance.player : null;
 
-        private void ChangeScene(int sceneId, Vector3 spawn)
+        private void ChangeScene(int sceneId, Vector3 spawn, bool keepBoat = false)
         {
             if (character == null) return;
             bool known = false;
@@ -95,7 +96,7 @@ namespace GSOOffline
                 sceneId = StartScene;
                 spawn = StartPos;
             }
-            StowBoat("zone change");
+            if (!keepBoat) StowBoat("zone change");   // sailing over a zone border keeps it (ZoneBorders.cs)
             ResetWorldState();
             pendingSpawn = spawn;
             character.scene = sceneId;
@@ -146,6 +147,9 @@ namespace GSOOffline
             AddHarpyToWorld();
             SyncBountyActors();
             LoadFerries(current.id);
+            HideStrayDoors(current.id);
+            HideFerryProps(current.id);
+            SetUpArenaHub(current.id);
 
             // Door arrivals wait (behind the loading screen) until the floor at the door exists; see Arrival.cs.
             if (pendingSpawnNeedsClearing && pendingSpawn.HasValue)
@@ -206,6 +210,7 @@ namespace GSOOffline
             SendGearStats();
             SendDeathToll();
             SendCowardMark();
+            RegisterHonorItems();
             RefreshAlignment(true);
             ResendBuffIcons();
             UpdateWhiskerSickness(QuestRatsTail);
@@ -237,6 +242,7 @@ namespace GSOOffline
             }
 
             if (!sceneReady || world == null) return;
+            if (TickZoneBorders()) return;   // zone change: this world is gone
             TickQuestTriggers();
             visibilityTimer -= Time.deltaTime;
             if (visibilityTimer > 0f) return;
@@ -335,10 +341,13 @@ namespace GSOOffline
             if (character == null) return;
             int typeId = (int)c[2];
             if (HandleBountyBoard(typeId)) return;   // a wanted board
+            if (HandleAuctionInteract(typeId)) return;   // the auction stand and the silver booth
+            if (HandleMessageBoard(typeId)) return;      // the town message boards
             if (HandleSewerInteract(typeId)) return;     // the sewers' pillar
             if (HandlePoacherInteract(typeId)) return;   // the Poacher dungeon's doors, chests, vault and dynamite crate
             if (HandleUlanInteract(typeId)) return;     // Ulan's dungeon: the gate, its key, the levers, the deep door
             if (HandleLakhmuInteract(typeId)) return;   // the hatch, Alorus's barrels, the ladder out of the dungeon
+            if (HandleArenaHubInteract(typeId)) return;  // the Arena's sign-up boards: the artisans' hall
             if (HandleTravelInteract(typeId)) return;
             if (HandleItemObjectInteract(typeId)) return;   // Kombra's book, the Argi blueprint chest
             if (HandleFurnitureInteract(typeId)) return;    // house doors and furniture

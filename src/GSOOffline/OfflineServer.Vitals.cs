@@ -16,7 +16,7 @@ namespace GSOOffline
                 foreach (var s in it.stats)
                     if (s.key == "Health") max += Graded(it, s.value);
             }
-            return Mathf.Max(1, max + BonusHealth());
+            return Mathf.Max(1, max + BuffStat("Health") + BonusHealth());
         }
 
         // StatType 36: the client's bonus health (gear and Survivor) on top of the base stat. The client caps health at
@@ -69,6 +69,15 @@ namespace GSOOffline
                 if (it.equipped)
                     foreach (var s in it.stats)
                         if (s.key == key) sum += Graded(it, s.value);
+            return sum + BuffStat(key);
+        }
+
+        // What buffs add to a gear stat (BuffEffect.stats), counted as if worn.
+        private int BuffStat(string key)
+        {
+            int sum = 0;
+            foreach (var b in buffs)
+                if (b.effect.stats != null && b.effect.stats.TryGetValue(key, out int v)) sum += v;
             return sum;
         }
 
@@ -141,7 +150,7 @@ namespace GSOOffline
         public void Heal(int amount, bool regen = false)
         {
             if (character == null) return;
-            if (!regen) amount = (int)(amount * NaturesBlessingHealing());
+            if (!regen) amount = (int)(amount * NaturesBlessingHealing() * BuffProduct(e => e.healingTaken));
             // Sepitus's plague, in his dungeon: a real heal (over 2% of your health) burns you for 2-3 times as much.
             if (!regen && character.scene == ScenePoacher && amount > MaxHealth() * 0.02f && buffs.Exists(b => b.effect.plague))
             {
