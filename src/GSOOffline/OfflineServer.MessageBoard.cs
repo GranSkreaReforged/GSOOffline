@@ -33,10 +33,10 @@ namespace GSOOffline
                 "Welcome back to Gran Skrea! The official servers are gone, but the world lives on. This mod is a free, " +
                 "non-commercial fan project to keep the game playable for everyone who owns it. Thank you for playing, " +
                 "and for keeping Gran Skrea alive. See you out there!"),
-            new BoardMessage("A special thanks to Lukebox",
-                "None of this would exist without Lukebox, the original developer of Gran Skrea Online. Thank you for " +
-                "creating this world, its towns, quests and creatures, and for the years of work you poured into it. " +
-                "This mod is a love letter to your game. Thank you, Lukebox!"),
+            new BoardMessage("Thanks to Lukebox and friends",
+                "Thank you, Lukebox, the original developer, for creating Gran Skrea Online. Thanks also to Destiny, " +
+                "Necrogizer, Herox, Ray_ark, PHyzza, Theo, and Chad & the New Light Audio team. And to everyone else " +
+                "who contributed, and every player who explored this world with us: thank you!"),
             new BoardMessage("About the offline server",
                 "The server now runs inside your game, and your characters are saved in OfflineSaves in the game folder. " +
                 "Some systems had to be rebuilt from scratch, so a few things may differ from the original. Type /help " +
@@ -45,6 +45,10 @@ namespace GSOOffline
                 "Found a bug or have an idea? Use \"Report a bug or give feedback\" in the menu, or open an issue at " +
                 "github.com/GranSkreaReforged/GSOOffline. When a new version is out, the top-left corner says so. " +
                 "Happy adventuring!"),
+            new BoardMessage("Star us and follow along",
+                "Enjoying the mod? Star GSOOffline on GitHub at github.com/GranSkreaReforged/GSOOffline, it helps other " +
+                "players find it. Follow the developer, @asbedb, on Bluesky or GitHub for news, updates and what comes " +
+                "next."),
         };
 
         private void RegisterMessageBoardHandlers()
