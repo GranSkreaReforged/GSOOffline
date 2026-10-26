@@ -4,6 +4,8 @@ All notable changes are documented here. Format: [Keep a Changelog](https://keep
 `release.ps1` turns the Unreleased heading into a version heading.
 
 ## [Unreleased]
+
+## [2.0.0] - 2026-10-26
 ### Added
 - The artisans' hall (#84): the Arena's Team Arena pit is a processing hub for skilled crafters. With Blacksmithy, Tailoring, Carpentry and Cooking all at level 20, click the Sign-up board on the walkway (take the Arena wayshrine or an Arena teleport) to climb down; otherwise it says which skills fall short. Down there are a forge and an anvil, a saw and a carpenters' workbench, a spinning wheel, a loom and a tailors' workbench, a stove for baking, a banker, and their shopkeepers from the towns: the Heavy armor vendor and Weapon merchant, the Bow vendor and Furniture merchant, the Light armor and Robe vendors, and the Food vendor, Baker and fishmonger. The board against the hall's north wall takes you back up.
 - The message boards in town open again, with a few posts from the developer: a thank you for playing, thanks to Lukebox, the original developer of Gran Skrea Online, and everyone who helped and played, how the offline server works, where to report bugs, and where to star the project and follow its developer. The board opens on the first post. It's read-only: with no other players, "+ New message" says so in chat instead of posting.
